@@ -8,15 +8,7 @@
 
 class APlayerController;
 
-//--------------------------------------------------------------------------------------------------------------------------
-USTRUCT()
-struct FCogEngineReplicatorSpawnAction
-{
-    GENERATED_USTRUCT_BODY()
-
-    bool Control = false;
-    bool Select = false;
-};
+using FCogEnineSpawnFunction = TFunction<void(const FCogEngineSpawnEntry& SpawnEntry)>;
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(NotBlueprintable, NotBlueprintType, notplaceable, noteditinlinenew, hidedropdown, Transient)
@@ -31,22 +23,22 @@ public:
 
     APlayerController* GetPlayerController() const { return OwnerPlayerController.Get(); }
 
-    bool IsLocal() const { return bIsLocal; }
+    FCogEnineSpawnFunction GetSpawnFunction() const { return SpawnFunction; }
+
+    void SetSpawnFunction(FCogEnineSpawnFunction Value) { SpawnFunction = Value; }
+
+    UFUNCTION(Server, Reliable)
+    void Server_Spawn(const FCogEngineSpawnEntry& SpawnEntry);
+
+    float GetTimeDilation() const { return TimeDilation; }
 
     UFUNCTION(Server, Reliable)
     void Server_SetTimeDilation(float Value);
 
-    float GetTimeDilation() const { return TimeDilation; }
-
 protected:
-
-    void TickSpawnActions();
 
     UFUNCTION()
     void OnRep_TimeDilation();
-
-    UPROPERTY()
-    TArray<FCogEngineReplicatorSpawnAction> SpawnActions;
 
     TObjectPtr<APlayerController> OwnerPlayerController;
 
@@ -54,7 +46,9 @@ protected:
     uint32 bIsLocal : 1;
 
 private:
+
     UPROPERTY(ReplicatedUsing = OnRep_TimeDilation)
     float TimeDilation = 1.0f;
 
+    FCogEnineSpawnFunction SpawnFunction;
 };

@@ -126,11 +126,11 @@ static void DrawRow(const char* Title, float MitigatedValue, float UnmitigatedVa
 //--------------------------------------------------------------------------------------------------------------------------
 static void DrawDamages(FCogDamageStats& Damage)
 {
-    ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(150, 150, 150, 60));
-    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered, IM_COL32(150, 150, 150, 80));
-    ImGui::PushStyleColor(ImGuiCol_FrameBgActive, IM_COL32(150, 150, 150, 120));
-    ImGui::PushStyleColor(ImGuiCol_CheckMark, IM_COL32(150, 150, 150, 200));
-    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, IM_COL32(120, 120, 120, 255));
+    ImGui::PushStyleColor(ImGuiCol_FrameBg,         IM_COL32(150, 150, 150, 60));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered,  IM_COL32(150, 150, 150, 80));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgActive,   IM_COL32(150, 150, 150, 120));
+    ImGui::PushStyleColor(ImGuiCol_CheckMark,       IM_COL32(150, 150, 150, 200));
+    ImGui::PushStyleColor(ImGuiCol_PlotHistogram,   IM_COL32(120, 120, 120, 255));
 
     if (ImGui::BeginTable("Damages", 4, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize | ImGuiTableFlags_RowBg))
     {

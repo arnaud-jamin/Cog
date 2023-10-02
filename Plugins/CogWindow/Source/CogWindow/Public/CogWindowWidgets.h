@@ -30,4 +30,8 @@ public:
     static float TextBaseHeight;
 
     static void MenuSearchBar(ImGuiTextFilter& Filter);
+
+    static void PushBackColor(const ImVec4& Color);
+
+    static void PopBackColor();
 };

@@ -37,7 +37,7 @@ void FCogImguiModule::Initialize()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-TSharedPtr<SCogImguiWidget> FCogImguiModule::CreateImGuiViewport(UGameViewportClient* GameViewport, FCogImguiRender Render, ImFontAtlas* FontAtlas /*= nullptr*/)
+TSharedPtr<SCogImguiWidget> FCogImguiModule::CreateImGuiViewport(UGameViewportClient* GameViewport, FCogImguiRenderFunction Render, ImFontAtlas* FontAtlas /*= nullptr*/)
 {
     if (bIsInitialized == false)
     {

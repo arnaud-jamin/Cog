@@ -25,6 +25,7 @@
 #include "CogDebugDefines.h"
 #include "CogDebugPlot.h"
 #include "CogEngineDataAsset_Collisions.h"
+#include "CogEngineDataAsset_Spawns.h"
 #include "CogEngineModule.h"
 #include "CogEngineWindow_Collisions.h"
 #include "CogEngineWindow_DebugSettings.h"
@@ -36,6 +37,7 @@
 #include "CogEngineWindow_Scalability.h"
 #include "CogEngineWindow_Selection.h"
 #include "CogEngineWindow_Skeleton.h"
+#include "CogEngineWindow_Spawn.h"
 #include "CogEngineWindow_Stats.h"
 #include "CogEngineWindow_Time.h"
 #include "CogImguiModule.h"
@@ -143,20 +145,30 @@ void ACogSampleGameState::InitializeCog()
     //---------------------------------------
     // Engine
     //---------------------------------------
-    CogWindowManager->CreateWindow<UCogEngineWindow_DebugSettings>("Engine.Debug Settings");
-    CogWindowManager->CreateWindow<UCogEngineWindow_ImGui>("Engine.ImGui");
-    CogWindowManager->CreateWindow<UCogEngineWindow_LogCategories>("Engine.Log Categories");
-    CogWindowManager->CreateWindow<UCogEngineWindow_NetEmulation>("Engine.Net Emulation");
-    CogWindowManager->CreateWindow<UCogEngineWindow_OutputLog>("Engine.Output Log");
-    CogWindowManager->CreateWindow<UCogEngineWindow_Plots>("Engine.Plots");
-    CogWindowManager->CreateWindow<UCogEngineWindow_Scalability>("Engine.Scalability");
-    CogWindowManager->CreateWindow<UCogEngineWindow_Skeleton>("Engine.Skeleton");
-    CogWindowManager->CreateWindow<UCogEngineWindow_Time>("Engine.Time");
-    UCogEngineWindow_Stats* StatsWindow = CogWindowManager->CreateWindow<UCogEngineWindow_Stats>("Engine.Stats");
+    UCogEngineWindow_Collisions* CollisionsWindow = CogWindowManager->CreateWindow<UCogEngineWindow_Collisions>("Engine.Collision");
+    CollisionsWindow->SetCollisionsAsset(GetFirstAssetByClass<UCogEngineDataAsset_Collisions>());
 
-    //---------------------------------------
-    // Selection
-    //---------------------------------------
+    CogWindowManager->CreateWindow<UCogEngineWindow_DebugSettings>("Engine.Debug Settings");
+
+    CogWindowManager->CreateWindow<UCogEngineWindow_ImGui>("Engine.ImGui");
+
+    CogWindowManager->CreateWindow<UCogEngineWindow_LogCategories>("Engine.Log Categories");
+
+    CogWindowManager->CreateWindow<UCogEngineWindow_NetEmulation>("Engine.Net Emulation");
+
+    CogWindowManager->CreateWindow<UCogEngineWindow_OutputLog>("Engine.Output Log");
+
+    CogWindowManager->CreateWindow<UCogEngineWindow_Plots>("Engine.Plots");
+
+    CogWindowManager->CreateWindow<UCogEngineWindow_Scalability>("Engine.Scalability");
+
+    CogWindowManager->CreateWindow<UCogEngineWindow_Skeleton>("Engine.Skeleton");
+
+    UCogEngineWindow_Spawn* SpawnWindow =CogWindowManager->CreateWindow<UCogEngineWindow_Spawn>("Engine.Spawn");
+    SpawnWindow->SetSpawnsAsset(GetFirstAssetByClass<UCogEngineDataAsset_Spawns>());
+
+    CogWindowManager->CreateWindow<UCogEngineWindow_Time>("Engine.Time");
+
     UCogEngineWindow_Selection* SelectionWindow = CogWindowManager->CreateWindow<UCogEngineWindow_Selection>("Engine.Selection");
     TArray<TSubclassOf<AActor>> SubClasses
     {
@@ -169,23 +181,7 @@ void ACogSampleGameState::InitializeCog()
     SelectionWindow->SetCurrentActorSubClass(ACharacter::StaticClass());
     SelectionWindow->SetTraceType(UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Pawn));
 
-    //---------------------------------------
-    // Collision
-    //---------------------------------------
-    UCogEngineWindow_Collisions* CollisionsWindow = CogWindowManager->CreateWindow<UCogEngineWindow_Collisions>("Engine.Collision");
-    CollisionsWindow->SetCollisionsAsset(GetFirstAssetByClass<UCogEngineDataAsset_Collisions>());
-
-    //---------------------------------------
-    // Attributes
-    //---------------------------------------
-    CogWindowManager->CreateWindow<UCogAbilityWindow_Attributes>("Gameplay.Attributes");
-
-    //---------------------------------------
-    // Effects
-    //---------------------------------------
-    UCogAbilityWindow_Effects* EffectsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Effects>("Gameplay.Effects");
-    EffectsWindow->NegativeEffectTag = Tag_Effect_Alignment_Negative;
-    EffectsWindow->PositiveEffectTag = Tag_Effect_Alignment_Positive;
+    UCogEngineWindow_Stats* StatsWindow = CogWindowManager->CreateWindow<UCogEngineWindow_Stats>("Engine.Stats");
 
     //---------------------------------------
     // Abilities
@@ -193,43 +189,31 @@ void ACogSampleGameState::InitializeCog()
     UCogAbilityWindow_Abilities* AbilitiesWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Abilities>("Gameplay.Abilities");
     AbilitiesWindow->AbilitiesAsset = GetFirstAssetByClass<UCogAbilityDataAsset_Abilities>();
 
-    //---------------------------------------
-    // Cheats
-    //---------------------------------------
+    CogWindowManager->CreateWindow<UCogAbilityWindow_Attributes>("Gameplay.Attributes");
+
     UCogAbilityWindow_Cheats* CheatsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Cheats>("Gameplay.Cheats");
     CheatsWindow->CheatsAsset = GetFirstAssetByClass<UCogAbilityDataAsset_Cheats>();
-    
-    //---------------------------------------
-    // Tweaks
-    //---------------------------------------
-    UCogAbilityWindow_Tweaks* TweaksWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Tweaks>("Gameplay.Tweaks");
-    TweaksWindow->TweaksAsset = GetFirstAssetByClass<UCogAbilityDataAsset_Tweaks>();
-    
-    //---------------------------------------
-    // Damages
-    //---------------------------------------
+
     CogWindowManager->CreateWindow<UCogAbilityWindow_Damages>("Gameplay.Damages");
 
-    //---------------------------------------
-    // Tags
-    //---------------------------------------
-    UCogAbilityWindow_Tags* TagsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Tags>("Gameplay.Tags");
+    UCogAbilityWindow_Effects* EffectsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Effects>("Gameplay.Effects");
+    EffectsWindow->NegativeEffectTag = Tag_Effect_Alignment_Negative;
+    EffectsWindow->PositiveEffectTag = Tag_Effect_Alignment_Positive;
 
-    //---------------------------------------
-    // Pools
-    //---------------------------------------
     UCogAbilityWindow_Pools* PoolsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Pools>("Gameplay.Pools");
     PoolsWindow->PoolsAsset = GetFirstAssetByClass<UCogAbilityDataAsset_Pools>();
 
+    CogWindowManager->CreateWindow<UCogAbilityWindow_Tags>("Gameplay.Tags");
+
+    UCogAbilityWindow_Tweaks* TweaksWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Tweaks>("Gameplay.Tweaks");
+    TweaksWindow->TweaksAsset = GetFirstAssetByClass<UCogAbilityDataAsset_Tweaks>();
+
     //---------------------------------------
-    // Input Actions
+    // Input
     //---------------------------------------
     UCogInputWindow_Actions* ActionsWindow = CogWindowManager->CreateWindow<UCogInputWindow_Actions>("Input.Actions");
     ActionsWindow->ActionsAsset = GetFirstAssetByClass<UCogInputDataAsset_Actions>();
 
-    //---------------------------------------
-    // Gamepad
-    //---------------------------------------
     UCogInputWindow_Gamepad* GamepadWindow = CogWindowManager->CreateWindow<UCogInputWindow_Gamepad>("Input.Gamepad");
     GamepadWindow->ActionsAsset = GetFirstAssetByClass<UCogInputDataAsset_Actions>();
 

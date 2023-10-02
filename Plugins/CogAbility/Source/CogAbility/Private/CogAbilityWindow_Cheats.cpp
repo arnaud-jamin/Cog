@@ -3,6 +3,7 @@
 #include "CogAbilityDataAsset_Cheats.h"
 #include "CogDebugAllegianceInterface.h"
 #include "CogDebugDraw.h"
+#include "CogImguiHelper.h"
 #include "EngineUtils.h"
 #include "GameFramework/Character.h"
 #include "imgui.h"
@@ -86,13 +87,7 @@ void UCogAbilityWindow_Cheats::AddCheat(AActor* CheatInstigator, AActor* Selecte
         Color = CheatsAsset->NeutralEffectColor;
     }
         
-    ImGui::PushStyleColor(ImGuiCol_FrameBg,             ImVec4(Color.R, Color.G, Color.B, 0.2f * Color.A));
-    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered,      ImVec4(Color.R, Color.G, Color.B, 0.3f * Color.A));
-    ImGui::PushStyleColor(ImGuiCol_FrameBgActive,       ImVec4(Color.R, Color.G, Color.B, 0.5f * Color.A));
-    ImGui::PushStyleColor(ImGuiCol_CheckMark,           ImVec4(Color.R, Color.G, Color.B, 0.8f * Color.A));
-    ImGui::PushStyleColor(ImGuiCol_Button,              ImVec4(Color.R, Color.G, Color.B, 0.2f * Color.A));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered,       ImVec4(Color.R, Color.G, Color.B, 0.3f * Color.A));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive,        ImVec4(Color.R, Color.G, Color.B, 0.5f * Color.A));
+    FCogWindowWidgets::PushBackColor(FCogImguiHelper::ToImVec4(Color));
 
     if (IsPersistent)
     {
@@ -124,7 +119,7 @@ void UCogAbilityWindow_Cheats::AddCheat(AActor* CheatInstigator, AActor* Selecte
         ImGui::EndTooltip();
     }
 
-    ImGui::PopStyleColor(7);
+    FCogWindowWidgets::PopBackColor();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -266,6 +266,15 @@ void UCogWindowManager::DrawMainMenu()
             }
             FCogWindowWidgets::PopStyleCompact();
 
+            if (ImGui::IsItemHovered())
+            {
+                ImGui::BeginTooltip();
+                ImGui::TextUnformatted("Change DPi Scale [Mouse Wheel]");
+                ImGui::TextUnformatted("Reset DPi Scale  [Middle Mouse]");
+                ImGui::EndTooltip();
+            }
+
+
             ImGui::EndMenu();
         }
 

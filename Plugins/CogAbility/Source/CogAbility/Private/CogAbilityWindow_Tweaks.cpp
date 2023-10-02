@@ -22,20 +22,12 @@ void DrawTweak(ACogAbilityReplicator* Replicator, const UCogAbilityDataAsset_Twe
     }
 
     const FCogAbilityTweakCategory& Category = TweaksAsset->TweaksCategories[TweakCategoryIndex];
-    const FLinearColor& Color = Category.Color;
 
-    ImGui::PushStyleColor(ImGuiCol_FrameBg,             ImVec4(Color.R, Color.G, Color.B, Color.A * 0.25f));
-    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered,      ImVec4(Color.R, Color.G, Color.B, Color.A * 0.3f));
-    ImGui::PushStyleColor(ImGuiCol_FrameBgActive,       ImVec4(Color.R, Color.G, Color.B, Color.A * 0.5f));
-    ImGui::PushStyleColor(ImGuiCol_SliderGrab,          ImVec4(Color.R, Color.G, Color.B, Color.A * 0.8f));
-    ImGui::PushStyleColor(ImGuiCol_SliderGrabActive,    ImVec4(Color.R, Color.G, Color.B, Color.A * 1.0f));
-
-    
+    FCogWindowWidgets::PushBackColor(FCogImguiHelper::ToImVec4(Category.Color));
     ImGui::PushItemWidth(-1);
     ImGui::SliderFloat("##Value", Value, TweaksAsset->TweakMinValue, TweaksAsset->TweakMaxValue, "%+0.0f%%", 1.0f);
     ImGui::PopItemWidth();
-
-    ImGui::PopStyleColor(5);
+    FCogWindowWidgets::PopBackColor();
 
     bool bUpdateValue = ImGui::IsItemDeactivatedAfterEdit();
 

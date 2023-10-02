@@ -22,12 +22,6 @@ ACogEngineReplicator::ACogEngineReplicator(const FObjectInitializer& ObjectIniti
 {
 #if !UE_BUILD_SHIPPING
 
-    PrimaryActorTick.bCanEverTick = true;
-    PrimaryActorTick.bAllowTickOnDedicatedServer = true;
-    PrimaryActorTick.bTickEvenWhenPaused = true;
-    PrimaryActorTick.bStartWithTickEnabled = true;
-    PrimaryActorTick.TickGroup = TG_PrePhysics;
-
     bHasAuthority = false;
     bIsLocal = false;
     bReplicates = true;
@@ -65,26 +59,42 @@ void ACogEngineReplicator::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+#if !UE_BUILD_SHIPPING
+
     FDoRepLifetimeParams Params;
     Params.bIsPushBased = true;
-
     DOREPLIFETIME_WITH_PARAMS_FAST(ACogEngineReplicator, TimeDilation, Params);
+
+#endif // !UE_BUILD_SHIPPING
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogEngineReplicator::TickSpawnActions()
+void ACogEngineReplicator::Server_Spawn_Implementation(const FCogEngineSpawnEntry& SpawnEntry)
 {
 #if !UE_BUILD_SHIPPING
 
-    if (OwnerPlayerController == nullptr)
+    if (GetWorld() == nullptr)
     {
         return;
     }
 
-    for (int32 i = SpawnActions.Num() - 1; i >= 0; --i)
+    if (SpawnFunction)
     {
-        const FCogEngineReplicatorSpawnAction& SpawnInfo = SpawnActions[i];
-        SpawnActions.RemoveAt(i);
+        SpawnFunction(SpawnEntry);
+    }
+    else
+    {
+        FTransform Transform(FTransform::Identity);
+        if (APawn* Pawn = GetPlayerController()->GetPawn())
+        {
+            Transform = Pawn->GetTransform();
+            Transform.SetLocation(Transform.GetLocation() + Transform.GetUnitAxis(EAxis::X) * 200.0f);
+            Transform.SetScale3D(FVector(1.0f));
+        }
+
+        FActorSpawnParameters Params;
+        Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+        GetWorld()->SpawnActor(SpawnEntry.Class, &Transform, Params);
     }
 
 #endif // !UE_BUILD_SHIPPING
@@ -118,3 +128,4 @@ void ACogEngineReplicator::OnRep_TimeDilation()
 
 #endif // !UE_BUILD_SHIPPING
 }
+

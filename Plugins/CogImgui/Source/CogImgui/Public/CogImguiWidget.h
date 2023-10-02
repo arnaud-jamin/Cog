@@ -13,7 +13,7 @@ struct ImFontAtlas;
 struct ImGuiContext;
 struct ImPlotContext;
 
-using FCogImguiRender = TFunction<void(float DeltaTime)>;
+using FCogImguiRenderFunction = TFunction<void(float DeltaTime)>;
 
 //--------------------------------------------------------------------------------------------------------------------------
 class COGIMGUI_API SCogImguiWidget : public SCompoundWidget
@@ -25,7 +25,7 @@ public:
     SLATE_BEGIN_ARGS(SCogImguiWidget) {}
     SLATE_ARGUMENT(UGameViewportClient*, GameViewport)
     SLATE_ARGUMENT(ImFontAtlas*, FontAtlas)
-    SLATE_ARGUMENT(FCogImguiRender, Render)
+    SLATE_ARGUMENT(FCogImguiRenderFunction, Render)
     SLATE_END_ARGS()
 
     void Construct(const FArguments& InArgs);
@@ -103,7 +103,7 @@ protected:
 
     ImPlotContext* ImPlotContext = nullptr;
 
-    FCogImguiRender Render;
+    FCogImguiRenderFunction Render;
 
     float DpiScale = 1.f;
 

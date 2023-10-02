@@ -22,17 +22,19 @@ protected:
 
     virtual void RenderContent() override;
 
-    virtual void DrawEffectRow(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffectHandle& ActiveHandle, int32 Index, int32& Selected);
+    virtual void RenderEffectsTable();
 
-    virtual void DrawEffectInfo(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffect& ActiveEffect, const UGameplayEffect& Effect);
+    virtual void RenderEffectRow(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffectHandle& ActiveHandle, int32 Index, int32& Selected);
+
+    virtual void RenderEffectInfo(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffect& ActiveEffect, const UGameplayEffect& Effect);
     
-    virtual void DrawTagContainer(const FGameplayTagContainer& Container);
+    virtual void RenderTagContainer(const FGameplayTagContainer& Container);
+
+    virtual void RenderRemainingTime(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffect& ActiveEffect);
+
+    virtual void RenderStacks(const FActiveGameplayEffect& ActiveEffect, const UGameplayEffect& Effect);
+
+    virtual void RenderPrediction(const FActiveGameplayEffect& ActiveEffect, bool Short);
 
     virtual FString GetEffectName(const UGameplayEffect& Effect);
-
-    virtual void DrawRemainingTime(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffect& ActiveEffect);
-
-    virtual void DrawStacks(const FActiveGameplayEffect& ActiveEffect, const UGameplayEffect& Effect);
-
-    virtual void DrawPrediction(const FActiveGameplayEffect& ActiveEffect, bool Short);
 };

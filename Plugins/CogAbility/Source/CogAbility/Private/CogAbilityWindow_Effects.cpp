@@ -12,8 +12,6 @@
 void UCogAbilityWindow_Effects::PreRender(ImGuiWindowFlags& WindowFlags)
 {
     Super::PreRender(WindowFlags);
-
-    WindowFlags |= ImGuiWindowFlags_MenuBar;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -21,6 +19,12 @@ void UCogAbilityWindow_Effects::RenderContent()
 {
     Super::RenderContent();
 
+    RenderEffectsTable();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogAbilityWindow_Effects::RenderEffectsTable()
+{
     UAbilitySystemComponent* AbilitySystemComponent = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetSelection(), true);
     if (AbilitySystemComponent == nullptr)
     {
@@ -40,14 +44,14 @@ void UCogAbilityWindow_Effects::RenderContent()
     FGameplayEffectQuery Query;
     for (const FActiveGameplayEffectHandle& ActiveHandle : AbilitySystemComponent->GetActiveEffects(Query))
     {
-        DrawEffectRow(*AbilitySystemComponent, ActiveHandle, Index, SelectedIndex);
+        RenderEffectRow(*AbilitySystemComponent, ActiveHandle, Index, SelectedIndex);
     }
 
     ImGui::EndTable();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Effects::DrawEffectRow(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffectHandle& ActiveHandle, int32 Index, int32& Selected)
+void UCogAbilityWindow_Effects::RenderEffectRow(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffectHandle& ActiveHandle, int32 Index, int32& Selected)
 {
     ImGui::PushID(Index);
 
@@ -104,7 +108,7 @@ void UCogAbilityWindow_Effects::DrawEffectRow(const UAbilitySystemComponent& Abi
     if (ImGui::IsItemHovered())
     {
         FCogWindowWidgets::BeginTableTooltip();
-        DrawEffectInfo(AbilitySystemComponent, ActiveEffect, Effect);
+        RenderEffectInfo(AbilitySystemComponent, ActiveEffect, Effect);
         FCogWindowWidgets::EndTableTooltip();
     }
 
@@ -113,7 +117,7 @@ void UCogAbilityWindow_Effects::DrawEffectRow(const UAbilitySystemComponent& Abi
     //------------------------
     if (ImGui::BeginPopupContextItem())
     {
-        if (ImGui::Button("Open Properties"))
+        if (ImGui::Button("Open"))
         {
             //GetOwner()->GetPropertyGrid()->Open(EffectPtr);
             ImGui::CloseCurrentPopup();
@@ -125,26 +129,26 @@ void UCogAbilityWindow_Effects::DrawEffectRow(const UAbilitySystemComponent& Abi
     // Remaining Time
     //------------------------
     ImGui::TableNextColumn();
-    DrawRemainingTime(AbilitySystemComponent, ActiveEffect);
+    RenderRemainingTime(AbilitySystemComponent, ActiveEffect);
 
     //------------------------
     // Stacks
     //------------------------
     ImGui::TableNextColumn();
-    DrawStacks(ActiveEffect, Effect);
+    RenderStacks(ActiveEffect, Effect);
 
     //------------------------
     // Prediction
     //------------------------
     ImGui::TableNextColumn();
-    DrawPrediction(ActiveEffect, true);
+    RenderPrediction(ActiveEffect, true);
 
     ImGui::PopID();
     Index++;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Effects::DrawEffectInfo(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffect& ActiveEffect, const UGameplayEffect& Effect)
+void UCogAbilityWindow_Effects::RenderEffectInfo(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffect& ActiveEffect, const UGameplayEffect& Effect)
 {
     if (ImGui::BeginTable("Effect", 2, ImGuiTableFlags_Borders))
     {
@@ -178,7 +182,7 @@ void UCogAbilityWindow_Effects::DrawEffectInfo(const UAbilitySystemComponent& Ab
         ImGui::TableNextColumn();
         ImGui::TextColored(TextColor, "Remaining Time");
         ImGui::TableNextColumn();
-        DrawRemainingTime(AbilitySystemComponent, ActiveEffect);
+        RenderRemainingTime(AbilitySystemComponent, ActiveEffect);
 
         //------------------------
         // Period
@@ -196,7 +200,7 @@ void UCogAbilityWindow_Effects::DrawEffectInfo(const UAbilitySystemComponent& Ab
         ImGui::TableNextColumn();
         ImGui::TextColored(TextColor, "Stacks");
         ImGui::TableNextColumn();
-        DrawStacks(ActiveEffect, Effect);
+        RenderStacks(ActiveEffect, Effect);
 
         //------------------------
         // Prediction
@@ -205,7 +209,7 @@ void UCogAbilityWindow_Effects::DrawEffectInfo(const UAbilitySystemComponent& Ab
         ImGui::TableNextColumn();
         ImGui::TextColored(TextColor, "Prediction");
         ImGui::TableNextColumn();
-        DrawPrediction(ActiveEffect, false);
+        RenderPrediction(ActiveEffect, false);
 
         //------------------------
         // Dynamic Asset Tags
@@ -214,7 +218,7 @@ void UCogAbilityWindow_Effects::DrawEffectInfo(const UAbilitySystemComponent& Ab
         ImGui::TableNextColumn();
         ImGui::TextColored(TextColor, "Dynamic Asset Tags");
         ImGui::TableNextColumn();
-        DrawTagContainer(ActiveEffect.Spec.GetDynamicAssetTags());
+        RenderTagContainer(ActiveEffect.Spec.GetDynamicAssetTags());
 
         //------------------------
         // All Asset Tags
@@ -225,7 +229,7 @@ void UCogAbilityWindow_Effects::DrawEffectInfo(const UAbilitySystemComponent& Ab
         ImGui::TableNextColumn();
         FGameplayTagContainer AllAssetTagsContainer;
         ActiveEffect.Spec.GetAllAssetTags(AllAssetTagsContainer);
-        DrawTagContainer(AllAssetTagsContainer);
+        RenderTagContainer(AllAssetTagsContainer);
 
         //------------------------
         // All Granted Tags
@@ -236,7 +240,7 @@ void UCogAbilityWindow_Effects::DrawEffectInfo(const UAbilitySystemComponent& Ab
         ImGui::TableNextColumn();
         FGameplayTagContainer AllGrantedTagsContainer;
         ActiveEffect.Spec.GetAllGrantedTags(AllGrantedTagsContainer);
-        DrawTagContainer(AllGrantedTagsContainer);
+        RenderTagContainer(AllGrantedTagsContainer);
 
         //------------------------
         // Modifiers
@@ -262,7 +266,7 @@ void UCogAbilityWindow_Effects::DrawEffectInfo(const UAbilitySystemComponent& Ab
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Effects::DrawTagContainer(const FGameplayTagContainer& Container)
+void UCogAbilityWindow_Effects::RenderTagContainer(const FGameplayTagContainer& Container)
 {
     TArray<FGameplayTag> GameplayTags;
     Container.GetGameplayTagArray(GameplayTags);
@@ -280,7 +284,7 @@ FString UCogAbilityWindow_Effects::GetEffectName(const UGameplayEffect& Effect)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Effects::DrawRemainingTime(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffect& ActiveEffect)
+void UCogAbilityWindow_Effects::RenderRemainingTime(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffect& ActiveEffect)
 {
     float StartTime = ActiveEffect.StartWorldTime;
     float Duration = ActiveEffect.GetDuration();
@@ -302,7 +306,7 @@ void UCogAbilityWindow_Effects::DrawRemainingTime(const UAbilitySystemComponent&
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Effects::DrawStacks(const FActiveGameplayEffect& ActiveEffect, const UGameplayEffect& Effect)
+void UCogAbilityWindow_Effects::RenderStacks(const FActiveGameplayEffect& ActiveEffect, const UGameplayEffect& Effect)
 {
     const int32 CurrentStackCount = ActiveEffect.Spec.StackCount;
     if (Effect.StackLimitCount <= 0)
@@ -320,7 +324,7 @@ void UCogAbilityWindow_Effects::DrawStacks(const FActiveGameplayEffect& ActiveEf
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Effects::DrawPrediction(const FActiveGameplayEffect& ActiveEffect, bool Short)
+void UCogAbilityWindow_Effects::RenderPrediction(const FActiveGameplayEffect& ActiveEffect, bool Short)
 {
     FString PredictionString;
     if (ActiveEffect.PredictionKey.IsValidKey())
