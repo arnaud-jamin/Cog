@@ -25,6 +25,7 @@ public class CogSample : ModuleRules
             PublicDependencyModuleNames.AddRange(new string[]
             {
                 "CogImgui",
+                "CogInterfaces",
                 "CogWindow",
                 "CogEngine",
                 "CogInput",

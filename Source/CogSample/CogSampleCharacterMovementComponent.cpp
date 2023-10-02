@@ -233,11 +233,13 @@ void UCogSampleCharacterMovementComponent::TickComponent(float DeltaTime, enum E
 
 #if ENABLE_COG
        
-    const FVector DebugBottomLocation = Character->GetActorLocation() - FVector::UpVector * CapsuleComponent->GetScaledCapsuleHalfHeight();
+    const FVector DebugLocation = Character->GetActorLocation();
+    const FVector DebugBottomLocation = DebugLocation - FVector::UpVector * CapsuleComponent->GetScaledCapsuleHalfHeight();
 
     if (FCogDebugSettings::IsDebugActiveForActor(GetPawnOwner()))
     {
         const FRotator Rotation = Character->GetActorRotation();
+        const FVector Forward = Character->GetActorForwardVector();
         const FVector LocalVelocity = Rotation.UnrotateVector(Velocity);
         const FVector LocalAcceleration = Rotation.UnrotateVector(GetCurrentAcceleration());
         const FVector VelocityDelta = (Velocity - DebugLastVelocity) / DeltaTime;
@@ -275,8 +277,12 @@ void UCogSampleCharacterMovementComponent::TickComponent(float DeltaTime, enum E
         }
 
         const FColor CapsuleColor = CapsuleComponent->GetCollisionEnabled() == ECollisionEnabled::NoCollision ? FColor::Black : FColor::White;
-        FCogDebugDraw::Capsule(LogCogCollision, this, CapsuleComponent->GetComponentLocation(), CapsuleComponent->GetScaledCapsuleHalfHeight(), CapsuleComponent->GetScaledCapsuleRadius(), CapsuleComponent->GetComponentQuat(), CapsuleColor, false, 0);
-        FCogDebugDraw::Axis(LogCogCollision, this, CapsuleComponent->GetComponentLocation(), CapsuleComponent->GetComponentRotation(), 50.0f, false, 0);
+        FCogDebugDraw::Capsule(LogCogCollision, Character, CapsuleComponent->GetComponentLocation(), CapsuleComponent->GetScaledCapsuleHalfHeight(), CapsuleComponent->GetScaledCapsuleRadius(), CapsuleComponent->GetComponentQuat(), CapsuleColor, false, 0);
+        FCogDebugDraw::Axis(LogCogCollision, Character, CapsuleComponent->GetComponentLocation(), CapsuleComponent->GetComponentRotation(), 50.0f, false, 0);
+        FCogDebugDraw::Arrow(LogCogRotation, Character, DebugLocation, DebugLocation + Rotation.Vector() * 100.0f, FColor::Green, true, 0);
+        FCogDebugDraw::Arrow(LogCogControlRotation, Character, DebugLocation, DebugLocation + Character->GetControlRotation().Vector() * 100.f, FColor::Silver, true, 0);
+        FCogDebugDraw::Arrow(LogCogBaseAimRotation, Character, DebugLocation, DebugLocation + Character->GetBaseAimRotation().Vector() * 100.f, FColor::Red, true, 0);
+        FCogDebugDraw::Skeleton(LogCogSkeleton, Character->GetMesh(), FColor::White, false, 1);
     }
     
     DebugLastBottomLocation = DebugBottomLocation;

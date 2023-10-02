@@ -1,11 +1,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogDebugAllegianceInterface.generated.h"
+#include "CogInterfacesAllegiance.generated.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 UENUM(BlueprintType)
-enum class ECogAllegiance : uint8
+enum class ECogInterfacesAllegiance : uint8
 {
     Ally,
     Enemy
@@ -13,17 +13,17 @@ enum class ECogAllegiance : uint8
 
 //--------------------------------------------------------------------------------------------------------------------------
 UINTERFACE(MinimalAPI, Blueprintable)
-class UCogAllegianceInterface : public UInterface
+class UCogInterfacesAllegianceActor : public UInterface
 {
     GENERATED_BODY()
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
-class ICogAllegianceInterface
+class ICogInterfacesAllegianceActor
 {
     GENERATED_BODY()
 
 public:
 
-    virtual ECogAllegiance GetAllegiance(const AActor* OtherActor) const = 0;
+    virtual ECogInterfacesAllegiance GetAllegiance(const AActor* OtherActor) const = 0;
 };

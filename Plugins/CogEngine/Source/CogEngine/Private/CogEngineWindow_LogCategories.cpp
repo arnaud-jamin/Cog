@@ -71,7 +71,7 @@ void UCogEngineWindow_LogCategories::RenderContent()
         FLogCategoryBase* Category = CategoryInfo.LogCategory;
 
         ImGui::PushID(Index);
-        FString CategoryFriendlyName = Category->GetCategoryName().ToString();
+        FString CategoryFriendlyName = CategoryInfo.GetDisplayName();
 
         if (bShowAllVerbosity == false)
         {

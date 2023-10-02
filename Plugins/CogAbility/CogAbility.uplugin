@@ -27,6 +27,10 @@
       "Enabled": true
     },
     {
+      "Name": "CogInterfaces",
+      "Enabled": true
+    },
+    {
       "Name": "CogDebug",
       "Enabled": true
     },

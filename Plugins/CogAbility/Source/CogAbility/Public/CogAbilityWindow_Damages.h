@@ -4,7 +4,7 @@
 #include "CogWindow.h"
 #include "CogAbilityWindow_Damages.generated.h"
 
-struct FCogAbilityDamageParams;
+struct FCogInterfacesDamageParams;
 
 //--------------------------------------------------------------------------------------------------------------------------
 class FCogDamageInstance
@@ -52,17 +52,19 @@ class COGABILITY_API UCogAbilityWindow_Damages : public UCogWindow
     GENERATED_BODY()
 
 public:
-    UCogAbilityWindow_Damages();
-    virtual void RenderContent() override;
-    virtual void RenderTick(float DeltaSeconds) override;
 
 protected:
+    
+    virtual void RenderContent() override;
+    
+    virtual void GameTick(float DeltaSeconds) override;
+
     virtual void OnSelectionChanged(AActor* OldSelection, AActor* NewSelection) override;
 
 private:
 
     UFUNCTION()
-    void OnDamageEvent(const FCogAbilityDamageParams& Params);
+    void OnDamageEvent(const FCogInterfacesDamageParams& Params);
 
     FCogDamageStats DamageDealtStats;
     FCogDamageStats DamageReceivedStats;

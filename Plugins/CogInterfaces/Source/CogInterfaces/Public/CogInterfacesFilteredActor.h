@@ -1,15 +1,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogDebugFilteredActorInterface.generated.h"
+#include "CogInterfacesFilteredActor.generated.h"
 
 UINTERFACE(MinimalAPI, Blueprintable)
-class UCogDebugFilteredActorInterface : public UInterface
+class UCogInterfacesFilteredActor : public UInterface
 {
     GENERATED_BODY()
 };
 
-class ICogDebugFilteredActorInterface
+class ICogInterfacesFilteredActor
 {
     GENERATED_BODY()
 

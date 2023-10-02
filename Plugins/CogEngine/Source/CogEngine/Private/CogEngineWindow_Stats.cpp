@@ -46,8 +46,7 @@ void UCogEngineWindow_Stats::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogEngineWindow_Stats::DrawMainMenuWidget(bool Draw, float& Width)
 {
-    const float ResetButtonWidth = FCogWindowWidgets::TextBaseWidth * 5;
-    Width = FCogWindowWidgets::TextBaseWidth * 15;
+    Width = FCogWindowWidgets::TextBaseWidth * 25;
 
     if (Draw == false)
     {
@@ -56,6 +55,7 @@ void UCogEngineWindow_Stats::DrawMainMenuWidget(bool Draw, float& Width)
 
     extern ENGINE_API float GAverageFPS;
     ImGui::TextColored(GetFpsColor(GAverageFPS), "%3dfps ", (int32)GAverageFPS);
+    ImGui::SetItemTooltip("Frame Per Second");
 
     if (const APlayerController* PlayerController = GetLocalPlayerController())
     {
@@ -64,6 +64,7 @@ void UCogEngineWindow_Stats::DrawMainMenuWidget(bool Draw, float& Width)
             const float Ping = PlayerState->GetPingInMilliseconds();
             ImGui::SameLine();
             ImGui::TextColored(GetPingColor(Ping), "%3dms ", (int32)Ping);
+            ImGui::SetItemTooltip("Ping");
         }
 
         if (UNetConnection* Connection = PlayerController->GetNetConnection())
@@ -73,6 +74,7 @@ void UCogEngineWindow_Stats::DrawMainMenuWidget(bool Draw, float& Width)
             const float TotalPacketLost = OutPacketLost + InPacketLost;
             ImGui::SameLine();
             ImGui::TextColored(GetPacketLossColor(TotalPacketLost), "%2d%% ", (int32)TotalPacketLost);
+            ImGui::SetItemTooltip("Packet Loss");
         }
     }
 }

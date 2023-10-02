@@ -1,8 +1,8 @@
 using UnrealBuildTool;
 
-public class CogDebug : ModuleRules
+public class CogInterfaces : ModuleRules
 {
-	public CogDebug(ReadOnlyTargetRules Target) : base(Target)
+	public CogInterfaces(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		
@@ -22,9 +22,7 @@ public class CogDebug : ModuleRules
 			new string[]
 			{
 				"Core",
-                "CogImgui",
-                "CogInterfaces",
-            }
+			}
             );
 			
 		
@@ -33,9 +31,6 @@ public class CogDebug : ModuleRules
 			{
 				"CoreUObject",
 				"Engine",
-				"Slate",
-				"SlateCore",
-                "NetCore",
             }
 			);
 		

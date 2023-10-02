@@ -2,7 +2,7 @@
   "FileVersion": 1,
   "Version": 1,
   "VersionName": "1.0",
-  "FriendlyName": "CogDebug",
+  "FriendlyName": "CogInterfaces",
   "Description": "",
   "Category": "Other",
   "CreatedBy": "Arnaud Jamin",
@@ -16,24 +16,11 @@
   "Installed": false,
   "Modules": [
     {
-      "Name": "CogDebug",
+      "Name": "CogInterfaces",
       "Type": "Runtime",
-      "LoadingPhase": "Default"
-    },
-    {
-      "Name": "CogDebugEditor",
-      "Type": "UncookedOnly",
       "LoadingPhase": "Default"
     }
   ],
   "Plugins": [
-    {
-      "Name": "CogImgui",
-      "Enabled": true
-    },
-    {
-      "Name": "CogInterfaces",
-      "Enabled": true
-    }
   ]
 }

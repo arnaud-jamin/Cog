@@ -1,7 +1,7 @@
 #include "CogAbilityWindow_Cheats.h"
 
 #include "CogAbilityDataAsset_Cheats.h"
-#include "CogDebugAllegianceInterface.h"
+#include "CogInterfacesAllegiance.h"
 #include "CogDebugDraw.h"
 #include "CogImguiHelper.h"
 #include "EngineUtils.h"
@@ -142,15 +142,15 @@ void UCogAbilityWindow_Cheats::RequestCheat(AActor* CheatInstigator, AActor* Sel
         {
             if (AActor* OtherActor = *It)
             {
-                ECogAllegiance Allegiance = ECogAllegiance::Enemy;
+                ECogInterfacesAllegiance Allegiance = ECogInterfacesAllegiance::Enemy;
                 
-                if (ICogAllegianceInterface* AllegianceInterface = Cast<ICogAllegianceInterface>(OtherActor))
+                if (ICogInterfacesAllegianceActor* AllegianceInterface = Cast<ICogInterfacesAllegianceActor>(OtherActor))
                 {
                     AllegianceInterface->GetAllegiance(CheatInstigator);
                 }
 
-                if ((IsShiftDown && (Allegiance == ECogAllegiance::Enemy))
-                    || (IsAltDown && (Allegiance == ECogAllegiance::Ally)))
+                if ((IsShiftDown && (Allegiance == ECogInterfacesAllegiance::Enemy))
+                    || (IsAltDown && (Allegiance == ECogInterfacesAllegiance::Ally)))
                 {
                     Actors.Add(OtherActor);
                 }

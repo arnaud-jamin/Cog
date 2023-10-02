@@ -1,5 +1,7 @@
 #include "CogDebugSettings.h"
 
+#include "CogInterfacesFilteredActor.h"
+
 //--------------------------------------------------------------------------------------------------------------------------
 TWeakObjectPtr<AActor> FCogDebugSettings::Selection;
 bool FCogDebugSettings::FilterBySelection = true;
@@ -72,7 +74,7 @@ bool FCogDebugSettings::IsDebugActiveForActor(const AActor* Actor)
         return true;
     }
 
-    if (Cast<ICogDebugFilteredActorInterface>(Actor))
+    if (Cast<ICogInterfacesFilteredActor>(Actor))
     {
         return (SelectionPtr == Actor || FilterBySelection == false);
     }

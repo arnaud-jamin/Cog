@@ -1,6 +1,6 @@
 #include "CogAbilityWindow_Damages.h"
 
-#include "CogAbilityDamageActorInterface.h"
+#include "CogInterfacesDamageActor.h"
 #include "CogImguiHelper.h"
 #include "imgui.h"
 
@@ -149,6 +149,10 @@ static void DrawDamages(FCogDamageStats& Damage)
         ImGui::EndTable();
     }
 
+    ImGui::Text("Timer");
+    ImGui::SameLine(FCogWindowWidgets::TextBaseWidth * 20);
+    ImGui::Text("%0.2f", Damage.Timer);
+
     ImGui::Text("Crits");
     ImGui::SameLine(FCogWindowWidgets::TextBaseWidth * 20);
     FCogWindowWidgets::ProgressBarCentered(Damage.Count == 0 ? 0.0f : Damage.Crits / (float)Damage.Count, ImVec2(-1, 0), TCHAR_TO_ANSI(*FString::Printf(TEXT("%d / %d"), Damage.Crits, Damage.Count)));
@@ -171,11 +175,6 @@ static void DrawDamages(FCogDamageStats& Damage)
 
     ImGui::Spacing();
     ImGui::Spacing();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-UCogAbilityWindow_Damages::UCogAbilityWindow_Damages()
-{
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -237,39 +236,36 @@ void UCogAbilityWindow_Damages::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogAbilityWindow_Damages::OnSelectionChanged(AActor* OldSelection, AActor* NewSelection)
 {
-    if (ICogAbilityDamageActorInterface* DamageActor = Cast<ICogAbilityDamageActorInterface>(OldSelection))
+    if (ICogInterfacesDamageActor* DamageActor = Cast<ICogInterfacesDamageActor>(OldSelection))
     {
         DamageActor->OnDamageEvent().Remove(OnDamageEventDelegate);
     }
 
-    if (ICogAbilityDamageActorInterface* DamageActor = Cast<ICogAbilityDamageActorInterface>(NewSelection))
+    if (ICogInterfacesDamageActor* DamageActor = Cast<ICogInterfacesDamageActor>(NewSelection))
     {
         OnDamageEventDelegate = DamageActor->OnDamageEvent().AddUObject(this, &UCogAbilityWindow_Damages::OnDamageEvent);
     }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Damages::RenderTick(float DeltaSeconds)
+void UCogAbilityWindow_Damages::GameTick(float DeltaSeconds)
 {
-    Super::RenderTick(DeltaSeconds);
+    Super::GameTick(DeltaSeconds);
 
     DamageReceivedStats.Tick(DeltaSeconds);
     DamageDealtStats.Tick(DeltaSeconds);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Damages::OnDamageEvent(const FCogAbilityDamageParams& Params)
+void UCogAbilityWindow_Damages::OnDamageEvent(const FCogInterfacesDamageParams& Params)
 {
-    DamageDealtStats.Restart();
-    DamageReceivedStats.Restart();
-
     AActor* Selection = GetSelection();
-    if (Selection == Params.DamageDealer.Get())
+    if (Params.Type == ECogInterfacesDamageEventType::DamageDealt)
     {
-        DamageDealtStats.AddDamage(Params.ReceivedDamage, Params.IncomingDamage, Params.IsCritical);
+        DamageDealtStats.AddDamage(Params.MitigatedDamage, Params.IncomingDamage, Params.IsCritical);
     }
-    else if (Selection == Params.DamageReceiver.Get())
+    else if (Params.Type == ECogInterfacesDamageEventType::DamageReceived)
     {
-        DamageReceivedStats.AddDamage(Params.ReceivedDamage, Params.IncomingDamage, Params.IsCritical);
+        DamageReceivedStats.AddDamage(Params.MitigatedDamage, Params.IncomingDamage, Params.IsCritical);
     }
 }

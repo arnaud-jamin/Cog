@@ -13,12 +13,15 @@ struct COGDEBUG_API FCogDebugLogCategoryInfo
 {
     FLogCategoryBase* LogCategory = nullptr;
     ELogVerbosity::Type ServerVerbosity = ELogVerbosity::NoLogging;
+    FString DisplayName;
+
+    FString GetDisplayName() const;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
 struct COGDEBUG_API FCogDebugLogCategoryManager
 {
-    static void AddLogCategory(FLogCategoryBase& LogCategory);
+    static void AddLogCategory(FLogCategoryBase& LogCategory, const FString& DisplayName = "");
 
     static bool IsVerbosityActive(ELogVerbosity::Type Verbosity);
 

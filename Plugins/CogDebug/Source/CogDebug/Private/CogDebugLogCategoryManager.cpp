@@ -12,10 +12,37 @@ DEFINE_LOG_CATEGORY(LogCogServerDebug);
 
 TMap<FName, FCogDebugLogCategoryInfo> FCogDebugLogCategoryManager::LogCategories;
 
+
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugLogCategoryManager::AddLogCategory(FLogCategoryBase& LogCategory)
+// FCogDebugLogCategoryInfo
+//--------------------------------------------------------------------------------------------------------------------------
+FString FCogDebugLogCategoryInfo::GetDisplayName() const
 {
-    LogCategories.Add(LogCategory.GetCategoryName(), FCogDebugLogCategoryInfo{ &LogCategory, ELogVerbosity::NumVerbosity });
+    if (DisplayName.IsEmpty() == false)
+    {
+        return DisplayName;
+    }
+
+    if (LogCategory != nullptr)
+    {
+        return LogCategory->GetCategoryName().ToString();
+    }
+
+    return FString("Invalid");
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// FCogDebugLogCategoryManager
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogDebugLogCategoryManager::AddLogCategory(FLogCategoryBase& LogCategory, const FString& DisplayName)
+{
+    LogCategories.Add(LogCategory.GetCategoryName(), 
+        FCogDebugLogCategoryInfo
+        {
+            &LogCategory, 
+            ELogVerbosity::NumVerbosity,
+            DisplayName,
+            });
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

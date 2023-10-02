@@ -1,33 +1,43 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogAbilityDamageActorInterface.generated.h"
+#include "CogInterfacesDamageActor.generated.h"
+
+//--------------------------------------------------------------------------------------------------------------------------
+UENUM(BlueprintType)
+enum class ECogInterfacesDamageEventType : uint8
+{
+    DamageDealt,
+    DamageReceived,
+};
+
 
 //--------------------------------------------------------------------------------------------------------------------------
 USTRUCT()
-struct COGABILITY_API FCogAbilityDamageParams
+struct FCogInterfacesDamageParams
 {
     GENERATED_BODY()
 
+    ECogInterfacesDamageEventType Type;
     TObjectPtr<AActor> DamageDealer;
     TObjectPtr<AActor> DamageReceiver;
-    float ReceivedDamage = 0;
+    float MitigatedDamage = 0;
     float IncomingDamage = 0;
     bool IsCritical = false;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
-DECLARE_MULTICAST_DELEGATE_OneParam(FCogAbilityOnDamageEvent, const FCogAbilityDamageParams&);
+DECLARE_MULTICAST_DELEGATE_OneParam(FCogAbilityOnDamageEvent, const FCogInterfacesDamageParams&);
 
 //--------------------------------------------------------------------------------------------------------------------------
 UINTERFACE(MinimalAPI, Blueprintable)
-class UCogAbilityDamageActorInterface : public UInterface
+class UCogInterfacesDamageActor : public UInterface
 {
     GENERATED_BODY()
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
-class ICogAbilityDamageActorInterface
+class ICogInterfacesDamageActor
 {
     GENERATED_BODY()
 

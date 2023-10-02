@@ -1,8 +1,8 @@
 #include "CogDebugPlot.h"
 
-#include "CogDebugFilteredActorInterface.h"
 #include "CogDebugDraw.h"
 #include "CogDebugHelper.h"
+#include "CogInterfacesFilteredActor.h"
 #include "CogImguiHelper.h"
 
 FCogDebugPlotEvent FCogDebugPlot::DefaultEvent;
@@ -427,7 +427,7 @@ FCogDebugPlotEntry* FCogDebugPlot::RegisterPlot(const UObject* WorldContextObjec
     //---------------------------------------------------------------------------------
     // Cast to ICogActorFilteringDebugInterface to know if we should filter
     //---------------------------------------------------------------------------------
-    if (Cast<ICogDebugFilteredActorInterface>(WorldContextObject))
+    if (Cast<ICogInterfacesFilteredActor>(WorldContextObject))
     {
         if (WorldContextObject != FCogDebugSettings::GetSelection())
         {

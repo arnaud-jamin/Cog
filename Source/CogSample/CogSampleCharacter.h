@@ -1,20 +1,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogDefines.h"
 #include "AbilitySystemInterface.h"
 #include "ActiveGameplayEffectHandle.h"
 #include "AttributeSet.h"
+#include "CogDefines.h"
+#include "CogInterfacesDamageActor.h"
+#include "CogInterfacesFilteredActor.h"
 #include "GameFramework/Character.h"
 #include "GameplayAbilitySpecHandle.h"
 #include "GameplayTagContainer.h"
 #include "InputActionValue.h"
-
-#if USE_COG
-#include "CogAbilityDamageActorInterface.h"
-#include "CogDebugFilteredActorInterface.h"
-#endif //USE_COG
-
 #include "CogSampleCharacter.generated.h"
 
 class UAbilitySystemComponent;
@@ -62,10 +58,8 @@ public:
 UCLASS(config=Game)
 class ACogSampleCharacter : public ACharacter
     , public IAbilitySystemInterface
-#if USE_COG
-    , public ICogDebugFilteredActorInterface
-    , public ICogAbilityDamageActorInterface
-#endif //USE_COG
+    , public ICogInterfacesFilteredActor
+    , public ICogInterfacesDamageActor
 {
 	GENERATED_BODY()
 
@@ -81,11 +75,8 @@ public:
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
     virtual void PossessedBy(AController* NewController) override;
 
-#if USE_COG
     virtual FCogAbilityOnDamageEvent& OnDamageEvent() override { return OnDamageEventDelegate; }
     virtual bool IsActorFilteringDebug() const override { return true; }
-#endif //USE_COG
-
 
     void OnAcknowledgePossession(APlayerController* InController);
     
@@ -155,9 +146,7 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Ability)
     TArray<TSubclassOf<UGameplayEffect>> Effects;
 
-#if USE_COG
     FCogAbilityOnDamageEvent OnDamageEventDelegate;
-#endif //USE_COG
 
 private:
 

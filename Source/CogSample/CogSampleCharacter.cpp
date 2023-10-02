@@ -348,8 +348,9 @@ void ACogSampleCharacter::Look(const FInputActionValue& Value)
 void ACogSampleCharacter::OnDamageReceived(float ReceivedDamage, float IncomingDamage, AActor* DamageDealer, const FGameplayEffectSpec& EffectSpec)
 {
 #if USE_COG
-    FCogAbilityDamageParams Params;
-    Params.ReceivedDamage = ReceivedDamage;
+    FCogInterfacesDamageParams Params;
+    Params.Type = ECogInterfacesDamageEventType::DamageReceived;
+    Params.MitigatedDamage = ReceivedDamage;
     Params.IncomingDamage = IncomingDamage;
     Params.DamageDealer = DamageDealer;
     Params.DamageReceiver = this;
@@ -361,8 +362,9 @@ void ACogSampleCharacter::OnDamageReceived(float ReceivedDamage, float IncomingD
 void ACogSampleCharacter::OnDamageDealt(float ReceivedDamage, float IncomingDamage, AActor* DamageReceiver, const FGameplayEffectSpec& EffectSpec)
 {
 #if USE_COG
-    FCogAbilityDamageParams Params;
-    Params.ReceivedDamage = ReceivedDamage;
+    FCogInterfacesDamageParams Params;
+    Params.Type = ECogInterfacesDamageEventType::DamageDealt;
+    Params.MitigatedDamage = ReceivedDamage;
     Params.IncomingDamage = IncomingDamage;
     Params.DamageDealer = this;
     Params.DamageReceiver = DamageReceiver;

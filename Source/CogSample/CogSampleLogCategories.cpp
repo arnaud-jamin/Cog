@@ -10,17 +10,25 @@
 DEFINE_LOG_CATEGORY(LogCogCollision);
 DEFINE_LOG_CATEGORY(LogCogInput);
 DEFINE_LOG_CATEGORY(LogCogPosition);
+DEFINE_LOG_CATEGORY(LogCogRotation);
+DEFINE_LOG_CATEGORY(LogCogControlRotation);
+DEFINE_LOG_CATEGORY(LogCogBaseAimRotation);
+DEFINE_LOG_CATEGORY(LogCogSkeleton);
 
 namespace CogSampleLog
 {
     void RegiterAllLogCategories()
     {
 #if USE_COG
-        FCogDebugLogCategoryManager::AddLogCategory(LogAbilitySystem);
-        FCogDebugLogCategoryManager::AddLogCategory(LogGameplayEffects);
-        FCogDebugLogCategoryManager::AddLogCategory(LogCogCollision);
-        FCogDebugLogCategoryManager::AddLogCategory(LogCogInput);
-        FCogDebugLogCategoryManager::AddLogCategory(LogCogPosition);
+        FCogDebugLogCategoryManager::AddLogCategory(LogAbilitySystem, "AbilitySystem");
+        FCogDebugLogCategoryManager::AddLogCategory(LogGameplayEffects, "Gameplay Effects");
+        FCogDebugLogCategoryManager::AddLogCategory(LogCogCollision, "Collision");
+        FCogDebugLogCategoryManager::AddLogCategory(LogCogInput, "Input");
+        FCogDebugLogCategoryManager::AddLogCategory(LogCogPosition, "Position");
+        FCogDebugLogCategoryManager::AddLogCategory(LogCogRotation, "Rotation");
+        FCogDebugLogCategoryManager::AddLogCategory(LogCogControlRotation, "ControlRotation");
+        FCogDebugLogCategoryManager::AddLogCategory(LogCogBaseAimRotation, "BaseAimRotation");
+        FCogDebugLogCategoryManager::AddLogCategory(LogCogSkeleton, "Skeleton");
 #endif //USE_COG
     }
 }
