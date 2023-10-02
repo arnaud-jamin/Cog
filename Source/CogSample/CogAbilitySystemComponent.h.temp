@@ -1,0 +1,22 @@
+#pragma once
+
+#include "CoreMinimal.h"
+#include "AttributeSet.h"
+#include "AbilitySystemComponent.h"
+#include "CogAbilitySystemComponent.generated.h"
+
+UCLASS(BlueprintType)
+class UCogAbilitySystemComponent : public UAbilitySystemComponent
+{
+    GENERATED_BODY()
+
+public:
+
+    template <class T>
+    const T* GetAttributeSet() const
+    {
+        UClass* DesiredClass = T::StaticClass();
+        check(DesiredClass->IsChildOf(UAttributeSet::StaticClass()));
+        return Cast<T>(Super::GetAttributeSet(DesiredClass));
+    }
+};

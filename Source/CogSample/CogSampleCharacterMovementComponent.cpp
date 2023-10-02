@@ -1,0 +1,301 @@
+#include "CogSampleCharacterMovementComponent.h"
+
+#include "AbilitySystemComponent.h"
+#include "AbilitySystemGlobals.h"
+#include "CogDebugDraw.h"
+#include "CogDebugPlot.h"
+#include "CogSampleAttributeSet_Speed.h"
+#include "CogSampleLogCategories.h"
+#include "CogSampleTagLibrary.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/Character.h"
+
+//--------------------------------------------------------------------------------------------------------------------------
+// UCogSampleCharacterMovementComponent::FCogSampleSavedMove
+//--------------------------------------------------------------------------------------------------------------------------
+uint8 UCogSampleCharacterMovementComponent::FCogSampleSavedMove::GetCompressedFlags() const
+{
+    uint8 Result = Super::GetCompressedFlags();
+
+    if (SavedRequestSprint)
+    {
+        Result |= FLAG_Custom_0;
+    }
+
+    return Result;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool UCogSampleCharacterMovementComponent::FCogSampleSavedMove::CanCombineWith(const FSavedMovePtr& NewMove, ACharacter* Character, float MaxDelta) const
+{
+    //----------------------------------------------------------------------------------------------
+    // Set which moves can be combined together. This will depend on the bit flags that are used.
+    //----------------------------------------------------------------------------------------------
+
+    if (SavedRequestSprint != ((FCogSampleSavedMove*)&NewMove)->SavedRequestSprint)
+    {
+        return false;
+    }
+
+
+    return Super::CanCombineWith(NewMove, Character, MaxDelta);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleCharacterMovementComponent::FCogSampleSavedMove::SetMoveFor(ACharacter* Character, float InDeltaTime, FVector const& NewAccel, FNetworkPredictionData_Client_Character& ClientData)
+{
+    Super::SetMoveFor(Character, InDeltaTime, NewAccel, ClientData);
+
+    if (UCogSampleCharacterMovementComponent* CharacterMovement = Cast<UCogSampleCharacterMovementComponent>(Character->GetCharacterMovement()))
+    {
+        SavedRequestSprint = CharacterMovement->bIsSprinting;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleCharacterMovementComponent::FCogSampleSavedMove::PrepMoveFor(ACharacter* Character)
+{
+    Super::PrepMoveFor(Character);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// UCogSampleCharacterMovementComponent::FCogSampleNetworkPredictionData_Client
+//--------------------------------------------------------------------------------------------------------------------------
+
+UCogSampleCharacterMovementComponent::FCogSampleNetworkPredictionData_Client::FCogSampleNetworkPredictionData_Client(const UCharacterMovementComponent& ClientMovement)
+    : Super(ClientMovement)
+{
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FSavedMovePtr UCogSampleCharacterMovementComponent::FCogSampleNetworkPredictionData_Client::AllocateNewMove()
+{
+    return FSavedMovePtr(new FCogSampleSavedMove());
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// UCogSampleCharacterMovementComponent
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleCharacterMovementComponent::UpdateFromCompressedFlags(uint8 Flags)
+{
+    Super::UpdateFromCompressedFlags(Flags);
+
+    //-------------------------------------------------------------------------------------------------------------------
+    // The Flags parameter contains the compressed input flags that are stored in the saved move.
+    // UpdateFromCompressed flags simply copies the flags from the saved move into the movement component.
+    // It basically just resets the movement component to the state when the move was made so it can simulate from there.
+    //-------------------------------------------------------------------------------------------------------------------
+
+    //-----------------------
+    // Sprint
+    //-----------------------
+    bIsSprinting = (Flags & FSavedMove_Character::FLAG_Custom_0) != 0;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FNetworkPredictionData_Client* UCogSampleCharacterMovementComponent::GetPredictionData_Client() const
+{
+    check(PawnOwner != NULL);
+
+    if (!ClientPredictionData)
+    {
+        UCogSampleCharacterMovementComponent* MutableThis = const_cast<UCogSampleCharacterMovementComponent*>(this);
+        MutableThis->ClientPredictionData = new FCogSampleNetworkPredictionData_Client(*this);
+    }
+
+    return ClientPredictionData;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+float UCogSampleCharacterMovementComponent::GetMaxSpeed() const
+{
+    UAbilitySystemComponent* AbilitySystemComponent = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetPawnOwner(), true);
+
+    if (AbilitySystemComponent == nullptr)
+    {
+        return Super::GetMaxSpeed();
+    }
+
+    if (AbilitySystemComponent->HasMatchingGameplayTag(Tag_Status_Immobilized))
+    {
+        return 0.0f;
+    }
+
+    if (AbilitySystemComponent->HasMatchingGameplayTag(Tag_Status_Stunned))
+    {
+        return 0.0f;
+    }
+
+    if (AbilitySystemComponent->HasMatchingGameplayTag(Tag_Status_Dead))
+    {
+        return 0.0f;
+    }
+
+    if (AbilitySystemComponent->HasMatchingGameplayTag(Tag_Status_Revived))
+    {
+        return 0.0f;
+    }
+
+    const float Speed = AbilitySystemComponent->GetNumericAttribute(UCogSampleAttributeSet_Speed::GetSpeedAttribute());
+    return Speed;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+float UCogSampleCharacterMovementComponent::GetMaxAcceleration() const
+{
+    UAbilitySystemComponent* AbilitySystemComponent = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetPawnOwner(), true);
+
+    if (AbilitySystemComponent == nullptr)
+    {
+        return Super::GetMaxAcceleration();
+    }
+
+    const float MaxAccel = AbilitySystemComponent->GetNumericAttribute(UCogSampleAttributeSet_Speed::GetMaxAccelerationAttribute());
+    return MaxAccel;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FRotator UCogSampleCharacterMovementComponent::GetDeltaRotation(float DeltaTime) const
+{
+    UAbilitySystemComponent* AbilitySystemComponent = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetPawnOwner(), true);
+    if (AbilitySystemComponent == nullptr)
+    {
+        return Super::GetDeltaRotation(DeltaTime);
+    }
+
+    if (AbilitySystemComponent->HasMatchingGameplayTag(Tag_Status_Stunned))
+    {
+        return FRotator::ZeroRotator;
+    }
+
+    if (AbilitySystemComponent->HasMatchingGameplayTag(Tag_Status_Dead))
+    {
+        return FRotator::ZeroRotator;
+    }
+
+    if (AbilitySystemComponent->HasMatchingGameplayTag(Tag_Status_Revived))
+    {
+        return FRotator::ZeroRotator;
+    }
+
+    return Super::GetDeltaRotation(DeltaTime);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleCharacterMovementComponent::StartSprinting()
+{
+    bIsSprinting = true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleCharacterMovementComponent::StopSprinting()
+{
+    bIsSprinting = false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleCharacterMovementComponent::FCogSampleSavedMove::Clear()
+{
+    Super::Clear();
+    SavedRequestSprint = false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleCharacterMovementComponent::BeginPlay()
+{
+    Super::BeginPlay();
+
+#if ENABLE_COG
+    const ACharacter* Character = GetCharacterOwner();
+    const UCapsuleComponent* CapsuleComponent = Character->GetCapsuleComponent();
+    DebugLastBottomLocation = Character->GetActorLocation() - FVector::UpVector * CapsuleComponent->GetScaledCapsuleHalfHeight();
+#endif //ENABLE_COG
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleCharacterMovementComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+#if ENABLE_COG
+
+    const ACharacter* Character = GetCharacterOwner();
+    const UCapsuleComponent* CapsuleComponent = Character->GetCapsuleComponent();
+
+    if (FCogDebugSettings::IsDebugActiveForActor(GetPawnOwner()))
+    {
+        FCogDebugPlot::PlotValue(GetPawnOwner(), "Move Input X", GetPendingInputVector().X);
+        FCogDebugPlot::PlotValue(GetPawnOwner(), "Move Input Y", GetPendingInputVector().Y);
+        FCogDebugPlot::PlotValue(GetPawnOwner(), "Move Input Local X", FVector::DotProduct(GetPawnOwner()->GetActorRightVector(), GetPendingInputVector()));
+        FCogDebugPlot::PlotValue(GetPawnOwner(), "Move Input Local Y", FVector::DotProduct(GetPawnOwner()->GetActorForwardVector(), GetPendingInputVector()));
+    }
+#endif //ENABLE_COG
+
+    Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+#if ENABLE_COG
+       
+    const FVector DebugBottomLocation = Character->GetActorLocation() - FVector::UpVector * CapsuleComponent->GetScaledCapsuleHalfHeight();
+
+    if (FCogDebugSettings::IsDebugActiveForActor(GetPawnOwner()))
+    {
+        const FRotator Rotation = Character->GetActorRotation();
+        const FVector LocalVelocity = Rotation.UnrotateVector(Velocity);
+        const FVector LocalAcceleration = Rotation.UnrotateVector(GetCurrentAcceleration());
+        const FVector VelocityDelta = (Velocity - DebugLastVelocity) / DeltaTime;
+        const FVector LocalVelocityDelta = Rotation.UnrotateVector(VelocityDelta);
+
+        FCogDebugPlot::PlotValue(Character, "Location X", DebugBottomLocation.X);
+        FCogDebugPlot::PlotValue(Character, "Location Y", DebugBottomLocation.Y);
+        FCogDebugPlot::PlotValue(Character, "Location Z", DebugBottomLocation.Z);
+        FCogDebugPlot::PlotValue(Character, "Rotation Yaw", Character->GetActorRotation().Yaw);
+        FCogDebugPlot::PlotValue(Character, "Acceleration X", GetCurrentAcceleration().X);
+        FCogDebugPlot::PlotValue(Character, "Acceleration Y", GetCurrentAcceleration().Y);
+        FCogDebugPlot::PlotValue(Character, "Acceleration Z", GetCurrentAcceleration().Z);
+        FCogDebugPlot::PlotValue(Character, "Acceleration Local X", LocalAcceleration.X);
+        FCogDebugPlot::PlotValue(Character, "Acceleration Local Y", LocalAcceleration.Y);
+        FCogDebugPlot::PlotValue(Character, "Acceleration Local Z", LocalAcceleration.Z);
+        FCogDebugPlot::PlotValue(Character, "Velocity X", Velocity.X);
+        FCogDebugPlot::PlotValue(Character, "Velocity Y", Velocity.Y);
+        FCogDebugPlot::PlotValue(Character, "Velocity Z", Velocity.Z);
+        FCogDebugPlot::PlotValue(Character, "Velocity Local X", LocalVelocity.X);
+        FCogDebugPlot::PlotValue(Character, "Velocity Local Y", LocalVelocity.Y);
+        FCogDebugPlot::PlotValue(Character, "Velocity Local Z", LocalVelocity.Z);
+        FCogDebugPlot::PlotValue(Character, "Velocity Delta X", VelocityDelta.X);
+        FCogDebugPlot::PlotValue(Character, "Velocity Delta Y", VelocityDelta.Y);
+        FCogDebugPlot::PlotValue(Character, "Velocity Delta Z", VelocityDelta.Z);
+        FCogDebugPlot::PlotValue(Character, "Velocity Delta Local X", LocalVelocityDelta.X);
+        FCogDebugPlot::PlotValue(Character, "Velocity Delta Local Y", LocalVelocityDelta.Y);
+        FCogDebugPlot::PlotValue(Character, "Velocity Delta Local Z", LocalVelocityDelta.Z);
+        FCogDebugPlot::PlotValue(Character, "Speed", Velocity.Length());
+
+        const FVector Delta = DebugBottomLocation - DebugLastBottomLocation;
+        const FColor Color = DebugIsPositionCorrected ? FColor::Blue : FColor::Yellow;
+        if (Delta.IsNearlyZero() == false)
+        {
+            FCogDebugDraw::Arrow(LogCogPosition, this, DebugLastBottomLocation, DebugBottomLocation, Color, true, 0);
+        }
+
+        const FColor CapsuleColor = CapsuleComponent->GetCollisionEnabled() == ECollisionEnabled::NoCollision ? FColor::Black : FColor::White;
+        FCogDebugDraw::Capsule(LogCogCollision, this, CapsuleComponent->GetComponentLocation(), CapsuleComponent->GetScaledCapsuleHalfHeight(), CapsuleComponent->GetScaledCapsuleRadius(), CapsuleComponent->GetComponentQuat(), CapsuleColor, false, 0);
+        FCogDebugDraw::Axis(LogCogCollision, this, CapsuleComponent->GetComponentLocation(), CapsuleComponent->GetComponentRotation(), 50.0f, false, 0);
+    }
+    
+    DebugLastBottomLocation = DebugBottomLocation;
+    DebugLastVelocity = Velocity;
+    DebugIsPositionCorrected = false;
+
+#endif //ENABLE_COG
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool UCogSampleCharacterMovementComponent::ClientUpdatePositionAfterServerUpdate()
+{
+    bool Result = Super::ClientUpdatePositionAfterServerUpdate();
+
+#if ENABLE_COG
+    DebugIsPositionCorrected = true;
+#endif //ENABLE_COG
+
+    return Result;
+}
+
