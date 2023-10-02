@@ -42,6 +42,9 @@ Cog are debug tools for Unreal Engine built on top of [ImGui](https://github.com
 #### Selection
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/67cf9019-85c0-449f-88bf-0fc4841f8795)
 
+#### Spawn
+![image](https://github.com/arnaud-jamin/Cog/assets/13844285/b37f9307-5fd5-4ea5-9652-c265a8f63e32)
+
 #### Stats
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/e394ec7b-02fa-4b09-879b-90c82bd542ef)
 
