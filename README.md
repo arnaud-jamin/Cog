@@ -1,6 +1,9 @@
 # Cog
 Cog are debug tools for Unreal Engine built on top of [ImGui](https://github.com/ocornut/imgui)
 
+![image](https://github.com/arnaud-jamin/Cog/assets/13844285/73164e2d-776e-4a59-ac0f-1afb84fe9166)
+
+
 ## Project Structure
 
 - `Plugins/CogImGui` - A simple wrapper of Imgui for Unreal, inspired by [UnrealImGui](https://github.com/segross/UnrealImGui)
