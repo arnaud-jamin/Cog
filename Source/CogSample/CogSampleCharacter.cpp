@@ -348,13 +348,11 @@ void ACogSampleCharacter::Look(const FInputActionValue& Value)
 void ACogSampleCharacter::OnDamageReceived(float ReceivedDamage, float IncomingDamage, AActor* DamageDealer, const FGameplayEffectSpec& EffectSpec)
 {
 #if USE_COG
-    FCogInterfaceDamageParams Params;
-    Params.Type = ECogInterfaceDamageEventType::DamageReceived;
-    Params.MitigatedDamage = ReceivedDamage;
-    Params.IncomingDamage = IncomingDamage;
-    Params.DamageDealer = DamageDealer;
-    Params.DamageReceiver = this;
-    OnDamageEventDelegate.Broadcast(Params);
+    FCogInterfaceMetricEventParams Params;
+    Params.Name = "Damage Received";
+    Params.MitigatedValue = ReceivedDamage;
+    Params.UnmitigatedValue = IncomingDamage;
+    OnMetricEventDelegate.Broadcast(Params);
 #endif //USE_COG
 }
 
@@ -362,13 +360,11 @@ void ACogSampleCharacter::OnDamageReceived(float ReceivedDamage, float IncomingD
 void ACogSampleCharacter::OnDamageDealt(float ReceivedDamage, float IncomingDamage, AActor* DamageReceiver, const FGameplayEffectSpec& EffectSpec)
 {
 #if USE_COG
-    FCogInterfaceDamageParams Params;
-    Params.Type = ECogInterfaceDamageEventType::DamageDealt;
-    Params.MitigatedDamage = ReceivedDamage;
-    Params.IncomingDamage = IncomingDamage;
-    Params.DamageDealer = this;
-    Params.DamageReceiver = DamageReceiver;
-    OnDamageEventDelegate.Broadcast(Params);
+    FCogInterfaceMetricEventParams Params;
+    Params.Name = "Damage Dealt";
+    Params.MitigatedValue = ReceivedDamage;
+    Params.UnmitigatedValue = IncomingDamage;
+    OnMetricEventDelegate.Broadcast(Params);
 #endif //USE_COG
 }
 

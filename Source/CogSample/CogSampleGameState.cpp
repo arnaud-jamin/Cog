@@ -17,8 +17,8 @@
 #include "CogAbilityWindow_Abilities.h"
 #include "CogAbilityWindow_Attributes.h"
 #include "CogAbilityWindow_Cheats.h"
-#include "CogAbilityWindow_Damages.h"
 #include "CogAbilityWindow_Effects.h"
+#include "CogAbilityWindow_Metrics.h"
 #include "CogAbilityWindow_Pools.h"
 #include "CogAbilityWindow_Tags.h"
 #include "CogAbilityWindow_Tweaks.h"
@@ -194,7 +194,7 @@ void ACogSampleGameState::InitializeCog()
     UCogAbilityWindow_Cheats* CheatsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Cheats>("Gameplay.Cheats");
     CheatsWindow->CheatsAsset = GetFirstAssetByClass<UCogAbilityDataAsset_Cheats>();
 
-    CogWindowManager->CreateWindow<UCogAbilityWindow_Damages>("Gameplay.Damages");
+    CogWindowManager->CreateWindow<UCogAbilityWindow_Metrics>("Gameplay.Metrics");
 
     UCogAbilityWindow_Effects* EffectsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Effects>("Gameplay.Effects");
     EffectsWindow->NegativeEffectTag = Tag_Effect_Alignment_Negative;

@@ -14,7 +14,7 @@ class COGABILITY_API UCogAbilityWindow_Cheats : public UCogWindow
     GENERATED_BODY()
 
 public:
-    UCogAbilityWindow_Cheats();
+
     virtual void RenderContent() override;
 
     TWeakObjectPtr<UCogAbilityDataAsset_Cheats> CheatsAsset;
