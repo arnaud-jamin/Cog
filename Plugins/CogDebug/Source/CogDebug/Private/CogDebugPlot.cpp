@@ -2,7 +2,7 @@
 
 #include "CogDebugDraw.h"
 #include "CogDebugHelper.h"
-#include "CogInterfacesFilteredActor.h"
+#include "CogInterfaceFilteredActor.h"
 #include "CogImguiHelper.h"
 
 FCogDebugPlotEvent FCogDebugPlot::DefaultEvent;

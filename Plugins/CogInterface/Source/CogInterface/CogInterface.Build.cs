@@ -1,8 +1,8 @@
 using UnrealBuildTool;
 
-public class CogInterfaces : ModuleRules
+public class CogInterface : ModuleRules
 {
-	public CogInterfaces(ReadOnlyTargetRules Target) : base(Target)
+	public CogInterface(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		

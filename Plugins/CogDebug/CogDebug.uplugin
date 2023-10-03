@@ -32,7 +32,7 @@
       "Enabled": true
     },
     {
-      "Name": "CogInterfaces",
+      "Name": "CogInterface",
       "Enabled": true
     }
   ]

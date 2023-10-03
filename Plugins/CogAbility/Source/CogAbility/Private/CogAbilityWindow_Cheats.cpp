@@ -1,7 +1,7 @@
 #include "CogAbilityWindow_Cheats.h"
 
 #include "CogAbilityDataAsset_Cheats.h"
-#include "CogInterfacesAllegiance.h"
+#include "CogInterfaceAllegianceActor.h"
 #include "CogDebugDraw.h"
 #include "CogImguiHelper.h"
 #include "EngineUtils.h"

@@ -1,6 +1,6 @@
 #include "CogAbilityWindow_Damages.h"
 
-#include "CogInterfacesDamageActor.h"
+#include "CogInterfaceDamageActor.h"
 #include "CogImguiHelper.h"
 #include "imgui.h"
 
@@ -236,12 +236,12 @@ void UCogAbilityWindow_Damages::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogAbilityWindow_Damages::OnSelectionChanged(AActor* OldSelection, AActor* NewSelection)
 {
-    if (ICogInterfacesDamageActor* DamageActor = Cast<ICogInterfacesDamageActor>(OldSelection))
+    if (ICogInterfaceDamageActor* DamageActor = Cast<ICogInterfaceDamageActor>(OldSelection))
     {
         DamageActor->OnDamageEvent().Remove(OnDamageEventDelegate);
     }
 
-    if (ICogInterfacesDamageActor* DamageActor = Cast<ICogInterfacesDamageActor>(NewSelection))
+    if (ICogInterfaceDamageActor* DamageActor = Cast<ICogInterfaceDamageActor>(NewSelection))
     {
         OnDamageEventDelegate = DamageActor->OnDamageEvent().AddUObject(this, &UCogAbilityWindow_Damages::OnDamageEvent);
     }
@@ -257,14 +257,14 @@ void UCogAbilityWindow_Damages::GameTick(float DeltaSeconds)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Damages::OnDamageEvent(const FCogInterfacesDamageParams& Params)
+void UCogAbilityWindow_Damages::OnDamageEvent(const FCogInterfaceDamageParams& Params)
 {
     AActor* Selection = GetSelection();
-    if (Params.Type == ECogInterfacesDamageEventType::DamageDealt)
+    if (Params.Type == ECogInterfaceDamageEventType::DamageDealt)
     {
         DamageDealtStats.AddDamage(Params.MitigatedDamage, Params.IncomingDamage, Params.IsCritical);
     }
-    else if (Params.Type == ECogInterfacesDamageEventType::DamageReceived)
+    else if (Params.Type == ECogInterfaceDamageEventType::DamageReceived)
     {
         DamageReceivedStats.AddDamage(Params.MitigatedDamage, Params.IncomingDamage, Params.IsCritical);
     }

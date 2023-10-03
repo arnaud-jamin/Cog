@@ -5,8 +5,8 @@
 #include "ActiveGameplayEffectHandle.h"
 #include "AttributeSet.h"
 #include "CogDefines.h"
-#include "CogInterfacesDamageActor.h"
-#include "CogInterfacesFilteredActor.h"
+#include "CogInterfaceDamageActor.h"
+#include "CogInterfaceFilteredActor.h"
 #include "GameFramework/Character.h"
 #include "GameplayAbilitySpecHandle.h"
 #include "GameplayTagContainer.h"
@@ -59,7 +59,7 @@ UCLASS(config=Game)
 class ACogSampleCharacter : public ACharacter
     , public IAbilitySystemInterface
     , public ICogInterfacesFilteredActor
-    , public ICogInterfacesDamageActor
+    , public ICogInterfaceDamageActor
 {
 	GENERATED_BODY()
 
@@ -75,7 +75,7 @@ public:
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
     virtual void PossessedBy(AController* NewController) override;
 
-    virtual FCogAbilityOnDamageEvent& OnDamageEvent() override { return OnDamageEventDelegate; }
+    virtual FCogInterfaceOnDamageEvent& OnDamageEvent() override { return OnDamageEventDelegate; }
     virtual bool IsActorFilteringDebug() const override { return true; }
 
     void OnAcknowledgePossession(APlayerController* InController);
@@ -146,7 +146,7 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Ability)
     TArray<TSubclassOf<UGameplayEffect>> Effects;
 
-    FCogAbilityOnDamageEvent OnDamageEventDelegate;
+    FCogInterfaceOnDamageEvent OnDamageEventDelegate;
 
 private:
 

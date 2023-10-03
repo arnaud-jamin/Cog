@@ -1,6 +1,6 @@
 #include "CogDebugSettings.h"
 
-#include "CogInterfacesFilteredActor.h"
+#include "CogInterfaceFilteredActor.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 TWeakObjectPtr<AActor> FCogDebugSettings::Selection;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogInterfacesAllegiance.generated.h"
+#include "CogInterfaceAllegianceActor.generated.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 UENUM(BlueprintType)

@@ -23,7 +23,7 @@ public class CogAbility : ModuleRules
 			{
 				"Core",
                 "CogImgui",
-                "CogInterfaces",
+                "CogInterface",
                 "CogDebug",
                 "CogWindow",
                 "GameplayAbilities",

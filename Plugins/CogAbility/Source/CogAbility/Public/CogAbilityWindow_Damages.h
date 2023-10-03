@@ -4,7 +4,7 @@
 #include "CogWindow.h"
 #include "CogAbilityWindow_Damages.generated.h"
 
-struct FCogInterfacesDamageParams;
+struct FCogInterfaceDamageParams;
 
 //--------------------------------------------------------------------------------------------------------------------------
 class FCogDamageInstance
@@ -64,7 +64,7 @@ protected:
 private:
 
     UFUNCTION()
-    void OnDamageEvent(const FCogInterfacesDamageParams& Params);
+    void OnDamageEvent(const FCogInterfaceDamageParams& Params);
 
     FCogDamageStats DamageDealtStats;
     FCogDamageStats DamageReceivedStats;
