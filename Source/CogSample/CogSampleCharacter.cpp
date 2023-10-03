@@ -2,6 +2,7 @@
 
 #include "Camera/CameraComponent.h"
 #include "CogDebugLogMacros.h"
+#include "CogDebugMetric.h"
 #include "CogSampleAttributeSet_Health.h"
 #include "CogSampleAttributeSet_Misc.h"
 #include "CogSampleCharacterMovementComponent.h"
@@ -345,26 +346,18 @@ void ACogSampleCharacter::Look(const FInputActionValue& Value)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogSampleCharacter::OnDamageReceived(float ReceivedDamage, float IncomingDamage, AActor* DamageDealer, const FGameplayEffectSpec& EffectSpec)
+void ACogSampleCharacter::OnDamageReceived(float MitigatedDamage, float UnmitigatedDamage, AActor* DamageDealer, const FGameplayEffectSpec& EffectSpec)
 {
 #if USE_COG
-    FCogInterfaceMetricEventParams Params;
-    Params.Name = "Damage Received";
-    Params.MitigatedValue = ReceivedDamage;
-    Params.UnmitigatedValue = IncomingDamage;
-    OnMetricEventDelegate.Broadcast(Params);
+    FCogDebugMetric::AddMetric(this, "Damage Received", MitigatedDamage, UnmitigatedDamage, false);
 #endif //USE_COG
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogSampleCharacter::OnDamageDealt(float ReceivedDamage, float IncomingDamage, AActor* DamageReceiver, const FGameplayEffectSpec& EffectSpec)
+void ACogSampleCharacter::OnDamageDealt(float MitigatedDamage, float UnmitigatedDamage, AActor* DamageReceiver, const FGameplayEffectSpec& EffectSpec)
 {
 #if USE_COG
-    FCogInterfaceMetricEventParams Params;
-    Params.Name = "Damage Dealt";
-    Params.MitigatedValue = ReceivedDamage;
-    Params.UnmitigatedValue = IncomingDamage;
-    OnMetricEventDelegate.Broadcast(Params);
+    FCogDebugMetric::AddMetric(this, "Damage Dealt", MitigatedDamage, UnmitigatedDamage, false);
 #endif //USE_COG
 }
 

@@ -2,13 +2,13 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
-#include "CogEngineWindow_Spawn.generated.h"
+#include "CogEngineWindow_Spawns.generated.h"
 
 class UCogEngineDataAsset_Spawns;
 struct FCogEngineSpawnGroup;
 
 UCLASS()
-class COGENGINE_API UCogEngineWindow_Spawn : public UCogWindow
+class COGENGINE_API UCogEngineWindow_Spawns : public UCogWindow
 {
     GENERATED_BODY()
 

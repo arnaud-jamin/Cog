@@ -1,13 +1,13 @@
-#include "CogEngineWindow_Spawn.h"
+#include "CogEngineWindow_Spawns.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Spawn::PreRender(ImGuiWindowFlags& WindowFlags)
+void UCogEngineWindow_Spawns::PreRender(ImGuiWindowFlags& WindowFlags)
 {
     Super::PreRender(WindowFlags);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Spawn::RenderContent()
+void UCogEngineWindow_Spawns::RenderContent()
 {
     Super::RenderContent();
 
@@ -23,7 +23,7 @@ void UCogEngineWindow_Spawn::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Spawn::RenderSpawnGroup(const FCogEngineSpawnGroup& SpawnGroup)
+void UCogEngineWindow_Spawns::RenderSpawnGroup(const FCogEngineSpawnGroup& SpawnGroup)
 {
     int32 GroupIndex = 0;
 
@@ -67,7 +67,7 @@ void UCogEngineWindow_Spawn::RenderSpawnGroup(const FCogEngineSpawnGroup& SpawnG
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Spawn::RenderSpawnAsset(const FCogEngineSpawnEntry& SpawnEntry, bool IsLastSelected)
+bool UCogEngineWindow_Spawns::RenderSpawnAsset(const FCogEngineSpawnEntry& SpawnEntry, bool IsLastSelected)
 {
     bool IsPressed = false;
 

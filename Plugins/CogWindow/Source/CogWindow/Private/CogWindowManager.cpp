@@ -108,10 +108,18 @@ void UCogWindowManager::Render(float DeltaTime)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::AddWindow(UCogWindow* Window)
+void UCogWindowManager::AddWindow(UCogWindow* Window, bool AddToMainMenu /*= true*/)
 {
     Window->SetOwner(this);
     Windows.Add(Window);
+
+    if (AddToMainMenu)
+    {
+        if (FMenu* Menu = AddMenu(Window->GetFullName()))
+        {
+            Menu->Window = Window;
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -169,16 +177,21 @@ void UCogWindowManager::SaveLayout(int LayoutIndex)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::RebuildMenu()
+void UCogWindowManager::SortMainMenu()
 {
     MainMenu.SubMenus.Empty();
 
-    for (UCogWindow* Window : Windows)
-    {
-        check(Window);
+    Windows.Sort();
 
-        FMenu* NewMenu = AddMenu(Window->GetFullName());
-        NewMenu->Window = Window;
+    TArray<UCogWindow*> SortedWindows = Windows;
+    SortedWindows.Sort([](UCogWindow& Lhs, UCogWindow& Rhs) { return Lhs.GetFullName() < Rhs.GetFullName(); });
+
+    for (UCogWindow* Window : SortedWindows)
+    {
+        if (FMenu* Menu = AddMenu(Window->GetFullName()))
+        {
+            Menu->Window = Window;
+        }
     }
 }
 

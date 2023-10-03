@@ -5,7 +5,6 @@
 #include "ActiveGameplayEffectHandle.h"
 #include "AttributeSet.h"
 #include "CogDefines.h"
-#include "CogInterfaceMetricActor.h"
 #include "CogInterfaceFilteredActor.h"
 #include "GameFramework/Character.h"
 #include "GameplayAbilitySpecHandle.h"
@@ -59,7 +58,6 @@ UCLASS(config=Game)
 class ACogSampleCharacter : public ACharacter
     , public IAbilitySystemInterface
     , public ICogInterfacesFilteredActor
-    , public ICogInterfaceMetricActor
 {
 	GENERATED_BODY()
 
@@ -70,14 +68,22 @@ public:
     // ACharacter overrides
     //----------------------------------------------------------------------------------------------------------------------
     virtual void BeginPlay();
+
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
+
     virtual void MarkComponentsAsPendingKill() override;
+
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
     virtual void PossessedBy(AController* NewController) override;
 
-    virtual FCogInterfaceOnMetricEvent& OnMetricEvent() override { return OnMetricEventDelegate; }
-    virtual bool IsActorFilteringDebug() const override { return true; }
+    //----------------------------------------------------------------------------------------------------------------------
+    // IAbilitySystemInterface overrides
+    //----------------------------------------------------------------------------------------------------------------------
+    UFUNCTION(BlueprintPure)
+    UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+    //----------------------------------------------------------------------------------------------------------------------
     void OnAcknowledgePossession(APlayerController* InController);
     
     void OnDamageReceived(float DamageAmount, float UnmitigatedDamageAmount, AActor* DamageDealer, const FGameplayEffectSpec& EffectSpec);
@@ -92,9 +98,8 @@ public:
 
     UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
-    UFUNCTION(BlueprintPure)
-    UAbilitySystemComponent* GetAbilitySystemComponent() const  override;
-
+    //----------------------------------------------------------------------------------------------------------------------
+    // Camera
     //----------------------------------------------------------------------------------------------------------------------
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -104,6 +109,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
 	
+    //----------------------------------------------------------------------------------------------------------------------
+    // Input
+    //----------------------------------------------------------------------------------------------------------------------
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
@@ -131,6 +139,9 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
     TArray<UInputAction*> ItemActions;
 
+    //----------------------------------------------------------------------------------------------------------------------
+    // Ability
+    //----------------------------------------------------------------------------------------------------------------------
     UPROPERTY(BlueprintReadOnly, Category = Ability, meta = (AllowPrivateAccess = "true"))
     UAbilitySystemComponent* AbilitySystem = nullptr;
 
@@ -146,31 +157,45 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Ability)
     TArray<TSubclassOf<UGameplayEffect>> Effects;
 
-    FCogInterfaceOnMetricEvent OnMetricEventDelegate;
-
 private:
 
     void InitializeAbilitySystem();
+
     void ShutdownAbilitySystem();
+
 	void Move(const FInputActionValue& Value);
+
     void MoveZ(const FInputActionValue& Value);
+
 	void Look(const FInputActionValue& Value);
+
     void OnAbilityInputStarted(const FInputActionValue& Value, int32 Index);
+
     void OnAbilityInputCompleted(const FInputActionValue& Value, int32 Index);
+
     void ActivateItem(const FInputActionValue& Value, int32 Index);
+
     void OnGameplayEffectAdded(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& GameplayEffectSpec, FActiveGameplayEffectHandle Handle);
+
     void OnGameplayEffectRemoved(const FActiveGameplayEffect& RemovedGameplayEffect);
+
     void OnGhostTagNewOrRemoved(const FGameplayTag InTag, int32 NewCount);
+
     void OnScaleAttributeChanged(const FOnAttributeChangeData& Data);
 
     UPROPERTY(Replicated, Transient)
     TArray<FGameplayAbilitySpecHandle> ActiveAbilityHandles;
     
     FDelegateHandle GameplayEffectAddedHandle;
+
     FDelegateHandle GameplayEffectRemovedHandle;
+
     FDelegateHandle GhostTagDelegateHandle;
+
     FDelegateHandle ScaleAttributeDelegateHandle;
+
     bool bIsGhost = false;
+
     bool bIsInitialized = false;
 };
 

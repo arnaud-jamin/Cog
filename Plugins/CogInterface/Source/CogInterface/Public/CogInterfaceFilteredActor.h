@@ -12,6 +12,4 @@ class UCogInterfacesFilteredActor : public UInterface
 class ICogInterfacesFilteredActor
 {
     GENERATED_BODY()
-
-    virtual bool IsActorFilteringDebug() const { return true; }
 };

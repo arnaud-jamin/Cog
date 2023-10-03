@@ -77,9 +77,8 @@ void UCogWindow::DrawMenuItem(const FString& MenuItemName)
 {
     if (bShowInsideMenu && bIsVisible == false)
     {
-        static const ImVec2 TEXT_BASE_SIZE = ImGui::CalcTextSize("A");
-        ImGui::SetNextWindowSizeConstraints(ImVec2(TEXT_BASE_SIZE.x * 40, TEXT_BASE_SIZE.y * 1),
-                                            ImVec2(TEXT_BASE_SIZE.x * 50, TEXT_BASE_SIZE.y * 60));
+        ImGui::SetNextWindowSizeConstraints(ImVec2(FCogWindowWidgets::TextBaseWidth * 40, FCogWindowWidgets::TextBaseHeight * 1),
+                                            ImVec2(FCogWindowWidgets::TextBaseWidth * 50, FCogWindowWidgets::TextBaseHeight * 60));
 
         if (ImGui::BeginMenu(TCHAR_TO_ANSI(*MenuItemName)))
         {

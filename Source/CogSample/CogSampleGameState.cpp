@@ -18,7 +18,6 @@
 #include "CogAbilityWindow_Attributes.h"
 #include "CogAbilityWindow_Cheats.h"
 #include "CogAbilityWindow_Effects.h"
-#include "CogAbilityWindow_Metrics.h"
 #include "CogAbilityWindow_Pools.h"
 #include "CogAbilityWindow_Tags.h"
 #include "CogAbilityWindow_Tweaks.h"
@@ -33,11 +32,12 @@
 #include "CogEngineWindow_LogCategories.h"
 #include "CogEngineWindow_NetEmulation.h"
 #include "CogEngineWindow_OutputLog.h"
+#include "CogEngineWindow_Metrics.h"
 #include "CogEngineWindow_Plots.h"
 #include "CogEngineWindow_Scalability.h"
 #include "CogEngineWindow_Selection.h"
 #include "CogEngineWindow_Skeleton.h"
-#include "CogEngineWindow_Spawn.h"
+#include "CogEngineWindow_Spawns.h"
 #include "CogEngineWindow_Stats.h"
 #include "CogEngineWindow_Time.h"
 #include "CogImguiModule.h"
@@ -160,28 +160,21 @@ void ACogSampleGameState::InitializeCog()
 
     CogWindowManager->CreateWindow<UCogEngineWindow_Plots>("Engine.Plots");
 
+    UCogEngineWindow_Selection* SelectionWindow = CogWindowManager->CreateWindow<UCogEngineWindow_Selection>("Engine.Selection");
+    SelectionWindow->SetActorSubClasses({ AActor::StaticClass(), AGameModeBase::StaticClass(), AGameStateBase::StaticClass(), ACharacter::StaticClass() });
+    SelectionWindow->SetCurrentActorSubClass(ACharacter::StaticClass());
+    SelectionWindow->SetTraceType(UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Pawn));
+
     CogWindowManager->CreateWindow<UCogEngineWindow_Scalability>("Engine.Scalability");
 
     CogWindowManager->CreateWindow<UCogEngineWindow_Skeleton>("Engine.Skeleton");
 
-    UCogEngineWindow_Spawn* SpawnWindow =CogWindowManager->CreateWindow<UCogEngineWindow_Spawn>("Engine.Spawn");
+    UCogEngineWindow_Spawns* SpawnWindow =CogWindowManager->CreateWindow<UCogEngineWindow_Spawns>("Engine.Spawns");
     SpawnWindow->SetSpawnsAsset(GetFirstAssetByClass<UCogEngineDataAsset_Spawns>());
 
-    CogWindowManager->CreateWindow<UCogEngineWindow_Time>("Engine.Time");
-
-    UCogEngineWindow_Selection* SelectionWindow = CogWindowManager->CreateWindow<UCogEngineWindow_Selection>("Engine.Selection");
-    TArray<TSubclassOf<AActor>> SubClasses
-    {
-        AActor::StaticClass(),
-        AGameModeBase::StaticClass(),
-        AGameStateBase::StaticClass(),
-        ACharacter::StaticClass()
-    };
-    SelectionWindow->SetActorSubClasses(SubClasses);
-    SelectionWindow->SetCurrentActorSubClass(ACharacter::StaticClass());
-    SelectionWindow->SetTraceType(UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Pawn));
-
     UCogEngineWindow_Stats* StatsWindow = CogWindowManager->CreateWindow<UCogEngineWindow_Stats>("Engine.Stats");
+
+    CogWindowManager->CreateWindow<UCogEngineWindow_Time>("Engine.Time");
 
     //---------------------------------------
     // Abilities
@@ -194,7 +187,7 @@ void ACogSampleGameState::InitializeCog()
     UCogAbilityWindow_Cheats* CheatsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Cheats>("Gameplay.Cheats");
     CheatsWindow->CheatsAsset = GetFirstAssetByClass<UCogAbilityDataAsset_Cheats>();
 
-    CogWindowManager->CreateWindow<UCogAbilityWindow_Metrics>("Gameplay.Metrics");
+    CogWindowManager->CreateWindow<UCogEngineWindow_Metrics>("Gameplay.Metrics");
 
     UCogAbilityWindow_Effects* EffectsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Effects>("Gameplay.Effects");
     EffectsWindow->NegativeEffectTag = Tag_Effect_Alignment_Negative;
@@ -222,18 +215,11 @@ void ACogSampleGameState::InitializeCog()
     //---------------------------------------
     CogWindowManager->AddMainMenuWidget(SelectionWindow);
     CogWindowManager->AddMainMenuWidget(StatsWindow);
-
-    CogWindowManager->RebuildMenu();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleGameState::RenderCog(float DeltaTime)
 {
-    static bool ShowImGuiDemo = false;
-    if (ShowImGuiDemo)
-    {
-        ImGui::ShowDemoWindow(&ShowImGuiDemo);
-    }
     CogWindowManager->Render(DeltaTime);
 }
 

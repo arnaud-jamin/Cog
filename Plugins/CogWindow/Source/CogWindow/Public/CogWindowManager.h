@@ -23,23 +23,23 @@ public:
 
     void Shutdown();
 
-    void RebuildMenu();
+    void SortMainMenu();
 
     void Render(float DeltaTime);
 
     void Tick(float DeltaTime);
 
     template<class T>
-    T* CreateWindow(const FString& Name)
+    T* CreateWindow(const FString& Name, bool AddToMainMenu = true)
     {
         T* Window = NewObject<T>(this);
         Window->SetFullName(Name);
         Window->Initialize();
-        AddWindow(Window);
+        AddWindow(Window, AddToMainMenu);
         return Window;
     }
 
-    void AddWindow(UCogWindow* Window);
+    void AddWindow(UCogWindow* Window, bool AddToMainMenu = true);
 
     void AddMainMenuWidget(UCogWindow* Window);
 
