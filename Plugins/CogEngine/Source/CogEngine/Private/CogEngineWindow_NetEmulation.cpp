@@ -219,3 +219,5 @@ void UCogEngineWindow_NetEmulation::DrawControls()
     }
 
 #endif //DO_ENABLE_NET_TEST
+
+}

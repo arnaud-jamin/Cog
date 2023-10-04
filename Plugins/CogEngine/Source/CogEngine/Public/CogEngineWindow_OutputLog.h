@@ -8,6 +8,7 @@
 
 class UCogEngineWindow_OutputLog;
 
+//--------------------------------------------------------------------------------------------------------------------------
 class UCogLogOutputDevice : public FOutputDevice
 {
 public:
@@ -21,6 +22,7 @@ public:
     UCogEngineWindow_OutputLog* OutputLog = nullptr;
 };
 
+//--------------------------------------------------------------------------------------------------------------------------
 UCLASS(Config = Cog)
 class COGENGINE_API UCogEngineWindow_OutputLog : public UCogWindow
 {
@@ -30,6 +32,10 @@ public:
 
     UCogEngineWindow_OutputLog();
 
+    void AddLog(const TCHAR* Message, ELogVerbosity::Type Verbosity, const FName& Category);
+
+    void Clear();
+
 protected:
 
     virtual void RenderHelp() override;
@@ -37,10 +43,6 @@ protected:
     virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;
 
     virtual void RenderContent() override;
-
-    void Clear();
-
-    void AddLog(const TCHAR* Message, ELogVerbosity::Type Verbosity, const FName& Category);
 
 private:
 

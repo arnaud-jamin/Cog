@@ -13,9 +13,13 @@ class COGINPUT_API UCogInputWindow_Actions : public UCogWindow
 {
     GENERATED_BODY()
 
+public:
+
+        TWeakObjectPtr<UCogInputDataAsset_Actions> ActionsAsset;
+
 protected:
 
-    void RenderHelp()
+    void RenderHelp();
 
     virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;
 
@@ -24,8 +28,6 @@ protected:
     virtual void RenderTick(float DeltaSeconds) override;
 
     virtual void DrawAxis(const char* Format, const char* ActionName, float CurrentValue, float* InjectValue);
-
-    TWeakObjectPtr<UCogInputDataAsset_Actions> ActionsAsset;
 
 private:
 

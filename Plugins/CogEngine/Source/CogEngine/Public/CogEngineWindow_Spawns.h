@@ -20,6 +20,8 @@ class COGENGINE_API UCogEngineWindow_Spawns : public UCogWindow
 
 protected:
 
+    virtual void RenderHelp();
+
     virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;
 
     virtual void RenderContent() override;

@@ -15,7 +15,7 @@ void UCogInputWindow_Actions::RenderHelp()
         "This window display the current state of each Input Action. "
         "It can also be used to inject inputs to help debugging. "
         "The input action are read from a Input Mapping Context defined in '%s' data asset. "
-        , TCHAR_TO_ANSI(*GetNameSafe(ActionAsset))
+        , TCHAR_TO_ANSI(*GetNameSafe(ActionsAsset.Get()))
     );
 }
 
