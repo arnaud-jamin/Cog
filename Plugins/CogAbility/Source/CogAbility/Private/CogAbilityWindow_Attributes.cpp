@@ -9,106 +9,21 @@
 #include "GameFramework/Character.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogAbilityWindow_Attributes::UCogAbilityWindow_Attributes()
+void UCogAbilityWindow_Attributes::RenderHelp()
 {
+    ImGui::Text(
+        "This window display the gameplay attributes of the selected actor. "
+        "Attributes can be sorted by name, category or attribute set. "
+        "Attributes with the Current value greater than the Base value are displayed in green. "
+        "Attributes with the Current value lower than the Base value are displayed in red. "
+        "Use the options 'Show Only Modified' to only show the attributes that have modifiers. "
+        );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogAbilityWindow_Attributes::PreRender(ImGuiWindowFlags& WindowFlags)
 {
     WindowFlags = ImGuiWindowFlags_MenuBar;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-static void DrawAttributeInfo(const UAbilitySystemComponent& AbilitySystemComponent, const FGameplayAttribute& Attribute)
-{
-    if (ImGui::BeginTable("Attribute", 2, ImGuiTableFlags_Borders))
-    {
-        const ImVec4 TextColor(1.0f, 1.0f, 1.0f, 0.5f);
-
-        ImGui::TableSetupColumn("Property");
-        ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
-
-        const float BaseValue = AbilitySystemComponent.GetNumericAttributeBase(Attribute);
-        const float CurrentValue = AbilitySystemComponent.GetNumericAttribute(Attribute);
-
-        ImVec4 Color;
-        if (CurrentValue > BaseValue)
-        {
-            Color = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
-        }
-        else if (CurrentValue < BaseValue)
-        {
-            Color = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
-        }
-        else
-        {
-            Color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
-        }
-
-        //------------------------
-        // Name
-        //------------------------
-        ImGui::TableNextRow();
-        ImGui::TableNextColumn();
-        ImGui::TextColored(TextColor, "Name");
-        ImGui::TableNextColumn();
-        ImGui::Text("%s", TCHAR_TO_ANSI(*Attribute.GetName()));
-
-        //------------------------
-        // Base Value
-        //------------------------
-        ImGui::TableNextRow();
-        ImGui::TableNextColumn();
-        ImGui::TextColored(TextColor, "Base Value");
-        ImGui::TableNextColumn();
-        ImGui::Text("%0.2f", BaseValue);
-
-        //------------------------
-        // Current Value
-        //------------------------
-        ImGui::TableNextRow();
-        ImGui::TableNextColumn();
-        ImGui::TextColored(TextColor, "Current Value");
-        ImGui::TableNextColumn();
-        ImGui::PushStyleColor(ImGuiCol_Text, Color);
-        ImGui::Text("%0.2f", CurrentValue);
-        ImGui::PopStyleColor(1);
-
-        //------------------------
-        // Modifiers
-        //------------------------
-        FGameplayEffectQuery Query;
-        for (const FActiveGameplayEffectHandle& ActiveHandle : AbilitySystemComponent.GetActiveEffects(Query))
-        {
-            const FActiveGameplayEffect* ActiveEffect = AbilitySystemComponent.GetActiveGameplayEffect(ActiveHandle);
-            if (ActiveEffect == nullptr)
-            {
-                continue;
-            }
-
-            for (int32 i = 0; i < ActiveEffect->Spec.Modifiers.Num(); ++i)
-            {
-                const FModifierSpec& ModSpec = ActiveEffect->Spec.Modifiers[i];
-                const FGameplayModifierInfo& ModInfo = ActiveEffect->Spec.Def->Modifiers[i];
-
-                if (ModInfo.Attribute == Attribute)
-                {
-                    ImGui::TableNextRow();
-                    ImGui::TableNextColumn();
-                    ImGui::TextColored(TextColor, "Effect");
-                    ImGui::TextColored(TextColor, "Operation");
-                    ImGui::TextColored(TextColor, "Magnitude");
-                    ImGui::TableNextColumn();
-                    ImGui::Text("%s", TCHAR_TO_ANSI(*FCogAbilityHelper::CleanupName(GetNameSafe(ActiveEffect->Spec.Def))));
-                    ImGui::Text("%s", TCHAR_TO_ANSI(*EGameplayModOpToString(ModInfo.ModifierOp)));
-                    ImGui::Text("%0.2f", ModSpec.GetEvaluatedMagnitude());
-                }
-            }
-        }
-
-        ImGui::EndTable();
-    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -343,6 +258,99 @@ void UCogAbilityWindow_Attributes::RenderContent()
             if (bOpenAttributeSet && bGroupByAttributeSet)
             {
                 ImGui::TreePop();
+            }
+        }
+
+        ImGui::EndTable();
+    }
+}
+
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogAbilityWindow_Attributes::DrawAttributeInfo(const UAbilitySystemComponent& AbilitySystemComponent, const FGameplayAttribute& Attribute)
+{
+    if (ImGui::BeginTable("Attribute", 2, ImGuiTableFlags_Borders))
+    {
+        const ImVec4 TextColor(1.0f, 1.0f, 1.0f, 0.5f);
+
+        ImGui::TableSetupColumn("Property");
+        ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+
+        const float BaseValue = AbilitySystemComponent.GetNumericAttributeBase(Attribute);
+        const float CurrentValue = AbilitySystemComponent.GetNumericAttribute(Attribute);
+
+        ImVec4 Color;
+        if (CurrentValue > BaseValue)
+        {
+            Color = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+        }
+        else if (CurrentValue < BaseValue)
+        {
+            Color = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+        }
+        else
+        {
+            Color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+        }
+
+        //------------------------
+        // Name
+        //------------------------
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+        ImGui::TextColored(TextColor, "Name");
+        ImGui::TableNextColumn();
+        ImGui::Text("%s", TCHAR_TO_ANSI(*Attribute.GetName()));
+
+        //------------------------
+        // Base Value
+        //------------------------
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+        ImGui::TextColored(TextColor, "Base Value");
+        ImGui::TableNextColumn();
+        ImGui::Text("%0.2f", BaseValue);
+
+        //------------------------
+        // Current Value
+        //------------------------
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+        ImGui::TextColored(TextColor, "Current Value");
+        ImGui::TableNextColumn();
+        ImGui::PushStyleColor(ImGuiCol_Text, Color);
+        ImGui::Text("%0.2f", CurrentValue);
+        ImGui::PopStyleColor(1);
+
+        //------------------------
+        // Modifiers
+        //------------------------
+        FGameplayEffectQuery Query;
+        for (const FActiveGameplayEffectHandle& ActiveHandle : AbilitySystemComponent.GetActiveEffects(Query))
+        {
+            const FActiveGameplayEffect* ActiveEffect = AbilitySystemComponent.GetActiveGameplayEffect(ActiveHandle);
+            if (ActiveEffect == nullptr)
+            {
+                continue;
+            }
+
+            for (int32 i = 0; i < ActiveEffect->Spec.Modifiers.Num(); ++i)
+            {
+                const FModifierSpec& ModSpec = ActiveEffect->Spec.Modifiers[i];
+                const FGameplayModifierInfo& ModInfo = ActiveEffect->Spec.Def->Modifiers[i];
+
+                if (ModInfo.Attribute == Attribute)
+                {
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::TextColored(TextColor, "Effect");
+                    ImGui::TextColored(TextColor, "Operation");
+                    ImGui::TextColored(TextColor, "Magnitude");
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%s", TCHAR_TO_ANSI(*FCogAbilityHelper::CleanupName(GetNameSafe(ActiveEffect->Spec.Def))));
+                    ImGui::Text("%s", TCHAR_TO_ANSI(*EGameplayModOpToString(ModInfo.ModifierOp)));
+                    ImGui::Text("%0.2f", ModSpec.GetEvaluatedMagnitude());
+                }
             }
         }
 

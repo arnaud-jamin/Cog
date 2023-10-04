@@ -19,6 +19,8 @@ public:
 
 protected:
 
+    virtual void RenderHelp() override;
+
     virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;
 
     virtual void RenderTick(float DetlaTime) override;

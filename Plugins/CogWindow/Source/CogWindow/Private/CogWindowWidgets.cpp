@@ -6,10 +6,6 @@
 #include "imgui_internal.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-float FCogWindowWidgets::TextBaseWidth = 0.0f;
-float FCogWindowWidgets::TextBaseHeight = 0.0f;
-
-//--------------------------------------------------------------------------------------------------------------------------
 void FCogWindowWidgets::BeginTableTooltip()
 {
     ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(4, 4));
@@ -197,3 +193,16 @@ void FCogWindowWidgets::PopBackColor()
 {
     ImGui::PopStyleColor(9);
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogWindowWidgets::SetNextItemToShortWidth()
+{
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 10);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+float FCogWindowWidgets::GetFontWidth()
+{
+    return ImGui::GetFontSize() * 0.5f;
+}
+

@@ -3,54 +3,25 @@
 #include "AbilitySystemComponent.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogAbilityWindow_Tweaks::UCogAbilityWindow_Tweaks()
+void UCogAbilityWindow_Tweaks::RenderHelp()
 {
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void DrawTweak(ACogAbilityReplicator* Replicator, const UCogAbilityDataAsset_Tweaks* TweaksAsset, int32 TweakIndex, int32 TweakCategoryIndex)
-{
-    if (TweaksAsset->TweaksCategories.IsValidIndex(TweakCategoryIndex) == false)
-    {
-        return;
-    }
-
-    float* Value = Replicator->GetTweakCurrentValuePtr(TweaksAsset, TweakIndex, TweakCategoryIndex);
-    if (Value == nullptr)
-    {
-        return;
-    }
-
-    const FCogAbilityTweakCategory& Category = TweaksAsset->TweaksCategories[TweakCategoryIndex];
-
-    FCogWindowWidgets::PushBackColor(FCogImguiHelper::ToImVec4(Category.Color));
-    ImGui::PushItemWidth(-1);
-    ImGui::SliderFloat("##Value", Value, TweaksAsset->TweakMinValue, TweaksAsset->TweakMaxValue, "%+0.0f%%", 1.0f);
-    ImGui::PopItemWidth();
-    FCogWindowWidgets::PopBackColor();
-
-    bool bUpdateValue = ImGui::IsItemDeactivatedAfterEdit();
-
-    if (ImGui::BeginPopupContextItem())
-    {
-        if (ImGui::Button("Reset"))
-        {
-            *Value = 0.f;
-            bUpdateValue = true;
-        }
-        ImGui::EndPopup();
-    }
-
-    if (bUpdateValue)
-    {
-        Replicator->SetTweakValue(TweaksAsset, TweakIndex, TweakCategoryIndex, *Value);
-    }
+    ImGui::Text(
+        "This window can be used to apply tweaks to all the loaded actors. "
+        "The tweaks are used to test various gameplay settings by actor category. "
+        "The tweaks can be configured in the '%s' data asset. "
+        , TCHAR_TO_ANSI(*GetNameSafe(TweaksAsset.Get()))
+    );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogAbilityWindow_Tweaks::RenderContent()
 {
     Super::RenderContent();
+
+    if (TweaksAsset == nullptr)
+    {
+        return;
+    }
 
     FCogAbilityModule& Module = FCogAbilityModule::Get();
     ACogAbilityReplicator* Replicator = Module.GetLocalReplicator();
@@ -127,7 +98,7 @@ void UCogAbilityWindow_Tweaks::RenderContent()
                 {
                     ImGui::TableNextColumn();
                     ImGui::PushID(TweakCategoryIndex);
-                    DrawTweak(Replicator, TweaksAsset.Get(), TweakIndex, TweakCategoryIndex);
+                    DrawTweak(Replicator, TweakIndex, TweakCategoryIndex);
                     ImGui::PopID();
                 }
 
@@ -137,5 +108,45 @@ void UCogAbilityWindow_Tweaks::RenderContent()
         }
 
         ImGui::EndTable();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogAbilityWindow_Tweaks::DrawTweak(ACogAbilityReplicator* Replicator, int32 TweakIndex, int32 TweakCategoryIndex)
+{
+    if (TweaksAsset->TweaksCategories.IsValidIndex(TweakCategoryIndex) == false)
+    {
+        return;
+    }
+
+    float* Value = Replicator->GetTweakCurrentValuePtr(TweaksAsset.Get(), TweakIndex, TweakCategoryIndex);
+    if (Value == nullptr)
+    {
+        return;
+    }
+
+    const FCogAbilityTweakCategory& Category = TweaksAsset->TweaksCategories[TweakCategoryIndex];
+
+    FCogWindowWidgets::PushBackColor(FCogImguiHelper::ToImVec4(Category.Color));
+    ImGui::PushItemWidth(-1);
+    ImGui::SliderFloat("##Value", Value, TweaksAsset->TweakMinValue, TweaksAsset->TweakMaxValue, "%+0.0f%%", 1.0f);
+    ImGui::PopItemWidth();
+    FCogWindowWidgets::PopBackColor();
+
+    bool bUpdateValue = ImGui::IsItemDeactivatedAfterEdit();
+
+    if (ImGui::BeginPopupContextItem())
+    {
+        if (ImGui::Button("Reset"))
+        {
+            *Value = 0.f;
+            bUpdateValue = true;
+        }
+        ImGui::EndPopup();
+    }
+
+    if (bUpdateValue)
+    {
+        Replicator->SetTweakValue(TweaksAsset.Get(), TweakIndex, TweakCategoryIndex, *Value);
     }
 }

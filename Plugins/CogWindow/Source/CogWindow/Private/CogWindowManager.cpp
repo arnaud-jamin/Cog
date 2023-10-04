@@ -66,9 +66,6 @@ void UCogWindowManager::Tick(float DeltaTime)
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::Render(float DeltaTime)
 {
-    FCogWindowWidgets::TextBaseWidth = ImGui::CalcTextSize("A").x;
-    FCogWindowWidgets::TextBaseHeight = ImGui::GetTextLineHeightWithSpacing();
-
     ImGui::DockSpaceOverViewport(0, ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingInCentralNode);
 
     bool bCompactSaved = bCompactMode;
@@ -272,6 +269,7 @@ void UCogWindowManager::DrawMainMenu()
             ImGui::Text("DPI Scale");
             ImGui::SameLine();
             FCogWindowWidgets::PushStyleCompact();
+            FCogWindowWidgets::SetNextItemToShortWidth();
             ImGui::SliderFloat("", &DPIScale, 0.5f, 2.0f, "%.1f");
             if (ImGui::IsItemDeactivatedAfterEdit())
             {
@@ -287,7 +285,15 @@ void UCogWindowManager::DrawMainMenu()
                 ImGui::EndTooltip();
             }
 
+            ImGui::Separator();
 
+            ImGui::MenuItem("Show Window Help", nullptr, &bShowHelp);
+            if (ImGui::IsItemHovered())
+            {
+                ImGui::BeginTooltip();
+                ImGui::TextUnformatted("Should some help be displayed when the mouse is over a window title ?");
+                ImGui::EndTooltip();
+            }
             ImGui::EndMenu();
         }
 

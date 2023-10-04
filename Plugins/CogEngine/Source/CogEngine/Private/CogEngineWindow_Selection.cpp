@@ -9,8 +9,14 @@
 #include "Kismet/GameplayStatics.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogEngineWindow_Selection::UCogEngineWindow_Selection()
+void UCogEngineWindow_Selection::RenderHelp()
 {
+    ImGui::Text(
+        "This window can be used to select an actor either by picking an actor in the world, "
+        "or by selecting an actor in the actor list. "
+        "The actor list can be filtered by actor type (Actor, Character, etc). "
+        "The current selection is used by various debug windows to filter out their content"
+        );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -200,7 +206,7 @@ void UCogEngineWindow_Selection::DrawActorContextMenu(AActor* Actor)
     //------------------------
     // ContextMenu
     //------------------------
-    ImGui::SetNextWindowSize(ImVec2(FCogWindowWidgets::TextBaseWidth * 20, 0));
+    ImGui::SetNextWindowSize(ImVec2(FCogWindowWidgets::GetFontWidth() * 20, 0));
     if (ImGui::BeginPopupContextItem())
     {
         if (ImGui::Button("Reset Selection", ImVec2(-1, 0)))
@@ -387,9 +393,9 @@ bool UCogEngineWindow_Selection::ComputeBoundingBoxScreenPosition(const APlayerC
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogEngineWindow_Selection::DrawMainMenuWidget(bool Draw, float& Width)
 {
-    const float PickButtonWidth = FCogWindowWidgets::TextBaseWidth * 5;
-    const float SelectionButtonWidth = FCogWindowWidgets::TextBaseWidth * 30;
-    const float ResetButtonWidth = FCogWindowWidgets::TextBaseWidth * 2;
+    const float PickButtonWidth = FCogWindowWidgets::GetFontWidth() * 5;
+    const float SelectionButtonWidth = FCogWindowWidgets::GetFontWidth() * 30;
+    const float ResetButtonWidth = FCogWindowWidgets::GetFontWidth() * 2;
     Width = PickButtonWidth + SelectionButtonWidth + ResetButtonWidth;
 
     if (Draw == false)
@@ -399,7 +405,7 @@ void UCogEngineWindow_Selection::DrawMainMenuWidget(bool Draw, float& Width)
 
     if (ImGui::BeginPopup("SelectionPopup"))
     {
-        ImGui::BeginChild("Popup", ImVec2(Width, FCogWindowWidgets::TextBaseWidth * 40), false);
+        ImGui::BeginChild("Popup", ImVec2(Width, FCogWindowWidgets::GetFontWidth() * 40), false);
 
         if (DrawSelectionCombo())
         {

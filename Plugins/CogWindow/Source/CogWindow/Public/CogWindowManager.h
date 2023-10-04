@@ -57,6 +57,8 @@ public:
 
     bool GetCompactMode() const { return bCompactMode; }
 
+    bool GetShowHelp() const { return bShowHelp; }
+
 private:
 
     struct FMenu
@@ -96,6 +98,9 @@ private:
 
     UPROPERTY(Config)
     float DPIScale = 1.0f;
+
+    UPROPERTY(Config)
+    bool bShowHelp = true;
 
     TSharedPtr<SCogImguiWidget> ImGuiWidget;
 

@@ -12,13 +12,16 @@ class COGENGINE_API UCogEngineWindow_Collisions : public UCogWindow
     GENERATED_BODY()
 
 public:
-    UCogEngineWindow_Collisions();
-
-    virtual void RenderContent() override;
 
     void SetCollisionsAsset(const UCogEngineDataAsset_Collisions* Asset);
 
 private:
+
+    virtual void RenderHelp() override;
+
+    virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;
+
+    virtual void RenderContent() override;
 
     struct FChannel
     {
@@ -31,8 +34,26 @@ private:
     FChannel Channels[ECC_MAX];
 
     UPROPERTY(Config)
-    int32 ObjectTypesToQuery;
+    int32 ObjectTypesToQuery = 0;
 
     UPROPERTY(Config)
     int32 ProfileIndex = 0;
+
+    UPROPERTY(Config)
+    int QueryType = 0;
+    
+    UPROPERTY(Config)
+    float QueryDistance = 5000.0f;
+    
+    UPROPERTY(Config)
+    float QueryThickness = 0.0f;
+    
+    UPROPERTY(Config)
+    bool UseComplexCollisions = false;
+    
+    UPROPERTY(Config)
+    bool ShowActorsNames = false;
+
+    UPROPERTY(Config)
+    bool ShowQuery = false;
 };

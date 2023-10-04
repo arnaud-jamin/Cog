@@ -9,6 +9,14 @@ ImVec4 StatOrangeColor(1.0f, 0.7f, 0.4f, 1.0f);
 ImVec4 StatGreenColor(0.5f, 1.0f, 0.6f, 1.0f);
 
 //--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindow_Stats::RenderHelp()
+{
+    ImGui::Text(
+        "This window display engine stats such as FPS, Ping, Packet Loss. "
+    );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void UCogEngineWindow_Stats::RenderContent()
 {
     Super::RenderContent();
@@ -46,7 +54,7 @@ void UCogEngineWindow_Stats::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogEngineWindow_Stats::DrawMainMenuWidget(bool Draw, float& Width)
 {
-    Width = FCogWindowWidgets::TextBaseWidth * 25;
+    Width = FCogWindowWidgets::GetFontWidth() * 25;
 
     if (Draw == false)
     {

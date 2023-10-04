@@ -105,7 +105,7 @@ void UCogEngineWindow_Skeleton::RenderContent()
         ImGui::EndMenuBar();
     }
 
-    ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, FCogWindowWidgets::TextBaseWidth);
+    ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, FCogWindowWidgets::GetFontWidth());
 
     HoveredBoneIndex = INDEX_NONE;
     DrawBoneEntry(0, false);

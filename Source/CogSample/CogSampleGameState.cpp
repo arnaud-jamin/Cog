@@ -39,7 +39,7 @@
 #include "CogEngineWindow_Skeleton.h"
 #include "CogEngineWindow_Spawns.h"
 #include "CogEngineWindow_Stats.h"
-#include "CogEngineWindow_Time.h"
+#include "CogEngineWindow_TimeScale.h"
 #include "CogImguiModule.h"
 #include "CogInputDataAsset_Actions.h"
 #include "CogInputWindow_Actions.h"
@@ -158,6 +158,8 @@ void ACogSampleGameState::InitializeCog()
 
     CogWindowManager->CreateWindow<UCogEngineWindow_OutputLog>("Engine.Output Log");
 
+    CogWindowManager->CreateWindow<UCogEngineWindow_Metrics>("Engine.Metrics");
+
     CogWindowManager->CreateWindow<UCogEngineWindow_Plots>("Engine.Plots");
 
     UCogEngineWindow_Selection* SelectionWindow = CogWindowManager->CreateWindow<UCogEngineWindow_Selection>("Engine.Selection");
@@ -174,7 +176,7 @@ void ACogSampleGameState::InitializeCog()
 
     UCogEngineWindow_Stats* StatsWindow = CogWindowManager->CreateWindow<UCogEngineWindow_Stats>("Engine.Stats");
 
-    CogWindowManager->CreateWindow<UCogEngineWindow_Time>("Engine.Time");
+    CogWindowManager->CreateWindow<UCogEngineWindow_TimeScale>("Engine.Time Scale");
 
     //---------------------------------------
     // Abilities
@@ -186,9 +188,6 @@ void ACogSampleGameState::InitializeCog()
 
     UCogAbilityWindow_Cheats* CheatsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Cheats>("Gameplay.Cheats");
     CheatsWindow->CheatsAsset = GetFirstAssetByClass<UCogAbilityDataAsset_Cheats>();
-
-    CogWindowManager->CreateWindow<UCogEngineWindow_Metrics>("Gameplay.Metrics");
-
     UCogAbilityWindow_Effects* EffectsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Effects>("Gameplay.Effects");
     EffectsWindow->NegativeEffectTag = Tag_Effect_Alignment_Negative;
     EffectsWindow->PositiveEffectTag = Tag_Effect_Alignment_Positive;

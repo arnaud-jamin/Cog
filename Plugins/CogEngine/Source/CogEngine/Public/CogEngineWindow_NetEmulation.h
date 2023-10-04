@@ -9,9 +9,15 @@ class COGENGINE_API UCogEngineWindow_NetEmulation : public UCogWindow
 {
     GENERATED_BODY()
 
-public:
+protected:
+
+    virtual void RenderHelp() override;
 
     virtual void RenderContent() override;
+
+    virtual void DrawStats();
+
+    virtual void DrawControls();
 
 private:
 

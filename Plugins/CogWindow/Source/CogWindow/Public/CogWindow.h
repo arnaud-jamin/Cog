@@ -59,6 +59,8 @@ protected:
 
     virtual const FString& GetTitle() const { return Name; }
 
+    virtual void RenderHelp();
+
     virtual void PreRender(ImGuiWindowFlags& WindowFlags) {}
 
     virtual void RenderContent() {}

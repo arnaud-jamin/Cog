@@ -1,42 +1,20 @@
-#include "CogEngineWindow_Time.h"
+#include "CogEngineWindow_TimeScale.h"
 
 #include "CogEngineReplicator.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void DrawTimeButton(ACogEngineReplicator* Replicator, float Value)
+void UCogEngineWindow_TimeScale::RenderHelp()
 {
-    const bool IsSelected = FMath::IsNearlyEqual(Replicator->GetTimeDilation(), Value, 0.0001f);
-    if (IsSelected)
-    {
-        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
-    }
-    else
-    {
-        ImGui::PushStyleColor(ImGuiCol_Button,          IM_COL32(128, 128, 128, 50));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered,   IM_COL32(128, 128, 128, 100));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive,    IM_COL32(128, 128, 128, 150));
-    }
-
-    const char* Text = TCHAR_TO_ANSI(*FString::Printf(TEXT("%g"), Value).Replace(TEXT("0."), TEXT(".")));
-    if (ImGui::Button(Text, ImVec2(3.5f * FCogWindowWidgets::TextBaseWidth, 0)))
-    {
-        Replicator->Server_SetTimeDilation(Value);
-    }
-
-    if (IsSelected)
-    {
-        ImGui::PopStyleVar();
-    }
-    else
-    {
-        ImGui::PopStyleColor(3);
-    }
+    ImGui::Text(
+        "This window can be used to change the game global time scale. "
+        "If changed on a client the time scale is also modified on the game server. "
+    );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogEngineWindow_Time::UCogEngineWindow_Time()
+UCogEngineWindow_TimeScale::UCogEngineWindow_TimeScale()
 {
     TimingScales.Add(0.00f);
     TimingScales.Add(0.01f);
@@ -49,7 +27,7 @@ UCogEngineWindow_Time::UCogEngineWindow_Time()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Time::RenderContent()
+void UCogEngineWindow_TimeScale::RenderContent()
 {
     Super::RenderContent();
 
@@ -73,4 +51,35 @@ void UCogEngineWindow_Time::RenderContent()
 
     ImGui::PopStyleColor(1);
     ImGui::PopStyleVar(3);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindow_TimeScale::DrawTimeButton(ACogEngineReplicator* Replicator, float Value)
+{
+    const bool IsSelected = FMath::IsNearlyEqual(Replicator->GetTimeDilation(), Value, 0.0001f);
+    if (IsSelected)
+    {
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
+    }
+    else
+    {
+        ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(128, 128, 128, 50));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, IM_COL32(128, 128, 128, 100));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, IM_COL32(128, 128, 128, 150));
+    }
+
+    const char* Text = TCHAR_TO_ANSI(*FString::Printf(TEXT("%g"), Value).Replace(TEXT("0."), TEXT(".")));
+    if (ImGui::Button(Text, ImVec2(3.5f * FCogWindowWidgets::GetFontWidth(), 0)))
+    {
+        Replicator->Server_SetTimeDilation(Value);
+    }
+
+    if (IsSelected)
+    {
+        ImGui::PopStyleVar();
+    }
+    else
+    {
+        ImGui::PopStyleColor(3);
+    }
 }

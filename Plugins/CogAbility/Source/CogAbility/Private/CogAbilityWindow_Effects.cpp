@@ -9,6 +9,15 @@
 #include "GameFramework/Character.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
+void UCogAbilityWindow_Effects::RenderHelp()
+{
+    ImGui::Text(
+        "This window displays the gameplay effects of the selected actor. "
+        "Mouse over an effect to see its details such as its modifiers and the gameplay tags it grants"
+        );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void UCogAbilityWindow_Effects::PreRender(ImGuiWindowFlags& WindowFlags)
 {
     Super::PreRender(WindowFlags);
@@ -300,7 +309,7 @@ void UCogAbilityWindow_Effects::RenderRemainingTime(const UAbilitySystemComponen
 
         ImGui::PushStyleColor(ImGuiCol_PlotHistogram, IM_COL32(100, 100, 100, 255));
         ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 100));
-        ImGui::ProgressBar(RemainingTime / Duration, ImVec2(FCogWindowWidgets::TextBaseWidth * 15, FCogWindowWidgets::TextBaseHeight * 0.8f), TCHAR_TO_ANSI(*FString::Printf(TEXT("%.2f / %.2f"), RemainingTime, Duration)));
+        ImGui::ProgressBar(RemainingTime / Duration, ImVec2(FCogWindowWidgets::GetFontWidth() * 15, ImGui::GetTextLineHeightWithSpacing() * 0.8f), TCHAR_TO_ANSI(*FString::Printf(TEXT("%.2f / %.2f"), RemainingTime, Duration)));
         ImGui::PopStyleColor(2);
     }
 }
@@ -318,7 +327,7 @@ void UCogAbilityWindow_Effects::RenderStacks(const FActiveGameplayEffect& Active
         ImGui::PushStyleColor(ImGuiCol_PlotHistogram, IM_COL32(100, 100, 100, 255));
         ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 100));
         ImGui::SetNextItemWidth(-1);
-        ImGui::ProgressBar(CurrentStackCount / (float)Effect.StackLimitCount, ImVec2(FCogWindowWidgets::TextBaseWidth * 15, FCogWindowWidgets::TextBaseHeight * 0.8f), TCHAR_TO_ANSI(*FString::Printf(TEXT("%d / %d"), CurrentStackCount, Effect.StackLimitCount)));
+        ImGui::ProgressBar(CurrentStackCount / (float)Effect.StackLimitCount, ImVec2(FCogWindowWidgets::GetFontWidth() * 15, ImGui::GetTextLineHeightWithSpacing() * 0.8f), TCHAR_TO_ANSI(*FString::Printf(TEXT("%d / %d"), CurrentStackCount, Effect.StackLimitCount)));
         ImGui::PopStyleColor(2);
     }
 }

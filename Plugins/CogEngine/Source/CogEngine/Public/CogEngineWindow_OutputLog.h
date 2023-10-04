@@ -27,7 +27,12 @@ class COGENGINE_API UCogEngineWindow_OutputLog : public UCogWindow
     GENERATED_BODY()
 
 public:
+
     UCogEngineWindow_OutputLog();
+
+protected:
+
+    virtual void RenderHelp() override;
 
     virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;
 

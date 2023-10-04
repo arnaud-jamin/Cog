@@ -5,6 +5,19 @@
 #include "CogDebugLogCategoryManager.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindow_LogCategories::RenderHelp()
+{
+    ImGui::Text(
+        "This window can be used to activate and deactivate log categories."
+        "Activating a log category set its verbosity to VeryVerbose. "
+        "Deactivating a log category set its verbosity to Warning. "
+        "The detailed verbosity of each log category can shown by using the Option menu. "
+        "On a client, both the client and the server verbosity can be modified. "
+        "The log categories are used to display both output log and debug display in the world. "
+    );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void UCogEngineWindow_LogCategories::PreRender(ImGuiWindowFlags& WindowFlags)
 {
     WindowFlags = ImGuiWindowFlags_MenuBar;
@@ -145,7 +158,7 @@ void UCogEngineWindow_LogCategories::RenderContent()
             if (IsClient)
             {
                 ELogVerbosity::Type CurrentVerbosity = FCogDebugLogCategoryManager::GetServerVerbosity(CategoryName);
-                ImGui::SetNextItemWidth(FCogWindowWidgets::TextBaseWidth * 12);
+                FCogWindowWidgets::SetNextItemToShortWidth();
                 if (ImGui::BeginCombo("##Server", FCogDebugHelper::VerbosityToString(CurrentVerbosity)))
                 {
                     for (int32 i = (int32)ELogVerbosity::Error; i <= (int32)ELogVerbosity::VeryVerbose; ++i)
@@ -173,7 +186,7 @@ void UCogEngineWindow_LogCategories::RenderContent()
 
             {
                 ELogVerbosity::Type CurrentVerbosity = Category->GetVerbosity();
-                ImGui::SetNextItemWidth(FCogWindowWidgets::TextBaseWidth * 12);
+                FCogWindowWidgets::SetNextItemToShortWidth();
                 if (ImGui::BeginCombo("##Local", FCogDebugHelper::VerbosityToString(CurrentVerbosity)))
                 {
                     for (int32 i = (int32)ELogVerbosity::Error; i <= (int32)ELogVerbosity::VeryVerbose; ++i)

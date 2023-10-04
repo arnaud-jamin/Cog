@@ -25,13 +25,13 @@ public:
 
     static void AddTextWithShadow(ImDrawList* DrawList, const ImVec2& Position, ImU32 Color, const char* TextBegin, const char* TextEnd = NULL);
 
-    static float TextBaseWidth;
-
-    static float TextBaseHeight;
-
     static void MenuSearchBar(ImGuiTextFilter& Filter);
 
     static void PushBackColor(const ImVec4& Color);
 
     static void PopBackColor();
+
+    static void SetNextItemToShortWidth();
+
+    static float GetFontWidth();
 };

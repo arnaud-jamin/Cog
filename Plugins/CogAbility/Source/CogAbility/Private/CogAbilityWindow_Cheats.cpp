@@ -10,6 +10,20 @@
 #include "imgui_internal.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
+void UCogAbilityWindow_Cheats::RenderHelp()
+{
+    ImGui::Text(
+        "This window can be used to apply cheats to the selected actor (by default). "
+        "The cheats can be configured in the '%s' data asset. "
+        "When clicking a cheat button, press:\n"
+        "   [CTRL]  to apply the cheat to controlled actor\n"
+        "   [ALT]   to apply the cheat to the allies of the selected actor\n"
+        "   [SHIFT] to apply the cheat to the enemies of the selected actor\n"
+        , TCHAR_TO_ANSI(*GetNameSafe(CheatsAsset.Get()))
+    );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void UCogAbilityWindow_Cheats::RenderContent()
 {
     Super::RenderContent();

@@ -41,6 +41,15 @@ UCogEngineWindow_OutputLog::UCogEngineWindow_OutputLog()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindow_OutputLog::RenderHelp()
+{
+    ImGui::Text(
+    "This window output the log based on each log categories verbosity. "
+    "The verbosity of each log category can be configured in the 'Log Categories' window. "
+    );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void UCogEngineWindow_OutputLog::Clear()
 {
     TextBuffer.clear();
@@ -169,13 +178,6 @@ void UCogEngineWindow_OutputLog::RenderContent()
             ImGui::Checkbox("Show Verbosity", &ShowVerbosity);
             ImGui::Checkbox("Show As Table", &ShowAsTable);
 
-            //if (ImGui::SmallButton("Add Log"))
-            //{
-            //    AddLog(TEXT("ABCD"), ELogVerbosity::Verbose, FName("Test"));
-            //    AddLog(TEXT("EFGH"), ELogVerbosity::Warning, FName("Test"));
-            //    AddLog(TEXT("WXYZ"), ELogVerbosity::Error, FName("Test"));
-            //}
-
             ImGui::EndMenu();
         }
 
@@ -222,17 +224,17 @@ void UCogEngineWindow_OutputLog::RenderContent()
             IsTableShown = true;
             if (ShowFrame)
             {
-                ImGui::TableSetupColumn("Frame", ImGuiTableColumnFlags_WidthFixed, FCogWindowWidgets::TextBaseWidth * 4);
+                ImGui::TableSetupColumn("Frame", ImGuiTableColumnFlags_WidthFixed, FCogWindowWidgets::GetFontWidth() * 4);
             }
 
             if (ShowCategory)
             {
-                ImGui::TableSetupColumn("Category", ImGuiTableColumnFlags_WidthFixed, FCogWindowWidgets::TextBaseWidth * 10);
+                ImGui::TableSetupColumn("Category", ImGuiTableColumnFlags_WidthFixed, FCogWindowWidgets::GetFontWidth() * 10);
             }
 
             if (ShowVerbosity)
             {
-                ImGui::TableSetupColumn("Verbosity", ImGuiTableColumnFlags_WidthFixed, FCogWindowWidgets::TextBaseWidth * 10);
+                ImGui::TableSetupColumn("Verbosity", ImGuiTableColumnFlags_WidthFixed, FCogWindowWidgets::GetFontWidth() * 10);
             }
 
             ImGui::TableSetupColumn("Message", ImGuiTableColumnFlags_WidthStretch);

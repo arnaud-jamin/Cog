@@ -10,7 +10,7 @@ class COGENGINE_API UCogEngineWindow_Scalability : public UCogWindow
     GENERATED_BODY()
 
 public:
-    UCogEngineWindow_Scalability();
+    virtual void RenderHelp() override;
 
     virtual void RenderContent() override;
 };

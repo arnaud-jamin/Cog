@@ -8,9 +8,58 @@
 #include "GameFramework/PlayerState.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void DrawControls(UWorld* World)
+void UCogEngineWindow_NetEmulation::RenderHelp()
 {
-    FWorldContext& WorldContext = GEngine->GetWorldContextFromWorldChecked(World);
+    ImGui::Text("This window is used to configure the network emulation.");
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindow_NetEmulation::RenderContent()
+{
+    Super::RenderContent();
+
+    DrawStats();
+
+    ImGui::Separator();
+
+    DrawControls();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindow_NetEmulation::DrawStats()
+{
+    const APlayerController* PlayerController = GetLocalPlayerController();
+    if (PlayerController == nullptr)
+    {
+        return;
+    }
+
+    if (const APlayerState* PlayerState = PlayerController->GetPlayerState<APlayerState>())
+    {
+        const float Ping = PlayerState->GetPingInMilliseconds();
+        ImGui::Text("Ping            ");
+        ImGui::SameLine();
+        ImGui::TextColored(UCogEngineWindow_Stats::GetPingColor(Ping), "%0.0fms", Ping);
+    }
+
+    if (UNetConnection* Connection = PlayerController->GetNetConnection())
+    {
+        const float OutPacketLost = Connection->GetOutLossPercentage().GetAvgLossPercentage() * 100.0f;
+        ImGui::Text("Packet Loss Out ");
+        ImGui::SameLine();
+        ImGui::TextColored(UCogEngineWindow_Stats::GetPacketLossColor(OutPacketLost), "%0.0f%%", OutPacketLost);
+
+        const float InPacketLost = Connection->GetInLossPercentage().GetAvgLossPercentage() * 100.0f;
+        ImGui::Text("Packet Loss In  ");
+        ImGui::SameLine();
+        ImGui::TextColored(UCogEngineWindow_Stats::GetPacketLossColor(InPacketLost), "%0.0f%%", InPacketLost);
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindow_NetEmulation::DrawControls()
+{
+    FWorldContext& WorldContext = GEngine->GetWorldContextFromWorldChecked(GetWorld());
 
     if (WorldContext.ActiveNetDrivers.Num() == 0)
     {
@@ -30,6 +79,7 @@ void DrawControls(UWorld* World)
         return;
     }
 
+    FCogWindowWidgets::SetNextItemToShortWidth();
     if (ImGui::BeginCombo("Driver", TCHAR_TO_ANSI(*SelectedNetDriver->NetDriver->GetName())))
     {
         int i = 0;
@@ -60,6 +110,7 @@ void DrawControls(UWorld* World)
     FPacketSimulationSettings Settings = SelectedNetDriver->NetDriver->PacketSimulationSettings;
 
     //-------------------------------------------------------------------------------------------
+    FCogWindowWidgets::SetNextItemToShortWidth();
     if (ImGui::DragInt("Lag Min", &Settings.PktLagMin, 1.0f, 0, INT_MAX, "%d ms"))
     {
         SelectedNetDriver->NetDriver->SetPacketSimulationSettings(Settings);
@@ -71,6 +122,7 @@ void DrawControls(UWorld* World)
     }
 
     //-------------------------------------------------------------------------------------------
+    FCogWindowWidgets::SetNextItemToShortWidth();
     if (ImGui::DragInt("Lag Max", &Settings.PktLagMax, 1.0f, 0, INT_MAX, "%d ms"))
     {
         SelectedNetDriver->NetDriver->SetPacketSimulationSettings(Settings);
@@ -81,6 +133,8 @@ void DrawControls(UWorld* World)
             "If set lag values will randomly fluctuate between Min and Max.");
     }
 
+
+    FCogWindowWidgets::SetNextItemToShortWidth();
     if (ImGui::SliderInt("Packet Loss", &Settings.PktLoss, 0, 100, "%d%%"))
     {
         SelectedNetDriver->NetDriver->SetPacketSimulationSettings(Settings);
@@ -96,6 +150,7 @@ void DrawControls(UWorld* World)
     }
 
     //-------------------------------------------------------------------------------------------
+    FCogWindowWidgets::SetNextItemToShortWidth();
     if (ImGui::SliderInt("Packet Order", &Settings.PktOrder, 0, 100, "%d%%"))
     {
         SelectedNetDriver->NetDriver->SetPacketSimulationSettings(Settings);
@@ -110,6 +165,7 @@ void DrawControls(UWorld* World)
     }
 
     //-------------------------------------------------------------------------------------------
+    FCogWindowWidgets::SetNextItemToShortWidth();
     if (ImGui::SliderInt("Packet Dup", &Settings.PktDup, 0, 100, "%d%%"))
     {
         SelectedNetDriver->NetDriver->SetPacketSimulationSettings(Settings);
@@ -127,6 +183,7 @@ void DrawControls(UWorld* World)
     ImGui::Separator();
 
     //-------------------------------------------------------------------------------------------
+    FCogWindowWidgets::SetNextItemToShortWidth();
     if (ImGui::DragInt("Incoming Lag Min", &Settings.PktIncomingLagMin, 1.0f, 0, INT_MAX, "%d ms"))
     {
         SelectedNetDriver->NetDriver->SetPacketSimulationSettings(Settings);
@@ -138,6 +195,7 @@ void DrawControls(UWorld* World)
     }
 
     //-------------------------------------------------------------------------------------------
+    FCogWindowWidgets::SetNextItemToShortWidth();
     if (ImGui::DragInt("Incoming Lag Max", &Settings.PktIncomingLagMax, 1.0f, 0, INT_MAX, "%d ms"))
     {
         SelectedNetDriver->NetDriver->SetPacketSimulationSettings(Settings);
@@ -149,6 +207,7 @@ void DrawControls(UWorld* World)
     }
 
     //-------------------------------------------------------------------------------------------
+    FCogWindowWidgets::SetNextItemToShortWidth();
     if (ImGui::SliderInt("Incoming Packet Loss", &Settings.PktIncomingLoss, 0, 100, "%d%%"))
     {
         SelectedNetDriver->NetDriver->SetPacketSimulationSettings(Settings);
@@ -160,42 +219,3 @@ void DrawControls(UWorld* World)
     }
 
 #endif //DO_ENABLE_NET_TEST
-
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_NetEmulation::RenderContent()
-{
-    Super::RenderContent();
-
-    const APlayerController* PlayerController = GetLocalPlayerController();
-    if (PlayerController == nullptr)
-    {
-        return;
-    }
-    
-    if (const APlayerState* PlayerState = PlayerController->GetPlayerState<APlayerState>())
-    {
-        const float Ping = PlayerState->GetPingInMilliseconds();
-        ImGui::Text("Ping            ");
-        ImGui::SameLine();
-        ImGui::TextColored(UCogEngineWindow_Stats::GetPingColor(Ping), "%0.0fms", Ping);
-    }
-
-    if (UNetConnection* Connection = PlayerController->GetNetConnection())
-    {
-        const float OutPacketLost = Connection->GetOutLossPercentage().GetAvgLossPercentage() * 100.0f;
-        ImGui::Text("Packet Loss Out ");
-        ImGui::SameLine();
-        ImGui::TextColored(UCogEngineWindow_Stats::GetPacketLossColor(OutPacketLost), "%0.0f%%", OutPacketLost);
-
-        const float InPacketLost = Connection->GetInLossPercentage().GetAvgLossPercentage() * 100.0f;
-        ImGui::Text("Packet Loss In  ");
-        ImGui::SameLine();
-        ImGui::TextColored(UCogEngineWindow_Stats::GetPacketLossColor(InPacketLost), "%0.0f%%", InPacketLost);
-    }
-
-    ImGui::Separator();
-
-    DrawControls(GetWorld());
-}

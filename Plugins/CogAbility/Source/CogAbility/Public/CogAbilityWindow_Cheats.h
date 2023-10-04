@@ -15,9 +15,13 @@ class COGABILITY_API UCogAbilityWindow_Cheats : public UCogWindow
 
 public:
 
-    virtual void RenderContent() override;
-
     TWeakObjectPtr<UCogAbilityDataAsset_Cheats> CheatsAsset;
+
+protected:
+
+    virtual void RenderHelp() override;
+
+    virtual void RenderContent() override;
 
 private:
     

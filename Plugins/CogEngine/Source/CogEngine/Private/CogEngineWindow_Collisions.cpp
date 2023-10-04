@@ -12,30 +12,19 @@
 #include "Kismet/GameplayStatics.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogEngineWindow_Collisions::UCogEngineWindow_Collisions()
+void UCogEngineWindow_Collisions::RenderHelp()
 {
-    ObjectTypesToQuery = 0;
+    ImGui::Text("This window is used to inspect collisions by performing a collision query with the selected channels. "
+        "The query can be configured in the options. "
+        "The displayed collision channels can be configured in the '%s' data asset. "
+        , TCHAR_TO_ANSI(*GetNameSafe(CollisionsAsset.Get()))
+    );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Collisions::SetCollisionsAsset(const UCogEngineDataAsset_Collisions* Asset)
+void UCogEngineWindow_Collisions::PreRender(ImGuiWindowFlags& WindowFlags)
 {
-    if (Asset == nullptr)
-    {
-        return;
-    }
-    
-    for (FChannel& Channel : Channels)
-    {
-        Channel.IsValid = false;
-    }
-
-    for (const FCogCollisionChannel& AssetChannel : Asset->Channels)
-    {
-        FChannel& Channel = Channels[(uint8)AssetChannel.Channel];
-        Channel.IsValid = true;
-        Channel.Color = AssetChannel.Color.ToFColor(true);
-    }
+    WindowFlags = ImGuiWindowFlags_MenuBar;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -60,6 +49,60 @@ void UCogEngineWindow_Collisions::RenderContent()
         return;
     }
 
+    //-------------------------------------------------
+    // Menu
+    //-------------------------------------------------
+    if (ImGui::BeginMenuBar())
+    {
+        if (ImGui::BeginMenu("Options"))
+        {
+            //-------------------------------------------------
+            // Query Mode
+            //-------------------------------------------------
+            ImGui::Combo("Query", &QueryType,
+                "Sphere\0"
+                "Raycast Crosshair\0"
+                "Raycast Cursor\0"
+                "\0"
+            );
+
+            //-------------------------------------------------
+            // Query Distance
+            //-------------------------------------------------
+            ImGui::SliderFloat("Distance", &QueryDistance, 0.0f, 20000.0f, "%0.f");
+
+            //-------------------------------------------------
+            // Query Thickness
+            //-------------------------------------------------
+            if (QueryType == 1 || QueryType == 2)
+            {
+                ImGui::SliderFloat("Thickness", &QueryThickness, 0.0f, 1000.0f, "%0.f");
+            }
+
+            //-------------------------------------------------
+            // Query Use Complex Collisions
+            //-------------------------------------------------
+            ImGui::Checkbox("Use Complex Collisions", &UseComplexCollisions);
+
+            //-------------------------------------------------
+            // Show Names
+            //-------------------------------------------------
+            ImGui::Checkbox("Show Actors Names", &ShowActorsNames);
+
+            //-------------------------------------------------
+            // Show Query
+            //-------------------------------------------------
+            ImGui::Checkbox("Show Query", &ShowQuery);
+
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndMenuBar();
+    }
+
+    //-------------------------------------------------
+    // Profile
+    //-------------------------------------------------
     const FCollisionResponseTemplate* SelectedProfile = CollisionProfile->GetProfileByIndex(ProfileIndex);
     FName SelectedProfileName = SelectedProfile != nullptr ? SelectedProfile->Name : FName("Custom");
 
@@ -89,7 +132,6 @@ void UCogEngineWindow_Collisions::RenderContent()
         }
         ImGui::EndCombo();
     }
-
     ImGui::Separator();
 
     //-------------------------------------------------
@@ -128,52 +170,6 @@ void UCogEngineWindow_Collisions::RenderContent()
         ImGui::PopID();
     }
 
-    ImGui::Separator();
-
-    //-------------------------------------------------
-    // Query Mode
-    //-------------------------------------------------
-    static int QueryType = 0;
-    ImGui::Combo("Query", &QueryType,
-        "Sphere\0"
-        "Raycast Crosshair\0"
-        "Raycast Cursor\0"
-        "\0"
-    );
-
-    //-------------------------------------------------
-    // Query Distance
-    //-------------------------------------------------
-    static float QueryDistance = 5000.0f;
-    ImGui::SliderFloat("Distance", &QueryDistance, 0.0f, 20000.0f, "%0.f");
-
-    //-------------------------------------------------
-    // Query Thickness
-    //-------------------------------------------------
-    static float QueryThickness = 0.0f;
-    if (QueryType == 1 || QueryType == 2)
-    {
-        ImGui::SliderFloat("Thickness", &QueryThickness, 0.0f, 1000.0f, "%0.f");
-    }
-
-    //-------------------------------------------------
-    // Query Use Complex Collisions
-    //-------------------------------------------------
-    static bool UseComplexCollisions = false;
-    ImGui::Checkbox("Use Complex Collisions", &UseComplexCollisions);
-
-    //-------------------------------------------------
-    // Show Names
-    //-------------------------------------------------
-    static bool ShowActorsNames = false;
-    ImGui::Checkbox("Show Actors Names", &ShowActorsNames);
-
-    //-------------------------------------------------
-    // Show Query
-    //-------------------------------------------------
-    static bool ShowQuery = false;
-    ImGui::Checkbox("Show Query", &ShowQuery);
-
     //-------------------------------------------------
     // Perform Query
     //-------------------------------------------------
@@ -181,8 +177,6 @@ void UCogEngineWindow_Collisions::RenderContent()
     {
         return;
     }
-
-    UWorld* World = GetWorld();
 
     FVector QueryStart;
     FVector QueryEnd;
@@ -235,6 +229,7 @@ void UCogEngineWindow_Collisions::RenderContent()
     QueryShape.SetSphere(QueryRadius);
 
     TArray<FHitResult> QueryHits;
+    UWorld* World = GetWorld();
     World->SweepMultiByObjectType(
         QueryHits,
         QueryStart,
@@ -369,5 +364,26 @@ void UCogEngineWindow_Collisions::RenderContent()
                 break;
             }
         }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindow_Collisions::SetCollisionsAsset(const UCogEngineDataAsset_Collisions* Asset)
+{
+    if (Asset == nullptr)
+    {
+        return;
+    }
+
+    for (FChannel& Channel : Channels)
+    {
+        Channel.IsValid = false;
+    }
+
+    for (const FCogCollisionChannel& AssetChannel : Asset->Channels)
+    {
+        FChannel& Channel = Channels[(uint8)AssetChannel.Channel];
+        Channel.IsValid = true;
+        Channel.Color = AssetChannel.Color.ToFColor(true);
     }
 }

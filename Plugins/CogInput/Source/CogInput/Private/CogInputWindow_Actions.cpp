@@ -9,35 +9,20 @@
 #include "InputMappingContext.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogInputWindow_Actions::UCogInputWindow_Actions()
+void UCogInputWindow_Actions::RenderHelp()
 {
+    ImGui::Text(
+        "This window display the current state of each Input Action. "
+        "It can also be used to inject inputs to help debugging. "
+        "The input action are read from a Input Mapping Context defined in '%s' data asset. "
+        , TCHAR_TO_ANSI(*GetNameSafe(ActionAsset))
+    );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogInputWindow_Actions::PreRender(ImGuiWindowFlags& WindowFlags)
 {
     WindowFlags = ImGuiWindowFlags_MenuBar;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void DrawAxis(const char* Format, const char* ActionName, float CurrentValue, float* InjectValue)
-{
-    ImGui::PushID(Format);
-    ImGui::TableNextRow();
-    
-    ImGui::TableNextColumn();
-    ImGui::Text(Format, ActionName);
-    
-    ImGui::TableNextColumn();
-    ImGui::SetNextItemWidth(-1);
-    ImGui::BeginDisabled();
-    ImGui::SliderFloat("##Value", &CurrentValue, -1.0f, 1.0f, "%0.2f");
-    ImGui::EndDisabled();
-
-    ImGui::TableNextColumn();
-    ImGui::SetNextItemWidth(-1);
-    FCogWindowWidgets::SliderWithReset("##Inject", InjectValue, -1.0f, 1.0f, 0.0f, "%0.2f");
-    ImGui::PopID();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -120,7 +105,7 @@ void UCogInputWindow_Actions::RenderContent()
 
                     const ImVec4 ActiveColor(1, 0.8f, 0, 1);
                     const ImVec4 InnactiveColor(0.3f, 0.3f, 0.3f, 1);
-                    const ImVec2 ButtonWidth(FCogWindowWidgets::TextBaseWidth * 10, 0);
+                    const ImVec2 ButtonWidth(FCogWindowWidgets::GetFontWidth() * 10, 0);
 
                     ImGui::TableNextColumn();
                     ImGui::BeginDisabled();
@@ -201,4 +186,25 @@ void UCogInputWindow_Actions::RenderTick(float DeltaSeconds)
     {
         ActionInfo.Inject(*EnhancedInput, IsTimeToRepeat);
     }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogInputWindow_Actions::DrawAxis(const char* Format, const char* ActionName, float CurrentValue, float* InjectValue)
+{
+    ImGui::PushID(Format);
+    ImGui::TableNextRow();
+
+    ImGui::TableNextColumn();
+    ImGui::Text(Format, ActionName);
+
+    ImGui::TableNextColumn();
+    ImGui::SetNextItemWidth(-1);
+    ImGui::BeginDisabled();
+    ImGui::SliderFloat("##Value", &CurrentValue, -1.0f, 1.0f, "%0.2f");
+    ImGui::EndDisabled();
+
+    ImGui::TableNextColumn();
+    ImGui::SetNextItemWidth(-1);
+    FCogWindowWidgets::SliderWithReset("##Inject", InjectValue, -1.0f, 1.0f, 0.0f, "%0.2f");
+    ImGui::PopID();
 }

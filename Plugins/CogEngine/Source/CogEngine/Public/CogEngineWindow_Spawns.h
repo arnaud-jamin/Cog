@@ -14,9 +14,9 @@ class COGENGINE_API UCogEngineWindow_Spawns : public UCogWindow
 
  public:
 
-    const UCogEngineDataAsset_Spawns* GetSpawnsAsset() const { return Asset; }
+    const UCogEngineDataAsset_Spawns* GetSpawnsAsset() const { return SpawnAsset; }
 
-    void SetSpawnsAsset(const UCogEngineDataAsset_Spawns* Value) { Asset = Value; }
+    void SetSpawnsAsset(const UCogEngineDataAsset_Spawns* Value) { SpawnAsset = Value; }
 
 protected:
 
@@ -30,5 +30,5 @@ protected:
 
 private:
 
-    const UCogEngineDataAsset_Spawns* Asset = nullptr;
+    const UCogEngineDataAsset_Spawns* SpawnAsset = nullptr;
 };

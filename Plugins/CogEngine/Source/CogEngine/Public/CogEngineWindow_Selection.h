@@ -11,23 +11,6 @@ class COGENGINE_API UCogEngineWindow_Selection : public UCogWindow
     GENERATED_BODY()
 
 public:
-    UCogEngineWindow_Selection();
-
-    virtual void RenderTick(float DeltaTime);
-
-    virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;
-
-    virtual void RenderContent() override;
-
-    virtual void DrawMainMenuWidget(bool Draw, float& Width) override;
-
-    bool DrawSelectionCombo();
-
-    void DrawActorContextMenu(AActor* Actor);
-
-    void ActivateSelectionMode();
-
-    void HackWaitInputRelease();
 
     bool GetIsSelecting() const { return bSelectionModeActive; }
 
@@ -43,6 +26,26 @@ public:
 
     void SetTraceType(ETraceTypeQuery Value) { TraceType = Value; }
 
+protected:
+
+    virtual void RenderHelp() override;
+
+    virtual void RenderTick(float DeltaTime) override;
+
+    virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;
+
+    virtual void RenderContent() override;
+
+    virtual void DrawMainMenuWidget(bool Draw, float& Width) override;
+
+    bool DrawSelectionCombo();
+
+    void DrawActorContextMenu(AActor* Actor);
+
+    void ActivateSelectionMode();
+
+    void HackWaitInputRelease();
+
 private:
 
     void TickSelectionMode();
@@ -52,8 +55,6 @@ private:
     void DeactivateSelectionMode();
 
     void DrawActorFrame(const AActor* Actor);
-
-    //void DrawActorDebug(const AActor* Actor);
 
     bool ComputeBoundingBoxScreenPosition(const APlayerController* PlayerController, const FVector& Origin, const FVector& Extent, FVector2D& Min, FVector2D& Max);
 

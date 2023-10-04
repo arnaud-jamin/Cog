@@ -15,7 +15,9 @@ class COGENGINE_API UCogEngineWindow_Metrics : public UCogWindow
 public:
 
 protected:
-    
+
+    virtual void RenderHelp() override;
+
     virtual void PostLoad() override;
 
     virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;

@@ -54,11 +54,38 @@ void UCogWindow::Render(float DeltaTime)
     ImGuiWindowFlags WindowFlags = 0;
     PreRender(WindowFlags);
 
-    if (ImGui::Begin(TCHAR_TO_ANSI(*GetTitle()), &bIsVisible, WindowFlags))
+    const FString WindowTitle = GetTitle() + "##" + Name;
+
+    if (ImGui::Begin(TCHAR_TO_ANSI(*WindowTitle), &bIsVisible, WindowFlags))
     {
+        if (Owner->GetShowHelp())
+        {
+            if (ImGui::IsItemHovered())
+            {
+                ImGui::PushStyleColor(ImGuiCol_PopupBg, IM_COL32(29, 42, 62, 240));
+                const float HelpWidth = FCogWindowWidgets::GetFontWidth() * 80;
+                ImGui::SetNextWindowSizeConstraints(ImVec2(HelpWidth / 2.0f, 0.0f), 
+                                                    ImVec2(HelpWidth, FLT_MAX));
+                if (ImGui::BeginTooltip())
+                {
+                    ImGui::PushTextWrapPos(HelpWidth - 1 * FCogWindowWidgets::GetFontWidth());
+                    RenderHelp();
+                    ImGui::PopTextWrapPos();
+                    ImGui::EndTooltip();
+                }
+                ImGui::PopStyleColor();
+            }
+        }
+
         RenderContent();
         ImGui::End();
     }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogWindow::RenderHelp()
+{
+    ImGui::Text("No help available.");
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -75,20 +102,20 @@ void UCogWindow::GameTick(float DeltaTime)
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindow::DrawMenuItem(const FString& MenuItemName)
 {
-    if (bShowInsideMenu && bIsVisible == false)
+    if (bShowInsideMenu)
     {
-        ImGui::SetNextWindowSizeConstraints(ImVec2(FCogWindowWidgets::TextBaseWidth * 40, FCogWindowWidgets::TextBaseHeight * 1),
-                                            ImVec2(FCogWindowWidgets::TextBaseWidth * 50, FCogWindowWidgets::TextBaseHeight * 60));
+        ImGui::SetNextWindowSizeConstraints(ImVec2(FCogWindowWidgets::GetFontWidth() * 40, ImGui::GetTextLineHeightWithSpacing() * 1),
+                                            ImVec2(FCogWindowWidgets::GetFontWidth() * 50, ImGui::GetTextLineHeightWithSpacing() * 60));
 
         if (ImGui::BeginMenu(TCHAR_TO_ANSI(*MenuItemName)))
         {
             RenderContent();
             ImGui::EndMenu();
-
-            if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
-            {
-                bIsVisible = !bIsVisible;
-            }
+        }
+        
+        if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
+        {
+            bIsVisible = !bIsVisible;
         }
     }
     else

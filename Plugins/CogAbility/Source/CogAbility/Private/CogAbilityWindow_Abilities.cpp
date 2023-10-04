@@ -10,6 +10,17 @@ ImVec4 ActiveColor(1.0f, 0.8f, 0.0f, 1.0f);
 ImVec4 DeactiveColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 //--------------------------------------------------------------------------------------------------------------------------
+void UCogAbilityWindow_Abilities::RenderHelp()
+{
+    ImGui::Text(
+    "This window displays the gameplay abilities of the selected actor. "
+    "Click the ability check box to force its activation or deactivation. "
+    "Right click an ability to open or close the ability separate window. "
+    "Use the 'Give Ability' menu to manually give an ability from a list defined in the '%s' data asset. "
+    , TCHAR_TO_ANSI(*GetNameSafe(AbilitiesAsset.Get())));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void UCogAbilityWindow_Abilities::PreRender(ImGuiWindowFlags& WindowFlags)
 {
     WindowFlags = ImGuiWindowFlags_MenuBar;
@@ -107,7 +118,7 @@ void UCogAbilityWindow_Abilities::RenderAbiltiesMenu(AActor* Selection)
 {
     if (ImGui::BeginMenuBar())
     {
-        if (ImGui::BeginMenu("Add"))
+        if (ImGui::BeginMenu("Give Ability"))
         {
             if (AbilitiesAsset != nullptr)
             {

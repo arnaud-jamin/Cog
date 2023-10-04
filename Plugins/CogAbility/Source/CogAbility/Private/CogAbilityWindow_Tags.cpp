@@ -5,7 +5,37 @@
 #include "CogWindowWidgets.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-static void DrawTagInfo(const UAbilitySystemComponent& AbilitySystemComponent, const FGameplayTag& Tag)
+void UCogAbilityWindow_Tags::RenderHelp()
+{
+    ImGui::Text("This window displays gameplay tags of the selected actor. ");
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogAbilityWindow_Tags::PreRender(ImGuiWindowFlags& WindowFlags)
+{
+    Super::PreRender(WindowFlags);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogAbilityWindow_Tags::RenderContent()
+{
+    Super::RenderContent();
+
+    UAbilitySystemComponent* AbilitySystemComponent = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetSelection(), true);
+    if (AbilitySystemComponent == nullptr)
+    {
+        return;
+    }
+
+    FGameplayTagContainer OwnedTags, BlockedTags;
+    AbilitySystemComponent->GetOwnedGameplayTags(OwnedTags);
+    AbilitySystemComponent->GetBlockedAbilityTags(BlockedTags);
+
+    DrawTagContainer("Owned Tags", *AbilitySystemComponent, OwnedTags);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogAbilityWindow_Tags::DrawTag(const UAbilitySystemComponent& AbilitySystemComponent, const FGameplayTag& Tag)
 {
     if (ImGui::BeginTable("Tag", 2, ImGuiTableFlags_Borders))
     {
@@ -32,27 +62,6 @@ static void DrawTagInfo(const UAbilitySystemComponent& AbilitySystemComponent, c
         ImGui::TableNextColumn();
         const int32 TagCount = AbilitySystemComponent.GetTagCount(Tag);
         ImGui::TextColored(TagCount > 1 ? ImVec4(1.0f, 1.0f, 0.0f, 1.0f) : ImVec4(1.0f, 1.0f, 1.0f, 1.0f), "%d", TagCount);
-
-        //------------------------
-        // Abilities
-        //------------------------
-        //ImGui::TableNextRow();
-        //ImGui::TableNextColumn();
-        //ImGui::TextColored(TextColor, "Abilities");
-        //ImGui::TableNextColumn();
-        //for (FGameplayAbilitySpec AbilitySpec : AbilitySystemComponent.GetActivatableAbilities())
-        //{
-        //    UGameplayAbility* Ability = AbilitySpec.GetPrimaryInstance() != nullptr ? AbilitySpec.GetPrimaryInstance() : AbilitySpec.Ability;
-        //    if (Ability == nullptr)
-        //    {
-        //        continue;
-        //    }
-
-        //    if (Ability->ActivationOwnedTags  GetActivationOwnedTags().HasTagExact(Tag))
-        //    {
-        //        ImGui::Text("%s", TCHAR_TO_ANSI(*FCogAbilityHelper::CleanupName(GetNameSafe(Ability))));
-        //    }
-        //}
 
         //------------------------
         // Effects
@@ -83,9 +92,8 @@ static void DrawTagInfo(const UAbilitySystemComponent& AbilitySystemComponent, c
     }
 }
 
-
 //--------------------------------------------------------------------------------------------------------------------------
-static void DrawTags(const FString& Title, UAbilitySystemComponent& AbilitySystemComponent, FGameplayTagContainer& TagContainer)
+void UCogAbilityWindow_Tags::DrawTagContainer(const FString& Title, const UAbilitySystemComponent& AbilitySystemComponent, FGameplayTagContainer& TagContainer)
 {
     if (ImGui::BeginTable(TCHAR_TO_ANSI(*Title), 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_BordersOuterV))
     {
@@ -122,15 +130,14 @@ static void DrawTags(const FString& Title, UAbilitySystemComponent& AbilitySyste
             }
 
             //------------------------
-            // Popup
+            // Tooltip
             //------------------------
             if (ImGui::IsItemHovered())
             {
                 FCogWindowWidgets::BeginTableTooltip();
-                DrawTagInfo(AbilitySystemComponent, Tag);
+                DrawTag(AbilitySystemComponent, Tag);
                 FCogWindowWidgets::EndTableTooltip();
             }
-
 
             ImGui::PopID();
             index++;
@@ -138,34 +145,4 @@ static void DrawTags(const FString& Title, UAbilitySystemComponent& AbilitySyste
 
         ImGui::EndTable();
     }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-
-UCogAbilityWindow_Tags::UCogAbilityWindow_Tags()
-{
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Tags::PreRender(ImGuiWindowFlags& WindowFlags)
-{
-    WindowFlags = ImGuiWindowFlags_MenuBar;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Tags::RenderContent()
-{
-    Super::RenderContent();
-
-    UAbilitySystemComponent* AbilitySystemComponent = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetSelection(), true);
-    if (AbilitySystemComponent == nullptr)
-    {
-        return;
-    }
-
-    FGameplayTagContainer OwnedTags, BlockedTags;
-    AbilitySystemComponent->GetOwnedGameplayTags(OwnedTags);
-    AbilitySystemComponent->GetBlockedAbilityTags(BlockedTags);
-
-    DrawTags("Owned Tags", *AbilitySystemComponent, OwnedTags);
 }

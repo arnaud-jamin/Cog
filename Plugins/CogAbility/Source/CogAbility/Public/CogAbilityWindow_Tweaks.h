@@ -4,9 +4,7 @@
 #include "CogWindow.h"
 #include "CogAbilityWindow_Tweaks.generated.h"
 
-class AActor;
 class UCogAbilityDataAsset_Tweaks;
-class ACogAbilityReplicator;
 
 UCLASS()
 class COGABILITY_API UCogAbilityWindow_Tweaks : public UCogWindow
@@ -14,10 +12,15 @@ class COGABILITY_API UCogAbilityWindow_Tweaks : public UCogWindow
     GENERATED_BODY()
 
 public:
-    UCogAbilityWindow_Tweaks();
+        TWeakObjectPtr<UCogAbilityDataAsset_Tweaks> TweaksAsset;
+
+protected:
+
+    virtual void RenderHelp() override;
+
     virtual void RenderContent() override;
 
-    TWeakObjectPtr<UCogAbilityDataAsset_Tweaks> TweaksAsset;
+    virtual void DrawTweak(ACogAbilityReplicator* Replicator, int32 TweakIndex, int32 TweakCategoryIndex);
 
 private:
 };

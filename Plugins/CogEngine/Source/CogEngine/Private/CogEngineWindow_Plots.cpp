@@ -8,8 +8,11 @@
 #include "Kismet/GameplayStatics.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogEngineWindow_Plots::UCogEngineWindow_Plots()
+void UCogEngineWindow_Plots::RenderHelp()
 {
+    ImGui::Text(
+        "This window plots values overtime. When applicable, only the values of the selected actor are displayed."
+    );
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -29,7 +32,7 @@ void UCogEngineWindow_Plots::RenderContent()
 
     if (ImGui::BeginTable("PlotTable", 2, ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable))
     {
-        ImGui::TableSetupColumn("Settings", ImGuiTableColumnFlags_WidthFixed, FCogWindowWidgets::TextBaseWidth * 20.0f);
+        ImGui::TableSetupColumn("Settings", ImGuiTableColumnFlags_WidthFixed, FCogWindowWidgets::GetFontWidth() * 20.0f);
         ImGui::TableSetupColumn("Graph", ImGuiTableColumnFlags_WidthStretch, 0.0f);
         ImGui::TableNextRow();
 
