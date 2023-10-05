@@ -7,8 +7,9 @@
 UENUM(BlueprintType)
 enum class ECogInterfacesAllegiance : uint8
 {
-    Ally,
-    Enemy
+    Friendly,
+    Enemy,
+    Neutral
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -25,5 +26,5 @@ class ICogInterfacesAllegianceActor
 
 public:
 
-    virtual ECogInterfacesAllegiance GetAllegiance(const AActor* OtherActor) const = 0;
+    virtual ECogInterfacesAllegiance GetAllegianceWithOtherActor(const AActor* OtherActor) const = 0;
 };

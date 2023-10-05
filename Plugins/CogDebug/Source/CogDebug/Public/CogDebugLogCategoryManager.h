@@ -14,6 +14,7 @@ struct COGDEBUG_API FCogDebugLogCategoryInfo
     FLogCategoryBase* LogCategory = nullptr;
     ELogVerbosity::Type ServerVerbosity = ELogVerbosity::NoLogging;
     FString DisplayName;
+    bool bVisible = true;
 
     FString GetDisplayName() const;
 };
@@ -21,7 +22,7 @@ struct COGDEBUG_API FCogDebugLogCategoryInfo
 //--------------------------------------------------------------------------------------------------------------------------
 struct COGDEBUG_API FCogDebugLogCategoryManager
 {
-    static void AddLogCategory(FLogCategoryBase& LogCategory, const FString& DisplayName = "");
+    static void AddLogCategory(FLogCategoryBase& LogCategory, const FString& DisplayName = "", bool bVisible = true);
 
     static bool IsVerbosityActive(ELogVerbosity::Type Verbosity);
 
@@ -37,13 +38,13 @@ struct COGDEBUG_API FCogDebugLogCategoryManager
 
     static TMap<FName, FCogDebugLogCategoryInfo>& GetLogCategories() { return LogCategories; }
 
-    static void SetServerVerbosityActive(FName LogCategory, bool Value);
+    static void SetServerVerbosityActive(UWorld& World, FName LogCategory, bool Value);
 
     static bool IsServerVerbosityActive(FName LogCategory);
 
     static ELogVerbosity::Type GetServerVerbosity(FName LogCategory);
 
-    static void SetServerVerbosity(FName LogCategory, ELogVerbosity::Type Verbosity);
+    static void SetServerVerbosity(UWorld& World, FName LogCategory, ELogVerbosity::Type Verbosity);
 
     static void OnServerVerbosityChanged(FName LogCategory, ELogVerbosity::Type Verbosity);
 

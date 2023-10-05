@@ -14,10 +14,21 @@ void UCogEngineWindow_Metrics::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Metrics::PostLoad()
+void UCogEngineWindow_Metrics::PostInitProperties()
 {
+    Super::PostInitProperties();
+
     FCogDebugMetric::MaxDurationSetting = MaxDurationSetting;
     FCogDebugMetric::RestartDelaySetting = RestartDelaySetting;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindow_Metrics::PreSaveConfig()
+{
+    Super::PreSaveConfig();
+
+    MaxDurationSetting = FCogDebugMetric::MaxDurationSetting;
+    RestartDelaySetting = FCogDebugMetric::RestartDelaySetting;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -47,17 +58,11 @@ void UCogEngineWindow_Metrics::RenderContent()
             bool bSettingModified = false;
 
             FCogWindowWidgets::PushStyleCompact();
-            if (ImGui::DragFloat("Auto Restart Delay", &RestartDelaySetting, 0.1f, 0.0f, FLT_MAX, "%0.1f"))
-            {
-                FCogDebugMetric::RestartDelaySetting = RestartDelaySetting;
-            }
+            ImGui::DragFloat("Auto Restart Delay", &FCogDebugMetric::RestartDelaySetting, 0.1f, 0.0f, FLT_MAX, "%0.1f");
             FCogWindowWidgets::PopStyleCompact();
 
             FCogWindowWidgets::PushStyleCompact();
-            if (ImGui::DragFloat("Max Time", &MaxDurationSetting, 0.1f, 0.0f, FLT_MAX, "%0.1f"))
-            {
-                FCogDebugMetric::MaxDurationSetting = MaxDurationSetting;
-            }
+            ImGui::DragFloat("Max Time", &FCogDebugMetric::MaxDurationSetting, 0.1f, 0.0f, FLT_MAX, "%0.1f");
             FCogWindowWidgets::PopStyleCompact();
 
             ImGui::EndMenu();

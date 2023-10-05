@@ -26,10 +26,10 @@ class COGDEBUG_API UCogDebugLogBlueprint : public UBlueprintFunctionLibrary
 
 public:
 
-    UFUNCTION(BlueprintCallable, Category = "Log", meta = (DevelopmentOnly))
-    static void Log(FCogLogCategory LogCategory, ECogLogVerbosity Verbosity = ECogLogVerbosity::Verbose, const AActor* Actor = nullptr, const FString& Text = FString(""));
+    UFUNCTION(BlueprintCallable, meta = (DevelopmentOnly, WorldContext = "WorldContextObject"))
+    static void Log(const UObject* WorldContextObject, FCogLogCategory LogCategory, ECogLogVerbosity Verbosity = ECogLogVerbosity::Verbose, const FString& Text = FString(""));
 
-    UFUNCTION(BlueprintPure, Category = "Log", meta = (DevelopmentOnly, AdvancedDisplay = "ScreenTextColor"))
-    static bool IsLogActive(FCogLogCategory LogCategory, const AActor* Actor = nullptr);
+    UFUNCTION(BlueprintPure, meta = (DevelopmentOnly, WorldContext = "WorldContextObject"))
+    static bool IsLogActive(const UObject* WorldContextObject, FCogLogCategory LogCategory);
 
 };

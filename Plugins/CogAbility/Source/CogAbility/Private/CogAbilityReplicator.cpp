@@ -23,8 +23,12 @@ void ACogAbilityReplicator::Create(APlayerController* Controller)
 ACogAbilityReplicator::ACogAbilityReplicator(const FObjectInitializer& ObjectInitializer)
     : Super(ObjectInitializer)
 {
+#if !UE_BUILD_SHIPPING
+
     bReplicates = true;
-    RootComponent = ObjectInitializer.CreateOptionalDefaultSubobject<USceneComponent>(this, TEXT("Root"));
+    bOnlyRelevantToOwner = true;
+
+#endif // !UE_BUILD_SHIPPING
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -40,20 +44,23 @@ void ACogAbilityReplicator::GetLifetimeReplicatedProps(TArray< FLifetimeProperty
     DOREPLIFETIME_WITH_PARAMS_FAST(ACogAbilityReplicator, TweakProfileIndex, Params);
 }
 
-
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogAbilityReplicator::BeginPlay()
 {
     Super::BeginPlay();
+
     OwnerPlayerController = Cast<APlayerController>(GetOwner());
 
-    if (OwnerPlayerController->IsLocalController())
+    if (OwnerPlayerController != nullptr)
     {
-        FCogAbilityModule::Get().SetLocalReplicator(this);
-    }
-    else
-    {
-        FCogAbilityModule::Get().AddRemoteReplicator(this);
+        if (OwnerPlayerController->IsLocalController())
+        {
+            FCogAbilityModule::Get().SetLocalReplicator(this);
+        }
+        else
+        {
+            FCogAbilityModule::Get().AddRemoteReplicator(this);
+        }
     }
 }
 

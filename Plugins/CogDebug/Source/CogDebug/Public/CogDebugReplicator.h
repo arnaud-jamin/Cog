@@ -65,8 +65,6 @@ public:
 
     APlayerController* GetPlayerController() const { return OwnerPlayerController.Get(); }
 
-    bool IsLocal() const { return bIsLocal; }
-
     TArray<FCogDebugShape> ReplicatedShapes;
 
     UFUNCTION(Server, Reliable)
@@ -87,7 +85,6 @@ protected:
     TObjectPtr<APlayerController> OwnerPlayerController;
 
     uint32 bHasAuthority : 1;
-    uint32 bIsLocal : 1;
 
 private:
 

@@ -1,5 +1,8 @@
 #include "CogDebugModule.h"
 
+#include "CogDebugReplicator.h"
+#include "EngineUtils.h"
+
 #define LOCTEXT_NAMESPACE "FCogDebugModule"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -13,34 +16,25 @@ void FCogDebugModule::ShutdownModule()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ACogDebugReplicator* FCogDebugModule::GetLocalReplicator()
+ACogDebugReplicator* FCogDebugModule::GetLocalReplicator(UWorld& World)
 {
-    return LocalReplicator;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugModule::SetLocalReplicator(ACogDebugReplicator* Value)
-{
-    LocalReplicator = Value;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-ACogDebugReplicator* FCogDebugModule::GetRemoteReplicator(const APlayerController* PlayerController)
-{
-    for (ACogDebugReplicator* Replicator : RemoteReplicators)
+    for (TActorIterator<ACogDebugReplicator> It(&World, ACogDebugReplicator::StaticClass()); It; ++It)
     {
-        if (Replicator->GetPlayerController() == PlayerController)
-        {
-            return Replicator;
-        }
+        ACogDebugReplicator* Replicator = *It;
+        return Replicator;
     }
+
     return nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugModule::AddRemoteReplicator(ACogDebugReplicator* Value)
+void FCogDebugModule::GetRemoteReplicators(UWorld& World, TArray<ACogDebugReplicator*>& Replicators)
 {
-    RemoteReplicators.Add(Value);
+    for (TActorIterator<ACogDebugReplicator> It(&World, ACogDebugReplicator::StaticClass()); It; ++It)
+    {
+        ACogDebugReplicator* Replicator = Cast<ACogDebugReplicator>(*It);
+        Replicators.Add(Replicator);
+    }
 }
 
 #undef LOCTEXT_NAMESPACE

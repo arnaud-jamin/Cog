@@ -34,7 +34,7 @@ FString FCogDebugLogCategoryInfo::GetDisplayName() const
 //--------------------------------------------------------------------------------------------------------------------------
 // FCogDebugLogCategoryManager
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugLogCategoryManager::AddLogCategory(FLogCategoryBase& LogCategory, const FString& DisplayName)
+void FCogDebugLogCategoryManager::AddLogCategory(FLogCategoryBase& LogCategory, const FString& DisplayName, bool bVisible)
 {
     LogCategories.Add(LogCategory.GetCategoryName(), 
         FCogDebugLogCategoryInfo
@@ -42,6 +42,7 @@ void FCogDebugLogCategoryManager::AddLogCategory(FLogCategoryBase& LogCategory, 
             &LogCategory, 
             ELogVerbosity::NumVerbosity,
             DisplayName,
+            bVisible,
             });
 }
 
@@ -95,18 +96,18 @@ ELogVerbosity::Type FCogDebugLogCategoryManager::GetServerVerbosity(FName Catego
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugLogCategoryManager::SetServerVerbosity(FName CategoryName, ELogVerbosity::Type Verbosity)
+void FCogDebugLogCategoryManager::SetServerVerbosity(UWorld& World, FName CategoryName, ELogVerbosity::Type Verbosity)
 {
-    if (ACogDebugReplicator* Replicator = FCogDebugModule::Get().GetLocalReplicator())
+    if (ACogDebugReplicator* Replicator = FCogDebugModule::Get().GetLocalReplicator(World))
     {
         Replicator->Server_SetCategoryVerbosity(CategoryName, (ECogLogVerbosity)Verbosity);
     }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugLogCategoryManager::SetServerVerbosityActive(FName CategoryName, bool Value)
+void FCogDebugLogCategoryManager::SetServerVerbosityActive(UWorld& World, FName CategoryName, bool Value)
 {
-    SetServerVerbosity(CategoryName, Value ? ELogVerbosity::Verbose : ELogVerbosity::Warning);
+    SetServerVerbosity(World, CategoryName, Value ? ELogVerbosity::Verbose : ELogVerbosity::Warning);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

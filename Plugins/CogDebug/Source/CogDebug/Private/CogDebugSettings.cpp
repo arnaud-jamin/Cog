@@ -1,6 +1,6 @@
 #include "CogDebugSettings.h"
 
-#include "CogInterfaceFilteredActor.h"
+#include "CogInterfaceDebugFilteredActor.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 TWeakObjectPtr<AActor> FCogDebugSettings::Selection;
@@ -66,17 +66,44 @@ void FCogDebugSettings::Reset()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogDebugSettings::IsDebugActiveForActor(const AActor* Actor)
+bool FCogDebugSettings::IsDebugActiveForObject(const UObject* WorldContextObject)
 {
-    const AActor* SelectionPtr = Selection.Get();
-    if (Actor == nullptr || SelectionPtr == nullptr)
+    if (FilterBySelection == false)
     {
         return true;
     }
 
-    if (Cast<ICogInterfacesFilteredActor>(Actor))
+    if (WorldContextObject == nullptr)
     {
-        return (SelectionPtr == Actor || FilterBySelection == false);
+        return true;
+    }
+
+    const AActor* SelectionPtr = Selection.Get();
+    if (SelectionPtr == nullptr)
+    {
+        return true;
+    }
+
+    const UObject* Outer = WorldContextObject;
+    for (;;)
+    {
+        if (SelectionPtr == Outer)
+        {
+            return true;
+        }
+
+        if (Cast<ICogInterfacesDebugFilteredActor>(Outer))
+        {
+            return false;
+        }
+
+        const UObject* NewOuter = Outer->GetOuter();
+        if (NewOuter == Outer || NewOuter == nullptr)
+        {
+            return true;
+        }
+
+        Outer = NewOuter;
     }
 
     return true;

@@ -81,6 +81,11 @@ void UCogEngineWindow_LogCategories::RenderContent()
     {
         FName CategoryName = Entry.Key;
         const FCogDebugLogCategoryInfo& CategoryInfo = Entry.Value;
+        if (CategoryInfo.bVisible == false)
+        {
+            continue;
+        }
+
         FLogCategoryBase* Category = CategoryInfo.LogCategory;
 
         ImGui::PushID(Index);
@@ -102,7 +107,7 @@ void UCogEngineWindow_LogCategories::RenderContent()
                 if (ImGui::Checkbox("##Server", &IsActive))
                 {
                     ELogVerbosity::Type NewVerbosity = IsActive ? (IsControlDown ? ELogVerbosity::VeryVerbose : ELogVerbosity::Verbose) : ELogVerbosity::Warning;
-                    FCogDebugLogCategoryManager::SetServerVerbosity(CategoryName, NewVerbosity);
+                    FCogDebugLogCategoryManager::SetServerVerbosity(*World, CategoryName, NewVerbosity);
                 }
 
                 if (Verbosity == ELogVerbosity::VeryVerbose)
@@ -168,7 +173,7 @@ void UCogEngineWindow_LogCategories::RenderContent()
 
                         if (ImGui::Selectable(FCogDebugHelper::VerbosityToString(Verbosity), IsSelected))
                         {
-                            FCogDebugLogCategoryManager::SetServerVerbosity(CategoryName, Verbosity);
+                            FCogDebugLogCategoryManager::SetServerVerbosity(*World, CategoryName, Verbosity);
                         }
                     }
                     ImGui::EndCombo();

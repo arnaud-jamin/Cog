@@ -25,19 +25,6 @@ void FCogEngineModule::SetLocalReplicator(ACogEngineReplicator* Value)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ACogEngineReplicator* FCogEngineModule::GetRemoteReplicator(const APlayerController* PlayerController)
-{
-    for (ACogEngineReplicator* Replicator : RemoteReplicators)
-    {
-        if (Replicator->GetPlayerController() == PlayerController)
-        {
-            return Replicator;
-        }
-    }
-    return nullptr;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineModule::AddRemoteReplicator(ACogEngineReplicator* Value)
 {
     RemoteReplicators.Add(Value);

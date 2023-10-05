@@ -16,19 +16,10 @@ public:
 
 	virtual void ShutdownModule() override;
 
-    ACogDebugReplicator* GetLocalReplicator();
+    ACogDebugReplicator* GetLocalReplicator(UWorld& World);
 
-    void SetLocalReplicator(ACogDebugReplicator* Value);
-
-    ACogDebugReplicator* GetRemoteReplicator(const APlayerController* PlayerController);
-
-    TArray<TObjectPtr<ACogDebugReplicator>> GetRemoteReplicators() const { return RemoteReplicators; }
-
-    void AddRemoteReplicator(ACogDebugReplicator* Value);
+    void GetRemoteReplicators(UWorld& World, TArray<ACogDebugReplicator*>& Replicators);
 
 private:
 
-    TObjectPtr<ACogDebugReplicator> LocalReplicator;
-
-    TArray<TObjectPtr<ACogDebugReplicator>> RemoteReplicators;
 };

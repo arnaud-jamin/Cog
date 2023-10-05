@@ -34,7 +34,7 @@ void UCogWindowManager::Shutdown()
 {
     for (UCogWindow* Window : Windows)
     {
-        Window->Shutdown();
+        Window->PreSaveConfig();
         Window->SaveConfig();
     }
 
@@ -147,6 +147,15 @@ void UCogWindowManager::SetHideAllWindows(bool Value)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void UCogWindowManager::ResetLayout()
+{
+    for (UCogWindow* Window : Windows)
+    {
+        ImGui::SetWindowPos(TCHAR_TO_ANSI(*Window->GetName()), ImVec2(10, 10), ImGuiCond_Always);
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::CloseAllWindows()
 {
     for (UCogWindow* Window : Windows)
@@ -230,7 +239,17 @@ void UCogWindowManager::DrawMainMenu()
 
         if (ImGui::BeginMenu("Window"))
         {
-            if (ImGui::BeginMenu("Load Layout"))
+            if (ImGui::MenuItem("Close All Windows"))
+            {
+                CloseAllWindows();
+            }
+
+            if (ImGui::MenuItem("Reset Window Layout"))
+            {
+                ResetLayout();
+            }
+
+            if (ImGui::BeginMenu("Load Window Layout"))
             {
                 for (int32 i = 1; i <= 4; ++i)
                 {
@@ -243,7 +262,7 @@ void UCogWindowManager::DrawMainMenu()
                 ImGui::EndMenu();
             }
 
-            if (ImGui::BeginMenu("Save Layout"))
+            if (ImGui::BeginMenu("Save Window Layout"))
             {
                 for (int32 i = 1; i <= 4; ++i)
                 {
@@ -258,12 +277,6 @@ void UCogWindowManager::DrawMainMenu()
 
             ImGui::Separator();
 
-            if (ImGui::MenuItem("Close All"))
-            {
-                CloseAllWindows();
-            }
-
-            ImGui::MenuItem("Transparent Mode", nullptr, &bTransparentMode);
             ImGui::MenuItem("Compact Mode", nullptr, &bCompactMode);
 
             ImGui::Text("DPI Scale");

@@ -7,15 +7,16 @@
 
 #if !ENABLE_COG
 
+#define COG_LOG_ACTIVE_FOR_OBJECT(Object)                                       (0)
 #define COG_LOG(LogCategory, Verbosity, Format, ...)                            (0)
 #define COG_LOG_FUNC(LogCategory, Verbosity, Format, ...)                       (0)
-#define COG_LOG_ACTOR(LogCategory, Verbosity, Actor, Format, ...)               (0)
-#define COG_LOG_ACTOR_NO_CONTEXT(LogCategory, Verbosity, Actor, Format, ...)    (0)
+#define COG_LOG_OBJECT(LogCategory, Verbosity, Actor, Format, ...)              (0)
+#define COG_LOG_OBJECT_NO_CONTEXT(LogCategory, Verbosity, Actor, Format, ...)   (0)
 
 #else //!ENABLE_COG
 
 //--------------------------------------------------------------------------------------------------------------------------
-#define COG_LOG_ACTIVE_FOR_ACTOR(Actor)   (FCogDebugSettings::IsDebugActiveForActor(Actor))
+#define COG_LOG_ACTIVE_FOR_OBJECT(Object)   (FCogDebugSettings::IsDebugActiveForObject(Object))
 
 //--------------------------------------------------------------------------------------------------------------------------
 #define COG_LOG(LogCategory, Verbosity, Format, ...)                                                                        \
@@ -32,20 +33,20 @@
     COG_LOG(LogCategory, Verbosity, TEXT("%s - %s"), ANSI_TO_TCHAR(__FUNCTION__), *FString::Printf(Format, ##__VA_ARGS__)); \
 
 //--------------------------------------------------------------------------------------------------------------------------
-#define COG_LOG_ACTOR(LogCategory, Verbosity, Actor, Format, ...)                                                           \
-    if (COG_LOG_ACTIVE_FOR_ACTOR(Actor) || (int32)Verbosity <= (int32)ELogVerbosity::Warning)                               \
+#define COG_LOG_OBJECT(LogCategory, Verbosity, Object, Format, ...)                                                         \
+    if (COG_LOG_ACTIVE_FOR_OBJECT(Object) || (int32)Verbosity <= (int32)ELogVerbosity::Warning)                             \
     {                                                                                                                       \
         COG_LOG(LogCategory, Verbosity, TEXT("%s - %s - %s"),                                                               \
-            *GetNameSafe(Actor),                                                                                            \
+            *GetNameSafe(Object),                                                                                           \
             ANSI_TO_TCHAR(__FUNCTION__),                                                                                    \
             *FString::Printf(Format, ##__VA_ARGS__));                                                                       \
     }                                                                                                                       \
 
 //--------------------------------------------------------------------------------------------------------------------------
-#define COG_LOG_ACTOR_NO_CONTEXT(LogCategory, Verbosity, Actor, Format, ...)                                                \
-    if (COG_LOG_ACTIVE_FOR_ACTOR(Actor) || (int32)Verbosity <= (int32)ELogVerbosity::Warning)                               \
+#define COG_LOG_OBJECT_NO_CONTEXT(LogCategory, Verbosity, Object, Format, ...)                                              \
+    if (COG_LOG_ACTIVE_FOR_OBJECT(Object) || (int32)Verbosity <= (int32)ELogVerbosity::Warning)                             \
     {                                                                                                                       \
-        COG_LOG(LogCategory, Verbosity, TEXT("%s - %s"), *GetNameSafe(Actor), *FString::Printf(Format, ##__VA_ARGS__));     \
+        COG_LOG(LogCategory, Verbosity, TEXT("%s - %s"), *GetNameSafe(Object), *FString::Printf(Format, ##__VA_ARGS__));    \
     }                                                                                                                       \
 
 

@@ -7,6 +7,7 @@
 #include "CogDebugLogCategoryManager.h"
 #endif //USE_COG
 
+DEFINE_LOG_CATEGORY(LogCogAlways);
 DEFINE_LOG_CATEGORY(LogCogCollision);
 DEFINE_LOG_CATEGORY(LogCogInput);
 DEFINE_LOG_CATEGORY(LogCogPosition);
@@ -20,6 +21,7 @@ namespace CogSampleLog
     void RegiterAllLogCategories()
     {
 #if USE_COG
+        FCogDebugLogCategoryManager::AddLogCategory(LogCogAlways, "Always", false);
         FCogDebugLogCategoryManager::AddLogCategory(LogAbilitySystem, "AbilitySystem");
         FCogDebugLogCategoryManager::AddLogCategory(LogGameplayEffects, "Gameplay Effects");
         FCogDebugLogCategoryManager::AddLogCategory(LogCogCollision, "Collision");

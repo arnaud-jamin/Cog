@@ -6,6 +6,7 @@
 #include "CogSampleAttributeSet_Health.h"
 #include "CogSampleAttributeSet_Misc.h"
 #include "CogSampleCharacterMovementComponent.h"
+#include "CogSampleForcedMove.h"
 #include "CogSampleLogCategories.h"
 #include "CogSampleTagLibrary.h"
 #include "Components/CapsuleComponent.h"
@@ -15,6 +16,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/CheatManagerDefines.h"
 #include "GameFramework/Controller.h"
+#include "GameFramework/RootMotionSource.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Net/Core/PushModel/PushModel.h"
 #include "Net/UnrealNetwork.h"
@@ -74,6 +76,7 @@ void ACogSampleCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
     Params.Condition = COND_OwnerOnly;
 
     DOREPLIFETIME_WITH_PARAMS_FAST(ACogSampleCharacter, ActiveAbilityHandles, Params);
+    DOREPLIFETIME_WITH_PARAMS_FAST(ACogSampleCharacter, TeamID, Params);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -107,6 +110,23 @@ void ACogSampleCharacter::MarkComponentsAsPendingKill()
 UAbilitySystemComponent* ACogSampleCharacter::GetAbilitySystemComponent() const 
 {
     return AbilitySystem; 
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+ECogInterfacesAllegiance ACogSampleCharacter::GetAllegianceWithOtherActor(const AActor* OtherActor) const
+{
+    const ACogSampleCharacter* OtherCharacter = Cast<ACogSampleCharacter>(OtherActor);
+    if (OtherCharacter == nullptr)
+    {
+        return ECogInterfacesAllegiance::Neutral;
+    }
+
+    if (TeamID == OtherCharacter->TeamID)
+    {
+        return ECogInterfacesAllegiance::Friendly;
+    }
+
+    return ECogInterfacesAllegiance::Enemy;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -301,7 +321,7 @@ void ACogSampleCharacter::OnAbilityInputCompleted(const FInputActionValue& Value
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleCharacter::ActivateItem(const FInputActionValue& Value, int32 Index)
 {
-    COG_LOG_ACTOR(LogCogInput, ELogVerbosity::Verbose, this, TEXT("%d"), Index);
+    COG_LOG_OBJECT(LogCogInput, ELogVerbosity::Verbose, this, TEXT("%d"), Index);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -467,4 +487,75 @@ void ACogSampleCharacter::OnGhostTagNewOrRemoved(const FGameplayTag InTag, int32
 void ACogSampleCharacter::OnScaleAttributeChanged(const FOnAttributeChangeData& Data)
 {
     SetActorScale3D(FVector(Data.NewValue));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSampleCharacter::SetTeamID(int32 Value)
+{
+    TeamID = Value;
+    MARK_PROPERTY_DIRTY_FROM_NAME(ACogSampleCharacter, TeamID, this);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+int32 ACogSampleCharacter::ApplyForcedMove(const FCogSampleForcedMoveParams& Params)
+{
+    if (HasAuthority() == false)
+    {
+        return (uint16)ERootMotionSourceID::Invalid;;
+    }
+
+    if (IsValid(Params.Effect))
+    {
+        FGameplayEffectContextHandle EffectContextHandle = AbilitySystem->MakeEffectContext();
+        EffectContextHandle.AddInstigator(Params.Instigator, Params.Causer);
+
+        FGameplayEffectSpecHandle SpecHandle = AbilitySystem->MakeOutgoingSpec(Params.Effect, 1.0f, EffectContextHandle);
+        SpecHandle.Data->SetDuration(Params.Duration, true);
+
+        if (SpecHandle.IsValid())
+        {
+            AbilitySystem->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+        }
+    }
+
+    Client_ApplyForcedMove(Params);
+    int32 RootMotionSourceID = ApplyForcedMoveInternal(Params);
+    return RootMotionSourceID;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSampleCharacter::Client_ApplyForcedMove_Implementation(const FCogSampleForcedMoveParams& Params)
+{
+    if (GetWorld()->GetNetMode() == NM_Client)
+    {
+        ApplyForcedMoveInternal(Params);
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+uint16 ACogSampleCharacter::ApplyForcedMoveInternal(const FCogSampleForcedMoveParams& Params)
+{
+    UCogSampleCharacterMovementComponent* MovementComponent = Cast<UCogSampleCharacterMovementComponent>(GetMovementComponent());
+    if (MovementComponent == nullptr)
+    {
+        return (uint16)ERootMotionSourceID::Invalid;;
+    }
+    
+    TSharedPtr<FRootMotionSource_JumpForce> JumpForce = MakeShared<FRootMotionSource_JumpForce>();
+    JumpForce->InstanceName = "ForceMove";
+    JumpForce->AccumulateMode = Params.IsAdditive ? ERootMotionAccumulateMode::Additive : ERootMotionAccumulateMode::Override;
+    JumpForce->Priority = (uint16)Params.Priority;
+    JumpForce->Duration = Params.Duration;
+    JumpForce->Rotation = Params.Rotation;
+    JumpForce->Distance = Params.Distance;
+    JumpForce->Height = Params.Height;
+    JumpForce->bDisableTimeout = Params.bFinishOnLanded; // If we finish on landed, we need to disable force's timeout
+    JumpForce->PathOffsetCurve = Params.PathOffsetCurve;
+    JumpForce->TimeMappingCurve = Params.TimeMappingCurve;
+    JumpForce->FinishVelocityParams.Mode = Params.FinishVelocityMode;
+    JumpForce->FinishVelocityParams.SetVelocity = Params.FinishSetVelocity;
+    JumpForce->FinishVelocityParams.ClampVelocity = Params.FinishClampVelocity;
+
+    uint16 RootMotionSourceID = MovementComponent->ApplyRootMotionSource(JumpForce);
+    return RootMotionSourceID;
 }

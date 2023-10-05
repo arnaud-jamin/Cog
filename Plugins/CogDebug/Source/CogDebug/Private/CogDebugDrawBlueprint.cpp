@@ -3,7 +3,7 @@
 #include "CogDebugDraw.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogDebugDrawBlueprint::DebugLogString(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FString& Text, const FVector Location, const FLinearColor Color, bool Persistent)
+void UCogDebugDrawBlueprint::DebugDrawString(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FString& Text, const FVector Location, const FLinearColor Color, bool Persistent)
 {
 #if ENABLE_COG
     if (const FLogCategoryBase* LogCategoryPtr = LogCategory.GetLogCategory())
@@ -14,7 +14,7 @@ void UCogDebugDrawBlueprint::DebugLogString(const UObject* WorldContextObject, F
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogDebugDrawBlueprint::DebugLogPoint(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FVector Location, float Size, const FLinearColor Color, bool Persistent, uint8 DepthPriority)
+void UCogDebugDrawBlueprint::DebugDrawPoint(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FVector Location, float Size, const FLinearColor Color, bool Persistent, uint8 DepthPriority)
 {
 #if ENABLE_COG
     if (const FLogCategoryBase* LogCategoryPtr = LogCategory.GetLogCategory())
@@ -25,7 +25,7 @@ void UCogDebugDrawBlueprint::DebugLogPoint(const UObject* WorldContextObject, FC
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogDebugDrawBlueprint::DebugLogSegment(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FVector SegmentStart, const FVector SegmentEnd, const FLinearColor Color, bool Persistent, uint8 DepthPriority)
+void UCogDebugDrawBlueprint::DebugDrawSegment(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FVector SegmentStart, const FVector SegmentEnd, const FLinearColor Color, bool Persistent, uint8 DepthPriority)
 {
 #if ENABLE_COG
     if (const FLogCategoryBase* LogCategoryPtr = LogCategory.GetLogCategory())
@@ -36,7 +36,7 @@ void UCogDebugDrawBlueprint::DebugLogSegment(const UObject* WorldContextObject, 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogDebugDrawBlueprint::DebugLogArrow(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FVector SegmentStart, const FVector SegmentEnd, const FLinearColor Color, bool Persistent, uint8 DepthPriority)
+void UCogDebugDrawBlueprint::DebugDrawArrow(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FVector SegmentStart, const FVector SegmentEnd, const FLinearColor Color, bool Persistent, uint8 DepthPriority)
 {
 #if ENABLE_COG
     if (const FLogCategoryBase* LogCategoryPtr = LogCategory.GetLogCategory())
@@ -47,7 +47,7 @@ void UCogDebugDrawBlueprint::DebugLogArrow(const UObject* WorldContextObject, FC
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogDebugDrawBlueprint::DebugLogAxis(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FVector Location, const FRotator Rotation, float Scale, bool Persistent, uint8 DepthPriority)
+void UCogDebugDrawBlueprint::DebugDrawAxis(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FVector Location, const FRotator Rotation, float Scale, bool Persistent, uint8 DepthPriority)
 {
 #if ENABLE_COG
     if (const FLogCategoryBase* LogCategoryPtr = LogCategory.GetLogCategory())
@@ -58,7 +58,7 @@ void UCogDebugDrawBlueprint::DebugLogAxis(const UObject* WorldContextObject, FCo
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogDebugDrawBlueprint::DebugLogSphere(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FVector Location, float Radius, const FLinearColor Color, bool Persistent, uint8 DepthPriority)
+void UCogDebugDrawBlueprint::DebugDrawSphere(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FVector Location, float Radius, const FLinearColor Color, bool Persistent, uint8 DepthPriority)
 {
 #if ENABLE_COG
     if (const FLogCategoryBase* LogCategoryPtr = LogCategory.GetLogCategory())
@@ -69,7 +69,7 @@ void UCogDebugDrawBlueprint::DebugLogSphere(const UObject* WorldContextObject, F
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogDebugDrawBlueprint::DebugLogBox(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FVector Center, const FVector Extent, const FQuat Rotation, const FLinearColor Color, bool Persistent, uint8 DepthPriority)
+void UCogDebugDrawBlueprint::DebugDrawBox(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FVector Center, const FVector Extent, const FQuat Rotation, const FLinearColor Color, bool Persistent, uint8 DepthPriority)
 {
 #if ENABLE_COG
     if (const FLogCategoryBase* LogCategoryPtr = LogCategory.GetLogCategory())
@@ -80,7 +80,7 @@ void UCogDebugDrawBlueprint::DebugLogBox(const UObject* WorldContextObject, FCog
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogDebugDrawBlueprint::DebugLogSolidBox(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FVector Center, const FVector Extent, const FQuat Rotation, const FLinearColor Color, bool Persistent, uint8 DepthPriority)
+void UCogDebugDrawBlueprint::DebugDrawSolidBox(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FVector Center, const FVector Extent, const FQuat Rotation, const FLinearColor Color, bool Persistent, uint8 DepthPriority)
 {
 #if ENABLE_COG
     if (const FLogCategoryBase* LogCategoryPtr = LogCategory.GetLogCategory())
@@ -91,7 +91,7 @@ void UCogDebugDrawBlueprint::DebugLogSolidBox(const UObject* WorldContextObject,
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogDebugDrawBlueprint::DebugLogCapsule(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FVector Center, const float HalfHeight, const float Radius, const FQuat Rotation, const FLinearColor Color, bool Persistent, uint8 DepthPriority)
+void UCogDebugDrawBlueprint::DebugDrawCapsule(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FVector Center, const float HalfHeight, const float Radius, const FQuat Rotation, const FLinearColor Color, bool Persistent, uint8 DepthPriority)
 {
 #if ENABLE_COG
     if (const FLogCategoryBase* LogCategoryPtr = LogCategory.GetLogCategory())
@@ -102,7 +102,7 @@ void UCogDebugDrawBlueprint::DebugLogCapsule(const UObject* WorldContextObject, 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogDebugDrawBlueprint::DebugLogCircle(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FMatrix& Matrix, float Radius, const FLinearColor Color, bool Persistent, uint8 DepthPriority)
+void UCogDebugDrawBlueprint::DebugDrawCircle(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FMatrix& Matrix, float Radius, const FLinearColor Color, bool Persistent, uint8 DepthPriority)
 {
 #if ENABLE_COG
     if (const FLogCategoryBase* LogCategoryPtr = LogCategory.GetLogCategory())
@@ -113,7 +113,7 @@ void UCogDebugDrawBlueprint::DebugLogCircle(const UObject* WorldContextObject, F
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogDebugDrawBlueprint::DebugLogCircleArc(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FMatrix& Matrix, float InnerRadius, float OuterRadius, float Angle, const FLinearColor Color, bool Persistent, uint8 DepthPriority)
+void UCogDebugDrawBlueprint::DebugDrawCircleArc(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FMatrix& Matrix, float InnerRadius, float OuterRadius, float Angle, const FLinearColor Color, bool Persistent, uint8 DepthPriority)
 {
 #if ENABLE_COG
     if (const FLogCategoryBase* LogCategoryPtr = LogCategory.GetLogCategory())
@@ -124,7 +124,7 @@ void UCogDebugDrawBlueprint::DebugLogCircleArc(const UObject* WorldContextObject
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogDebugDrawBlueprint::DebugLogPoints(const UObject* WorldContextObject, FCogLogCategory LogCategory, const TArray<FVector>& Points, float Radius, const FLinearColor StartColor, const FLinearColor EndColor, bool Persistent, uint8 DepthPriority)
+void UCogDebugDrawBlueprint::DebugDrawPoints(const UObject* WorldContextObject, FCogLogCategory LogCategory, const TArray<FVector>& Points, float Radius, const FLinearColor StartColor, const FLinearColor EndColor, bool Persistent, uint8 DepthPriority)
 {
 #if ENABLE_COG
     if (const FLogCategoryBase* LogCategoryPtr = LogCategory.GetLogCategory())
@@ -135,7 +135,7 @@ void UCogDebugDrawBlueprint::DebugLogPoints(const UObject* WorldContextObject, F
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogDebugDrawBlueprint::DebugLogPath(const UObject* WorldContextObject, FCogLogCategory LogCategory, const TArray<FVector>& Points, float PointSize, const FLinearColor StartColor, const FLinearColor EndColor, bool Persistent, uint8 DepthPriority)
+void UCogDebugDrawBlueprint::DebugDrawPath(const UObject* WorldContextObject, FCogLogCategory LogCategory, const TArray<FVector>& Points, float PointSize, const FLinearColor StartColor, const FLinearColor EndColor, bool Persistent, uint8 DepthPriority)
 {
 #if ENABLE_COG
     if (const FLogCategoryBase* LogCategoryPtr = LogCategory.GetLogCategory())
@@ -146,7 +146,7 @@ void UCogDebugDrawBlueprint::DebugLogPath(const UObject* WorldContextObject, FCo
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogDebugDrawBlueprint::DebugLogString2D(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FString& Text, const FVector2D Location, const FLinearColor Color, bool Persistent)
+void UCogDebugDrawBlueprint::DebugDrawString2D(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FString& Text, const FVector2D Location, const FLinearColor Color, bool Persistent)
 {
 #if ENABLE_COG
     if (const FLogCategoryBase* LogCategoryPtr = LogCategory.GetLogCategory())
@@ -157,7 +157,7 @@ void UCogDebugDrawBlueprint::DebugLogString2D(const UObject* WorldContextObject,
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogDebugDrawBlueprint::DebugLogSegment2D(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FVector2D SegmentStart, const FVector2D SegmentEnd, const FLinearColor Color, bool Persistent)
+void UCogDebugDrawBlueprint::DebugDrawSegment2D(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FVector2D SegmentStart, const FVector2D SegmentEnd, const FLinearColor Color, bool Persistent)
 {
 #if ENABLE_COG
     if (const FLogCategoryBase* LogCategoryPtr = LogCategory.GetLogCategory())
@@ -168,7 +168,7 @@ void UCogDebugDrawBlueprint::DebugLogSegment2D(const UObject* WorldContextObject
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogDebugDrawBlueprint::DebugLogCircle2D(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FVector2D Location, float Radius, const FLinearColor Color, bool Persistent)
+void UCogDebugDrawBlueprint::DebugDrawCircle2D(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FVector2D Location, float Radius, const FLinearColor Color, bool Persistent)
 {
 #if ENABLE_COG
     if (const FLogCategoryBase* LogCategoryPtr = LogCategory.GetLogCategory())
@@ -179,7 +179,7 @@ void UCogDebugDrawBlueprint::DebugLogCircle2D(const UObject* WorldContextObject,
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogDebugDrawBlueprint::DebugLogRect2D(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FVector2D Min, const FVector2D Max, const FLinearColor Color, bool Persistent)
+void UCogDebugDrawBlueprint::DebugDrawRect2D(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FVector2D Min, const FVector2D Max, const FLinearColor Color, bool Persistent)
 {
 #if ENABLE_COG
     if (const FLogCategoryBase* LogCategoryPtr = LogCategory.GetLogCategory())

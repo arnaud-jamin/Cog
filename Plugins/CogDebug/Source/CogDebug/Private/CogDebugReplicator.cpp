@@ -115,11 +115,10 @@ ACogDebugReplicator::ACogDebugReplicator(const FObjectInitializer& ObjectInitial
     PrimaryActorTick.bStartWithTickEnabled = true;
     PrimaryActorTick.TickGroup = TG_PrePhysics;
 
-    bHasAuthority = false;
-    bIsLocal = false;
     bReplicates = true;
     bOnlyRelevantToOwner = true;
 
+    bHasAuthority = false;
     ReplicatedData.Owner = this;
 
 #endif // !UE_BUILD_SHIPPING
@@ -134,18 +133,12 @@ void ACogDebugReplicator::BeginPlay()
     check(World);
     const ENetMode NetMode = World->GetNetMode();
     bHasAuthority = NetMode != NM_Client;
-    bIsLocal = NetMode != NM_DedicatedServer;
 
     OwnerPlayerController = Cast<APlayerController>(GetOwner());
 
     if (OwnerPlayerController->IsLocalController())
     {
-        FCogDebugModule::Get().SetLocalReplicator(this);
         Server_RequestAllCategoriesVerbosity();
-    }
-    else
-    {
-        FCogDebugModule::Get().AddRemoteReplicator(this);
     }
 }
 
@@ -186,7 +179,7 @@ void ACogDebugReplicator::Server_SetCategoryVerbosity_Implementation(FName LogCa
 #if !UE_BUILD_SHIPPING
 
     ENetMode NetMode = GetWorld()->GetNetMode();
-    if (NetMode == NM_DedicatedServer || NetMode == NM_DedicatedServer)
+    if (NetMode == NM_DedicatedServer || NetMode == NM_ListenServer)
     {
         if (FCogDebugLogCategoryInfo* LogCategoryInfo = FCogDebugLogCategoryManager::FindLogCategoryInfo(LogCategoryName))
         {
@@ -239,7 +232,7 @@ void ACogDebugReplicator::Server_RequestAllCategoriesVerbosity_Implementation()
 #if !UE_BUILD_SHIPPING
 
     ENetMode NetMode = GetWorld()->GetNetMode();
-    if (NetMode == NM_DedicatedServer || NetMode == NM_DedicatedServer)
+    if (NetMode == NM_DedicatedServer || NetMode == NM_ListenServer)
     {
         TArray<FCogServerCategoryData> CategoriesData;
         for (auto& Entry : FCogDebugLogCategoryManager::GetLogCategories())

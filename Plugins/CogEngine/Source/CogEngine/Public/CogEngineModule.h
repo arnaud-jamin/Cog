@@ -20,8 +20,6 @@ public:
 
     void SetLocalReplicator(ACogEngineReplicator* Value);
 
-    ACogEngineReplicator* GetRemoteReplicator(const APlayerController* PlayerController);
-
     TArray<TObjectPtr<ACogEngineReplicator>> GetRemoteReplicators() const { return RemoteReplicators; }
 
     void AddRemoteReplicator(ACogEngineReplicator* Value);

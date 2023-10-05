@@ -506,13 +506,24 @@ void FCogDebugDraw::Skeleton(const FLogCategoryBase& LogCategory, const USkeleta
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDraw::ReplicateShape(const UObject* WorldContextObject, const FCogDebugShape& Shape)
 {
-    const UWorld* World = WorldContextObject != nullptr ? WorldContextObject->GetWorld() : nullptr;
+    UWorld* World = WorldContextObject != nullptr ? WorldContextObject->GetWorld() : nullptr;
+    if (World == nullptr)
+    {
+        return;
+    }
+
     const ENetMode NetMode = World->GetNetMode();
     if (NetMode == NM_DedicatedServer || NetMode == NM_ListenServer)
     {
-        for (const TObjectPtr<ACogDebugReplicator>& Replicator : FCogDebugModule::Get().GetRemoteReplicators())
+        TArray<ACogDebugReplicator*> Replicators;
+        FCogDebugModule::Get().GetRemoteReplicators(*World, Replicators);
+
+        for (ACogDebugReplicator* Replicator : Replicators)
         {
-            Replicator->ReplicatedShapes.Add(Shape);
+            if (Replicator != nullptr)
+            {
+                Replicator->ReplicatedShapes.Add(Shape);
+            }
         }
     }
 }

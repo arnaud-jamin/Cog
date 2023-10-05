@@ -155,11 +155,11 @@ void UCogAbilityWindow_Cheats::RequestCheat(AActor* CheatInstigator, AActor* Sel
                 
                 if (ICogInterfacesAllegianceActor* AllegianceInterface = Cast<ICogInterfacesAllegianceActor>(OtherActor))
                 {
-                    AllegianceInterface->GetAllegiance(CheatInstigator);
+                    AllegianceInterface->GetAllegianceWithOtherActor(CheatInstigator);
                 }
 
                 if ((IsShiftDown && (Allegiance == ECogInterfacesAllegiance::Enemy))
-                    || (IsAltDown && (Allegiance == ECogInterfacesAllegiance::Ally)))
+                    || (IsAltDown && (Allegiance == ECogInterfacesAllegiance::Friendly)))
                 {
                     Actors.Add(OtherActor);
                 }

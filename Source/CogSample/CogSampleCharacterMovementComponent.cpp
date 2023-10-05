@@ -220,7 +220,7 @@ void UCogSampleCharacterMovementComponent::TickComponent(float DeltaTime, enum E
     const ACharacter* Character = GetCharacterOwner();
     const UCapsuleComponent* CapsuleComponent = Character->GetCapsuleComponent();
 
-    if (FCogDebugSettings::IsDebugActiveForActor(GetPawnOwner()))
+    if (FCogDebugSettings::IsDebugActiveForObject(GetPawnOwner()))
     {
         FCogDebugPlot::PlotValue(GetPawnOwner(), "Move Input X", GetPendingInputVector().X);
         FCogDebugPlot::PlotValue(GetPawnOwner(), "Move Input Y", GetPendingInputVector().Y);
@@ -236,7 +236,7 @@ void UCogSampleCharacterMovementComponent::TickComponent(float DeltaTime, enum E
     const FVector DebugLocation = Character->GetActorLocation();
     const FVector DebugBottomLocation = DebugLocation - FVector::UpVector * CapsuleComponent->GetScaledCapsuleHalfHeight();
 
-    if (FCogDebugSettings::IsDebugActiveForActor(GetPawnOwner()))
+    if (FCogDebugSettings::IsDebugActiveForObject(GetPawnOwner()))
     {
         const FRotator Rotation = Character->GetActorRotation();
         const FVector Forward = Character->GetActorForwardVector();

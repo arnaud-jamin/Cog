@@ -16,9 +16,11 @@ public:
 
 protected:
 
-    virtual void RenderHelp() override;
+    virtual void PostInitProperties() override;
 
-    virtual void PostLoad() override;
+    virtual void PreSaveConfig() override;
+
+    virtual void RenderHelp() override;
 
     virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;
 

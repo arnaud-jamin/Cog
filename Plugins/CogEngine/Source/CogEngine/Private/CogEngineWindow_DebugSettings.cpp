@@ -13,6 +13,50 @@ void UCogEngineWindow_DebugSettings::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindow_DebugSettings::PostInitProperties()
+{
+    Super::PostInitProperties();
+
+    FCogDebugSettings::FilterBySelection        = FilterBySelection;
+    FCogDebugSettings::Persistent               = Persistent;
+    FCogDebugSettings::TextShadow               = TextShadow;
+    FCogDebugSettings::Fade2D                   = Fade2D;
+    FCogDebugSettings::Duration                 = Duration;
+    FCogDebugSettings::DepthPriority            = DepthPriority;
+    FCogDebugSettings::Segments                 = Segments;
+    FCogDebugSettings::Thickness                = Thickness;
+    FCogDebugSettings::ServerThickness          = ServerThickness;
+    FCogDebugSettings::ServerColorMultiplier    = ServerColorMultiplier;
+    FCogDebugSettings::ArrowSize                = ArrowSize;
+    FCogDebugSettings::AxesScale                = AxesScale;
+    FCogDebugSettings::GradientColorIntensity   = GradientColorIntensity;
+    FCogDebugSettings::GradientColorSpeed       = GradientColorSpeed;
+    FCogDebugSettings::TextSize                 = TextSize;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindow_DebugSettings::PreSaveConfig()
+{
+    Super::PreSaveConfig();
+
+    FilterBySelection        = FCogDebugSettings::FilterBySelection;
+    Persistent               = FCogDebugSettings::Persistent;
+    TextShadow               = FCogDebugSettings::TextShadow;
+    Fade2D                   = FCogDebugSettings::Fade2D;
+    Duration                 = FCogDebugSettings::Duration;
+    DepthPriority            = FCogDebugSettings::DepthPriority;
+    Segments                 = FCogDebugSettings::Segments;
+    Thickness                = FCogDebugSettings::Thickness;
+    ServerThickness          = FCogDebugSettings::ServerThickness;
+    ServerColorMultiplier    = FCogDebugSettings::ServerColorMultiplier;
+    ArrowSize                = FCogDebugSettings::ArrowSize;
+    AxesScale                = FCogDebugSettings::AxesScale;
+    GradientColorIntensity   = FCogDebugSettings::GradientColorIntensity;
+    GradientColorSpeed       = FCogDebugSettings::GradientColorSpeed;
+    TextSize                 = FCogDebugSettings::TextSize;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void UCogEngineWindow_DebugSettings::PreRender(ImGuiWindowFlags& WindowFlags)
 {
     WindowFlags = ImGuiWindowFlags_MenuBar;

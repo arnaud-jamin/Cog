@@ -4,7 +4,7 @@
 #include "CogDebugLogMacros.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogDebugLogBlueprint::Log(FCogLogCategory LogCategory, ECogLogVerbosity Verbosity, const AActor* Actor, const FString& Text)
+void UCogDebugLogBlueprint::Log(const UObject* WorldContextObject, FCogLogCategory LogCategory, ECogLogVerbosity Verbosity, const FString& Text)
 {
 #if ENABLE_COG
 
@@ -16,9 +16,9 @@ void UCogDebugLogBlueprint::Log(FCogLogCategory LogCategory, ECogLogVerbosity Ve
         return;
     }
 
-    if (Actor != nullptr)
+    if (WorldContextObject != nullptr)
     {
-        COG_LOG_ACTOR_NO_CONTEXT(*LogCategoryPtr, (ELogVerbosity::Type)Verbosity, Actor, TEXT("%s"), *Text);
+        COG_LOG_OBJECT_NO_CONTEXT(*LogCategoryPtr, (ELogVerbosity::Type)Verbosity, WorldContextObject, TEXT("%s"), *Text);
     }
     else
     {
@@ -29,7 +29,7 @@ void UCogDebugLogBlueprint::Log(FCogLogCategory LogCategory, ECogLogVerbosity Ve
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogDebugLogBlueprint::IsLogActive(FCogLogCategory LogCategory, const AActor* Actor)
+bool UCogDebugLogBlueprint::IsLogActive(const UObject* WorldContextObject, FCogLogCategory LogCategory)
 {
 #if ENABLE_COG
 
@@ -40,7 +40,7 @@ bool UCogDebugLogBlueprint::IsLogActive(FCogLogCategory LogCategory, const AActo
             return false;
         }
 
-        if (FCogDebugSettings::IsDebugActiveForActor(Actor) == false)
+        if (FCogDebugSettings::IsDebugActiveForObject(WorldContextObject) == false)
         {
             return false;
         }

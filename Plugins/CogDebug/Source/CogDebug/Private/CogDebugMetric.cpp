@@ -1,7 +1,6 @@
 #include "CogDebugMetric.h"
 
 #include "CogDebugSettings.h"
-#include "CogInterfaceFilteredActor.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 float FCogDebugMetric::MaxDurationSetting = 0.0f;
@@ -14,12 +13,9 @@ TMap<FName, FCogDebugMetricEntry> FCogDebugMetric::Metrics;
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugMetric::AddMetric(const FCogDebugMetricParams& Params)
 {
-    if (Cast<ICogInterfacesFilteredActor>(Params.WorldContextObject))
+    if (FCogDebugSettings::IsDebugActiveForObject(Params.WorldContextObject) == false)
     {
-        if (Params.WorldContextObject != FCogDebugSettings::GetSelection())
-        {
-            return;
-        }
+        return;
     }
 
     FCogDebugMetricEntry& Entry = Metrics.FindOrAdd(Params.Name);

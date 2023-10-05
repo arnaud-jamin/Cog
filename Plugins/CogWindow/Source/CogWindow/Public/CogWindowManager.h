@@ -47,6 +47,8 @@ public:
 
     void CloseAllWindows();
 
+    void ResetLayout();
+
     void LoadLayout(int LayoutIndex);
 
     void SaveLayout(int LayoutIndex);

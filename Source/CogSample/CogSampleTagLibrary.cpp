@@ -14,6 +14,9 @@ UE_DEFINE_GAMEPLAY_TAG(Tag_Effect_Type_Heal_Revive, "Effect.Type.Heal.Revive");
 UE_DEFINE_GAMEPLAY_TAG(Tag_GameplayEvent_Killed, "GameplayEvent.Killed");
 UE_DEFINE_GAMEPLAY_TAG(Tag_GameplayEvent_Revived, "GameplayEvent.Revived");
 
+UE_DEFINE_GAMEPLAY_TAG(Tag_MontageEvent_Cast_Begin, "MontageEvent.Cast.Begin");
+UE_DEFINE_GAMEPLAY_TAG(Tag_MontageEvent_Cast_End, "MontageEvent.Cast.End");
+
 UE_DEFINE_GAMEPLAY_TAG(Tag_Status_Dead, "Effect.Status.Dead");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Status_Ghost, "Effect.Status.Ghost");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Status_Immobilized, "Effect.Status.Immobilized");

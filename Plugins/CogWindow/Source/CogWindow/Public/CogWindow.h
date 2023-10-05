@@ -17,7 +17,7 @@ public:
     
     virtual void Initialize() {}
 
-    virtual void Shutdown() {}
+    virtual void PreSaveConfig() {}
 
     /** Called every frame with a valid imgui context if the window is visible.  */
     virtual void Render(float DeltaTime);
