@@ -454,7 +454,11 @@ FReply SCogImguiWidget::OnMouseMove(const FGeometry& MyGeometry, const FPointerE
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiWidget::OnFocusReceived(const FGeometry& MyGeometry, const FFocusEvent& FocusEvent)
 {
-    return Super::OnFocusReceived(MyGeometry, FocusEvent);
+    Super::OnFocusReceived(MyGeometry, FocusEvent);
+
+    FSlateApplication::Get().ResetToDefaultPointerInputSettings();
+
+    return FReply::Handled();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

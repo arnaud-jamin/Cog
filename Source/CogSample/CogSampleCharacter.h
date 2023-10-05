@@ -22,7 +22,7 @@ class UInputAction;
 class UInputMappingContext;
 class USpringArmComponent;
 struct FActiveGameplayEffect;
-struct FCogSampleForcedMoveParams;
+struct FCogSampleRootMotionParams;
 struct FGameplayEffectSpec;
 struct FOnAttributeChangeData;
 
@@ -190,10 +190,10 @@ public:
     int32 TeamID = 0;
     
     //----------------------------------------------------------------------------------------------------------------------
-    // Forced Move
+    // Root Motion
     //----------------------------------------------------------------------------------------------------------------------
     UFUNCTION(BlueprintCallable)
-    int32 ApplyForcedMove(const FCogSampleForcedMoveParams& Params);
+    int32 ApplyRootMotion(const FCogSampleRootMotionParams& Params);
 
 private:
 
@@ -227,16 +227,21 @@ private:
 
     void OnScaleAttributeChanged(const FOnAttributeChangeData& Data);
 
+    void UpdateActiveAbilitySlots();
+
+    UFUNCTION()
+    void OnRep_ActiveAbilityHandles();
+
     //----------------------------------------------------------------------------------------------------------------------
-    // Forced Move
+    // Root Motion 
     //----------------------------------------------------------------------------------------------------------------------
     UFUNCTION(Reliable, Client)
-    void Client_ApplyForcedMove(const FCogSampleForcedMoveParams& Params);
+    void Client_ApplyRootMotion(const FCogSampleRootMotionParams& Params);
 
-    uint16 ApplyForcedMoveInternal(const FCogSampleForcedMoveParams& Params);
+    uint16 ApplyRootMotionShared(const FCogSampleRootMotionParams& Params);
 
     //----------------------------------------------------------------------------------------------------------------------
-    UPROPERTY(Replicated, Transient)
+    UPROPERTY(ReplicatedUsing=OnRep_ActiveAbilityHandles, Transient)
     TArray<FGameplayAbilitySpecHandle> ActiveAbilityHandles;
     
     FDelegateHandle GameplayEffectAddedHandle;

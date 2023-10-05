@@ -393,7 +393,7 @@ bool UCogEngineWindow_Selection::ComputeBoundingBoxScreenPosition(const APlayerC
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogEngineWindow_Selection::DrawMainMenuWidget(bool Draw, float& Width)
 {
-    const float PickButtonWidth = FCogWindowWidgets::GetFontWidth() * 5;
+    const float PickButtonWidth = FCogWindowWidgets::GetFontWidth() * 6;
     const float SelectionButtonWidth = FCogWindowWidgets::GetFontWidth() * 30;
     const float ResetButtonWidth = FCogWindowWidgets::GetFontWidth() * 2;
     Width = PickButtonWidth + SelectionButtonWidth + ResetButtonWidth;

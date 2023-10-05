@@ -20,9 +20,6 @@ public:
     ATTRIBUTE_ACCESSORS(UCogSampleAttributeSet_Health, Health);
     ATTRIBUTE_ACCESSORS(UCogSampleAttributeSet_Health, MaxHealth);
     ATTRIBUTE_ACCESSORS(UCogSampleAttributeSet_Health, HealthRegen)
-    ATTRIBUTE_ACCESSORS(UCogSampleAttributeSet_Health, Armor);
-    ATTRIBUTE_ACCESSORS(UCogSampleAttributeSet_Health, MaxArmor);
-    ATTRIBUTE_ACCESSORS(UCogSampleAttributeSet_Health, ArmorRegen)
     ATTRIBUTE_ACCESSORS(UCogSampleAttributeSet_Health, DamageResistance)
 
     UFUNCTION()
@@ -33,15 +30,6 @@ public:
 
     UFUNCTION()
     virtual void OnRep_HealthRegen(const FGameplayAttributeData& PrevHealthRegen);
-
-    UFUNCTION()
-    virtual void OnRep_Armor(const FGameplayAttributeData& PrevArmor);
-    
-    UFUNCTION()
-    virtual void OnRep_MaxArmor(const FGameplayAttributeData& PrevMaxArmor);
-
-    UFUNCTION()
-    virtual void OnRep_ArmorRegen(const FGameplayAttributeData& PrevArmorRegen);
 
     UFUNCTION()
     virtual void OnRep_DamageResistance(const FGameplayAttributeData& PrevDamageResistance);
@@ -63,16 +51,7 @@ private:
     UPROPERTY(BlueprintReadOnly, Category = "Health", ReplicatedUsing = OnRep_HealthRegen, meta = (AllowPrivateAccess = "true"))
     FGameplayAttributeData HealthRegen;
 
-    UPROPERTY(BlueprintReadOnly, Category = "Armor", ReplicatedUsing = OnRep_Armor, meta = (AllowPrivateAccess = "true"))
-    FGameplayAttributeData Armor;
-
-    UPROPERTY(BlueprintReadOnly, Category = "Armor", ReplicatedUsing = OnRep_MaxArmor, meta = (AllowPrivateAccess = "true"))
-    FGameplayAttributeData MaxArmor;
-
-    UPROPERTY(BlueprintReadOnly, Category = "Armor", ReplicatedUsing = OnRep_ArmorRegen, meta = (AllowPrivateAccess = "true"))
-    FGameplayAttributeData ArmorRegen;
-
-    UPROPERTY(BlueprintReadOnly, Category = "Armor", ReplicatedUsing = OnRep_DamageResistance, meta = (AllowPrivateAccess = "true"))
+    UPROPERTY(BlueprintReadOnly, Category = "Health", ReplicatedUsing = OnRep_DamageResistance, meta = (AllowPrivateAccess = "true"))
     FGameplayAttributeData DamageResistance;
 
     void ClampAttributes(const FGameplayAttribute& Attribute, float& NewValue) const;

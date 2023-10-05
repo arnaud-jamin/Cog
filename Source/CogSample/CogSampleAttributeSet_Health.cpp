@@ -11,9 +11,6 @@ UCogSampleAttributeSet_Health::UCogSampleAttributeSet_Health()
     InitMaxHealth(1000.0f);
     InitHealth(1000.0f);
     InitHealthRegen(10.0f);
-
-    InitMaxArmor(500.f);
-    InitArmorRegen(0.f);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -35,24 +32,6 @@ void UCogSampleAttributeSet_Health::OnRep_HealthRegen(const FGameplayAttributeDa
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogSampleAttributeSet_Health::OnRep_Armor(const FGameplayAttributeData& PrevArmor)
-{
-    GAMEPLAYATTRIBUTE_REPNOTIFY(UCogSampleAttributeSet_Health, Armor, PrevArmor);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogSampleAttributeSet_Health::OnRep_MaxArmor(const FGameplayAttributeData& PrevMaxArmor)
-{
-    GAMEPLAYATTRIBUTE_REPNOTIFY(UCogSampleAttributeSet_Health, MaxArmor, PrevMaxArmor);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogSampleAttributeSet_Health::OnRep_ArmorRegen(const FGameplayAttributeData& PrevArmorRegen)
-{
-    GAMEPLAYATTRIBUTE_REPNOTIFY(UCogSampleAttributeSet_Health, ArmorRegen, PrevArmorRegen);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void UCogSampleAttributeSet_Health::OnRep_DamageResistance(const FGameplayAttributeData& PrevDamageResistance)
 {
     GAMEPLAYATTRIBUTE_REPNOTIFY(UCogSampleAttributeSet_Health, DamageResistance, PrevDamageResistance);
@@ -70,9 +49,6 @@ void UCogSampleAttributeSet_Health::GetLifetimeReplicatedProps(TArray<class FLif
     DOREPLIFETIME_WITH_PARAMS_FAST(UCogSampleAttributeSet_Health, Health, Params);
     DOREPLIFETIME_WITH_PARAMS_FAST(UCogSampleAttributeSet_Health, MaxHealth, Params);
     DOREPLIFETIME_WITH_PARAMS_FAST(UCogSampleAttributeSet_Health, HealthRegen, Params);
-    DOREPLIFETIME_WITH_PARAMS_FAST(UCogSampleAttributeSet_Health, Armor, Params);
-    DOREPLIFETIME_WITH_PARAMS_FAST(UCogSampleAttributeSet_Health, MaxArmor, Params);
-    DOREPLIFETIME_WITH_PARAMS_FAST(UCogSampleAttributeSet_Health, ArmorRegen, Params);
     DOREPLIFETIME_WITH_PARAMS_FAST(UCogSampleAttributeSet_Health, DamageResistance, Params);
 }
 
@@ -98,10 +74,6 @@ void UCogSampleAttributeSet_Health::PostAttributeChange(const FGameplayAttribute
     if (Attribute == GetMaxHealthAttribute())
     {
         UCogSampleFunctionLibrary_Gameplay::AdjustAttributeForMaxChange(GetOwningAbilitySystemComponent(), Health, OldValue, NewValue, GetHealthAttribute());
-    }
-    else if (Attribute == GetMaxArmorAttribute())
-    {
-        UCogSampleFunctionLibrary_Gameplay::AdjustAttributeForMaxChange(GetOwningAbilitySystemComponent(), Armor, OldValue, NewValue, GetArmorAttribute());
     }
     else
     {
@@ -137,9 +109,5 @@ void UCogSampleAttributeSet_Health::ClampAttributes(const FGameplayAttribute& At
     if (Attribute == GetHealthAttribute())
     {
         NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxHealth());
-    }
-    else if (Attribute == GetArmorAttribute())
-    {
-        NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxArmor());
     }
 }

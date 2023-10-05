@@ -13,6 +13,7 @@ public class CogSample : ModuleRules
             "CoreUObject", 
             "Engine", 
             "EnhancedInput",
+            "GameplayTasks",
             "GameplayAbilities",
             "GameplayTags",
             "HeadMountedDisplay", 

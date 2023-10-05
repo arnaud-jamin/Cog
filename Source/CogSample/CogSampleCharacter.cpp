@@ -6,8 +6,9 @@
 #include "CogSampleAttributeSet_Health.h"
 #include "CogSampleAttributeSet_Misc.h"
 #include "CogSampleCharacterMovementComponent.h"
-#include "CogSampleForcedMove.h"
+#include "CogSampleGameplayAbility.h"
 #include "CogSampleLogCategories.h"
+#include "CogSampleRootMotionParams.h"
 #include "CogSampleTagLibrary.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -163,12 +164,26 @@ void ACogSampleCharacter::InitializeAbilitySystem()
             AbilitySystem->GiveAbility(Spec);
         }
 
+        int32 Index = 0;
         for (FActiveAbilityInfo& AbilityInfo : ActiveAbilities)
         {
             const FGameplayAbilitySpec Spec(AbilityInfo.Ability, 1, INDEX_NONE, this);
             FGameplayAbilitySpecHandle Handle = AbilitySystem->GiveAbility(Spec);
             ActiveAbilityHandles.Add(Handle);
+
+            if (FGameplayAbilitySpec* AddedSpec = AbilitySystem->FindAbilitySpecFromHandle(Handle))
+            {
+                if (UCogSampleGameplayAbility* Ab = Cast<UCogSampleGameplayAbility>(AddedSpec->GetPrimaryInstance()))
+                {
+                    Ab->SetSlotTag(FCogSampleTagLibrary::ActiveAbilityCooldownTags[Index]);
+                }
+            }
+
+            Index++;
         }
+
+        UpdateActiveAbilitySlots();
+
         MARK_PROPERTY_DIRTY_FROM_NAME(ACogSampleCharacter, ActiveAbilityHandles, this);
     }
 
@@ -497,7 +512,7 @@ void ACogSampleCharacter::SetTeamID(int32 Value)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-int32 ACogSampleCharacter::ApplyForcedMove(const FCogSampleForcedMoveParams& Params)
+int32 ACogSampleCharacter::ApplyRootMotion(const FCogSampleRootMotionParams& Params)
 {
     if (HasAuthority() == false)
     {
@@ -518,22 +533,22 @@ int32 ACogSampleCharacter::ApplyForcedMove(const FCogSampleForcedMoveParams& Par
         }
     }
 
-    Client_ApplyForcedMove(Params);
-    int32 RootMotionSourceID = ApplyForcedMoveInternal(Params);
+    Client_ApplyRootMotion(Params);
+    int32 RootMotionSourceID = ApplyRootMotionShared(Params);
     return RootMotionSourceID;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogSampleCharacter::Client_ApplyForcedMove_Implementation(const FCogSampleForcedMoveParams& Params)
+void ACogSampleCharacter::Client_ApplyRootMotion_Implementation(const FCogSampleRootMotionParams& Params)
 {
     if (GetWorld()->GetNetMode() == NM_Client)
     {
-        ApplyForcedMoveInternal(Params);
+        ApplyRootMotionShared(Params);
     }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-uint16 ACogSampleCharacter::ApplyForcedMoveInternal(const FCogSampleForcedMoveParams& Params)
+uint16 ACogSampleCharacter::ApplyRootMotionShared(const FCogSampleRootMotionParams& Params)
 {
     UCogSampleCharacterMovementComponent* MovementComponent = Cast<UCogSampleCharacterMovementComponent>(GetMovementComponent());
     if (MovementComponent == nullptr)
@@ -558,4 +573,39 @@ uint16 ACogSampleCharacter::ApplyForcedMoveInternal(const FCogSampleForcedMovePa
 
     uint16 RootMotionSourceID = MovementComponent->ApplyRootMotionSource(JumpForce);
     return RootMotionSourceID;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSampleCharacter::OnRep_ActiveAbilityHandles()
+{
+    UpdateActiveAbilitySlots();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSampleCharacter::UpdateActiveAbilitySlots()
+{
+    for (int32 i = 0; i < ActiveAbilityHandles.Num(); ++i)
+    {
+        FGameplayAbilitySpecHandle& Handle = ActiveAbilityHandles[i];
+
+        if (FCogSampleTagLibrary::ActiveAbilityCooldownTags.IsValidIndex(i) == false)
+        {
+            return;
+        }
+
+        FGameplayAbilitySpec* Spec = AbilitySystem->FindAbilitySpecFromHandle(Handle);
+        if (Spec == nullptr)
+        {
+            continue;
+        }
+
+        UCogSampleGameplayAbility* AbilityInstance = Cast<UCogSampleGameplayAbility>(Spec->GetPrimaryInstance());
+        if (AbilityInstance == nullptr)
+        {
+            continue;
+        }
+
+        FGameplayTag SlotTag = FCogSampleTagLibrary::ActiveAbilityCooldownTags[i];
+        AbilityInstance->SetSlotTag(SlotTag);
+    }
 }

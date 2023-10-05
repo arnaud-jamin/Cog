@@ -2,13 +2,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/RootMotionSource.h"
-#include "CogSampleForcedMove.generated.h"
+#include "CogSampleRootMotionParams.generated.h"
 
 class UGameplayEffect;
 
 //--------------------------------------------------------------------------------------------------------------------------
 USTRUCT(BlueprintType)
-struct FCogSampleForcedMoveParams
+struct FCogSampleRootMotionParams
 {
     GENERATED_BODY()
 
@@ -27,7 +27,7 @@ public:
     FRotator Rotation;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    bool IsAdditive = true;
+    bool IsAdditive = false;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     int32 Priority = 0;

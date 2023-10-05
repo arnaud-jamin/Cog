@@ -22,7 +22,7 @@ namespace CogSampleLog
     {
 #if USE_COG
         FCogDebugLogCategoryManager::AddLogCategory(LogCogAlways, "Always", false);
-        FCogDebugLogCategoryManager::AddLogCategory(LogAbilitySystem, "AbilitySystem");
+        FCogDebugLogCategoryManager::AddLogCategory(LogAbilitySystem, "Ability System");
         FCogDebugLogCategoryManager::AddLogCategory(LogGameplayEffects, "Gameplay Effects");
         FCogDebugLogCategoryManager::AddLogCategory(LogCogCollision, "Collision");
         FCogDebugLogCategoryManager::AddLogCategory(LogCogInput, "Input");
