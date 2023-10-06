@@ -59,39 +59,45 @@ void UCogSampleExecCalculation_Damage::Execute_Implementation(const FGameplayEff
     //-----------------------------------------------------------------------------------------------------
     // Get flat Damage
     //-----------------------------------------------------------------------------------------------------
-    float IncomingDamage = 0.0f;
-    ExecutionParams.AttemptCalculateTransientAggregatorMagnitude(Tag_Effect_Data_Damage, EvaluationParameters, IncomingDamage);
+    float UnmitigatedDamage = 0.0f;
+    ExecutionParams.AttemptCalculateTransientAggregatorMagnitude(Tag_Effect_Data_Damage, EvaluationParameters, UnmitigatedDamage);
 
     //-----------------------------------------------------------------------------------------------------
     // Apply resistances
     //-----------------------------------------------------------------------------------------------------
-    float ReceivedDamage = 0.0f;
+    float MitigatedDamage = 0.0f;
     if (TargetAbilitySystem->HasMatchingGameplayTag(Tag_Status_Immune_Damage) == false)
     {
         float Resistances = 0.0f;
         ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().DamageResistanceDef, EvaluationParameters, Resistances);
         Resistances = FMath::Min(Resistances, 1.0f);
-        ReceivedDamage = IncomingDamage * (1.0f - Resistances);
+        MitigatedDamage = UnmitigatedDamage * (1.0f - Resistances);
     }
 
     if (SpecAssetTags.HasTag(Tag_Effect_Type_Damage_Kill))
     {
-        IncomingDamage = TargetAbilitySystem->GetNumericAttribute(UCogSampleAttributeSet_Health::GetMaxHealthAttribute());
-        ReceivedDamage  = IncomingDamage;
+        UnmitigatedDamage = TargetAbilitySystem->GetNumericAttribute(UCogSampleAttributeSet_Health::GetMaxHealthAttribute());
+        MitigatedDamage  = UnmitigatedDamage;
     }
 
     //-----------------------------------------------------------------------------------------------------
     // Apply Damage
     //-----------------------------------------------------------------------------------------------------
-    if (ReceivedDamage > 0.0f)
+    if (MitigatedDamage > 0.0f)
     {
-        OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(UCogSampleAttributeSet_Health::GetHealthAttribute(), EGameplayModOp::Additive, -ReceivedDamage));
+        OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(UCogSampleAttributeSet_Health::GetHealthAttribute(), EGameplayModOp::Additive, -MitigatedDamage));
 
-        TargetCharacter->OnDamageReceived(ReceivedDamage, IncomingDamage, SourceCharacter, EffectSpec);
+        FCogSampleDamageEventParams Params;
+        Params.DamageDealer = SourceCharacter;
+        Params.DamageReceiver = TargetCharacter;
+        Params.MitigatedDamage = MitigatedDamage;
+        Params.UnmitigatedDamage = UnmitigatedDamage;
+
+        TargetCharacter->HandleDamageReceived(Params);
 
         if (SourceCharacter != nullptr)
         {
-            SourceCharacter->OnDamageDealt(ReceivedDamage, IncomingDamage, TargetCharacter, EffectSpec);
+            SourceCharacter->HandleDamageDealt(Params);
         }
     }
 }

@@ -309,7 +309,7 @@ void UCogAbilityWindow_Effects::RenderRemainingTime(const UAbilitySystemComponen
 
         ImGui::PushStyleColor(ImGuiCol_PlotHistogram, IM_COL32(100, 100, 100, 255));
         ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 100));
-        ImGui::ProgressBar(RemainingTime / Duration, ImVec2(FCogWindowWidgets::GetFontWidth() * 15, ImGui::GetTextLineHeightWithSpacing() * 0.8f), TCHAR_TO_ANSI(*FString::Printf(TEXT("%.2f / %.2f"), RemainingTime, Duration)));
+        ImGui::ProgressBar(RemainingTime / Duration, ImVec2(-1, ImGui::GetTextLineHeightWithSpacing() * 0.8f), TCHAR_TO_ANSI(*FString::Printf(TEXT("%.2f / %.2f"), RemainingTime, Duration)));
         ImGui::PopStyleColor(2);
     }
 }

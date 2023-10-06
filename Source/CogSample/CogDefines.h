@@ -6,12 +6,14 @@
 #define USE_COG (ENABLE_DRAW_DEBUG && !NO_LOGGING)
 #endif
 
-#if !USE_COG
+#if USE_COG
 
-#define COG(expr)   (0)
+#define IF_COG(expr)        { expr; }
+#define COG_LOG_CATEGORY    FLogCategoryBase
 
-#else //!ENABLE_COG
+#else //USE_COG
 
-#define COG(expr)   { expr; }
+#define IF_COG(expr)        (0)
+#define COG_LOG_CATEGORY    FNoLoggingCategory
 
-#endif //!ENABLE_COG
+#endif //USE_COG

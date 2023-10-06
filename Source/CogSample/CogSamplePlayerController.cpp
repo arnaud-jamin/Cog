@@ -51,6 +51,32 @@ void ACogSamplePlayerController::Tick(float DeltaSeconds)
         TArray<AActor*> TagretToIgnore;
         FCogSampleTargetAcquisitionResult Result;
         TargetAcquisition->FindBestTarget(this, TagretToIgnore, nullptr, true, FVector2D::ZeroVector, false, Result);
-        Target = Result.Target;
+        SetTarget(Result.Target);
     }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSamplePlayerController::SetTarget(AActor* Value)
+{
+    if (Value == Target)
+    {
+        return;
+    }
+
+    AActor* OldTarget = Target.Get();
+
+    Target = Value;
+
+    if (GetLocalRole() == ROLE_AutonomousProxy)
+    {
+        Server_SetTarget(Value);
+    }
+
+    OnTargetChanged.Broadcast(this, Target.Get(), OldTarget);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSamplePlayerController::Server_SetTarget_Implementation(AActor* Value)
+{
+    Target = Value;
 }

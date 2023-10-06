@@ -12,7 +12,7 @@
 void UCogAbilityWindow_Attributes::RenderHelp()
 {
     ImGui::Text(
-        "This window display the gameplay attributes of the selected actor. "
+        "This window displays the gameplay attributes of the selected actor. "
         "Attributes can be sorted by name, category or attribute set. "
         "Attributes with the Current value greater than the Base value are displayed in green. "
         "Attributes with the Current value lower than the Base value are displayed in red. "

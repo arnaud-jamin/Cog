@@ -12,7 +12,7 @@ ImVec4 StatGreenColor(0.5f, 1.0f, 0.6f, 1.0f);
 void UCogEngineWindow_Stats::RenderHelp()
 {
     ImGui::Text(
-        "This window display engine stats such as FPS, Ping, Packet Loss. "
+        "This window displays engine stats such as FPS, Ping, Packet Loss. "
     );
 }
 

@@ -15,9 +15,9 @@
 #endif //USE_COG
 
 //--------------------------------------------------------------------------------------------------------------------------
-// UCogSampleTargetAcquisition_Generic
+// FCogSampleTargetTargetAcquisitionParams
 //--------------------------------------------------------------------------------------------------------------------------
-struct FCogSampleTargetCandidateEvaluationParameters
+struct FCogSampleTargetTargetAcquisitionParams
 {
     const AActor* Source;
     FVector SourceLocation;
@@ -35,18 +35,11 @@ struct FCogSampleTargetCandidateEvaluationParameters
     FVector2D SearchDirectionScreenOrigin = FVector2D::ZeroVector;
     FVector2D SearchDirectionNormalized = FVector2D::ZeroVector;
     bool IsDebugPersistent = false;
+    bool IsCrosshairInsideAnyCandidate = false;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
-struct FCogSampleTargetCandidateEvaluationResult
-{
-    AActor* BestTarget;
-    float MinScore;
-    bool bFoundLocationInsideShape;
-};
-
-//--------------------------------------------------------------------------------------------------------------------------
-// UCogSampleTargetAcquisition_Generic
+// UCogSampleTargetAcquisition
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSampleTargetAcquisition::FindBestTargets(
     const APlayerController* Controller,
@@ -60,7 +53,7 @@ void UCogSampleTargetAcquisition::FindBestTargets(
 {
     TRACE_CPUPROFILER_EVENT_SCOPE(UCogSampleTargetAcquisition::FindBestTargets);
 
-    COG(FCogDebugDraw::String2D(LogCogTargetAcquisition, Controller, GetName(), FVector2D(20, 20), FColor::White, bIsDebugPersistent));
+    IF_COG(FCogDebugDraw::String2D(LogCogTargetAcquisition, Controller, GetName(), FVector2D(20, 20), FColor::White, bIsDebugPersistent));
 
     TArray<AActor*> TempTargetsToIgnore(TargetsToIgnore);
 
@@ -136,7 +129,7 @@ void UCogSampleTargetAcquisition::FindBestTarget(
     const FVector2D SearchDirectionNormalized = (TargetSwitchSearchDirection.IsNearlyZero() == false) ? TargetSwitchSearchDirection.GetSafeNormal() : FVector2D::ZeroVector;
     if (SearchDirectionNormalized.IsNearlyZero() == false)
     {
-        COG(FCogDebugDraw::Segment2D(LogCogTargetAcquisition, Controller, FVector2D::ZeroVector, FVector2D(SearchDirectionNormalized.X, -SearchDirectionNormalized.Y), FColor(255, 255, 0, 255), bIsDebugPersistent));
+        IF_COG(FCogDebugDraw::Segment2D(LogCogTargetAcquisition, Controller, FVector2D::ZeroVector, FVector2D(SearchDirectionNormalized.X, -SearchDirectionNormalized.Y), FColor(255, 255, 0, 255), bIsDebugPersistent));
     }
 #endif //USE_COG
 
@@ -155,7 +148,7 @@ void UCogSampleTargetAcquisition::FindBestTarget(
     const FQuat CapsuleRotation = (CastRotation + FRotator(90, 0, 0)).Quaternion();
     const FCollisionShape CapsuleShape = FCollisionShape::MakeCapsule(CapsuleRadius, CapsuleHalfHeight);
 
-    COG(FCogDebugDraw::Capsule(LogCogTargetAcquisition, Controller, CapsuleCenter, CapsuleHalfHeight, CapsuleRadius, CapsuleRotation, FColor::Yellow, bIsDebugPersistent, 0));
+    IF_COG(FCogDebugDraw::Capsule(LogCogTargetAcquisition, Controller, CapsuleCenter, CapsuleHalfHeight, CapsuleRadius, CapsuleRotation, FColor::Yellow, bIsDebugPersistent, 0));
 
     //-------------------------------------------------
     // Gather targets asynchronously    
@@ -220,7 +213,7 @@ void UCogSampleTargetAcquisition::FindBestTarget(
         {
             if (CheckIfTargetValid(Controller, Character, Actor) == false)
             {
-                COG(FCogDebugDraw::String(LogCogTargetAcquisition, Controller, "Filter", UCogSampleFunctionLibrary_Gameplay::GetActorTargetLocation(Actor), FColor::Red, bIsDebugPersistent));
+                IF_COG(FCogDebugDraw::String(LogCogTargetAcquisition, Controller, "Filter", UCogSampleFunctionLibrary_Gameplay::GetActorTargetLocation(Actor), FColor::Red, bIsDebugPersistent));
                 continue;
             }
 
@@ -256,19 +249,160 @@ bool UCogSampleTargetAcquisition::GetViewInfo(
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleTargetAcquisition::FindBestTargetInCandidates(
+    const APlayerController* Controller,
+    const TArray<AActor*>& TargetsToIgnore,
+    const TArray<AActor*>& Candidates,
+    const FVector2D ScreenSearchDirection,
+    const FVector2D SearchDirectionScreenOrigin,
+    const bool bIsDebugPersistent,
+    FCogSampleTargetAcquisitionResult& Result) const
+{
+    TRACE_CPUPROFILER_EVENT_SCOPE(UCogSampleTargetAcquisition::FindBestTargetInCandidates);
+
+    ACogSampleCharacter* Character = Cast<ACogSampleCharacter>(Controller->GetPawn());
+    if (Character == nullptr)
+    {
+        return;
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Compute view matrix to project each candidate capsules in screen space
+    //----------------------------------------------------------------------------------------------------------------------
+    FMatrix ViewProjectionMatrix;
+    FIntRect ViewRect;
+    if (GetViewInfo(Controller, ViewProjectionMatrix, ViewRect) == false)
+    {
+        return;
+    }
+
+
+    
+    FVector2D ScreenSize(ViewRect.Width(), ViewRect.Height()); 
+    FVector2D ScreenCrosshairPosition = ScreenSize * 0.5f;;
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Draw screen limits
+    //----------------------------------------------------------------------------------------------------------------------
+
+#if USE_COG
+
+    FCogDebugDraw::Circle2D(LogCogTargetAcquisition, Controller, ScreenCrosshairPosition, 5.0f, FColor(255, 255, 255, 255), bIsDebugPersistent);
+
+    if (bUseScreenLimit)
+    {
+        if (ScreenLimitType == ECogSampleTargetAcquisitionScreenLimitType::Rectangle)
+        {
+            FCogDebugDraw::Rect2D(
+                LogCogTargetAcquisition,
+                Controller,
+                UCogSampleFunctionLibrary_Gameplay::ViewportToScreen(FVector2D(-ScreenMaxX, -ScreenMaxY), ScreenSize),
+                UCogSampleFunctionLibrary_Gameplay::ViewportToScreen(FVector2D(ScreenMaxX, ScreenMaxY), ScreenSize),
+                FColor(255, 255, 255, 255),
+                bIsDebugPersistent);
+        }
+        else
+        {
+            FCogDebugDraw::Circle2D(
+                LogCogTargetAcquisition,
+                Controller,
+                ScreenCrosshairPosition,
+                UCogSampleFunctionLibrary_Gameplay::ViewportToScreen(ScreenMaxX, ScreenSize),
+                FColor(255, 255, 255, 255),
+                bIsDebugPersistent);
+        }
+    }
+#endif //USE_COG
+
+    const FRotator YawRotation = GetReferentialRotation(Character, YawReferential);
+    const FVector YawDirection = YawRotation.Vector();
+
+    FCogSampleTargetTargetAcquisitionParams Params;
+    Params.Source = Character;
+    Params.SourceLocation = UCogSampleFunctionLibrary_Gameplay::GetActorTargetLocation(Character);
+    Params.Controller = Controller;
+    Params.TargetsToIgnore = TargetsToIgnore;
+    Params.bWorldDistanceIgnoreZ = WorldDistanceIgnoreZ;
+    Params.MaxWorldDistance = WorldDistanceMax;
+    Params.CrosshairPosition = ScreenCrosshairPosition;
+    Params.YawDirection = YawDirection;
+    Params.CameraRight = Character->GetFollowCamera()->GetComponentQuat().GetRightVector();
+    Params.ViewProjectionMatrix = ViewProjectionMatrix;
+    Params.ViewRect = ViewRect;
+    Params.BlockersParams = UCogSampleFunctionLibrary_Gameplay::ConfigureCollisionObjectParams(BlockerTypes);
+    Params.bUseSearchDirection = ScreenSearchDirection.IsNearlyZero() == false;
+    Params.SearchDirectionScreenOrigin = SearchDirectionScreenOrigin;
+    Params.SearchDirectionNormalized = Params.bUseSearchDirection ? ScreenSearchDirection.GetSafeNormal() : FVector2D::ZeroVector;
+    Params.IsDebugPersistent = bIsDebugPersistent;
+    Params.IsCrosshairInsideAnyCandidate = false;
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Evaluate candidates actors
+    //----------------------------------------------------------------------------------------------------------------------
+    float MinScore = FLT_MAX;
+    AActor* BestTarget = nullptr;
+
+    bool bIsCrosshairInsideAnyTarget = false;
+    for (int32 i = 0; i < Candidates.Num(); ++i)
+    {
+        AActor* Candidate = Candidates[i];
+        if (Candidate == nullptr)
+        {
+            continue;
+        }
+
+        float CandidateScore = 0.0f;
+        bool bIsCrosshairInsideCandidate = false;
+        if (EvaluateCandidate(Candidate, Params, CandidateScore, bIsCrosshairInsideCandidate) == false)
+        {
+            continue;
+        }
+
+        //-----------------------------------------------------------------------------------------
+        // If the crosshair is inside this candidate, we can discard subsequent candidates 
+        // that are not inside but also the best previous candidate since we were not inside it.
+        //-----------------------------------------------------------------------------------------
+        if (bPrioritizeTargetWithCrosshairInsideThem && bIsCrosshairInsideCandidate && bIsCrosshairInsideAnyTarget == false)
+        {
+            BestTarget = nullptr;
+            MinScore = FLT_MAX;
+        }
+
+        Params.IsCrosshairInsideAnyCandidate |= bIsCrosshairInsideCandidate;
+
+        if (CandidateScore > MinScore)
+        {
+            continue;
+        }
+
+        MinScore = CandidateScore;
+        BestTarget = Candidate;
+    }
+
+    if (BestTarget != nullptr)
+    {
+        Result.Target = BestTarget;
+        Result.Score = MinScore;
+
+        IF_COG(FCogDebugDraw::Point(LogCogTargetAcquisition, Controller, UCogSampleFunctionLibrary_Gameplay::GetActorTargetLocation(Result.Target), 20.0f, FColor::Green, Params.IsDebugPersistent, 100));
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 bool UCogSampleTargetAcquisition::EvaluateCandidate(
-    AActor* CandidateTarget,
-    const FCogSampleTargetCandidateEvaluationParameters& EvalParams,
-    FCogSampleTargetCandidateEvaluationResult& EvalResult) const
+    AActor* Candidate,
+    const FCogSampleTargetTargetAcquisitionParams& EvalParams,
+    float& CandidateScore,
+    bool& bIsCrosshairInsideCandidate) const
 {
     TRACE_CPUPROFILER_EVENT_SCOPE(UCogSampleTargetAcquisition::EvaluateCandidate);
 
-    if (EvalParams.TargetsToIgnore.Contains(CandidateTarget))
+    if (EvalParams.TargetsToIgnore.Contains(Candidate))
     {
         return false;
     }
 
-    const FVector CandidateTargetLocation = UCogSampleFunctionLibrary_Gameplay::GetActorTargetLocation(CandidateTarget);
+    const FVector CandidateTargetLocation = UCogSampleFunctionLibrary_Gameplay::GetActorTargetLocation(Candidate);
 
     FVector CandidateLocationDelta = CandidateTargetLocation - EvalParams.SourceLocation;
     if (EvalParams.bWorldDistanceIgnoreZ)
@@ -285,7 +419,7 @@ bool UCogSampleTargetAcquisition::EvaluateCandidate(
     //--------------------------------------------------------------------------------------------------------------        
     if (CandidateWorldDistance > EvalParams.MaxWorldDistance)
     {
-        COG(FCogDebugDraw::String(LogCogTargetAcquisition, EvalParams.Controller, FString::Printf(TEXT("Dist: %0.2f"), CandidateWorldDistance * 0.01f), CandidateTargetLocation, FColor::Red, EvalParams.IsDebugPersistent));
+        IF_COG(FCogDebugDraw::String(LogCogTargetAcquisition, EvalParams.Controller, FString::Printf(TEXT("Dist: %0.2f"), CandidateWorldDistance * 0.01f), CandidateTargetLocation, FColor::Red, EvalParams.IsDebugPersistent));
         return false;
     }
 
@@ -297,7 +431,7 @@ bool UCogSampleTargetAcquisition::EvaluateCandidate(
     const float CandidateYaw = FRotator::NormalizeAxis(FMath::RadiansToDegrees(FMath::Acos(CandidateDot)));
     if (bUseYawLimit && CandidateYaw > YawMax)
     {
-        COG(FCogDebugDraw::String(LogCogTargetAcquisition, EvalParams.Controller, FString::Printf(TEXT("Yaw: %0.2f"), CandidateYaw), CandidateTargetLocation, FColor::Red, EvalParams.IsDebugPersistent));
+        IF_COG(FCogDebugDraw::String(LogCogTargetAcquisition, EvalParams.Controller, FString::Printf(TEXT("Yaw: %0.2f"), CandidateYaw), CandidateTargetLocation, FColor::Red, EvalParams.IsDebugPersistent));
         return false;
     }
 
@@ -309,7 +443,7 @@ bool UCogSampleTargetAcquisition::EvaluateCandidate(
     FVector2D CandidateClosestScreenLocation;
     float CandidateClosestScreenDistance;
     const UCapsuleComponent* CandidateBestHitZone = nullptr;
-    if (!ComputeCandidateScreenLocation(CandidateTarget, EvalParams, CandidateTargetLocation, CandidateScreenLocation, CandidateClosestScreenLocation, CandidateClosestScreenDistance))
+    if (!ComputeCandidateScreenLocation(Candidate, EvalParams, CandidateTargetLocation, CandidateScreenLocation, CandidateClosestScreenLocation, CandidateClosestScreenDistance))
     {
         return false;
     }
@@ -328,31 +462,21 @@ bool UCogSampleTargetAcquisition::EvaluateCandidate(
     //--------------------------------------------------------------------------------------------------------------
     // Raycast to verify this target is not blocked by a collision.
     //--------------------------------------------------------------------------------------------------------------
-    if (!HasLineOfSightToTarget(EvalParams.Source, CandidateTarget, EvalParams.BlockersParams))
+    if (HasLineOfSightToTarget(EvalParams.Source, EvalParams.SourceLocation, Candidate, CandidateTargetLocation, EvalParams.BlockersParams) == false)
     {
         return false;
     }
 
-    const bool bIsInsideCandidate = CandidateClosestScreenDistance < 0.0f;
-    if (!IsSearchDirectionUsed && bPrioritizeInsideHitZones)
+    bIsCrosshairInsideCandidate = CandidateClosestScreenDistance < 0.0f;
+    if (!IsSearchDirectionUsed && bPrioritizeTargetWithCrosshairInsideThem)
     {
         //--------------------------------------------------------------------------------------------------------------
         // We always prioritize the candidates if the crosshair is inside them. Thus if we are inside another candidate
         // but not inside this one, we discard it (unless we are switching the lock target)
         //--------------------------------------------------------------------------------------------------------------
-        if (EvalResult.bFoundLocationInsideShape && bIsInsideCandidate == false)
+        if (EvalParams.IsCrosshairInsideAnyCandidate && bIsCrosshairInsideCandidate == false)
         {
             return false;
-        }
-
-        //--------------------------------------------------------------------------------------------------------------
-        // if we are inside the capsule of this candidate, we can discard subsequent candidates that are not inside
-        // but also the best previous candidate since we were not inside it.
-        //--------------------------------------------------------------------------------------------------------------
-        if (bIsInsideCandidate && EvalResult.bFoundLocationInsideShape == false)
-        {
-            EvalResult.BestTarget = nullptr;
-            EvalResult.MinScore = FLT_MAX;
         }
     }
 
@@ -403,7 +527,7 @@ bool UCogSampleTargetAcquisition::EvaluateCandidate(
 
         if (FMath::Abs(TargetAngleWithSearchDirection) > SearchDirectionMaxAngle)
         {
-            COG(FCogDebugDraw::String(LogCogTargetAcquisition, EvalParams.Controller, FString::Printf(TEXT("MaxAngle: %0.2f"), TargetAngleWithSearchDirection), CandidateTargetLocation, FColor::Red, EvalParams.IsDebugPersistent));
+            IF_COG(FCogDebugDraw::String(LogCogTargetAcquisition, EvalParams.Controller, FString::Printf(TEXT("MaxAngle: %0.2f"), TargetAngleWithSearchDirection), CandidateTargetLocation, FColor::Red, EvalParams.IsDebugPersistent));
             return false;
         }
 
@@ -416,19 +540,15 @@ bool UCogSampleTargetAcquisition::EvaluateCandidate(
     //--------------------------------------------------------------------------------------------------------------
     // Compute final score by summing all the scores. The best score is the smallest one.
     //--------------------------------------------------------------------------------------------------------------
-    const float TargetScore = CandidateWorldDistanceScore + CandidateScreenDistanceScore + CandidateYawScore + SearchDirectionDistanceScore + SearchDirectionAngleScore;
+    CandidateScore = CandidateWorldDistanceScore + CandidateScreenDistanceScore + CandidateYawScore + SearchDirectionDistanceScore + SearchDirectionAngleScore;
 
     //--------------------------------------------------------------------------------------------------------------
     // Draw the score of each candidate
     //--------------------------------------------------------------------------------------------------------------
 #if USE_COG
 
-    /*
-    
     if (FCogDebugLog::IsLogCategoryActive(LogCogTargetAcquisition))
     {
-        ImVec2 CandidateClosestViewportLocation = ImGui::ScreenToViewport(ImGui::ToImVec2(CandidateClosestScreenLocation));
-
         FCogDebugDraw::Point(LogCogTargetAcquisition, EvalParams.Controller, CandidateTargetLocation, 8.0f, FColor::Blue, EvalParams.IsDebugPersistent, 0);
 
         FString Text;
@@ -438,11 +558,9 @@ bool UCogSampleTargetAcquisition::EvaluateCandidate(
             {
                 Text.Append(FString::Printf(TEXT
                 (
-                    "XY: %.0f %.0f \n"
                     "SD: %.0f => %.0f => %.0f \n"
                 ),
-                    CandidateClosestViewportLocation.x * 100.0f, CandidateClosestViewportLocation.y * 100.0f,
-                    CandidateClosestScreenDistance, CandidateScreenDistanceRatio * 100, CandidateScreenDistanceScore * 100));
+                CandidateClosestScreenDistance, CandidateScreenDistanceRatio * 100, CandidateScreenDistanceScore * 100));
             }
 
             if (bUseWorldDistanceScore)
@@ -470,146 +588,24 @@ bool UCogSampleTargetAcquisition::EvaluateCandidate(
                     SearchDirectionAngleScore * 100));
             }
 
-            Text.Append(FString::Printf(TEXT("==> %.0f \n"), TargetScore * 100));
+            Text.Append(FString::Printf(TEXT("==> %.0f \n"), CandidateScore * 100));
         }
         else
         {
-            Text = FString::Printf(TEXT("%0.f"), TargetScore * 100);
+            Text = FString::Printf(TEXT("%0.f"), CandidateScore * 100);
         }
         FCogDebugDraw::String(LogCogTargetAcquisition, EvalParams.Controller, Text, CandidateTargetLocation, FColor::White, EvalParams.IsDebugPersistent);
     }
     
-    */
 #endif //USE_COG
 
-    if (EvalResult.MinScore < TargetScore)
-    {
-        return false;
-    }
-
-    EvalResult.BestTarget = CandidateTarget;
-    EvalResult.MinScore = TargetScore;
-    EvalResult.bFoundLocationInsideShape = EvalResult.bFoundLocationInsideShape || bIsInsideCandidate;
     return true;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogSampleTargetAcquisition::FindBestTargetInCandidates(
-    const APlayerController* Controller,
-    const TArray<AActor*>& TargetsToIgnore,
-    const TArray<AActor*>& Candidates,
-    const FVector2D ScreenSearchDirection,
-    const FVector2D SearchDirectionScreenOrigin,
-    const bool bIsDebugPersistent,
-    FCogSampleTargetAcquisitionResult& Result) const
-{
-    TRACE_CPUPROFILER_EVENT_SCOPE(UCogSampleTargetAcquisition::FindBestTargetInCandidates);
-
-    ACogSampleCharacter* Character = Cast<ACogSampleCharacter>(Controller->GetPawn());
-    if (Character == nullptr)
-    {
-        return;
-    }
-
-    //----------------------------------------------------------------------------------------------------------------------
-    // Compute view matrix to project each candidate capsules in screen space
-    //----------------------------------------------------------------------------------------------------------------------
-    FMatrix ViewProjectionMatrix;
-    FIntRect ViewRect;
-    if (GetViewInfo(Controller, ViewProjectionMatrix, ViewRect) == false)
-    {
-        return;
-    }
-
-    //----------------------------------------------------------------------------------------------------------------------
-    // Draw screen limits
-    //----------------------------------------------------------------------------------------------------------------------
-    FVector2D ScreenCrosshairPosition(0.5f * ViewRect.Width(), 0.5f * ViewRect.Height());
-
-    COG(FCogDebugDraw::Circle2D(LogCogTargetAcquisition, Controller, ScreenCrosshairPosition, 5.0f, FColor(255, 255, 255, 255), bIsDebugPersistent));
-
-#if USE_COG
-    //if (bUseScreenLimit)
-    //{
-    //    if (ScreenLimitType == ECogSampleTargetAcquisitionScreenLimitType::Rectangle)
-    //    {
-    //        COG(FCogDebugDraw::Rect2D(
-    //            LogCogTargetAcquisition,
-    //            Controller,
-    //            FVector2D(-ScreenMaxX, -ScreenMaxY),
-    //            FVector2D(ScreenMaxX, ScreenMaxY),
-    //            FColor(255, 255, 255, 255),
-    //            bIsDebugPersistent));
-    //    }
-    //    else
-    //    {
-    //        COG(FCogDebugDraw::Circle2D(
-    //            LogCogTargetAcquisition,
-    //            Controller,
-    //            ScreenCrosshairPosition,
-    //            ImGui::ViewportToScreen(ScreenMaxX),
-    //            FColor(255, 255, 255, 255),
-    //            bIsDebugPersistent));
-    //    }
-    //}
-#endif //USE_COG
-
-    const FRotator YawRotation = GetReferentialRotation(Character, YawReferential);
-    const FVector YawDirection = YawRotation.Vector();
-
-    FCogSampleTargetCandidateEvaluationParameters EvalParams;
-    EvalParams.Source = Character;
-    EvalParams.SourceLocation = Character->GetActorLocation();
-    EvalParams.Controller = Controller;
-    EvalParams.TargetsToIgnore = TargetsToIgnore;
-    EvalParams.bWorldDistanceIgnoreZ = WorldDistanceIgnoreZ;
-    EvalParams.MaxWorldDistance = WorldDistanceMax;
-    EvalParams.CrosshairPosition = ScreenCrosshairPosition;
-    EvalParams.YawDirection = YawDirection;
-    EvalParams.CameraRight = Character->GetFollowCamera()->GetComponentQuat().GetRightVector();
-    EvalParams.ViewProjectionMatrix = ViewProjectionMatrix;
-    EvalParams.ViewRect = ViewRect;
-    EvalParams.BlockersParams = UCogSampleFunctionLibrary_Gameplay::ConfigureCollisionObjectParams(BlockerTypes);
-    EvalParams.bUseSearchDirection = ScreenSearchDirection.IsNearlyZero() == false;
-    EvalParams.SearchDirectionScreenOrigin = SearchDirectionScreenOrigin;
-    EvalParams.SearchDirectionNormalized = EvalParams.bUseSearchDirection ? ScreenSearchDirection.GetSafeNormal() : FVector2D::ZeroVector;
-    EvalParams.IsDebugPersistent = bIsDebugPersistent;
-
-    FCogSampleTargetCandidateEvaluationResult EvalResult
-    {
-        nullptr,
-        FLT_MAX,
-        false
-    };
-
-    //----------------------------------------------------------------------------------------------------------------------
-    // Evaluate candidates actors
-    //----------------------------------------------------------------------------------------------------------------------
-    for (int32 i = 0; i < Candidates.Num(); ++i)
-    {
-        AActor* Candidate = Candidates[i];
-        check(Candidate != nullptr);
-        if (Candidate == nullptr)
-        {
-            continue;
-        }
-
-        EvaluateCandidate(Candidate, EvalParams, EvalResult);
-    }
-
-    if (EvalResult.BestTarget != nullptr)
-    {
-        Result.Target = EvalResult.BestTarget;
-        Result.Score = EvalResult.MinScore;
-
-        COG(FCogDebugDraw::Point(LogCogTargetAcquisition, Controller, UCogSampleFunctionLibrary_Gameplay::GetActorTargetLocation(Result.Target), 10.0f, FColor::Green, EvalParams.IsDebugPersistent, 0));
-    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 bool UCogSampleTargetAcquisition::ComputeCandidateScreenLocation(
     const AActor* CandidateActor,
-    const FCogSampleTargetCandidateEvaluationParameters& EvalParams,
+    const FCogSampleTargetTargetAcquisitionParams& Params,
     const FVector& CandidateTargetLocation,
     FVector2D& CandidateScreenLocation,
     FVector2D& CandidateClosestScreenLocation,
@@ -636,31 +632,26 @@ bool UCogSampleTargetAcquisition::ComputeCandidateScreenLocation(
             const FVector CapsuleLocation = Capsule->GetComponentLocation();
             const FVector CapsuleTop = CapsuleLocation + FVector::UpVector * (HalfHeight - Radius);
             const FVector CapsuleBottom = CapsuleLocation - FVector::UpVector * (HalfHeight - Radius);
-            const FVector CapsuleRight = CapsuleLocation - EvalParams.CameraRight * Radius;
+            const FVector CapsuleRight = CapsuleLocation - Params.CameraRight * Radius;
 
             FVector2D CapsuleTop2D;
             FVector2D CapsuleBot2D;
             FVector2D CapsuleRight2D;
 
-            if (FSceneView::ProjectWorldToScreen(CapsuleTop, EvalParams.ViewRect, EvalParams.ViewProjectionMatrix, CapsuleTop2D) == false)
+            if (FSceneView::ProjectWorldToScreen(CapsuleTop, Params.ViewRect, Params.ViewProjectionMatrix, CapsuleTop2D) == false)
             {
                 continue;
             }
 
-            if (FSceneView::ProjectWorldToScreen(CapsuleBottom, EvalParams.ViewRect, EvalParams.ViewProjectionMatrix, CapsuleBot2D) == false)
+            if (FSceneView::ProjectWorldToScreen(CapsuleBottom, Params.ViewRect, Params.ViewProjectionMatrix, CapsuleBot2D) == false)
             {
                 continue;
             }
 
-            if (FSceneView::ProjectWorldToScreen(CapsuleRight, EvalParams.ViewRect, EvalParams.ViewProjectionMatrix, CapsuleRight2D) == false)
+            if (FSceneView::ProjectWorldToScreen(CapsuleRight, Params.ViewRect, Params.ViewProjectionMatrix, CapsuleRight2D) == false)
             {
                 continue;
             }
-
-            //if (Type == ECogSampleTargetAcquisitionType::Melee && CandidateCharacter != nullptr && !UCogFunctionLibrary_Targeting::IsTargetCapsuleReachableByMelee(EvalParams.Source, CandidateCharacter, Capsule))
-            //{
-            //    continue;
-            //}
 
             const FVector2D CapsuleCenter2D = CapsuleBot2D + 0.5f * (CapsuleTop2D - CapsuleBot2D);
             const float CapsuleRadius2D = FVector2D::Distance(CapsuleCenter2D, CapsuleRight2D);
@@ -668,7 +659,7 @@ bool UCogSampleTargetAcquisition::ComputeCandidateScreenLocation(
             FVector2D Projection;
             float Time;
             float ScreenCenterToCapsuleDistance;
-            UCogSampleFunctionLibrary_Gameplay::FindCapsulePointDistance(CapsuleBot2D, CapsuleTop2D, CapsuleRadius2D, EvalParams.CrosshairPosition, Projection, Time, ScreenCenterToCapsuleDistance);
+            UCogSampleFunctionLibrary_Gameplay::FindCapsulePointDistance(CapsuleBot2D, CapsuleTop2D, CapsuleRadius2D, Params.CrosshairPosition, Projection, Time, ScreenCenterToCapsuleDistance);
 
             if (ScreenCenterToCapsuleDistance < CandidateClosestScreenDistance)
             {
@@ -680,16 +671,16 @@ bool UCogSampleTargetAcquisition::ComputeCandidateScreenLocation(
 
 #if USE_COG
             const FColor CapsuleColor = (ScreenCenterToCapsuleDistance > 0.0f) ? FColor(255, 255, 255, 100) : FColor(0, 255, 0, 200);
-            FCogDebugDraw::Segment2D(LogCogTargetAcquisition, CandidateActor, CapsuleBot2D + FVector2D(CapsuleRadius2D, 0), CapsuleTop2D + FVector2D(CapsuleRadius2D, 0), CapsuleColor, EvalParams.IsDebugPersistent);
-            FCogDebugDraw::Segment2D(LogCogTargetAcquisition, CandidateActor, CapsuleBot2D - FVector2D(CapsuleRadius2D, 0), CapsuleTop2D - FVector2D(CapsuleRadius2D, 0), CapsuleColor, EvalParams.IsDebugPersistent);
-            FCogDebugDraw::Circle2D(LogCogTargetAcquisition, CandidateActor, CapsuleTop2D, CapsuleRadius2D, CapsuleColor, EvalParams.IsDebugPersistent);
-            FCogDebugDraw::Circle2D(LogCogTargetAcquisition, CandidateActor, CapsuleBot2D, CapsuleRadius2D, CapsuleColor, EvalParams.IsDebugPersistent);
+            FCogDebugDraw::Segment2D(LogCogTargetAcquisition, CandidateActor, CapsuleBot2D + FVector2D(CapsuleRadius2D, 0), CapsuleTop2D + FVector2D(CapsuleRadius2D, 0), CapsuleColor, Params.IsDebugPersistent);
+            FCogDebugDraw::Segment2D(LogCogTargetAcquisition, CandidateActor, CapsuleBot2D - FVector2D(CapsuleRadius2D, 0), CapsuleTop2D - FVector2D(CapsuleRadius2D, 0), CapsuleColor, Params.IsDebugPersistent);
+            FCogDebugDraw::Circle2D(LogCogTargetAcquisition, CandidateActor, CapsuleTop2D, CapsuleRadius2D, CapsuleColor, Params.IsDebugPersistent);
+            FCogDebugDraw::Circle2D(LogCogTargetAcquisition, CandidateActor, CapsuleBot2D, CapsuleRadius2D, CapsuleColor, Params.IsDebugPersistent);
 #endif //USE_COG
         }
     }
     else
     {
-        if (FSceneView::ProjectWorldToScreen(CandidateTargetLocation, EvalParams.ViewRect, EvalParams.ViewProjectionMatrix, CandidateScreenLocation))
+        if (FSceneView::ProjectWorldToScreen(CandidateTargetLocation, Params.ViewRect, Params.ViewProjectionMatrix, CandidateScreenLocation))
         {
             CandidateClosestScreenDistance = CandidateScreenLocation.Length();
             CandidateClosestScreenLocation = CandidateScreenLocation;
@@ -700,7 +691,7 @@ bool UCogSampleTargetAcquisition::ComputeCandidateScreenLocation(
 #if USE_COG
     if (bFoundValidCandidate)
     {
-        FCogDebugDraw::Circle2D(LogCogTargetAcquisition, CandidateActor, CandidateClosestScreenLocation, 2.0f, FColor(0, 255, 0, 255), EvalParams.IsDebugPersistent);
+        FCogDebugDraw::Circle2D(LogCogTargetAcquisition, CandidateActor, CandidateClosestScreenLocation, 2.0f, FColor(0, 255, 0, 255), Params.IsDebugPersistent);
     }
 #endif //USE_COG
 
@@ -729,13 +720,13 @@ bool UCogSampleTargetAcquisition::CheckCandidateWithinScreenDistance(
     {
         if (FMath::Abs(CandidateViewportLocation.X) > ScreenMaxX)
         {
-            COG(FCogDebugDraw::String(LogCogTargetAcquisition, Controller, FString::Printf(TEXT("MaxX: %0.2f"), CandidateViewportLocation.X), CandidateLocation, FColor::Red, bIsDebugPersistent));
+            IF_COG(FCogDebugDraw::String(LogCogTargetAcquisition, Controller, FString::Printf(TEXT("MaxX: %0.2f"), CandidateViewportLocation.X), CandidateLocation, FColor::Red, bIsDebugPersistent));
             return false;
         }
 
         if (FMath::Abs(CandidateViewportLocation.Y) > ScreenMaxY)
         {
-            COG(FCogDebugDraw::String(LogCogTargetAcquisition, Controller, FString::Printf(TEXT("MaxY: %0.2f"), CandidateViewportLocation.Y), CandidateLocation, FColor::Red, bIsDebugPersistent));
+            IF_COG(FCogDebugDraw::String(LogCogTargetAcquisition, Controller, FString::Printf(TEXT("MaxY: %0.2f"), CandidateViewportLocation.Y), CandidateLocation, FColor::Red, bIsDebugPersistent));
             return false;
         }
     }
@@ -746,7 +737,7 @@ bool UCogSampleTargetAcquisition::CheckCandidateWithinScreenDistance(
     {
         if (CandidateViewportDistance > ScreenMaxX)
         {
-            COG(FCogDebugDraw::String(LogCogTargetAcquisition, Controller, FString::Printf(TEXT("Max: %0.2f"), CandidateViewportDistance), CandidateLocation, FColor::Red, bIsDebugPersistent));
+            IF_COG(FCogDebugDraw::String(LogCogTargetAcquisition, Controller, FString::Printf(TEXT("Max: %0.2f"), CandidateViewportDistance), CandidateLocation, FColor::Red, bIsDebugPersistent));
             return false;
         }
     }
@@ -767,25 +758,30 @@ bool UCogSampleTargetAcquisition::CheckIfTargetValid(
         return false;
     }
 
+    if (UCogSampleFunctionLibrary_Gameplay::IsActorMatchingTags(Target, RequiredTags, IgnoredTags) == false)
+    {
+        return false;
+    }
+
     return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 bool UCogSampleTargetAcquisition::HasLineOfSightToTarget(
     const AActor* Source,
+    const FVector& SourceLocation,
     const AActor* Target,
+    const FVector& TargetLocation,
     const FCollisionObjectQueryParams& BlockersParams) const
 {
     TRACE_CPUPROFILER_EVENT_SCOPE(UCogSampleTargetAcquisition::HasLineOfSightToTarget);
 
-    const FVector Origin = Source->GetActorLocation();
-
     static const FName BlockerTraceTag(TEXT("FindLockTarget_Blocker"));
     FCollisionQueryParams TargetQueryParams(BlockerTraceTag, SCENE_QUERY_STAT_ONLY(CogSampleTargetAcquisition), false);
+    TargetQueryParams.AddIgnoredActor(Source);
     TargetQueryParams.AddIgnoredActor(Target);
 
-    return true;
-    //return FCogHitDetectionHelper::HasLineOfSight(Source->GetWorld(), Origin, Target.GetTargetLocation(), BlockersParams, TargetQueryParams, LogCogTargetAcquisition);
+    return UCogSampleFunctionLibrary_Gameplay::HasLineOfSight(Source->GetWorld(), SourceLocation, TargetLocation, BlockersParams, TargetQueryParams, LogCogTargetAcquisition);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -797,8 +793,11 @@ bool UCogSampleTargetAcquisition::HasLineOfSightToTargetBrokenForTooLong(
 {
     TRACE_CPUPROFILER_EVENT_SCOPE(UCogSampleTargetAcquisition::HasLineOfSightToTargetBrokenForTooLong);
 
+    const FVector& SourceLocation = UCogSampleFunctionLibrary_Gameplay::GetActorTargetLocation(Source); 
+    const FVector& TargetLocation = UCogSampleFunctionLibrary_Gameplay::GetActorTargetLocation(Target);
+
     const FCollisionObjectQueryParams BlockersParams = UCogSampleFunctionLibrary_Gameplay::ConfigureCollisionObjectParams(BlockerTypes);
-    bool HasLineOfSight = HasLineOfSightToTarget(Source, Target, BlockersParams);
+    const bool HasLineOfSight = HasLineOfSightToTarget(Source, SourceLocation, Target, TargetLocation, BlockersParams);
     if (HasLineOfSight)
     {
         Timer = 0.0f;
@@ -824,18 +823,18 @@ FVector UCogSampleTargetAcquisition::GetReferentialLocation(const ACogSampleChar
 
     switch (Referential)
     {
-    case ECogSampleTargetAcquisitionLocationReferential::Character:
-    {
-        Location = UCogSampleFunctionLibrary_Gameplay::GetActorBottomLocation(Character);
-        break;
-    }
+        case ECogSampleTargetAcquisitionLocationReferential::Character:
+        {
+            Location = UCogSampleFunctionLibrary_Gameplay::GetActorBottomLocation(Character);
+            break;
+        }
 
 
-    case ECogSampleTargetAcquisitionLocationReferential::Camera:
-    {
-        Location = Character->GetFollowCamera()->GetComponentLocation();
-        break;
-    }
+        case ECogSampleTargetAcquisitionLocationReferential::Camera:
+        {
+            Location = Character->GetFollowCamera()->GetComponentLocation();
+            break;
+        }
     }
 
     return Location;
@@ -848,38 +847,38 @@ FRotator UCogSampleTargetAcquisition::GetReferentialRotation(const ACogSampleCha
 
     switch (Referential)
     {
-    case ECogSampleTargetAcquisitionRotationReferential::Character:
-    {
-        Rotation = Character->GetActorRotation();
-        break;
-    }
+        case ECogSampleTargetAcquisitionRotationReferential::Character:
+        {
+            Rotation = Character->GetActorRotation();
+            break;
+        }
 
-    case ECogSampleTargetAcquisitionRotationReferential::MoveInput:
-    {
-        //const FVector WorldInput = Character->TransformInputInWorldSpace(Character->GetDesiredMoveInput());
-        //if (WorldInput.IsNearlyZero())
-        //{
-        //    Rotation = Character->GetActorRotation();
-        //}
-        //else
-        //{
-        //    Rotation = WorldInput.GetSafeNormal().Rotation();
-        //}
-        //break;
-    }
+        case ECogSampleTargetAcquisitionRotationReferential::MoveInput:
+        {
+            const FVector WorldInput = Character->GetMoveInputInWorldSpace();
+            if (WorldInput.IsNearlyZero())
+            {
+                Rotation = Character->GetActorRotation();
+            }
+            else
+            {
+                Rotation = WorldInput.GetSafeNormal().Rotation();
+            }
+            break;
+        }
 
-    case ECogSampleTargetAcquisitionRotationReferential::Camera:
-    {
-        Rotation = Character->GetFollowCamera()->GetComponentRotation();
-        break;
-    }
+        case ECogSampleTargetAcquisitionRotationReferential::Camera:
+        {
+            Rotation = Character->GetFollowCamera()->GetComponentRotation();
+            break;
+        }
 
-    case ECogSampleTargetAcquisitionRotationReferential::CameraFlatten:
-    {
-        const FVector CameraForwardFlat = Character->GetFollowCamera()->GetComponentQuat().GetForwardVector().GetSafeNormal2D();
-        Rotation = CameraForwardFlat.Rotation();
-        break;
-    }
+        case ECogSampleTargetAcquisitionRotationReferential::CameraFlatten:
+        {
+            const FVector CameraForwardFlat = Character->GetFollowCamera()->GetComponentQuat().GetForwardVector().GetSafeNormal2D();
+            Rotation = CameraForwardFlat.Rotation();
+            break;
+        }
     }
 
     return Rotation;

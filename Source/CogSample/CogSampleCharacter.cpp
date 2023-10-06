@@ -9,6 +9,7 @@
 #include "CogSampleFunctionLibrary_Team.h"
 #include "CogSampleGameplayAbility.h"
 #include "CogSampleLogCategories.h"
+#include "CogSamplePlayerController.h"
 #include "CogSampleRootMotionParams.h"
 #include "CogSampleTagLibrary.h"
 #include "Components/CapsuleComponent.h"
@@ -93,6 +94,8 @@ void ACogSampleCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+    TryFinishInitialize();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -132,7 +135,7 @@ ECogInterfacesAllegiance ACogSampleCharacter::GetAllegianceWithOtherActor(const 
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleCharacter::InitializeAbilitySystem()
 {   
-    if (bIsInitialized)
+    if (bIsAbilitySystemInitialized)
     {
         return;
     }
@@ -205,7 +208,32 @@ void ACogSampleCharacter::InitializeAbilitySystem()
     GameplayEffectAddedHandle = AbilitySystem->OnActiveGameplayEffectAddedDelegateToSelf.AddUObject(this, &ACogSampleCharacter::OnGameplayEffectAdded);
     GameplayEffectRemovedHandle = AbilitySystem->OnAnyGameplayEffectRemovedDelegate().AddUObject(this, &ACogSampleCharacter::OnGameplayEffectRemoved);
 
+    bIsAbilitySystemInitialized = true;
+
+    TryFinishInitialize();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSampleCharacter::TryFinishInitialize()
+{
+    if (bIsInitialized)
+    {
+        return;
+    }
+
+    if (bIsAbilitySystemInitialized == false)
+    {
+        return;
+    }
+    
+    if (HasActorBegunPlay() == false)
+    {
+        return;
+    }
+
     bIsInitialized = true;
+
+    OnInitialized.Broadcast(this);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -252,9 +280,6 @@ void ACogSampleCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 {
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
 		
-        EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-        EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACogSampleCharacter::Move);
 		EnhancedInputComponent->BindAction(MoveZAction, ETriggerEvent::Triggered, this, &ACogSampleCharacter::MoveZ);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACogSampleCharacter::Look);
@@ -341,19 +366,35 @@ void ACogSampleCharacter::ActivateItem(const FInputActionValue& Value, int32 Ind
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleCharacter::Move(const FInputActionValue& Value)
 {
-	const FVector2D MovementVector = Value.Get<FVector2D>();
+    FVector2D MoveInput2D = Value.Get<FVector2D>();
+
+    MoveInput.X = MoveInput2D.X;
+    MoveInput.Y = MoveInput2D.Y;
+
+    MoveInputInWorldSpace = MoveInput;
 
 	if (Controller != nullptr)
 	{
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-		AddMovementInput(ForwardDirection, MovementVector.Y);
-		AddMovementInput(RightDirection, MovementVector.X);
+        MoveInputInWorldSpace = TransformInputInWorldSpace(MoveInput);
+		AddMovementInput(MoveInputInWorldSpace);
 	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FVector ACogSampleCharacter::TransformInputInWorldSpace(const FVector& Input) const
+{
+    if (Controller == nullptr)
+    {
+        return Input;
+    }
+
+    FRotator ControlRotation = Controller->GetControlRotation();
+    ControlRotation.Pitch = 0.0f;
+    ControlRotation.Roll = 0.0f;
+
+    FVector WorldInput = ControlRotation.RotateVector(FVector(Input.Y, Input.X, 0.0f));
+
+    return WorldInput;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -380,18 +421,27 @@ void ACogSampleCharacter::Look(const FInputActionValue& Value)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogSampleCharacter::OnDamageReceived(float MitigatedDamage, float UnmitigatedDamage, AActor* DamageDealer, const FGameplayEffectSpec& EffectSpec)
+void ACogSampleCharacter::HandleDamageReceived(const FCogSampleDamageEventParams& Params) 
 {
+    OnDamageReceived.Broadcast(Params);
+
 #if USE_COG
-    FCogDebugMetric::AddMetric(this, "Damage Received", MitigatedDamage, UnmitigatedDamage, false);
+    FCogDebugMetric::AddMetric(this, "Damage Received", Params.MitigatedDamage, Params.UnmitigatedDamage, false);
 #endif //USE_COG
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogSampleCharacter::OnDamageDealt(float MitigatedDamage, float UnmitigatedDamage, AActor* DamageReceiver, const FGameplayEffectSpec& EffectSpec)
+void ACogSampleCharacter::HandleDamageDealt(const FCogSampleDamageEventParams& Params)
 {
+    OnDamageDealt.Broadcast(Params);
+
+    if (ACogSamplePlayerController* PlayerController = Cast<ACogSamplePlayerController>(GetController()))
+    {
+        PlayerController->OnPawnDealtDamage.Broadcast(Params);
+    }
+
 #if USE_COG
-    FCogDebugMetric::AddMetric(this, "Damage Dealt", MitigatedDamage, UnmitigatedDamage, false);
+    FCogDebugMetric::AddMetric(this, "Damage Dealt", Params.MitigatedDamage, Params.UnmitigatedDamage, false);
 #endif //USE_COG
 }
 
@@ -463,27 +513,27 @@ void ACogSampleCharacter::OnGhostTagNewOrRemoved(const FGameplayTag InTag, int32
     check(InTag == Tag_Status_Ghost);
 
     bool bHasGhostTags = NewCount > 0;
-    if (bIsGhost == bHasGhostTags)
+    if (bIsInGhostMode == bHasGhostTags)
     {
         return;
     }
     
-    bIsGhost = bHasGhostTags;
+    bIsInGhostMode = bHasGhostTags;
 
-    SetActorEnableCollision(bIsGhost == false);
-    CameraBoom->bDoCollisionTest = bIsGhost == false;
+    SetActorEnableCollision(bIsInGhostMode == false);
+    CameraBoom->bDoCollisionTest = bIsInGhostMode == false;
 
     if (UCogSampleCharacterMovementComponent* MovementComponent = Cast<UCogSampleCharacterMovementComponent>(GetMovementComponent()))
     {
-        MovementComponent->bCheatFlying = bIsGhost;
-        MovementComponent->SetMovementMode(bIsGhost ? MOVE_Flying : MOVE_Falling);
+        MovementComponent->bCheatFlying = bIsInGhostMode;
+        MovementComponent->SetMovementMode(bIsInGhostMode ? MOVE_Flying : MOVE_Falling);
     }
 
     if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
     {
         if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
         {
-            if (bIsGhost)
+            if (bIsInGhostMode)
             {
                 Subsystem->AddMappingContext(GhostMappingContext, 0);
             }
@@ -620,3 +670,4 @@ void ACogSampleCharacter::GetTargetCapsules(TArray<const UCapsuleComponent*>& Ca
 {
     Capsules.Add(GetCapsuleComponent());
 }
+

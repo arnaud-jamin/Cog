@@ -153,12 +153,13 @@ void UCogAbilityWindow_Abilities::RenderAbilitiesTable(UAbilitySystemComponent& 
 {
     TArray<FGameplayAbilitySpec>& Abilities = AbilitySystemComponent.GetActivatableAbilities();
 
-    if (ImGui::BeginTable("Abilities", 4, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersH | ImGuiTableFlags_NoBordersInBody))
+    if (ImGui::BeginTable("Abilities", 5, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersH | ImGuiTableFlags_NoBordersInBody))
     {
         ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableSetupColumn("Ability");
         ImGui::TableSetupColumn("Level");
         ImGui::TableSetupColumn("Input");
+        ImGui::TableSetupColumn("Cooldown");
         ImGui::TableHeadersRow();
 
         static int SelectedIndex = -1;
@@ -240,6 +241,12 @@ void UCogAbilityWindow_Abilities::RenderAbilitiesTable(UAbilitySystemComponent& 
                 ImGui::Text("%d", Spec.InputPressed);
             }
 
+            //------------------------
+            // Cooldown
+            //------------------------
+            ImGui::TableNextColumn();
+            RenderAbilityCooldown(AbilitySystemComponent, *Ability);
+
             ImGui::PopStyleColor(1);
 
             ImGui::PopID();
@@ -247,6 +254,21 @@ void UCogAbilityWindow_Abilities::RenderAbilitiesTable(UAbilitySystemComponent& 
         }
 
         ImGui::EndTable();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogAbilityWindow_Abilities::RenderAbilityCooldown(const UAbilitySystemComponent& AbilitySystemComponent, UGameplayAbility& Ability)
+{
+    float RemainingTime, CooldownDuration;
+    Ability.GetCooldownTimeRemainingAndDuration(Ability.GetCurrentAbilitySpec()->Handle, AbilitySystemComponent.AbilityActorInfo.Get(), RemainingTime, CooldownDuration);
+
+    if (CooldownDuration > 0)
+    {
+        ImGui::PushStyleColor(ImGuiCol_PlotHistogram, IM_COL32(100, 100, 100, 255));
+        ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 100));
+        ImGui::ProgressBar(RemainingTime / CooldownDuration, ImVec2(-1, ImGui::GetTextLineHeightWithSpacing() * 0.8f), TCHAR_TO_ANSI(*FString::Printf(TEXT("%.2f / %.2f"), RemainingTime, CooldownDuration)));
+        ImGui::PopStyleColor(2);
     }
 }
 

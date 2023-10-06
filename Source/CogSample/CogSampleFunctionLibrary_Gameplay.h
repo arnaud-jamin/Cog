@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogDefines.h"
 #include "CogSampleFunctionLibrary_Gameplay.generated.h"
 
 class UAbilitySystemComponent;
@@ -10,6 +11,7 @@ struct FGameplayAttribute;
 struct FGameplayAttributeData;
 struct FGameplayCueNotify_SpawnResult;
 struct FGameplayCueParameters;
+struct FGameplayTagContainer;
 
 //--------------------------------------------------------------------------------------------------------------------------
 #define ATTRIBUTE_ACCESSORS(ClassName, PropertyName) \
@@ -73,4 +75,11 @@ public:
     static FVector2D ScreenToViewport(const FVector2D& value, const FVector2D& displaySize);
 
     static float ScreenToViewport(const float value, const FVector2D& displaySize);
+
+    static bool HasLineOfSight(const UWorld* World, const FVector& Start, const FVector& End, const FCollisionObjectQueryParams& BlockersParams, const FCollisionQueryParams& QueryParams, const COG_LOG_CATEGORY& LogCategory);
+
+    static bool IsActorAbilitySystemMatchingTags(const UAbilitySystemComponent* AbilitySystem, const FGameplayTagContainer& RequiredTags, const FGameplayTagContainer& IgnoredTags);
+
+    static bool IsActorMatchingTags(const AActor* Actor, const FGameplayTagContainer& RequiredTags, const FGameplayTagContainer& IgnoredTags);
+
 };

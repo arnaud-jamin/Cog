@@ -35,6 +35,8 @@ protected:
 
     virtual void RenderAbilitiesTable(UAbilitySystemComponent& AbilitySystemComponent);
 
+    virtual void RenderAbilityCooldown(const UAbilitySystemComponent& AbilitySystemComponent, UGameplayAbility& Ability);
+
     virtual void RenderAbilityContextMenu(UAbilitySystemComponent& AbilitySystemComponent, FGameplayAbilitySpec& Spec, int Index);
 
     virtual void RenderOpenAbilities();

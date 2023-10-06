@@ -4,14 +4,14 @@
 #include "CogSampleFunctionLibrary_Team.h"
 #include "Engine/DataAsset.h"
 #include "Engine/EngineTypes.h"
+#include "GameplayTagContainer.h"
 #include "WorldCollision.h"
 #include "CogSampleTargetAcquisition.generated.h"
 
 class ACogSampleCharacter;
 class APlayerController;
 class UCurveFloat;
-struct FCogSampleTargetCandidateEvaluationResult;
-struct FCogSampleTargetCandidateEvaluationParameters;
+struct FCogSampleTargetTargetAcquisitionParams;
 
 //--------------------------------------------------------------------------------------------------------------------------
 UENUM(BlueprintType)
@@ -89,7 +89,10 @@ public:
     int32 Allegiance = 0;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "General")
-    bool AcceptDead = false;
+    FGameplayTagContainer RequiredTags;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "General")
+    FGameplayTagContainer IgnoredTags;
 
     //--------------------------------------------------------------------------------------------------------------
     // Detection
@@ -118,7 +121,7 @@ public:
     bool bUseScreenLimit = true;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Limit|Screen", meta = (EditCondition = "bUseScreenLimit", EditConditionHides))
-    bool bPrioritizeInsideHitZones = true;
+    bool bPrioritizeTargetWithCrosshairInsideThem = true;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Limit|Screen", meta = (EditCondition = "bUseScreenLimit", EditConditionHides))
     bool ScreenTestUseAspectRatio = true;
@@ -237,10 +240,6 @@ public:
         const AActor* Source,
         const AActor* Target) const;
 
-    //--------------------------------------------------------------------------------------------------------------
-    // Utility
-    //--------------------------------------------------------------------------------------------------------------
-
     void FindBestTargetInCandidates(
         const APlayerController* Controller,
         const TArray<AActor*>& TargetsToIgnore,
@@ -261,13 +260,16 @@ public:
 
     bool HasLineOfSightToTarget(
         const AActor* Source,
+        const FVector& SourceLocation,
         const AActor* Target,
+        const FVector& TargetLocation,
         const FCollisionObjectQueryParams& BlockersParams) const;
 
     bool EvaluateCandidate(
         AActor* CandidateTarget,
-        const FCogSampleTargetCandidateEvaluationParameters& EvaluationParameters,
-        FCogSampleTargetCandidateEvaluationResult& EvaluationResult) const;
+        const FCogSampleTargetTargetAcquisitionParams& EvaluationParameters,
+        float& CandidateScore,
+        bool& bIsCrosshairInsideCandidate) const;
 
     bool CheckCandidateWithinScreenDistance(
         const APlayerController* Controller,
@@ -279,7 +281,7 @@ public:
 
     bool ComputeCandidateScreenLocation(
         const AActor* CandidateTarget,
-        const FCogSampleTargetCandidateEvaluationParameters& EvalParams,
+        const FCogSampleTargetTargetAcquisitionParams& EvalParams,
         const FVector& CandidateTargetLocation,
         FVector2D& CandidateScreenLocation,
         FVector2D& CandidateClosestScreenLocation,

@@ -7,6 +7,7 @@
 #include "CogDefines.h"
 #include "CogInterfaceAllegianceActor.h"
 #include "CogInterfaceDebugFilteredActor.h"
+#include "CogSampleDamageEvent.h"
 #include "CogSampleTargetableInterface.h"
 #include "CogSampleTeamInterface.h"
 #include "GameFramework/Character.h"
@@ -58,6 +59,9 @@ public:
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCogSampleCharacterEventDelegate, ACogSampleCharacter*, Character);
+
+//--------------------------------------------------------------------------------------------------------------------------
 UCLASS(config=Game)
 class ACogSampleCharacter : public ACharacter
     , public IAbilitySystemInterface
@@ -74,9 +78,10 @@ public:
     //----------------------------------------------------------------------------------------------------------------------
     // ACharacter overrides
     //----------------------------------------------------------------------------------------------------------------------
-    virtual void BeginPlay();
+    
+    virtual void BeginPlay() override;
 
-    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
     virtual void MarkComponentsAsPendingKill() override;
 
@@ -84,35 +89,42 @@ public:
 
     virtual void PossessedBy(AController* NewController) override;
 
+    void OnAcknowledgePossession(APlayerController* InController);
+
     //----------------------------------------------------------------------------------------------------------------------
     // IAbilitySystemInterface overrides
     //----------------------------------------------------------------------------------------------------------------------
+    
     UFUNCTION(BlueprintPure)
     UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
     //----------------------------------------------------------------------------------------------------------------------
     // ICogInterfacesAllegianceActor overrides
     //----------------------------------------------------------------------------------------------------------------------
+    
     ECogInterfacesAllegiance GetAllegianceWithOtherActor(const AActor* OtherActor) const override;
 
     //----------------------------------------------------------------------------------------------------------------------
     // ICogSampleTargetInterface overrides
     //----------------------------------------------------------------------------------------------------------------------
+    
     virtual FVector GetTargetLocation() const override;
 
     virtual void GetTargetCapsules(TArray<const UCapsuleComponent*>& Capsules) const override;
 
     //----------------------------------------------------------------------------------------------------------------------
-    void OnAcknowledgePossession(APlayerController* InController);
+    // Team
+    //----------------------------------------------------------------------------------------------------------------------
     
-    void OnDamageReceived(float DamageAmount, float UnmitigatedDamageAmount, AActor* DamageDealer, const FGameplayEffectSpec& EffectSpec);
-    
-    void OnDamageDealt(float DamageAmount, float UnmitigatedDamageAmount, AActor* DamageReceiver, const FGameplayEffectSpec& EffectSpec);
-    
-    void OnKilled(AActor* InInstigator, AActor* InCauser, const FGameplayEffectSpec& InEffectSpec, float InMagnitude);
-    
-    void OnRevived(AActor* InInstigator, AActor* InCauser, const FGameplayEffectSpec& InEffectSpec, float InMagnitude);
-    
+    UFUNCTION(BlueprintPure)
+    virtual int32 GetTeam() const override { return Team; }
+
+    UFUNCTION(BlueprintCallable)
+    void SetTeamID(int32 Value);
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Team, Replicated, meta = (AllowPrivateAccess = "true"))
+    int32 Team = 0;
+
     //----------------------------------------------------------------------------------------------------------------------
     // Camera
     //----------------------------------------------------------------------------------------------------------------------
@@ -120,17 +132,21 @@ public:
 
     UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
-	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
 
-	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
 	
     //----------------------------------------------------------------------------------------------------------------------
     // Input
     //----------------------------------------------------------------------------------------------------------------------
+    FVector TransformInputInWorldSpace(const FVector& Input) const;
+
+    FVector GetMoveInput() const { return MoveInput; }
+
+    FVector GetMoveInputInWorldSpace() const { return MoveInputInWorldSpace; }
+
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
@@ -138,10 +154,6 @@ public:
     /** MappingContext */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
     UInputMappingContext* GhostMappingContext;
-
-	/** Jump Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* JumpAction;
 
 	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -161,6 +173,17 @@ public:
     //----------------------------------------------------------------------------------------------------------------------
     // Ability
     //----------------------------------------------------------------------------------------------------------------------
+    UFUNCTION(BlueprintPure)
+    bool IsInitialized() const { return bIsInitialized; }
+
+    void HandleDamageReceived(const FCogSampleDamageEventParams& Params);
+
+    void HandleDamageDealt(const FCogSampleDamageEventParams& Params);
+
+    void OnKilled(AActor* InInstigator, AActor* InCauser, const FGameplayEffectSpec& InEffectSpec, float InMagnitude);
+
+    void OnRevived(AActor* InInstigator, AActor* InCauser, const FGameplayEffectSpec& InEffectSpec, float InMagnitude);
+
     UPROPERTY(BlueprintReadOnly, Category = Ability, meta = (AllowPrivateAccess = "true"))
     UAbilitySystemComponent* AbilitySystem = nullptr;
 
@@ -176,19 +199,15 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Ability)
     TArray<TSubclassOf<UGameplayEffect>> Effects;
 
-    //----------------------------------------------------------------------------------------------------------------------
-    // Team
-    //----------------------------------------------------------------------------------------------------------------------
-    
-    UFUNCTION(BlueprintPure)
-    virtual int32 GetTeam() const override { return Team; }
+    UPROPERTY(BlueprintAssignable)
+    FCogSampleCharacterEventDelegate OnInitialized;
 
-    UFUNCTION(BlueprintCallable)
-    void SetTeamID(int32 Value);
+    UPROPERTY(BlueprintAssignable)
+    FCogSampleDamageEventDelegate OnDamageDealt;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Team, Replicated, meta = (AllowPrivateAccess = "true"))
-    int32 Team = 0;
-    
+    UPROPERTY(BlueprintAssignable)
+    FCogSampleDamageEventDelegate OnDamageReceived;
+
     //----------------------------------------------------------------------------------------------------------------------
     // Root Motion
     //----------------------------------------------------------------------------------------------------------------------
@@ -200,6 +219,7 @@ private:
     //----------------------------------------------------------------------------------------------------------------------
     // Inputs
     //----------------------------------------------------------------------------------------------------------------------
+
 	void Move(const FInputActionValue& Value);
 
     void MoveZ(const FInputActionValue& Value);
@@ -212,9 +232,16 @@ private:
 
     void ActivateItem(const FInputActionValue& Value, int32 Index);
 
+    FVector MoveInput;
+
+    FVector MoveInputInWorldSpace;
+
     //----------------------------------------------------------------------------------------------------------------------
-    // Ability system
+    // Ability
     //----------------------------------------------------------------------------------------------------------------------
+
+    void TryFinishInitialize();
+
     void InitializeAbilitySystem();
 
     void ShutdownAbilitySystem();
@@ -232,15 +259,6 @@ private:
     UFUNCTION()
     void OnRep_ActiveAbilityHandles();
 
-    //----------------------------------------------------------------------------------------------------------------------
-    // Root Motion 
-    //----------------------------------------------------------------------------------------------------------------------
-    UFUNCTION(Reliable, Client)
-    void Client_ApplyRootMotion(const FCogSampleRootMotionParams& Params);
-
-    uint16 ApplyRootMotionShared(const FCogSampleRootMotionParams& Params);
-
-    //----------------------------------------------------------------------------------------------------------------------
     UPROPERTY(ReplicatedUsing=OnRep_ActiveAbilityHandles, Transient)
     TArray<FGameplayAbilitySpecHandle> ActiveAbilityHandles;
     
@@ -252,9 +270,19 @@ private:
 
     FDelegateHandle ScaleAttributeDelegateHandle;
 
-    bool bIsGhost = false;
+    bool bIsAbilitySystemInitialized = false;
 
     bool bIsInitialized = false;
 
+    bool bIsInGhostMode = false;
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Root Motion 
+    //----------------------------------------------------------------------------------------------------------------------
+
+    UFUNCTION(Reliable, Client)
+    void Client_ApplyRootMotion(const FCogSampleRootMotionParams& Params);
+
+    uint16 ApplyRootMotionShared(const FCogSampleRootMotionParams& Params);
 };
 

@@ -9,9 +9,15 @@
 #include "GameFramework/Character.h"
 #include "GameplayCueNotifyTypes.h"
 #include "GameplayEffectTypes.h"
+#include "GameplayTagContainer.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "ScalableFloat.h"
+
+#if USE_COG
+#include "CogDebugDraw.h"
+#include "CogDebugLog.h"
+#endif //USE_COG
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSampleFunctionLibrary_Gameplay::AdjustAttributeForMaxChange(UAbilitySystemComponent* AbilityComponent, FGameplayAttributeData& AffectedAttribute, float OldValue, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty)
@@ -250,4 +256,62 @@ FVector2D UCogSampleFunctionLibrary_Gameplay::ScreenToViewport(const FVector2D& 
 float UCogSampleFunctionLibrary_Gameplay::ScreenToViewport(const float Value, const FVector2D& DisplaySize)
 {
     return Value * 2.0f / FMath::Min(DisplaySize.X, DisplaySize.Y);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool UCogSampleFunctionLibrary_Gameplay::HasLineOfSight(
+    const UWorld* World,
+    const FVector& Start,
+    const FVector& End,
+    const FCollisionObjectQueryParams& BlockersParams,
+    const FCollisionQueryParams& QueryParams,
+    const COG_LOG_CATEGORY& LogCategory)
+{
+    IF_COG(FCogDebugDraw::Sphere(LogCategory, World, Start, 5.0f, FColor::Black, false, 0));
+    IF_COG(FCogDebugDraw::Sphere(LogCategory, World, End, 10.0f, FColor::Black, false, 0));
+
+    FHitResult BlockerRaycastHit;
+    if (World->LineTraceSingleByObjectType(BlockerRaycastHit, Start, End, BlockersParams, QueryParams))
+    {
+        IF_COG(FCogDebugDraw::Segment(LogCategory, World, Start, End, FColor(0, 0, 0, 10), false, 0));
+        IF_COG(FCogDebugDraw::Sphere(LogCategory, World, BlockerRaycastHit.ImpactPoint, 5.0f, FColor::Red, false, 0));
+    }
+    else
+    {
+        IF_COG(FCogDebugDraw::Segment(LogCategory, World, Start, End, FColor(255, 255, 255, 10), false, 0));
+
+        //--------------------------------------------------------------------------------------------------------------
+        // We didn't touch a blocker, we have line of sight.
+        //--------------------------------------------------------------------------------------------------------------
+        return true;
+    }
+
+    return false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool UCogSampleFunctionLibrary_Gameplay::IsActorAbilitySystemMatchingTags(const UAbilitySystemComponent* AbilitySystem, const FGameplayTagContainer& RequiredTags, const FGameplayTagContainer& IgnoredTags)
+{
+    if (AbilitySystem == nullptr)
+    {
+        return false;
+    }
+
+    const bool bHasRequiredTags = AbilitySystem->HasAllMatchingGameplayTags(RequiredTags);
+    const bool bHasIgnoredTags = AbilitySystem->HasAnyMatchingGameplayTags(IgnoredTags);
+    
+    if (bHasRequiredTags && bHasIgnoredTags == false)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool UCogSampleFunctionLibrary_Gameplay::IsActorMatchingTags(const AActor* Actor, const FGameplayTagContainer& RequiredTags, const FGameplayTagContainer& IgnoredTags)
+{
+    const UAbilitySystemComponent* AbilitySystem = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Actor);
+    bool Result = IsActorAbilitySystemMatchingTags(AbilitySystem, RequiredTags, IgnoredTags);
+    return Result;
 }
