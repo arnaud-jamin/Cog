@@ -5,7 +5,7 @@
 #include "CogDebugHelper.h"
 #include "CogDebugDrawImGui.h"
 #include "CogImguiHelper.h"
-#include "CogDebugLogCategoryManager.h"
+#include "CogDebugLog.h"
 #include "CogDebugModule.h"
 #include "CogDebugReplicator.h"
 #include "Engine/SkeletalMesh.h"
@@ -16,7 +16,7 @@
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDraw::String2D(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FString& Text, const FVector2D& Location, const FColor& Color, bool Persistent)
 {
-    if (FCogDebugLogCategoryManager::IsLogCategoryActive(LogCategory))
+    if (FCogDebugLog::IsLogCategoryActive(LogCategory))
     {
         FCogDebugDrawImGui::AddText(
             FCogImguiHelper::ToImVec2(Location),
@@ -31,7 +31,7 @@ void FCogDebugDraw::String2D(const FLogCategoryBase& LogCategory, const UObject*
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDraw::Segment2D(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector2D& SegmentStart, const FVector2D& SegmentEnd, const FColor& Color, bool Persistent)
 {
-    if (FCogDebugLogCategoryManager::IsLogCategoryActive(LogCategory))
+    if (FCogDebugLog::IsLogCategoryActive(LogCategory))
     {
         FCogDebugDrawImGui::AddLine(
             FCogImguiHelper::ToImVec2(SegmentStart),
@@ -46,7 +46,7 @@ void FCogDebugDraw::Segment2D(const FLogCategoryBase& LogCategory, const UObject
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDraw::Circle2D(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector2D& Location, float Radius, const FColor& Color, bool Persistent)
 {
-    if (FCogDebugLogCategoryManager::IsLogCategoryActive(LogCategory))
+    if (FCogDebugLog::IsLogCategoryActive(LogCategory))
     {
         FCogDebugDrawImGui::AddCircle(
             FCogImguiHelper::ToImVec2(Location),
@@ -63,7 +63,7 @@ void FCogDebugDraw::Circle2D(const FLogCategoryBase& LogCategory, const UObject*
 
 void FCogDebugDraw::Rect2D(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector2D& Min, const FVector2D& Max, const FColor& Color, bool Persistent)
 {
-    if (FCogDebugLogCategoryManager::IsLogCategoryActive(LogCategory))
+    if (FCogDebugLog::IsLogCategoryActive(LogCategory))
     {
         const ImVec2 ImMin = FCogImguiHelper::ToImVec2(Min);
         const ImVec2 ImMax = FCogImguiHelper::ToImVec2(Max);
@@ -82,7 +82,7 @@ void FCogDebugDraw::Rect2D(const FLogCategoryBase& LogCategory, const UObject* W
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDraw::String(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FString& Text, const FVector& Location, const FColor& Color, const bool Persistent)
 {
-    if (FCogDebugLogCategoryManager::IsLogCategoryActive(LogCategory))
+    if (FCogDebugLog::IsLogCategoryActive(LogCategory))
     {
         const FColor NewColor = FCogDebugSettings::ModulateDebugColor(WorldContextObject->GetWorld(), Color, Persistent);
         UE_VLOG_LOCATION(WorldContextObject, LogCategory, Verbose, Location, 10.0f, NewColor, TEXT("%s"), *Text);
@@ -102,7 +102,7 @@ void FCogDebugDraw::String(const FLogCategoryBase& LogCategory, const UObject* W
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDraw::Point(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& Location, const float Size, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
-    if (FCogDebugLogCategoryManager::IsLogCategoryActive(LogCategory))
+    if (FCogDebugLog::IsLogCategoryActive(LogCategory))
     {
         const FColor NewColor = FCogDebugSettings::ModulateDebugColor(WorldContextObject->GetWorld(), Color, Persistent);
         ::DrawDebugPoint(
@@ -121,7 +121,7 @@ void FCogDebugDraw::Point(const FLogCategoryBase& LogCategory, const UObject* Wo
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDraw::Segment(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& SegmentStart, const FVector& SegmentEnd, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
-    if (FCogDebugLogCategoryManager::IsLogCategoryActive(LogCategory))
+    if (FCogDebugLog::IsLogCategoryActive(LogCategory))
     {
         const FColor NewColor = FCogDebugSettings::ModulateDebugColor(WorldContextObject->GetWorld(), Color, Persistent);
         UE_VLOG_SEGMENT(WorldContextObject, LogCategory, Verbose, SegmentStart, SegmentEnd, NewColor, TEXT_EMPTY);
@@ -142,7 +142,7 @@ void FCogDebugDraw::Segment(const FLogCategoryBase& LogCategory, const UObject* 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDraw::Bone(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& BoneLocation, const FVector& ParentLocation, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
-    if (FCogDebugLogCategoryManager::IsLogCategoryActive(LogCategory))
+    if (FCogDebugLog::IsLogCategoryActive(LogCategory))
     {
         const FColor NewColor = FCogDebugSettings::ModulateDebugColor(WorldContextObject->GetWorld(), Color, Persistent);
         UE_VLOG_SEGMENT(WorldContextObject, LogCategory, Verbose, BoneLocation, ParentLocation, NewColor, TEXT_EMPTY);
@@ -173,7 +173,7 @@ void FCogDebugDraw::Bone(const FLogCategoryBase& LogCategory, const UObject* Wor
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDraw::Arrow(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& SegmentStart, const FVector& SegmentEnd, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
-    if (FCogDebugLogCategoryManager::IsLogCategoryActive(LogCategory))
+    if (FCogDebugLog::IsLogCategoryActive(LogCategory))
     {
         const FColor NewColor = FCogDebugSettings::ModulateDebugColor(WorldContextObject->GetWorld(), Color, Persistent);
         UE_VLOG_ARROW(WorldContextObject, LogCategory, Verbose, SegmentStart, SegmentEnd, NewColor, TEXT_EMPTY);
@@ -195,7 +195,7 @@ void FCogDebugDraw::Arrow(const FLogCategoryBase& LogCategory, const UObject* Wo
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDraw::Axis(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& AxisLoc, const FRotator& AxisRot, float Scale, const bool Persistent, const uint8 DepthPriority)
 {
-    if (FCogDebugLogCategoryManager::IsLogCategoryActive(LogCategory))
+    if (FCogDebugLog::IsLogCategoryActive(LogCategory))
     {
         FRotationMatrix R(AxisRot);
         UE_VLOG_ARROW(WorldContextObject, LogCategory, Verbose, AxisLoc, AxisLoc + R.GetScaledAxis(EAxis::X) * Scale, FColor::Red, TEXT_EMPTY);
@@ -218,7 +218,7 @@ void FCogDebugDraw::Axis(const FLogCategoryBase& LogCategory, const UObject* Wor
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDraw::Circle(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FMatrix& Matrix, float Radius, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
-    if (FCogDebugLogCategoryManager::IsLogCategoryActive(LogCategory))
+    if (FCogDebugLog::IsLogCategoryActive(LogCategory))
     {
         const FColor NewColor = FCogDebugSettings::ModulateDebugColor(WorldContextObject->GetWorld(), Color, Persistent);
         const FVector Center = Matrix.GetOrigin();
@@ -243,7 +243,7 @@ void FCogDebugDraw::Circle(const FLogCategoryBase& LogCategory, const UObject* W
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDraw::CircleArc(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FMatrix& Matrix, float InnerRadius, float OuterRadius, float Angle, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
-    if (FCogDebugLogCategoryManager::IsLogCategoryActive(LogCategory))
+    if (FCogDebugLog::IsLogCategoryActive(LogCategory))
     {
         const FColor NewColor = FCogDebugSettings::ModulateDebugColor(WorldContextObject->GetWorld(), Color, Persistent);
 
@@ -269,7 +269,7 @@ void FCogDebugDraw::CircleArc(const FLogCategoryBase& LogCategory, const UObject
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDraw::FlatCapsule(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector2D& Start, const FVector2D& End, const float Radius, const float Z, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
-    if (FCogDebugLogCategoryManager::IsLogCategoryActive(LogCategory))
+    if (FCogDebugLog::IsLogCategoryActive(LogCategory))
     {
         const FColor NewColor = FCogDebugSettings::ModulateDebugColor(WorldContextObject->GetWorld(), Color, Persistent);
         // TODO : Add VLOG
@@ -294,7 +294,7 @@ void FCogDebugDraw::FlatCapsule(const FLogCategoryBase& LogCategory, const UObje
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDraw::Sphere(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& Location, float Radius, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
-    if (FCogDebugLogCategoryManager::IsLogCategoryActive(LogCategory))
+    if (FCogDebugLog::IsLogCategoryActive(LogCategory))
     {
         const FColor NewColor = FCogDebugSettings::ModulateDebugColor(WorldContextObject->GetWorld(), Color, Persistent);
         UE_VLOG_CAPSULE(WorldContextObject, LogCategory, Verbose, Location, 0.0f, Radius, FQuat::Identity, NewColor, TEXT_EMPTY);
@@ -316,7 +316,7 @@ void FCogDebugDraw::Sphere(const FLogCategoryBase& LogCategory, const UObject* W
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDraw::Box(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& Center, const FVector& Extent, const FQuat& Rotation, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
-    if (FCogDebugLogCategoryManager::IsLogCategoryActive(LogCategory))
+    if (FCogDebugLog::IsLogCategoryActive(LogCategory))
     {
         const FColor NewColor = FCogDebugSettings::ModulateDebugColor(WorldContextObject->GetWorld(), Color, Persistent);
         UE_VLOG_OBOX(WorldContextObject, LogCategory, Verbose, FBox(-Extent, Extent), FQuatRotationTranslationMatrix::Make(Rotation, Center), NewColor, TEXT_EMPTY);
@@ -339,7 +339,7 @@ void FCogDebugDraw::Box(const FLogCategoryBase& LogCategory, const UObject* Worl
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDraw::SolidBox(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& Center, const FVector& Extent, const FQuat& Rotation, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
-    if (FCogDebugLogCategoryManager::IsLogCategoryActive(LogCategory))
+    if (FCogDebugLog::IsLogCategoryActive(LogCategory))
     {
         const FColor NewColor = FCogDebugSettings::ModulateDebugColor(WorldContextObject->GetWorld(), Color, Persistent);
         UE_VLOG_OBOX(WorldContextObject, LogCategory, Verbose, FBox(-Extent, Extent), FQuatRotationTranslationMatrix::Make(Rotation, Center), NewColor, TEXT_EMPTY);
@@ -366,7 +366,7 @@ void FCogDebugDraw::SolidBox(const FLogCategoryBase& LogCategory, const UObject*
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDraw::Frustrum(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FMatrix& Matrix, const float Angle, const float AspectRatio, const float NearPlane, const float FarPlane, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
-    if (FCogDebugLogCategoryManager::IsLogCategoryActive(LogCategory))
+    if (FCogDebugLog::IsLogCategoryActive(LogCategory))
     {
         const FColor NewColor = FCogDebugSettings::ModulateDebugColor(WorldContextObject->GetWorld(), Color, Persistent);
 
@@ -390,7 +390,7 @@ void FCogDebugDraw::Frustrum(const FLogCategoryBase& LogCategory, const UObject*
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDraw::Capsule(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& Center, const float HalfHeight, const float Radius, const FQuat& Rotation, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
-    if (FCogDebugLogCategoryManager::IsLogCategoryActive(LogCategory))
+    if (FCogDebugLog::IsLogCategoryActive(LogCategory))
     {
         const FColor NewColor = FCogDebugSettings::ModulateDebugColor(WorldContextObject->GetWorld(), Color, Persistent);
         UE_VLOG_CAPSULE(WorldContextObject, LogCategory, Verbose, Center, HalfHeight, Radius, FQuat::Identity, NewColor, TEXT_EMPTY);
@@ -414,7 +414,7 @@ void FCogDebugDraw::Capsule(const FLogCategoryBase& LogCategory, const UObject* 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDraw::Points(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const TArray<FVector>& Points, float Radius, const FColor& StartColor, const FColor& EndColor, const bool Persistent, const uint8 DepthPriority)
 {
-    if (FCogDebugLogCategoryManager::IsLogCategoryActive(LogCategory))
+    if (FCogDebugLog::IsLogCategoryActive(LogCategory))
     {
         int32 index = 0;
         for (const FVector& Point : Points)
@@ -429,7 +429,7 @@ void FCogDebugDraw::Points(const FLogCategoryBase& LogCategory, const UObject* W
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDraw::Path(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const TArray<FVector>& Points, float PointSize, const FColor& StartColor, const FColor& EndColor, const bool Persistent, const uint8 DepthPriority)
 {
-    if (FCogDebugLogCategoryManager::IsLogCategoryActive(LogCategory))
+    if (FCogDebugLog::IsLogCategoryActive(LogCategory))
     {
         if (Points.Num() == 0)
         {
@@ -465,7 +465,7 @@ void FCogDebugDraw::Skeleton(const FLogCategoryBase& LogCategory, const USkeleta
         return;
     }
 
-    if (FCogDebugLogCategoryManager::IsLogCategoryActive(LogCategory))
+    if (FCogDebugLog::IsLogCategoryActive(LogCategory))
     {
         const FReferenceSkeleton& ReferenceSkeleton = Skeleton->GetSkeletalMeshAsset()->GetRefSkeleton();
         const FTransform WorldTransform = Skeleton->GetComponentTransform();

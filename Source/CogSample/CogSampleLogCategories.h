@@ -8,6 +8,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogCogRotation, Warning, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogCogControlRotation, Warning, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogCogBaseAimRotation, Warning, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogCogSkeleton, Warning, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogCogTargetAcquisition, Warning, All);
 
 namespace CogSampleLog
 {

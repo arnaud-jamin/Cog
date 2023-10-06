@@ -247,7 +247,7 @@ TSharedPtr<FLogCategoryViewerNode> SLogCategoryListWidget::UpdatePropertyOptions
 	PropertyOptions.Add(InitiallySelected);
 
 	// Gather all ULogCategory classes
-    for (auto& Entry : FCogDebugLogCategoryManager::GetLogCategories())
+    for (auto& Entry : FCogDebugLog::GetLogCategories())
 	{
         // if we have a search string and this doesn't match, don't show it
         if (LogCategoryTextFilter.IsValid() && !LogCategoryTextFilter->PassesFilter(Entry.Value.LogCategory->GetCategoryName()))

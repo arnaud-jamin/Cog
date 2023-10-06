@@ -1,6 +1,6 @@
 #include "CogDebugLogCategory.h"
 
-#include "CogDebugLogCategoryManager.h"
+#include "CogDebugLog.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 FLogCategoryBase* FCogLogCategory::GetLogCategory() const
@@ -18,7 +18,7 @@ FLogCategoryBase* FCogLogCategory::GetLogCategory() const
 
     if (LogCategory == nullptr)
     {
-        if (FCogDebugLogCategoryInfo* CategoryInfo = FCogDebugLogCategoryManager::GetLogCategories().Find(Name))
+        if (FCogDebugLogCategoryInfo* CategoryInfo = FCogDebugLog::GetLogCategories().Find(Name))
         {
             LogCategory = CategoryInfo->LogCategory;
         }

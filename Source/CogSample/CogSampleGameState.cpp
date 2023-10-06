@@ -22,6 +22,7 @@
 #include "CogAbilityWindow_Tags.h"
 #include "CogAbilityWindow_Tweaks.h"
 #include "CogDebugDefines.h"
+#include "CogDebugDrawImGui.h"
 #include "CogDebugPlot.h"
 #include "CogEngineDataAsset_Collisions.h"
 #include "CogEngineDataAsset_Spawns.h"
@@ -220,6 +221,7 @@ void ACogSampleGameState::InitializeCog()
 void ACogSampleGameState::RenderCog(float DeltaTime)
 {
     CogWindowManager->Render(DeltaTime);
+    FCogDebugDrawImGui::Draw();
 }
 
 #endif //USE_COG

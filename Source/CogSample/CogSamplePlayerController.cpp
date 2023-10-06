@@ -2,6 +2,7 @@
 
 #include "CogDefines.h"
 #include "CogSampleCharacter.h"
+#include "CogSampleTargetAcquisition.h"
 #include "Net/UnrealNetwork.h"
 
 #if USE_COG
@@ -37,5 +38,19 @@ void ACogSamplePlayerController::AcknowledgePossession(APawn* P)
     if (ACogSampleCharacter* PossessedCharacter = Cast<ACogSampleCharacter>(P))
     {
         PossessedCharacter->OnAcknowledgePossession(this);
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSamplePlayerController::Tick(float DeltaSeconds)
+{
+    Super::Tick(DeltaSeconds);
+
+    if (TargetAcquisition != nullptr)
+    {   
+        TArray<AActor*> TagretToIgnore;
+        FCogSampleTargetAcquisitionResult Result;
+        TargetAcquisition->FindBestTarget(this, TagretToIgnore, nullptr, true, FVector2D::ZeroVector, false, Result);
+        Target = Result.Target;
     }
 }

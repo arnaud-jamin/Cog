@@ -7,6 +7,8 @@
 #include "CogDefines.h"
 #include "CogInterfaceAllegianceActor.h"
 #include "CogInterfaceDebugFilteredActor.h"
+#include "CogSampleTargetableInterface.h"
+#include "CogSampleTeamInterface.h"
 #include "GameFramework/Character.h"
 #include "GameplayAbilitySpecHandle.h"
 #include "GameplayTagContainer.h"
@@ -25,17 +27,6 @@ struct FActiveGameplayEffect;
 struct FCogSampleRootMotionParams;
 struct FGameplayEffectSpec;
 struct FOnAttributeChangeData;
-
-//--------------------------------------------------------------------------------------------------------------------------
-UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
-enum class ECogSampleAllegianceFilter : uint8
-{
-    None    = 0 UMETA(Hidden),
-    Ally    = 1 << 0,
-    Neutral = 1 << 1,
-    Enemy   = 1 << 2,
-};
-ENUM_CLASS_FLAGS(ECogSampleAllegianceFilter);
 
 //--------------------------------------------------------------------------------------------------------------------------
 USTRUCT(BlueprintType)
@@ -72,6 +63,8 @@ class ACogSampleCharacter : public ACharacter
     , public IAbilitySystemInterface
     , public ICogInterfacesDebugFilteredActor
     , public ICogInterfacesAllegianceActor
+    , public ICogSampleTeamInterface
+    , public ICogSampleTargetableInterface
 {
 	GENERATED_BODY()
 
@@ -101,6 +94,13 @@ public:
     // ICogInterfacesAllegianceActor overrides
     //----------------------------------------------------------------------------------------------------------------------
     ECogInterfacesAllegiance GetAllegianceWithOtherActor(const AActor* OtherActor) const override;
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // ICogSampleTargetInterface overrides
+    //----------------------------------------------------------------------------------------------------------------------
+    virtual FVector GetTargetLocation() const override;
+
+    virtual void GetTargetCapsules(TArray<const UCapsuleComponent*>& Capsules) const override;
 
     //----------------------------------------------------------------------------------------------------------------------
     void OnAcknowledgePossession(APlayerController* InController);
@@ -181,13 +181,13 @@ public:
     //----------------------------------------------------------------------------------------------------------------------
     
     UFUNCTION(BlueprintPure)
-    int32 GetTeamID() const { return TeamID; }
+    virtual int32 GetTeam() const override { return Team; }
 
     UFUNCTION(BlueprintCallable)
     void SetTeamID(int32 Value);
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Team, Replicated, meta = (AllowPrivateAccess = "true"))
-    int32 TeamID = 0;
+    int32 Team = 0;
     
     //----------------------------------------------------------------------------------------------------------------------
     // Root Motion

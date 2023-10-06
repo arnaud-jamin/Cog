@@ -6,6 +6,7 @@
 #include "CogSampleAttributeSet_Health.h"
 #include "CogSampleAttributeSet_Misc.h"
 #include "CogSampleCharacterMovementComponent.h"
+#include "CogSampleFunctionLibrary_Team.h"
 #include "CogSampleGameplayAbility.h"
 #include "CogSampleLogCategories.h"
 #include "CogSampleRootMotionParams.h"
@@ -77,7 +78,7 @@ void ACogSampleCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
     Params.Condition = COND_OwnerOnly;
 
     DOREPLIFETIME_WITH_PARAMS_FAST(ACogSampleCharacter, ActiveAbilityHandles, Params);
-    DOREPLIFETIME_WITH_PARAMS_FAST(ACogSampleCharacter, TeamID, Params);
+    DOREPLIFETIME_WITH_PARAMS_FAST(ACogSampleCharacter, Team, Params);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -116,18 +117,16 @@ UAbilitySystemComponent* ACogSampleCharacter::GetAbilitySystemComponent() const
 //--------------------------------------------------------------------------------------------------------------------------
 ECogInterfacesAllegiance ACogSampleCharacter::GetAllegianceWithOtherActor(const AActor* OtherActor) const
 {
-    const ACogSampleCharacter* OtherCharacter = Cast<ACogSampleCharacter>(OtherActor);
-    if (OtherCharacter == nullptr)
-    {
-        return ECogInterfacesAllegiance::Neutral;
-    }
+    ECogSampleAllegiance Allegiance = UCogSampleFunctionLibrary_Team::GetActorsAllegiance(this, OtherActor);
 
-    if (TeamID == OtherCharacter->TeamID)
+    switch (Allegiance)
     {
-        return ECogInterfacesAllegiance::Friendly;
+        case ECogSampleAllegiance::Enemy:       return ECogInterfacesAllegiance::Enemy;
+        case ECogSampleAllegiance::Friendly:    return ECogInterfacesAllegiance::Friendly;
+        case ECogSampleAllegiance::Neutral:     return ECogInterfacesAllegiance::Neutral;
     }
-
-    return ECogInterfacesAllegiance::Enemy;
+    
+    return ECogInterfacesAllegiance::Neutral;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -507,8 +506,8 @@ void ACogSampleCharacter::OnScaleAttributeChanged(const FOnAttributeChangeData& 
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleCharacter::SetTeamID(int32 Value)
 {
-    TeamID = Value;
-    MARK_PROPERTY_DIRTY_FROM_NAME(ACogSampleCharacter, TeamID, this);
+    Team = Value;
+    MARK_PROPERTY_DIRTY_FROM_NAME(ACogSampleCharacter, Team, this);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -608,4 +607,16 @@ void ACogSampleCharacter::UpdateActiveAbilitySlots()
         FGameplayTag SlotTag = FCogSampleTagLibrary::ActiveAbilityCooldownTags[i];
         AbilityInstance->SetSlotTag(SlotTag);
     }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FVector ACogSampleCharacter::GetTargetLocation() const
+{
+    return GetActorLocation();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSampleCharacter::GetTargetCapsules(TArray<const UCapsuleComponent*>& Capsules) const
+{
+    Capsules.Add(GetCapsuleComponent());
 }

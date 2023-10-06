@@ -2,7 +2,7 @@
 
 #include "CogDebugHelper.h"
 #include "CogWindowWidgets.h"
-#include "CogDebugLogCategoryManager.h"
+#include "CogDebugLog.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogEngineWindow_LogCategories::RenderHelp()
@@ -49,7 +49,7 @@ void UCogEngineWindow_LogCategories::RenderContent()
 
         if (ImGui::MenuItem("Reset"))
         {
-            FCogDebugLogCategoryManager::DeactivateAllLogCateories(*World);
+            FCogDebugLog::DeactivateAllLogCateories(*World);
         }
 
         if (ImGui::IsItemHovered())
@@ -77,7 +77,7 @@ void UCogEngineWindow_LogCategories::RenderContent()
     ImGuiStyle& Style = ImGui::GetStyle();
 
     int Index = 0;
-    for (const auto& Entry : FCogDebugLogCategoryManager::GetLogCategories())
+    for (const auto& Entry : FCogDebugLog::GetLogCategories())
     {
         FName CategoryName = Entry.Key;
         const FCogDebugLogCategoryInfo& CategoryInfo = Entry.Value;
@@ -96,8 +96,8 @@ void UCogEngineWindow_LogCategories::RenderContent()
             const bool IsControlDown = ImGui::GetIO().KeyCtrl;
             if (IsClient)
             {
-                ELogVerbosity::Type Verbosity = FCogDebugLogCategoryManager::GetServerVerbosity(CategoryName);
-                bool IsActive = FCogDebugLogCategoryManager::IsVerbosityActive(Verbosity);
+                ELogVerbosity::Type Verbosity = FCogDebugLog::GetServerVerbosity(CategoryName);
+                bool IsActive = FCogDebugLog::IsVerbosityActive(Verbosity);
 
                 if (Verbosity == ELogVerbosity::VeryVerbose)
                 {
@@ -107,7 +107,7 @@ void UCogEngineWindow_LogCategories::RenderContent()
                 if (ImGui::Checkbox("##Server", &IsActive))
                 {
                     ELogVerbosity::Type NewVerbosity = IsActive ? (IsControlDown ? ELogVerbosity::VeryVerbose : ELogVerbosity::Verbose) : ELogVerbosity::Warning;
-                    FCogDebugLogCategoryManager::SetServerVerbosity(*World, CategoryName, NewVerbosity);
+                    FCogDebugLog::SetServerVerbosity(*World, CategoryName, NewVerbosity);
                 }
 
                 if (Verbosity == ELogVerbosity::VeryVerbose)
@@ -128,7 +128,7 @@ void UCogEngineWindow_LogCategories::RenderContent()
 
             {
                 ELogVerbosity::Type Verbosity = Category->GetVerbosity();
-                bool IsActive = FCogDebugLogCategoryManager::IsVerbosityActive(Verbosity);
+                bool IsActive = FCogDebugLog::IsVerbosityActive(Verbosity);
 
                 if (Verbosity == ELogVerbosity::VeryVerbose)
                 {
@@ -162,7 +162,7 @@ void UCogEngineWindow_LogCategories::RenderContent()
         {
             if (IsClient)
             {
-                ELogVerbosity::Type CurrentVerbosity = FCogDebugLogCategoryManager::GetServerVerbosity(CategoryName);
+                ELogVerbosity::Type CurrentVerbosity = FCogDebugLog::GetServerVerbosity(CategoryName);
                 FCogWindowWidgets::SetNextItemToShortWidth();
                 if (ImGui::BeginCombo("##Server", FCogDebugHelper::VerbosityToString(CurrentVerbosity)))
                 {
@@ -173,7 +173,7 @@ void UCogEngineWindow_LogCategories::RenderContent()
 
                         if (ImGui::Selectable(FCogDebugHelper::VerbosityToString(Verbosity), IsSelected))
                         {
-                            FCogDebugLogCategoryManager::SetServerVerbosity(*World, CategoryName, Verbosity);
+                            FCogDebugLog::SetServerVerbosity(*World, CategoryName, Verbosity);
                         }
                     }
                     ImGui::EndCombo();

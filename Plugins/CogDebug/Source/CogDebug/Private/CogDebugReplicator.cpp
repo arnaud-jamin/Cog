@@ -181,7 +181,7 @@ void ACogDebugReplicator::Server_SetCategoryVerbosity_Implementation(FName LogCa
     ENetMode NetMode = GetWorld()->GetNetMode();
     if (NetMode == NM_DedicatedServer || NetMode == NM_ListenServer)
     {
-        if (FCogDebugLogCategoryInfo* LogCategoryInfo = FCogDebugLogCategoryManager::FindLogCategoryInfo(LogCategoryName))
+        if (FCogDebugLogCategoryInfo* LogCategoryInfo = FCogDebugLog::FindLogCategoryInfo(LogCategoryName))
         {
             LogCategoryInfo->LogCategory->SetVerbosity((ELogVerbosity::Type)Verbosity);
 
@@ -203,7 +203,7 @@ void ACogDebugReplicator::NetMulticast_SendCategoriesVerbosity_Implementation(co
     {
         for (const FCogServerCategoryData& Category : Categories)
         {
-            FCogDebugLogCategoryManager::OnServerVerbosityChanged(Category.LogCategoryName, (ELogVerbosity::Type)Category.Verbosity);
+            FCogDebugLog::OnServerVerbosityChanged(Category.LogCategoryName, (ELogVerbosity::Type)Category.Verbosity);
         }
     }
 
@@ -219,7 +219,7 @@ void ACogDebugReplicator::Client_SendCategoriesVerbosity_Implementation(const TA
     {
         for (const FCogServerCategoryData& Category : Categories)
         {
-            FCogDebugLogCategoryManager::OnServerVerbosityChanged(Category.LogCategoryName, (ELogVerbosity::Type)Category.Verbosity);
+            FCogDebugLog::OnServerVerbosityChanged(Category.LogCategoryName, (ELogVerbosity::Type)Category.Verbosity);
         }
     }
 
@@ -235,7 +235,7 @@ void ACogDebugReplicator::Server_RequestAllCategoriesVerbosity_Implementation()
     if (NetMode == NM_DedicatedServer || NetMode == NM_ListenServer)
     {
         TArray<FCogServerCategoryData> CategoriesData;
-        for (auto& Entry : FCogDebugLogCategoryManager::GetLogCategories())
+        for (auto& Entry : FCogDebugLog::GetLogCategories())
         {
             FCogDebugLogCategoryInfo& CategoryInfo = Entry.Value;
             if (CategoryInfo.LogCategory != nullptr)

@@ -1,7 +1,7 @@
 #include "CogDebugLogCategoryDetails.h"
 
 #include "CogDebugLogCategory.h"
-#include "CogDebugLogCategoryManager.h"
+#include "CogDebugLog.h"
 #include "DetailWidgetRow.h"
 #include "Editor.h"
 #include "IPropertyUtilities.h"
@@ -27,7 +27,7 @@ void FCogLogCategoryDetails::CustomizeHeader(TSharedRef<IPropertyHandle> StructP
 
     PropertyOptions.Empty();
     PropertyOptions.Add(MakeShareable(new FString("None")));
-    for (auto& Entry : FCogDebugLogCategoryManager::GetLogCategories())
+    for (auto& Entry : FCogDebugLog::GetLogCategories())
     {
         PropertyOptions.Add(MakeShareable(new FString(Entry.Value.LogCategory->GetCategoryName().ToString())));
     }

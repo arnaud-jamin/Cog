@@ -1,6 +1,6 @@
 #include "CogDebugLogBlueprint.h"
 
-#include "CogDebugLogCategoryManager.h"
+#include "CogDebugLog.h"
 #include "CogDebugLogMacros.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ bool UCogDebugLogBlueprint::IsLogActive(const UObject* WorldContextObject, FCogL
 
     if (const FLogCategoryBase* LogCategoryPtr = LogCategory.GetLogCategory())
     {
-        if (FCogDebugLogCategoryManager::IsLogCategoryActive(*LogCategoryPtr) == false)
+        if (FCogDebugLog::IsLogCategoryActive(*LogCategoryPtr) == false)
         {
             return false;
         }

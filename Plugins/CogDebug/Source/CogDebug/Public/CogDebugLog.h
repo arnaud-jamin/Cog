@@ -20,7 +20,7 @@ struct COGDEBUG_API FCogDebugLogCategoryInfo
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
-struct COGDEBUG_API FCogDebugLogCategoryManager
+struct COGDEBUG_API FCogDebugLog
 {
     static void AddLogCategory(FLogCategoryBase& LogCategory, const FString& DisplayName = "", bool bVisible = true);
 

@@ -1,4 +1,4 @@
-#include "CogDebugLogCategoryManager.h"
+#include "CogDebugLog.h"
 
 #include "CogDebugModule.h"
 #include "CogDebugReplicator.h"
@@ -10,7 +10,7 @@
 DEFINE_LOG_CATEGORY(LogCogNone);
 DEFINE_LOG_CATEGORY(LogCogServerDebug);
 
-TMap<FName, FCogDebugLogCategoryInfo> FCogDebugLogCategoryManager::LogCategories;
+TMap<FName, FCogDebugLogCategoryInfo> FCogDebugLog::LogCategories;
 
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ FString FCogDebugLogCategoryInfo::GetDisplayName() const
 //--------------------------------------------------------------------------------------------------------------------------
 // FCogDebugLogCategoryManager
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugLogCategoryManager::AddLogCategory(FLogCategoryBase& LogCategory, const FString& DisplayName, bool bVisible)
+void FCogDebugLog::AddLogCategory(FLogCategoryBase& LogCategory, const FString& DisplayName, bool bVisible)
 {
     LogCategories.Add(LogCategory.GetCategoryName(), 
         FCogDebugLogCategoryInfo
@@ -47,19 +47,19 @@ void FCogDebugLogCategoryManager::AddLogCategory(FLogCategoryBase& LogCategory, 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogDebugLogCategoryManager::IsVerbosityActive(ELogVerbosity::Type Verbosity)
+bool FCogDebugLog::IsVerbosityActive(ELogVerbosity::Type Verbosity)
 {
     return Verbosity >= ELogVerbosity::Verbose;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogDebugLogCategoryManager::IsLogCategoryActive(const FLogCategoryBase& LogCategory)
+bool FCogDebugLog::IsLogCategoryActive(const FLogCategoryBase& LogCategory)
 {
     return IsVerbosityActive(LogCategory.GetVerbosity());
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogDebugLogCategoryManager::IsLogCategoryActive(FName CategoryName)
+bool FCogDebugLog::IsLogCategoryActive(FName CategoryName)
 {
     if (FLogCategoryBase* LogCategory = FindLogCategory(CategoryName))
     {
@@ -70,13 +70,13 @@ bool FCogDebugLogCategoryManager::IsLogCategoryActive(FName CategoryName)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugLogCategoryManager::SetLogCategoryActive(FLogCategoryBase& LogCategory, bool Value)
+void FCogDebugLog::SetLogCategoryActive(FLogCategoryBase& LogCategory, bool Value)
 {
     LogCategory.SetVerbosity(Value ? ELogVerbosity::Verbose : ELogVerbosity::Warning);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugLogCategoryManager::OnServerVerbosityChanged(FName CategoryName, ELogVerbosity::Type Verbosity)
+void FCogDebugLog::OnServerVerbosityChanged(FName CategoryName, ELogVerbosity::Type Verbosity)
 {
     if (FCogDebugLogCategoryInfo* LogCategoryInfo = FindLogCategoryInfo(CategoryName))
     {
@@ -85,7 +85,7 @@ void FCogDebugLogCategoryManager::OnServerVerbosityChanged(FName CategoryName, E
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ELogVerbosity::Type FCogDebugLogCategoryManager::GetServerVerbosity(FName CategoryName)
+ELogVerbosity::Type FCogDebugLog::GetServerVerbosity(FName CategoryName)
 {
     if (FCogDebugLogCategoryInfo* LogCategoryInfo = FindLogCategoryInfo(CategoryName))
     {
@@ -96,7 +96,7 @@ ELogVerbosity::Type FCogDebugLogCategoryManager::GetServerVerbosity(FName Catego
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugLogCategoryManager::SetServerVerbosity(UWorld& World, FName CategoryName, ELogVerbosity::Type Verbosity)
+void FCogDebugLog::SetServerVerbosity(UWorld& World, FName CategoryName, ELogVerbosity::Type Verbosity)
 {
     if (ACogDebugReplicator* Replicator = FCogDebugModule::Get().GetLocalReplicator(World))
     {
@@ -105,25 +105,25 @@ void FCogDebugLogCategoryManager::SetServerVerbosity(UWorld& World, FName Catego
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugLogCategoryManager::SetServerVerbosityActive(UWorld& World, FName CategoryName, bool Value)
+void FCogDebugLog::SetServerVerbosityActive(UWorld& World, FName CategoryName, bool Value)
 {
     SetServerVerbosity(World, CategoryName, Value ? ELogVerbosity::Verbose : ELogVerbosity::Warning);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogDebugLogCategoryManager::IsServerVerbosityActive(FName CategoryName)
+bool FCogDebugLog::IsServerVerbosityActive(FName CategoryName)
 {
     return IsVerbosityActive(GetServerVerbosity(CategoryName));
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FCogDebugLogCategoryInfo* FCogDebugLogCategoryManager::FindLogCategoryInfo(FName CategoryName)
+FCogDebugLogCategoryInfo* FCogDebugLog::FindLogCategoryInfo(FName CategoryName)
 {
     return LogCategories.Find(CategoryName);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FLogCategoryBase* FCogDebugLogCategoryManager::FindLogCategory(FName CategoryName)
+FLogCategoryBase* FCogDebugLog::FindLogCategory(FName CategoryName)
 {
     if (FCogDebugLogCategoryInfo* LogCategoryInfo = FindLogCategoryInfo(CategoryName))
     {
@@ -138,7 +138,7 @@ FLogCategoryBase* FCogDebugLogCategoryManager::FindLogCategory(FName CategoryNam
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugLogCategoryManager::DeactivateAllLogCateories(UWorld& World)
+void FCogDebugLog::DeactivateAllLogCateories(UWorld& World)
 {
     FString ToggleStr = TEXT("Log LogCogNone Only");
     GEngine->Exec(&World, *ToggleStr);

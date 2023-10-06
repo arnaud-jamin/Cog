@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "imgui.h"
 
-class FCogDebugDrawImGui
+class COGDEBUG_API FCogDebugDrawImGui
 {
 public:
     static void AddLine(const ImVec2& P1, const ImVec2& P2, ImU32 Color, float Thickness = 1.0f, float Duration = 0.0f, bool FadeColor = false);
