@@ -2,14 +2,16 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
-#include "CogSampleDamageEvent.h"
 #include "GameFramework/PlayerController.h"
 #include "CogSamplePlayerController.generated.h"
 
 class UCogSampleTargetAcquisition;
+class ACogSampleCharacter;
 
 //--------------------------------------------------------------------------------------------------------------------------
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FCogSampleTargetChangedEventDelegate, ACogSamplePlayerController*, Controller, AActor*, NewTarget, AActor*, OldTarget);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FCogSampleControlledCharacterChangedEventDelegate, ACogSamplePlayerController*, Controller, ACogSampleCharacter*, NewCharacter, ACogSampleCharacter*, OldCharacter);
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(config=Game)
@@ -23,21 +25,52 @@ public:
 
     virtual void BeginPlay() override;
 
-    virtual void AcknowledgePossession(APawn* P);
+    virtual void Tick(float DeltaSeconds) override;
 
-    virtual void Tick(float DeltaSeconds);
+    //----------------------------------------------------------------------------------------------------------------------
+    // Control
+    //----------------------------------------------------------------------------------------------------------------------
+    virtual void OnPossess(APawn* NewPawn) override;
 
+    virtual void AcknowledgePossession(APawn* NewPawn) override;
+
+    UFUNCTION(BlueprintCallable)
+    void ControlCharacter(ACogSampleCharacter* NewCharacter);
+
+    UFUNCTION(BlueprintCallable)
+    void ResetControlledPawn();
+
+    UPROPERTY(BlueprintAssignable)
+    FCogSampleControlledCharacterChangedEventDelegate OnControlledCharacterChanged;
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Targeting
+    //----------------------------------------------------------------------------------------------------------------------
     void SetTarget(AActor* Value);
 
     AActor* GetTarget() const { return Target.Get(); }
 
+
     UPROPERTY(BlueprintAssignable)
     FCogSampleTargetChangedEventDelegate OnTargetChanged;
 
-    UPROPERTY(BlueprintAssignable)
-    FCogSampleDamageEventDelegate OnPawnDealtDamage;
-
 private:
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Control
+    //----------------------------------------------------------------------------------------------------------------------
+
+    UPROPERTY(BlueprintReadonly, meta = (AllowPrivateAccess = "true"))
+    TWeakObjectPtr<ACogSampleCharacter> ControlledCharacter = nullptr;
+
+    UPROPERTY(BlueprintReadonly, meta = (AllowPrivateAccess = "true"))
+    TWeakObjectPtr<ACogSampleCharacter> InitialControlledCharacter = nullptr;
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Targeting
+    //----------------------------------------------------------------------------------------------------------------------
+
+    virtual void TickTargeting(float DeltaSeconds);
 
     UFUNCTION(Reliable, Server)
     void Server_SetTarget(AActor* Value);

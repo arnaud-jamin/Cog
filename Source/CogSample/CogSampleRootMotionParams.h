@@ -15,16 +15,16 @@ struct FCogSampleRootMotionParams
 public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    AActor* Instigator;
+    AActor* Instigator = nullptr;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    AActor* Causer;
+    AActor* Causer = nullptr;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TSubclassOf<UGameplayEffect> Effect;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FRotator Rotation;
+    FRotator Rotation = FRotator::ZeroRotator;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     bool IsAdditive = false;

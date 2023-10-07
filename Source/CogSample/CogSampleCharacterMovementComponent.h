@@ -5,12 +5,60 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "CogSampleCharacterMovementComponent.generated.h"
 
+class AController;
+
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS()
 class UCogSampleCharacterMovementComponent : public UCharacterMovementComponent
 {
 	GENERATED_BODY()
 
+public:
+    
+    virtual void BeginPlay() override;
+    
+    virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+    
+    virtual float GetMaxSpeed() const override;
+    
+    virtual float GetMaxAcceleration() const override;
+    
+    virtual FRotator GetDeltaRotation(float DeltaTime) const;
+    
+    virtual void UpdateFromCompressedFlags(uint8 Flags) override;
+    
+    virtual class FNetworkPredictionData_Client* GetPredictionData_Client() const override;
+
+    virtual bool ClientUpdatePositionAfterServerUpdate() override;
+
+    virtual void PossessedBy(AController* NewController);
+    
+    virtual void UnPossessed();
+
+    UFUNCTION(BlueprintCallable)
+    void StartSprinting();
+
+    UFUNCTION(BlueprintCallable)
+    void StopSprinting();
+
+private:
+
+    bool bIsSprinting = false;
+
+    bool bWasAvoidanceEnabled = false;
+
+#if USE_COG
+
+    FVector DebugLastBottomLocation = FVector::ZeroVector;
+
+    FVector DebugLastVelocity = FVector::ZeroVector;
+
+    bool DebugIsPositionCorrected = false;
+
+#endif //USE_COG
+
+
+    //----------------------------------------------------------------------------------------------------------------------
     class FCogSampleSavedMove : public FSavedMove_Character
     {
     public:
@@ -29,7 +77,7 @@ class UCogSampleCharacterMovementComponent : public UCharacterMovementComponent
 
         ///@brief Sets up the move before sending it to the server. 
         virtual void SetMoveFor(ACharacter* Character, float InDeltaTime, FVector const& NewAccel, class FNetworkPredictionData_Client_Character& ClientData) override;
-        
+
         ///@brief Sets variables on character movement component before making a predictive correction.
         virtual void PrepMoveFor(class ACharacter* Character) override;
 
@@ -37,6 +85,7 @@ class UCogSampleCharacterMovementComponent : public UCharacterMovementComponent
         uint8 SavedRequestSprint : 1;
     };
 
+    //----------------------------------------------------------------------------------------------------------------------
     class FCogSampleNetworkPredictionData_Client : public FNetworkPredictionData_Client_Character
     {
     public:
@@ -47,30 +96,4 @@ class UCogSampleCharacterMovementComponent : public UCharacterMovementComponent
         ///@brief Allocates a new copy of our custom saved move
         virtual FSavedMovePtr AllocateNewMove() override;
     };
-
-public:
-    virtual void BeginPlay() override;
-    virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-    virtual float GetMaxSpeed() const override;
-    virtual float GetMaxAcceleration() const override;
-    virtual FRotator GetDeltaRotation(float DeltaTime) const;
-    virtual void UpdateFromCompressedFlags(uint8 Flags) override;
-    virtual class FNetworkPredictionData_Client* GetPredictionData_Client() const override;
-    virtual bool ClientUpdatePositionAfterServerUpdate() override;
-
-    UFUNCTION(BlueprintCallable)
-    void StartSprinting();
-
-    UFUNCTION(BlueprintCallable)
-    void StopSprinting();
-
-private:
-
-    bool bIsSprinting = false;
-
-#if USE_COG
-    FVector DebugLastBottomLocation = FVector::ZeroVector;
-    FVector DebugLastVelocity = FVector::ZeroVector;
-    bool DebugIsPositionCorrected = false;
-#endif //USE_COG
 };

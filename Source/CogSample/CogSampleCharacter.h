@@ -79,6 +79,8 @@ public:
     // ACharacter overrides
     //----------------------------------------------------------------------------------------------------------------------
     
+    virtual void PostInitializeComponents() override;
+
     virtual void BeginPlay() override;
 
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -89,7 +91,11 @@ public:
 
     virtual void PossessedBy(AController* NewController) override;
 
-    void OnAcknowledgePossession(APlayerController* InController);
+    virtual void UnPossessed() override;
+
+    virtual void AcknowledgePossession(AController* NewController);
+
+    virtual void AcknowledgeUnpossession();
 
     //----------------------------------------------------------------------------------------------------------------------
     // IAbilitySystemInterface overrides
@@ -215,6 +221,11 @@ public:
     int32 ApplyRootMotion(const FCogSampleRootMotionParams& Params);
 
 private:
+    
+    friend class ACogSamplePlayerController;
+
+    UPROPERTY()
+    AController* InitialController = nullptr;
 
     //----------------------------------------------------------------------------------------------------------------------
     // Inputs

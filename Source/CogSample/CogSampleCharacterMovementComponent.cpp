@@ -305,3 +305,26 @@ bool UCogSampleCharacterMovementComponent::ClientUpdatePositionAfterServerUpdate
     return Result;
 }
 
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleCharacterMovementComponent::PossessedBy(AController* NewController)
+{
+    if (NewController != nullptr && NewController->IsPlayerController())
+    {
+        bWasAvoidanceEnabled = bUseRVOAvoidance;
+        SetAvoidanceEnabled(false);
+    }
+    else
+    {
+        SetAvoidanceEnabled(bWasAvoidanceEnabled);
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleCharacterMovementComponent::UnPossessed()
+{
+    //---------------------------------------------------------------------------------------
+    // Make sure the character doesn't keep his velocity while not controlled anymore.
+    //---------------------------------------------------------------------------------------
+    ConsumeInputVector();
+}

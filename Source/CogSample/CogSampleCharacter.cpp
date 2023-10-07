@@ -82,6 +82,15 @@ void ACogSampleCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
     DOREPLIFETIME_WITH_PARAMS_FAST(ACogSampleCharacter, Team, Params);
 }
 
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSampleCharacter::PostInitializeComponents()
+{
+    Super::PostInitializeComponents();
+
+    InitializeAbilitySystem();
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleCharacter::BeginPlay()
 {
@@ -117,19 +126,83 @@ UAbilitySystemComponent* ACogSampleCharacter::GetAbilitySystemComponent() const
     return AbilitySystem; 
 }
 
-//--------------------------------------------------------------------------------------------------------------------------
-ECogInterfacesAllegiance ACogSampleCharacter::GetAllegianceWithOtherActor(const AActor* OtherActor) const
-{
-    ECogSampleAllegiance Allegiance = UCogSampleFunctionLibrary_Team::GetActorsAllegiance(this, OtherActor);
 
-    switch (Allegiance)
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSampleCharacter::PossessedBy(AController* NewController)
+{
+    COG_LOG_OBJECT(LogCogPossession, ELogVerbosity::Verbose, this, TEXT("Controller:%s"), *GetNameSafe(NewController));
+
+    if (InitialController == nullptr)
     {
-        case ECogSampleAllegiance::Enemy:       return ECogInterfacesAllegiance::Enemy;
-        case ECogSampleAllegiance::Friendly:    return ECogInterfacesAllegiance::Friendly;
-        case ECogSampleAllegiance::Neutral:     return ECogInterfacesAllegiance::Neutral;
+        InitialController = NewController;
     }
-    
-    return ECogInterfacesAllegiance::Neutral;
+
+    Super::PossessedBy(NewController);
+
+    if (bIsInitialized == false)
+    {
+        InitializeAbilitySystem();
+    }
+    else
+    {
+        //-------------------------------------------------------------------------------------------
+        // When possessing a NPC, we need to refresh the ability system actor info, so it knows about
+        // the new controller to be able to activate abilities.
+        //-------------------------------------------------------------------------------------------
+        AbilitySystem->InitAbilityActorInfo(this, this);
+
+        //-------------------------------------------------------------------------------------------
+        // We might be possessed when in a middle of an ability. Currently we prefer to cancel it.
+        //-------------------------------------------------------------------------------------------
+        AbilitySystem->CancelAllAbilities();
+
+        if (UCogSampleCharacterMovementComponent* MovementComp = Cast<UCogSampleCharacterMovementComponent>(GetMovementComponent()))
+        {
+            MovementComp->PossessedBy(NewController);
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSampleCharacter::UnPossessed()
+{
+    COG_LOG_OBJECT(LogCogPossession, ELogVerbosity::Verbose, this, TEXT(""));
+
+    if (UCogSampleCharacterMovementComponent* MovementComp = Cast<UCogSampleCharacterMovementComponent>(GetMovementComponent()))
+    {
+        MovementComp->UnPossessed();
+    }
+
+    Super::UnPossessed();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSampleCharacter::AcknowledgePossession(AController* NewController)
+{
+    COG_LOG_OBJECT(LogCogPossession, ELogVerbosity::Verbose, this, TEXT("Controller:%s - NewController:%s"), *GetNameSafe(NewController), *GetNameSafe(Controller));
+
+    //-------------------------------------------------------------------------------------------
+    // Set the controller otherwise when the player possesses a NPC, he would not be able to cast
+    // any ability. The ability system component needs to know the controller and therefore it
+    // needs to be set before calling InitAbilityActorInfo.
+    // See FGameplayAbilityActorInfo::InitFromActor
+    //-------------------------------------------------------------------------------------------
+    Controller = NewController;
+
+    if (AbilitySystem != nullptr)
+    {
+        AbilitySystem->InitAbilityActorInfo(this, this);
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSampleCharacter::AcknowledgeUnpossession()
+{
+    COG_LOG_OBJECT(LogCogPossession, ELogVerbosity::Verbose, this, TEXT("OldController:%s"), *GetNameSafe(Controller));
+
+    Controller = nullptr;
+
+    AbilitySystem->InitAbilityActorInfo(this, this);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -221,11 +294,6 @@ void ACogSampleCharacter::TryFinishInitialize()
         return;
     }
 
-    if (bIsAbilitySystemInitialized == false)
-    {
-        return;
-    }
-    
     if (HasActorBegunPlay() == false)
     {
         return;
@@ -260,19 +328,6 @@ void ACogSampleCharacter::ShutdownAbilitySystem()
 
 
     AbilitySystem->ClearActorInfo();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void ACogSampleCharacter::PossessedBy(AController* NewController)
-{
-    Super::PossessedBy(NewController);
-    InitializeAbilitySystem();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void ACogSampleCharacter::OnAcknowledgePossession(APlayerController* InController)
-{
-    InitializeAbilitySystem();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -421,6 +476,21 @@ void ACogSampleCharacter::Look(const FInputActionValue& Value)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+ECogInterfacesAllegiance ACogSampleCharacter::GetAllegianceWithOtherActor(const AActor* OtherActor) const
+{
+    ECogSampleAllegiance Allegiance = UCogSampleFunctionLibrary_Team::GetActorsAllegiance(this, OtherActor);
+
+    switch (Allegiance)
+    {
+    case ECogSampleAllegiance::Enemy:       return ECogInterfacesAllegiance::Enemy;
+    case ECogSampleAllegiance::Friendly:    return ECogInterfacesAllegiance::Friendly;
+    case ECogSampleAllegiance::Neutral:     return ECogInterfacesAllegiance::Neutral;
+    }
+
+    return ECogInterfacesAllegiance::Neutral;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleCharacter::HandleDamageReceived(const FCogSampleDamageEventParams& Params) 
 {
     OnDamageReceived.Broadcast(Params);
@@ -434,11 +504,6 @@ void ACogSampleCharacter::HandleDamageReceived(const FCogSampleDamageEventParams
 void ACogSampleCharacter::HandleDamageDealt(const FCogSampleDamageEventParams& Params)
 {
     OnDamageDealt.Broadcast(Params);
-
-    if (ACogSamplePlayerController* PlayerController = Cast<ACogSamplePlayerController>(GetController()))
-    {
-        PlayerController->OnPawnDealtDamage.Broadcast(Params);
-    }
 
 #if USE_COG
     FCogDebugMetric::AddMetric(this, "Damage Dealt", Params.MitigatedDamage, Params.UnmitigatedDamage, false);
