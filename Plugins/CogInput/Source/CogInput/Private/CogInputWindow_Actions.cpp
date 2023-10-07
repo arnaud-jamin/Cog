@@ -30,20 +30,29 @@ void UCogInputWindow_Actions::RenderContent()
 {
     Super::RenderContent();
 
-    if (ActionsAsset == nullptr || ActionsAsset->MappingContext == nullptr)
+    if (ActionsAsset == nullptr)
     {
+        ImGui::Text("No Actions Asset");
+        return;
+    }
+
+    if (ActionsAsset->MappingContext == nullptr)
+    {
+        ImGui::Text("No MappingContext");
         return;
     }
 
     ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
     if (LocalPlayer == nullptr)
     {
+        ImGui::Text("No Local Player");
         return;
     }
 
     UEnhancedInputLocalPlayerSubsystem* EnhancedInputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
     if (EnhancedInputSubsystem == nullptr)
     {
+        ImGui::Text("No Enhanced Input Subsystem");
         return;
     }
     

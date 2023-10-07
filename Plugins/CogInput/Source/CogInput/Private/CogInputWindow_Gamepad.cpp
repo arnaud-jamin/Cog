@@ -172,24 +172,28 @@ void UCogInputWindow_Gamepad::RenderContent()
 
     if (GetWorld() == nullptr)
     {
+        ImGui::Text("No World");
         return;
     }
 
     ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
     if (LocalPlayer == nullptr)
     {
+        ImGui::Text("No Local Player");
         return;
     }
 
     UEnhancedInputLocalPlayerSubsystem* EnhancedInputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
     if (EnhancedInputSubsystem == nullptr)
     {
+        ImGui::Text("No Enhanced Input Subsystem");
         return;
     }
     
     Input = EnhancedInputSubsystem->GetPlayerInput();
     if (Input == nullptr)
     {
+        ImGui::Text("No Player Input");
         return;
     }
 
@@ -233,6 +237,14 @@ void UCogInputWindow_Gamepad::RenderContent()
                 }
             }
         }
+        else
+        {
+            ImGui::Text("No Actions in Action Asset");
+        }
+    }
+    else
+    {
+        ImGui::Text("No Action Asset");
     }
 
     const float AspectRatio = 0.55f;
