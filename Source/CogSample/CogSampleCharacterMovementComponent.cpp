@@ -209,17 +209,17 @@ void UCogSampleCharacterMovementComponent::BeginPlay()
 {
     Super::BeginPlay();
 
-#if ENABLE_COG
+#if USE_COG
     const ACharacter* Character = GetCharacterOwner();
     const UCapsuleComponent* CapsuleComponent = Character->GetCapsuleComponent();
     DebugLastBottomLocation = Character->GetActorLocation() - FVector::UpVector * CapsuleComponent->GetScaledCapsuleHalfHeight();
-#endif //ENABLE_COG
+#endif //USE_COG
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSampleCharacterMovementComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-#if ENABLE_COG
+#if USE_COG
 
     const ACharacter* Character = GetCharacterOwner();
     const UCapsuleComponent* CapsuleComponent = Character->GetCapsuleComponent();
@@ -231,11 +231,12 @@ void UCogSampleCharacterMovementComponent::TickComponent(float DeltaTime, enum E
         FCogDebugPlot::PlotValue(GetPawnOwner(), "Move Input Local X", FVector::DotProduct(GetPawnOwner()->GetActorRightVector(), GetPendingInputVector()));
         FCogDebugPlot::PlotValue(GetPawnOwner(), "Move Input Local Y", FVector::DotProduct(GetPawnOwner()->GetActorForwardVector(), GetPendingInputVector()));
     }
-#endif //ENABLE_COG
+
+#endif //USE_COG
 
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-#if ENABLE_COG
+#if USE_COG
        
     const FVector DebugLocation = Character->GetActorLocation();
     const FVector DebugBottomLocation = DebugLocation - FVector::UpVector * CapsuleComponent->GetScaledCapsuleHalfHeight();
@@ -293,7 +294,7 @@ void UCogSampleCharacterMovementComponent::TickComponent(float DeltaTime, enum E
     DebugLastVelocity = Velocity;
     DebugIsPositionCorrected = false;
 
-#endif //ENABLE_COG
+#endif //USE_COG
 
 }
 
@@ -302,9 +303,9 @@ bool UCogSampleCharacterMovementComponent::ClientUpdatePositionAfterServerUpdate
 {
     bool Result = Super::ClientUpdatePositionAfterServerUpdate();
 
-#if ENABLE_COG
+#if USE_COG
     DebugIsPositionCorrected = true;
-#endif //ENABLE_COG
+#endif //USE_COG
 
     return Result;
 }
