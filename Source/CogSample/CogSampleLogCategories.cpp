@@ -1,7 +1,7 @@
 #include "CogSampleLogCategories.h"
 
 #include "AbilitySystemLog.h"
-#include "CogDefines.h"
+#include "CogSampleDefines.h"
 
 #if USE_COG
 #include "CogDebugLog.h"

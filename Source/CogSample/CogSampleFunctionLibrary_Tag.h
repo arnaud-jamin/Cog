@@ -6,6 +6,7 @@
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Ability_Activation_Fail_Cooldown);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Ability_Activation_Fail_Cost);
 
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Ability_Cooldown);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Ability_Cooldown_1);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Ability_Cooldown_2);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Ability_Cooldown_3);
@@ -14,6 +15,10 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Ability_Cooldown_5);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Ability_Cooldown_6);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Ability_Cooldown_7);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Ability_Cooldown_8);
+
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Ability_Type_Active);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Ability_Type_Passive);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Ability_Type_Hidden);
 
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Effect_Alignment_Negative);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Effect_Alignment_Positive);
@@ -49,7 +54,7 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_MontageEvent_Cast_End);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Unit_Hero);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(Tag_Unit_Creature);
 
-struct FCogSampleTagLibrary
+struct UCogSampleFunctionLibrary_Tag
 {
 public:
 

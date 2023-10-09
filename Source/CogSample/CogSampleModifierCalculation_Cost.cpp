@@ -1,8 +1,8 @@
 #include "CogSampleModifierCalculation_Cost.h"
 
 #include "CogSampleGameplayAbility.h"
+#include "CogSampleFunctionLibrary_Tag.h"
 #include "CogSampleAttributeSet_Caster.h"
-#include "CogSampleTagLibrary.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCogSampleModifierCalculation_Cost::UCogSampleModifierCalculation_Cost()

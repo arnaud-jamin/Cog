@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogDefines.h"
+#include "CogSampleDefines.h"
 #include "CogSampleFunctionLibrary_Gameplay.generated.h"
 
 class UAbilitySystemComponent;
@@ -81,5 +81,8 @@ public:
     static bool IsActorAbilitySystemMatchingTags(const UAbilitySystemComponent* AbilitySystem, const FGameplayTagContainer& RequiredTags, const FGameplayTagContainer& IgnoredTags);
 
     static bool IsActorMatchingTags(const AActor* Actor, const FGameplayTagContainer& RequiredTags, const FGameplayTagContainer& IgnoredTags);
+
+    static bool MatchCooldownTag(const FGameplayTagContainer& TagContainer);
+
 
 };

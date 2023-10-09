@@ -1,8 +1,9 @@
-#include "CogSampleTagLibrary.h"
+#include "CogSampleFunctionLibrary_Tag.h"
 
 UE_DEFINE_GAMEPLAY_TAG(Tag_Ability_Activation_Fail_Cooldown, "Ability.Activation.Fail.Cooldown");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Ability_Activation_Fail_Cost, "Ability.Activation.Fail.Cost");
 
+UE_DEFINE_GAMEPLAY_TAG(Tag_Ability_Cooldown, "Ability.Cooldown");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Ability_Cooldown_1, "Ability.Cooldown.1");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Ability_Cooldown_2, "Ability.Cooldown.2");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Ability_Cooldown_3, "Ability.Cooldown.3");
@@ -11,6 +12,10 @@ UE_DEFINE_GAMEPLAY_TAG(Tag_Ability_Cooldown_5, "Ability.Cooldown.5");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Ability_Cooldown_6, "Ability.Cooldown.6");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Ability_Cooldown_7, "Ability.Cooldown.7");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Ability_Cooldown_8, "Ability.Cooldown.8");
+
+UE_DEFINE_GAMEPLAY_TAG(Tag_Ability_Type_Active, "Ability.Type.Active");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Ability_Type_Passive, "Ability.Type.Passive");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Ability_Type_Hidden, "Ability.Type.Hidden");
 
 UE_DEFINE_GAMEPLAY_TAG(Tag_Effect_Alignment_Negative, "Effect.Alignment.Negative");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Effect_Alignment_Positive, "Effect.Alignment.Positive");
@@ -47,7 +52,7 @@ UE_DEFINE_GAMEPLAY_TAG(Tag_MontageEvent_Cast_End, "MontageEvent.Cast.End");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Unit_Hero, "Unit.Hero");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Unit_Creature, "Unit.Creature");
 
-TArray<FGameplayTag> FCogSampleTagLibrary::ActiveAbilityCooldownTags =
+TArray<FGameplayTag> UCogSampleFunctionLibrary_Tag::ActiveAbilityCooldownTags =
 { 
     Tag_Ability_Cooldown_1, 
     Tag_Ability_Cooldown_2, 

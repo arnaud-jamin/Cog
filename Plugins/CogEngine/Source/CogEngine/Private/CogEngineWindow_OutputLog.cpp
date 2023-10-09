@@ -243,7 +243,7 @@ void UCogEngineWindow_OutputLog::RenderContent()
 
     if (IsTableShown == false)
     {
-        ImGui::BeginChild("Scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+        ImGui::BeginChild("Scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_AlwaysHorizontalScrollbar);
     }
 
     const char* BufferStart = TextBuffer.begin();

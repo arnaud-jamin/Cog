@@ -25,6 +25,9 @@ public:
     FGameplayAttribute AmountAttribute;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    FGameplayAttribute MaxAmountAttribute;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
     FGameplayTag DisableRegenTag;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -35,9 +38,6 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (EditConditionHides, EditCondition = "Mode == ECogSamplePoolRegenMode::ScalableFloatRate"))
     FScalableFloat RegenRate;
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (EditConditionHides, EditCondition = "Mode == ECogSamplePoolRegenMode::MaxPoolDuration"))
-    FGameplayAttribute MaxAmountAttribute;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (EditConditionHides, EditCondition = "Mode == ECogSamplePoolRegenMode::MaxPoolDuration"))
     FScalableFloat TotalDuration;

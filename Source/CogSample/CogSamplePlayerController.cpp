@@ -1,7 +1,7 @@
 #include "CogSamplePlayerController.h"
 
 #include "CogDebugLogMacros.h"
-#include "CogDefines.h"
+#include "CogSampleDefines.h"
 #include "CogSampleCharacter.h"
 #include "CogSampleLogCategories.h"
 #include "CogSampleTargetAcquisition.h"
@@ -10,6 +10,7 @@
 #if USE_COG
 #include "CogAbilityReplicator.h"
 #include "CogDebugDefines.h"
+#include "CogDebugDraw.h"
 #include "CogDebugReplicator.h"
 #include "CogEngineReplicator.h"
 #endif //USE_COG
@@ -154,16 +155,26 @@ void ACogSamplePlayerController::Tick(float DeltaSeconds)
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogSamplePlayerController::TickTargeting(float DeltaSeconds)
 {
-    if (TargetAcquisition == nullptr)
+    if (IsLocalController())
     {
-        SetTarget(nullptr);
-        return;
+        if (TargetAcquisition == nullptr)
+        {
+            SetTarget(nullptr);
+            return;
+        }
+    
+        TArray<AActor*> TagretToIgnore;
+        FCogSampleTargetAcquisitionResult Result;
+        TargetAcquisition->FindBestTarget(this, TagretToIgnore, nullptr, true, FVector2D::ZeroVector, false, Result);
+        SetTarget(Result.Target);
     }
 
-    TArray<AActor*> TagretToIgnore;
-    FCogSampleTargetAcquisitionResult Result;
-    TargetAcquisition->FindBestTarget(this, TagretToIgnore, nullptr, true, FVector2D::ZeroVector, false, Result);
-    SetTarget(Result.Target);
+#if USE_COG
+    if (Target != nullptr && ControlledCharacter != nullptr)
+    {
+        FCogDebugDraw::Segment(LogCogTargetAcquisition, ControlledCharacter.Get(), ControlledCharacter->GetActorLocation(), Target->GetActorLocation(), FColor::White, false);
+    }
+#endif //USE_COG
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

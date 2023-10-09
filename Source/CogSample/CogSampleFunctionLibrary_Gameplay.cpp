@@ -315,3 +315,4 @@ bool UCogSampleFunctionLibrary_Gameplay::IsActorMatchingTags(const AActor* Actor
     bool Result = IsActorAbilitySystemMatchingTags(AbilitySystem, RequiredTags, IgnoredTags);
     return Result;
 }
+

@@ -6,12 +6,12 @@
 #include "CogSampleAttributeSet_Health.h"
 #include "CogSampleAttributeSet_Misc.h"
 #include "CogSampleCharacterMovementComponent.h"
+#include "CogSampleFunctionLibrary_Tag.h"
 #include "CogSampleFunctionLibrary_Team.h"
 #include "CogSampleGameplayAbility.h"
 #include "CogSampleLogCategories.h"
 #include "CogSamplePlayerController.h"
 #include "CogSampleRootMotionParams.h"
-#include "CogSampleTagLibrary.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "EnhancedInputComponent.h"
@@ -250,7 +250,7 @@ void ACogSampleCharacter::InitializeAbilitySystem()
             {
                 if (UCogSampleGameplayAbility* Ab = Cast<UCogSampleGameplayAbility>(AddedSpec->GetPrimaryInstance()))
                 {
-                    Ab->SetSlotTag(FCogSampleTagLibrary::ActiveAbilityCooldownTags[Index]);
+                    Ab->SetCooldownTag(UCogSampleFunctionLibrary_Tag::ActiveAbilityCooldownTags[Index]);
                 }
             }
 
@@ -702,7 +702,7 @@ void ACogSampleCharacter::UpdateActiveAbilitySlots()
     {
         FGameplayAbilitySpecHandle& Handle = ActiveAbilityHandles[i];
 
-        if (FCogSampleTagLibrary::ActiveAbilityCooldownTags.IsValidIndex(i) == false)
+        if (UCogSampleFunctionLibrary_Tag::ActiveAbilityCooldownTags.IsValidIndex(i) == false)
         {
             return;
         }
@@ -719,8 +719,8 @@ void ACogSampleCharacter::UpdateActiveAbilitySlots()
             continue;
         }
 
-        FGameplayTag SlotTag = FCogSampleTagLibrary::ActiveAbilityCooldownTags[i];
-        AbilityInstance->SetSlotTag(SlotTag);
+        FGameplayTag SlotTag = UCogSampleFunctionLibrary_Tag::ActiveAbilityCooldownTags[i];
+        AbilityInstance->SetCooldownTag(SlotTag);
     }
 }
 

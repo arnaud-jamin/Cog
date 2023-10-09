@@ -1,15 +1,40 @@
 #include "CogSampleGameplayAbility.h"
 
-#include "CogSampleTagLibrary.h"
-#include "CogSampleGameplayEffectContext.h"
-#include "CogSampleFunctionLibrary_Gameplay.h"
 #include "CogSampleAttributeSet_Caster.h"
+#include "CogSampleFunctionLibrary_Gameplay.h"
+#include "CogSampleFunctionLibrary_Tag.h"
+#include "CogSampleGameplayEffectContext.h"
+#include "CogSampleLogCategories.h"
+
+
+
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCogSampleGameplayAbility::UCogSampleGameplayAbility()
 {
     InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
     ActivationBlockedTags.AddTag(Tag_Status_Dead);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleGameplayAbility::PreActivate(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData)
+{
+    COG_LOG_ABILITY(ELogVerbosity::Verbose, this, TEXT("PreActivate"));
+    Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+{
+    COG_LOG_ABILITY(ELogVerbosity::Verbose, this, TEXT("PredictionKey:%s"), *GetAbilitySystemComponentFromActorInfo_Checked()->ScopedPredictionKey.ToString());
+    Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+{
+    Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+    COG_LOG_ABILITY(ELogVerbosity::Verbose, this, TEXT(""));
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -113,7 +138,7 @@ const FGameplayTagContainer* UCogSampleGameplayAbility::GetCooldownTags() const
     {
         MutableTags->AppendTags(*ParentTags);
     }
-    MutableTags->AddTag(SlotTag);
+    MutableTags->AddTag(CooldownTag);
 
     return MutableTags;
 }
@@ -121,6 +146,11 @@ const FGameplayTagContainer* UCogSampleGameplayAbility::GetCooldownTags() const
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSampleGameplayAbility::ApplyCooldown(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const
 {
+    if (ActorInfo->AbilitySystemComponent->HasMatchingGameplayTag(Tag_Status_NoCooldown))
+    {
+        return;
+    }
+
     if (GetUnmitigatedCooldownDuration() <= 0.0f)
     {
         return;
@@ -129,7 +159,7 @@ void UCogSampleGameplayAbility::ApplyCooldown(const FGameplayAbilitySpecHandle H
     if (UGameplayEffect* CooldownEffect = GetCooldownGameplayEffect())
     {
         FGameplayEffectSpecHandle SpecHandle = MakeOutgoingGameplayEffectSpec(CooldownEffect->GetClass(), GetAbilityLevel());
-        SpecHandle.Data.Get()->DynamicGrantedTags.AddTag(SlotTag);
+        SpecHandle.Data.Get()->DynamicGrantedTags.AddTag(CooldownTag);
         ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
     }
 }
@@ -137,6 +167,11 @@ void UCogSampleGameplayAbility::ApplyCooldown(const FGameplayAbilitySpecHandle H
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSampleGameplayAbility::ApplyCost(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const
 {
+    if (ActorInfo->AbilitySystemComponent->HasMatchingGameplayTag(Tag_Status_NoCost))
+    {
+        return;
+    }
+
     if (GetUnmitigatedCost() <= 0.0f)
     {
         return;
@@ -190,4 +225,14 @@ bool UCogSampleGameplayAbility::GetBoolValueAtAbilityLevel(const FScalableFloat&
 int32 UCogSampleGameplayAbility::GetIntValueAtAbilityLevel(const FScalableFloat& ScalableFloat) const
 {
     return UCogSampleFunctionLibrary_Gameplay::GetIntValue(ScalableFloat, GetAbilityLevel());
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleGameplayAbility::GetCooldownInfos(float& TimeRemaining, float& CooldownDuration) const
+{
+    //-------------------------------------------------------------------------------------
+    // Provide a default Handle as it is not used in GetCooldownTimeRemainingAndDuration
+    //-------------------------------------------------------------------------------------
+    FGameplayAbilitySpecHandle Handle;
+    GetCooldownTimeRemainingAndDuration(Handle, CurrentActorInfo, TimeRemaining, CooldownDuration);
 }

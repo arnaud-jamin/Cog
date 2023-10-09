@@ -4,7 +4,7 @@
 #include "AbilitySystemComponent.h"
 #include "Kismet/BlueprintAsyncActionBase.h"
 
-#include "CogSampleTask_WaitAttributeChanged.generated.h"
+#include "CogSampleTask_ListenForAttributeChanged.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnAttributeChangedDelegate, FGameplayAttribute, Attribute, float, NewValue, float, OldValue)
 ;
@@ -12,7 +12,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnAttributeChangedDelegate, FGam
  * Blueprint node to automatically register a listener for all attribute changes in an AbilitySystemComponent.
  */
 UCLASS(BlueprintType, meta = (ExposedAsyncProxy = AsyncTask))
-class UCogSampleTask_WaitAttributeChanged : public UBlueprintAsyncActionBase
+class UCogSampleTask_ListenForAttributeChanged : public UBlueprintAsyncActionBase
 {
     GENERATED_BODY()
 public:
@@ -21,7 +21,7 @@ public:
     FOnAttributeChangedDelegate OnAttributeChanged;
 
     UFUNCTION(BlueprintCallable, meta = (BlueprintInternalUseOnly = "true"))
-    static UCogSampleTask_WaitAttributeChanged* ListenForAttributeChange(UAbilitySystemComponent* AbilitySystemComponent, FGameplayAttribute Attribute);
+    static UCogSampleTask_ListenForAttributeChanged* ListenForAttributeChange(UAbilitySystemComponent* AbilitySystemComponent, FGameplayAttribute Attribute);
 
     virtual void Activate() override;
 

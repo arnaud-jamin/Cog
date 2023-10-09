@@ -1,8 +1,8 @@
 #include "CogSampleTargetAcquisition.h"
 
 #include "Camera/CameraComponent.h"
-#include "CogDefines.h"
 #include "CogSampleCharacter.h"
+#include "CogSampleDefines.h"
 #include "CogSampleFunctionLibrary_Gameplay.h"
 #include "CogSampleLogCategories.h"
 #include "CogSampleTargetableInterface.h"
@@ -129,7 +129,7 @@ void UCogSampleTargetAcquisition::FindBestTarget(
     const FVector2D SearchDirectionNormalized = (TargetSwitchSearchDirection.IsNearlyZero() == false) ? TargetSwitchSearchDirection.GetSafeNormal() : FVector2D::ZeroVector;
     if (SearchDirectionNormalized.IsNearlyZero() == false)
     {
-        IF_COG(FCogDebugDraw::Segment2D(LogCogTargetAcquisition, Controller, FVector2D::ZeroVector, FVector2D(SearchDirectionNormalized.X, -SearchDirectionNormalized.Y), FColor(255, 255, 0, 255), bIsDebugPersistent));
+        FCogDebugDraw::Segment2D(LogCogTargetAcquisition, Controller, FVector2D::ZeroVector, FVector2D(SearchDirectionNormalized.X, -SearchDirectionNormalized.Y), FColor(255, 255, 0, 255), bIsDebugPersistent);
     }
 #endif //USE_COG
 

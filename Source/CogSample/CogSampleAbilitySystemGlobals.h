@@ -9,5 +9,5 @@ class UCogSampleAbilitySystemGlobals : public UAbilitySystemGlobals
 {
     GENERATED_BODY()
 
-        virtual FGameplayEffectContext* AllocGameplayEffectContext() const override;
+    virtual FGameplayEffectContext* AllocGameplayEffectContext() const override;
 };

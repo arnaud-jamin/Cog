@@ -2,13 +2,17 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
-#include "CogDebugDraw.h"
-#include "CogDebugPlot.h"
 #include "CogSampleAttributeSet_Speed.h"
+#include "CogSampleDefines.h"
+#include "CogSampleFunctionLibrary_Tag.h"
 #include "CogSampleLogCategories.h"
-#include "CogSampleTagLibrary.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/Character.h"
+
+#if USE_COG
+#include "CogDebugDraw.h"
+#include "CogDebugPlot.h"
+#endif //USE_COG
 
 //--------------------------------------------------------------------------------------------------------------------------
 // UCogSampleCharacterMovementComponent::FCogSampleSavedMove

@@ -2,7 +2,7 @@
 
 #include "CogSampleAttributeSet_Health.h"
 #include "CogSampleCharacter.h"
-#include "CogSampleTagLibrary.h"
+#include "CogSampleFunctionLibrary_Tag.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 struct FCogSampleHealStatics

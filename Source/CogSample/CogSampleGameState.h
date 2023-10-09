@@ -1,8 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogSampleDefines.h"
 #include "GameFramework/GameStateBase.h"
-#include "CogDefines.h"
 #include "CogSampleGameState.generated.h"
 
 class UCogWindowManager;

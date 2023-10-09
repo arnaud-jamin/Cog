@@ -13,19 +13,25 @@ public:
 
     UCogSampleGameplayAbility();
 
-    const FGameplayTag& GetSlotTag() const { return SlotTag; }
-
-    void SetSlotTag(FGameplayTag Value) { SlotTag = Value; }
+    //----------------------------------------------------------------------------------------------------------------------
+    // UGameplayAbility overrides
+    //----------------------------------------------------------------------------------------------------------------------
+    virtual void PreActivate(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData) override;
+    virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+    virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
     //----------------------------------------------------------------------------------------------------------------------
     // Cooldown & Cost
     //----------------------------------------------------------------------------------------------------------------------
-
     UFUNCTION(BlueprintNativeEvent, BlueprintPure, Category = Ability)
     float GetUnmitigatedCooldownDuration() const;
 
     UFUNCTION(BlueprintNativeEvent, BlueprintPure, Category = Ability)
     float GetUnmitigatedCost() const;
+
+    const FGameplayTag& GetCooldownTag() const { return CooldownTag; }
+
+    void SetCooldownTag(FGameplayTag Value) { CooldownTag = Value; }
 
     virtual const FGameplayTagContainer* GetCooldownTags() const override;
 
@@ -37,6 +43,8 @@ public:
     
     virtual void ApplyCost(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const override;
 
+    UFUNCTION(BlueprintCallable, Category = Ability, BlueprintPure=false)
+    virtual void GetCooldownInfos(float& TimeRemaining, float& CooldownDuration) const;
 
     //----------------------------------------------------------------------------------------------------------------------
     // Scalable Float
@@ -56,7 +64,7 @@ private:
     bool IsCostGameplayEffectIsZero(const UGameplayEffect* GameplayEffect, float Level, const FGameplayEffectContextHandle& EffectContext) const;
 
     UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-    FGameplayTag SlotTag;
+    FGameplayTag CooldownTag;
 
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Cooldowns", meta = (AllowPrivateAccess = "true"))
     FScalableFloat Cooldown;

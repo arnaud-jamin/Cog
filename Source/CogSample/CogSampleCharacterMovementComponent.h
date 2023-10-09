@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogDefines.h"
+#include "CogSampleDefines.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "CogSampleCharacterMovementComponent.generated.h"
 

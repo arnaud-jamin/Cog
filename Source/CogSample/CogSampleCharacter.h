@@ -4,7 +4,7 @@
 #include "AbilitySystemInterface.h"
 #include "ActiveGameplayEffectHandle.h"
 #include "AttributeSet.h"
-#include "CogDefines.h"
+#include "CogSampleDefines.h"
 #include "CogInterfaceAllegianceActor.h"
 #include "CogInterfaceDebugFilteredActor.h"
 #include "CogSampleDamageEvent.h"
@@ -28,6 +28,8 @@ struct FActiveGameplayEffect;
 struct FCogSampleRootMotionParams;
 struct FGameplayEffectSpec;
 struct FOnAttributeChangeData;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FCogSampleCooldownUpdateEventDelegate, const UGameplayAbility*, Ability, float, Duration, float, TimeRemaining);
 
 //--------------------------------------------------------------------------------------------------------------------------
 USTRUCT(BlueprintType)
@@ -214,6 +216,9 @@ public:
     UPROPERTY(BlueprintAssignable)
     FCogSampleDamageEventDelegate OnDamageReceived;
 
+    UPROPERTY(BlueprintAssignable)
+    FCogSampleCooldownUpdateEventDelegate OnCooldownUpdated;
+
     //----------------------------------------------------------------------------------------------------------------------
     // Root Motion
     //----------------------------------------------------------------------------------------------------------------------
@@ -260,6 +265,8 @@ private:
     void OnGameplayEffectAdded(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& GameplayEffectSpec, FActiveGameplayEffectHandle Handle);
 
     void OnGameplayEffectRemoved(const FActiveGameplayEffect& RemovedGameplayEffect);
+
+    void OnCooldownEffectUpdated(const FActiveGameplayEffect& GameplayEffect, bool bIsEffectRemoved);
 
     void OnGhostTagNewOrRemoved(const FGameplayTag InTag, int32 NewCount);
 

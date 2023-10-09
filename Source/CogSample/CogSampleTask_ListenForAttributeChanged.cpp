@@ -1,14 +1,14 @@
-#include "CogSampleTask_WaitAttributeChanged.h"
+#include "CogSampleTask_ListenForAttributeChanged.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogSampleTask_WaitAttributeChanged* UCogSampleTask_WaitAttributeChanged::ListenForAttributeChange(UAbilitySystemComponent* AbilitySystemComponent, FGameplayAttribute Attribute)
+UCogSampleTask_ListenForAttributeChanged* UCogSampleTask_ListenForAttributeChanged::ListenForAttributeChange(UAbilitySystemComponent* AbilitySystemComponent, FGameplayAttribute Attribute)
 {
     if (!IsValid(AbilitySystemComponent) || !Attribute.IsValid())
     {
         return nullptr;
     }
 
-    UCogSampleTask_WaitAttributeChanged* WaitForAttributeChangedTask = NewObject<UCogSampleTask_WaitAttributeChanged>();
+    UCogSampleTask_ListenForAttributeChanged* WaitForAttributeChangedTask = NewObject<UCogSampleTask_ListenForAttributeChanged>();
     WaitForAttributeChangedTask->AbilitySystemComponent = AbilitySystemComponent;
     WaitForAttributeChangedTask->AttributeToListenFor = Attribute;
 
@@ -16,13 +16,13 @@ UCogSampleTask_WaitAttributeChanged* UCogSampleTask_WaitAttributeChanged::Listen
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogSampleTask_WaitAttributeChanged::Activate()
+void UCogSampleTask_ListenForAttributeChanged::Activate()
 {
-    AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeToListenFor).AddUObject(this, &UCogSampleTask_WaitAttributeChanged::AttributeChanged);
+    AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeToListenFor).AddUObject(this, &UCogSampleTask_ListenForAttributeChanged::AttributeChanged);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogSampleTask_WaitAttributeChanged::EndTask()
+void UCogSampleTask_ListenForAttributeChanged::EndTask()
 {
     if (IsValid(AbilitySystemComponent))
     {
@@ -34,7 +34,7 @@ void UCogSampleTask_WaitAttributeChanged::EndTask()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogSampleTask_WaitAttributeChanged::AttributeChanged(const FOnAttributeChangeData& Data)
+void UCogSampleTask_ListenForAttributeChanged::AttributeChanged(const FOnAttributeChangeData& Data)
 {
     OnAttributeChanged.Broadcast(Data.Attribute, Data.NewValue, Data.OldValue);
 }

@@ -2,7 +2,8 @@
 
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetRegistry/IAssetRegistry.h"
-#include "CogDefines.h"
+#include "CogSampleDefines.h"
+#include "CogSampleFunctionLibrary_Tag.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/GameMode.h"
 #include "GameFramework/GameState.h"
@@ -45,7 +46,6 @@
 #include "CogInputDataAsset_Actions.h"
 #include "CogInputWindow_Actions.h"
 #include "CogInputWindow_Gamepad.h"
-#include "CogSampleTagLibrary.h"
 #include "CogWindowManager.h"
 #endif //USE_COG
 

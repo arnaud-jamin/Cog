@@ -17,6 +17,18 @@ void UCogSampleExecCalculation_PoolRegen::Execute_Implementation(const FGameplay
     EvaluationParameters.SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
     EvaluationParameters.TargetTags = Spec.CapturedTargetTags.GetAggregatedTags();
 
+    float MaxAmount = 0.0f;
+    if (MaxAmountAttribute.IsValid())
+    {
+        const float Amount = TargetAbilitySystem->GetNumericAttribute(AmountAttribute);
+        MaxAmount = TargetAbilitySystem->GetNumericAttribute(MaxAmountAttribute);
+
+        if (Amount >= MaxAmount)
+        {
+            return;
+        }
+    }
+
     const float Period = ExecutionParams.GetOwningSpec().GetPeriod();
 
     float RegenRateValue = 0.0f;
@@ -38,7 +50,6 @@ void UCogSampleExecCalculation_PoolRegen::Execute_Implementation(const FGameplay
 
             case ECogSamplePoolRegenMode::MaxPoolDuration:
             {
-                const float MaxAmount = TargetAbilitySystem->GetNumericAttribute(MaxAmountAttribute);
                 const float TotalDurationValue = TotalDuration.GetValueAtLevel(Spec.GetLevel());
                 RegenRateValue = TotalDurationValue > 0 ? (MaxAmount / TotalDurationValue) * Period : 0.0f;
             }
