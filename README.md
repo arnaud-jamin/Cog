@@ -18,9 +18,9 @@ Cog are debug tools for Unreal Engine built on top of [ImGui](https://github.com
 
 - Most windows display their contents based on a selected actor.
 - The selector actor can be chosen using the selection window or widget.
-- A window help is displayed when the mouse over the window title bar. This behavior can be disabled in the Window menu.
+- mouse over a window title to display its help. This behavior can be disabled in the Window menu.
 - Window Layouts can be saved/loaded.
-- Windows save their own settings in a Cog.ini file to maintain the state between multiple sessions.
+- Windows save their own settings in a Cog.ini file to maintain their state between multiple sessions.
 
 ### Abilities
 Displays the gameplay abilities of the selected actor.
