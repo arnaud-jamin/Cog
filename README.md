@@ -116,6 +116,7 @@ Displays gameplay tags of the selected actor.
 
 ### Tweaks
 Used to apply tweaks to all the spawned actors
+
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/e8a5cdd5-908d-4ae3-901a-48addd4ce353)
 - The tweaks are used to test various gameplay settings by actor category
 - The tweaks can be configured in a data asset.
