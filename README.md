@@ -16,14 +16,24 @@ Cog are debug tools for Unreal Engine built on top of [ImGui](https://github.com
 
 ## ImGui Windows
 
+Most windows display their contents based on a selected actor. The selector actor can be chosen using the selection window or widget.
+
 ### Abilities
+Displays the gameplay abilities of the selected actor.
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/5eece87c-eba3-45f1-95c5-e132be2133b8)
+- Click the ability checkbox to force its activation or deactivation.
+- Right click an ability to open or close the ability separate window.
+- Use the 'Give Ability' menu to manually give an ability from a list defined in a data asset.
 
 ### Actions
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/6323e78b-2ee4-43e2-bec6-19aa15716d2c)
 
 ### Attributes
+Displays the gameplay attributes of the selected actor
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/a6329ef1-f775-4e6e-9581-6389f9f4b39c)
+- Attributes can be sorted by name, category or attribute set.
+- Attributes with the Current value greater than the Base value are displayed in green.
+- Attributes with the Current value lower than the Base value are displayed in red. - Use the options 'Show Only Modified' to only show the attributes that have modifiers.
 
 ### Cheats
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/b7b89635-7924-49b7-98c0-311199947dfc)
