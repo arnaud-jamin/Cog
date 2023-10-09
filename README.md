@@ -24,6 +24,7 @@ Cog are debug tools for Unreal Engine built on top of [ImGui](https://github.com
 
 ### Abilities
 Displays the gameplay abilities of the selected actor.
+
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/5eece87c-eba3-45f1-95c5-e132be2133b8)
 - Click the ability checkbox to force its activation or deactivation.
 - Right click an ability to open or close the ability separate window.
@@ -34,6 +35,7 @@ Displays the gameplay abilities of the selected actor.
 
 ### Attributes
 Displays the gameplay attributes of the selected actor
+
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/a6329ef1-f775-4e6e-9581-6389f9f4b39c)
 - Attributes can be sorted by name, category or attribute set.
 - Attributes with the Current value greater than the Base value are displayed in green.
@@ -41,6 +43,7 @@ Displays the gameplay attributes of the selected actor
 
 ### Cheats
 Used to apply cheats to the selected actor.
+
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/b7b89635-7924-49b7-98c0-311199947dfc)
 - The cheats are gameplay effects configured in a data asset.
 - Key modifiers can be used to change which actor should be affected by the cheat:
@@ -50,6 +53,7 @@ Used to apply cheats to the selected actor.
 
 ### Collisions
 Used to inspect collisions by performing a collision query with the selected channels. 
+
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/ccee855b-b33b-4dfc-ba14-dff87e1150cf)
 - The query can be configured in the options.
 - The displayed collision channels can be configured in a Data Asset.
@@ -59,6 +63,7 @@ Used to inspect collisions by performing a collision query with the selected cha
 
 ### Effects
 Displays the gameplay effects of the selected actor.
+
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/4fffa8fe-bd93-44bc-8ca5-27ae81f5da0c)
 - Mouse over an effect to see its details such as its modifiers, the gameplay tags it grants, the remaining time. 
 
@@ -79,6 +84,7 @@ Displays the gameplay effects of the selected actor.
 
 ### Pools
 Displays attributes of the selected actor as pools.
+
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/7bb1aadd-9c0b-439f-b263-5ed842d0cd69)
 - The pools can be configured in a data asset.
 
@@ -102,6 +108,7 @@ Displays attributes of the selected actor as pools.
 
 ### Tags
 Displays gameplay tags of the selected actor.
+
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/3f14be3f-77f2-4d59-887d-1245fc97ed6a)
 
 ### Time Scale
