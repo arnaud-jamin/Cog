@@ -36,7 +36,13 @@ Displays the gameplay attributes of the selected actor
 - Attributes with the Current value lower than the Base value are displayed in red. - Use the options 'Show Only Modified' to only show the attributes that have modifiers.
 
 ### Cheats
+Used to apply cheats to the selected actor.
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/b7b89635-7924-49b7-98c0-311199947dfc)
+- The cheats are gameplay effects configured in a data asset.
+- Key modifiers can be used to change which actor should be affected by the cheat:
+- [CTRL] apply the cheat to the controlled actor
+- [ALT] apply the cheat to the allies of the selected actor
+- [SHIFT] apply the cheat to the enemies of the selected actor
 
 ### Collisions
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/ccee855b-b33b-4dfc-ba14-dff87e1150cf)
