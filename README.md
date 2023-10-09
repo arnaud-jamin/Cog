@@ -16,7 +16,11 @@ Cog are debug tools for Unreal Engine built on top of [ImGui](https://github.com
 
 ## ImGui Windows
 
-Most windows display their contents based on a selected actor. The selector actor can be chosen using the selection window or widget.
+- Most windows display their contents based on a selected actor.
+- The selector actor can be chosen using the selection window or widget.
+- A window help is displayed when the mouse over the window title bar. This behavior can be disabled in the Window menu.
+- Window Layouts can be saved/loaded.
+- Windows save their own settings in a Cog.ini file to maintain the state between multiple sessions.
 
 ### Abilities
 Displays the gameplay abilities of the selected actor.
@@ -45,13 +49,18 @@ Used to apply cheats to the selected actor.
 - [SHIFT] apply the cheat to the enemies of the selected actor
 
 ### Collisions
+Used to inspect collisions by performing a collision query with the selected channels. 
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/ccee855b-b33b-4dfc-ba14-dff87e1150cf)
+- The query can be configured in the options.
+- The displayed collision channels can be configured in a Data Asset.
 
 ### Debug Settings
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/e55c8d07-133e-48ab-a974-ed076f3d4a58)
 
 ### Effects
+Displays the gameplay effects of the selected actor.
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/4fffa8fe-bd93-44bc-8ca5-27ae81f5da0c)
+- Mouse over an effect to see its details such as its modifiers, the gameplay tags it grants, the remaining time. 
 
 ### Gamepad
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/734dd08a-5b9f-44cf-8d24-9bf257f08ec6)
@@ -69,7 +78,9 @@ Used to apply cheats to the selected actor.
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/71b1de06-a3d0-4e4d-83f3-c3f482c0d8f4)
 
 ### Pools
+Displays attributes of the selected actor as pools.
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/7bb1aadd-9c0b-439f-b263-5ed842d0cd69)
+- The pools can be configured in a data asset.
 
 ### Plots
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/bc134e95-4887-4245-b34d-c030464f644a)
@@ -90,17 +101,14 @@ Used to apply cheats to the selected actor.
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/e394ec7b-02fa-4b09-879b-90c82bd542ef)
 
 ### Tags
+Displays gameplay tags of the selected actor.
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/3f14be3f-77f2-4d59-887d-1245fc97ed6a)
 
 ### Time Scale
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/d19198c5-37dd-400d-a09f-7a5077eb2511)
 
 ### Tweaks
+Used to apply tweaks to all the spawned actors
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/e8a5cdd5-908d-4ae3-901a-48addd4ce353)
-
-
-
-
-
-
-
+- The tweaks are used to test various gameplay settings by actor category
+- The tweaks can be configured in a data asset.
