@@ -26,12 +26,13 @@ UE_DEFINE_GAMEPLAY_TAG(Tag_Effect_Data_Cost, "Effect.Data.Cost");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Effect_Data_Damage, "Effect.Data.Damage");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Effect_Data_Heal, "Effect.Data.Heal");
 
-UE_DEFINE_GAMEPLAY_TAG(Tag_Effect_Type_Damage_Kill, "Effect.Type.Damage.Kill");
-UE_DEFINE_GAMEPLAY_TAG(Tag_Effect_Type_Heal_Full, "Effect.Type.Heal.Full");
-UE_DEFINE_GAMEPLAY_TAG(Tag_Effect_Type_Heal_Revive, "Effect.Type.Heal.Revive");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Effect_Type_Cost_Free, "Effect.Type.Cost.Free");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Effect_Type_Cost_Overtime, "Effect.Type.Cost.Overtime");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Effect_Type_Cost_Stamina, "Effect.Type.Cost.Stamina");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Effect_Type_Damage_Kill, "Effect.Type.Damage.Kill");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Effect_Type_Heal_Full, "Effect.Type.Heal.Full");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Effect_Type_Heal_Revive, "Effect.Type.Heal.Revive");
+UE_DEFINE_GAMEPLAY_TAG(Tag_Effect_Type_Hidden, "Effect.Type.Hidden");
 
 UE_DEFINE_GAMEPLAY_TAG(Tag_Status_Dead, "Status.Dead");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Status_Ghost, "Status.Ghost");
