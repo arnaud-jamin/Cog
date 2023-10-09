@@ -29,8 +29,6 @@ struct FCogSampleRootMotionParams;
 struct FGameplayEffectSpec;
 struct FOnAttributeChangeData;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FCogSampleCooldownUpdateEventDelegate, const UGameplayAbility*, Ability, float, Duration, float, TimeRemaining);
-
 //--------------------------------------------------------------------------------------------------------------------------
 USTRUCT(BlueprintType)
 struct FActiveAbilityInfo
@@ -216,8 +214,11 @@ public:
     UPROPERTY(BlueprintAssignable)
     FCogSampleDamageEventDelegate OnDamageReceived;
 
-    UPROPERTY(BlueprintAssignable)
-    FCogSampleCooldownUpdateEventDelegate OnCooldownUpdated;
+    //UPROPERTY(BlueprintAssignable)
+    //FCogSampleGameplayEffectAddedEventDelegate OnEffectAdded;
+
+    //UPROPERTY(BlueprintAssignable)
+    //FCogSampleGameplayEffectRemovedEventDelegate OnEffectRemoved;
 
     //----------------------------------------------------------------------------------------------------------------------
     // Root Motion
