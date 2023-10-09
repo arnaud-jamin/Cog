@@ -5,7 +5,7 @@ Cog are debug tools for Unreal Engine built on top of [ImGui](https://github.com
 
 ## Project Structure
 
-- `CogSample` - A Sample that demonstrate various Cog functionalities
+- `CogSample` - A Sample that demonstrate various Cog functionalities. The project was saved in Unreal 5.1
 - `Plugins/CogAbility` - ImGui windows for the Gameplay Ability System (Abilities, Effects, Tags, ...)
 - `Plugins/CogInput` - ImGui windows for the Enhanced Input library (Input action, Gamepad)
 - `Plugins/CogEngine` - ImGui windows for the core unreal engine functionalities (Log, Stats, Time, Collisions, Skeleton, ...)
