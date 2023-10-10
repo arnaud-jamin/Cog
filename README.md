@@ -24,7 +24,8 @@ Cog is a set of debug tools for Unreal Engine built on top of [ImGui](https://gi
 - Window Layouts can be saved/loaded.
 - Windows save their own settings in a Cog.ini file to maintain their state between multiple sessions.
 
-### Abilities
+### Abilities 
+
 Displays the gameplay abilities of the selected actor.
 
 [![Abilities](https://github.com/arnaud-jamin/Cog/assets/13844285/cc6cb2af-eb9a-42fd-8ae5-80b5c7b361e9)]()
