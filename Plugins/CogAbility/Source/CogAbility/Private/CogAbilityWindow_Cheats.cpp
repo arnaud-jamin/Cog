@@ -1,6 +1,8 @@
 #include "CogAbilityWindow_Cheats.h"
 
+#include "AbilitySystemGlobals.h"
 #include "CogAbilityDataAsset_Cheats.h"
+#include "CogAbilityReplicator.h"
 #include "CogInterfaceAllegianceActor.h"
 #include "CogDebugDraw.h"
 #include "CogImguiHelper.h"
@@ -24,6 +26,41 @@ void UCogAbilityWindow_Cheats::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void UCogAbilityWindow_Cheats::SetCheatsAsset(const UCogAbilityDataAsset_Cheats* Value) 
+{
+    CheatsAsset = Value;
+
+    if (CheatsAsset == nullptr)
+    {
+        return;
+    }
+
+    APawn* LocalPawn = GetLocalPlayerPawn();
+    if (LocalPawn == nullptr)
+    {
+        return;
+    }
+
+    FCogAbilityModule& Module = FCogAbilityModule::Get();
+    ACogAbilityReplicator* Replicator = Module.GetLocalReplicator();
+    if (Replicator == nullptr)
+    {
+        return;
+    }
+
+    TArray<AActor*> Targets{ LocalPawn };
+
+    for (const FString& AppliedCheatName : AppliedCheats)
+    {
+        if (const FCogAbilityCheat* Cheat = CheatsAsset->PersistentEffects.FindByPredicate(
+            [AppliedCheatName](const FCogAbilityCheat& Cheat) { return Cheat.Name == AppliedCheatName; }))
+        {
+            Replicator->ApplyCheat(LocalPawn, Targets, *Cheat);
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void UCogAbilityWindow_Cheats::RenderContent()
 {
     Super::RenderContent();
@@ -39,7 +76,12 @@ void UCogAbilityWindow_Cheats::RenderContent()
         return;
     }
 
-    APawn* LocalPawn = GetLocalPlayerPawn();
+    APawn* ControlledActor = GetLocalPlayerPawn();
+
+    if (SelectedActor == ControlledActor)
+    {
+        AppliedCheats.Empty();
+    }
 
     if (ImGui::BeginTable("Cheats", 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize))
     {
@@ -53,7 +95,7 @@ void UCogAbilityWindow_Cheats::RenderContent()
         for (const FCogAbilityCheat& CheatEffect : CheatsAsset->PersistentEffects)
         {
             ImGui::PushID(Index);
-            AddCheat(LocalPawn, SelectedActor, CheatEffect, true);
+            AddCheat(ControlledActor, SelectedActor, CheatEffect, true);
             ImGui::PopID();
             Index++;
         }
@@ -63,7 +105,7 @@ void UCogAbilityWindow_Cheats::RenderContent()
         for (const FCogAbilityCheat& CheatEffect : CheatsAsset->InstantEffects)
         {
             ImGui::PushID(Index);
-            AddCheat(LocalPawn, SelectedActor, CheatEffect, false);
+            AddCheat(ControlledActor, SelectedActor, CheatEffect, false);
             ImGui::PopID();
             Index++;
         }
@@ -73,7 +115,7 @@ void UCogAbilityWindow_Cheats::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Cheats::AddCheat(AActor* CheatInstigator, AActor* SelectedActor, const FCogAbilityCheat& Cheat, bool IsPersistent)
+void UCogAbilityWindow_Cheats::AddCheat(AActor* ControlledActor, AActor* SelectedActor, const FCogAbilityCheat& Cheat, bool IsPersistent)
 {
     if (Cheat.Effect == nullptr)
     {
@@ -103,14 +145,19 @@ void UCogAbilityWindow_Cheats::AddCheat(AActor* CheatInstigator, AActor* Selecte
         bool isEnabled = ACogAbilityReplicator::IsCheatActive(SelectedActor, Cheat);
         if (ImGui::Checkbox(TCHAR_TO_ANSI(*Cheat.Name), &isEnabled))
         {
-            RequestCheat(CheatInstigator, SelectedActor, Cheat);
+            RequestCheat(ControlledActor, SelectedActor, Cheat);
+        }
+
+        if (isEnabled && SelectedActor == ControlledActor)
+        {
+            AppliedCheats.Add(Cheat.Name);
         }
     }
     else
     {
         if (ImGui::Button(TCHAR_TO_ANSI(*Cheat.Name), ImVec2(-1, 0)))
         {
-            RequestCheat(CheatInstigator, SelectedActor, Cheat);
+            RequestCheat(ControlledActor, SelectedActor, Cheat);
         }
     }
 
@@ -132,7 +179,7 @@ void UCogAbilityWindow_Cheats::AddCheat(AActor* CheatInstigator, AActor* Selecte
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Cheats::RequestCheat(AActor* CheatInstigator, AActor* SelectedActor, const FCogAbilityCheat& Cheat)
+void UCogAbilityWindow_Cheats::RequestCheat(AActor* ControlledActor, AActor* SelectedActor, const FCogAbilityCheat& Cheat)
 {
     const bool IsShiftDown = (ImGui::GetCurrentContext()->IO.KeyMods & ImGuiMod_Shift) != 0;
     const bool IsAltDown = (ImGui::GetCurrentContext()->IO.KeyMods & ImGuiMod_Alt) != 0;
@@ -142,7 +189,7 @@ void UCogAbilityWindow_Cheats::RequestCheat(AActor* CheatInstigator, AActor* Sel
 
     if (IsControlDown)
     {
-        Actors.Add(CheatInstigator);
+        Actors.Add(ControlledActor);
     }
     
     if (IsShiftDown || IsAltDown)
@@ -155,7 +202,7 @@ void UCogAbilityWindow_Cheats::RequestCheat(AActor* CheatInstigator, AActor* Sel
                 
                 if (ICogInterfacesAllegianceActor* AllegianceInterface = Cast<ICogInterfacesAllegianceActor>(OtherActor))
                 {
-                    AllegianceInterface->GetAllegianceWithOtherActor(CheatInstigator);
+                    AllegianceInterface->GetAllegianceWithOtherActor(ControlledActor);
                 }
 
                 if ((IsShiftDown && (Allegiance == ECogInterfacesAllegiance::Enemy))
@@ -175,6 +222,6 @@ void UCogAbilityWindow_Cheats::RequestCheat(AActor* CheatInstigator, AActor* Sel
     FCogAbilityModule& Module = FCogAbilityModule::Get();
     if (ACogAbilityReplicator* Replicator = Module.GetLocalReplicator())
     {
-        Replicator->ApplyCheat(CheatInstigator, Actors, Cheat);
+        Replicator->ApplyCheat(ControlledActor, Actors, Cheat);
     }
 }

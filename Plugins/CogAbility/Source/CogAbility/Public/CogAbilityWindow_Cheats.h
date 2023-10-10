@@ -15,7 +15,9 @@ class COGABILITY_API UCogAbilityWindow_Cheats : public UCogWindow
 
 public:
 
-    TWeakObjectPtr<UCogAbilityDataAsset_Cheats> CheatsAsset;
+    const UCogAbilityDataAsset_Cheats* GetCheatsAsset() const { return CheatsAsset.Get(); }
+
+    void SetCheatsAsset(const UCogAbilityDataAsset_Cheats* Value);
 
 protected:
 
@@ -25,10 +27,12 @@ protected:
 
 private:
     
-    void AddCheat(AActor* InstigatorActor, AActor* TargetActor, const FCogAbilityCheat& CheatEffect, bool IsPersistent);
+    void AddCheat(AActor* ControlledActor, AActor* TargetActor, const FCogAbilityCheat& CheatEffect, bool IsPersistent);
 
-    void RequestCheat(AActor* InstigatorActor, AActor* TargetActor, const FCogAbilityCheat& CheatEffect);
+    void RequestCheat(AActor* ControlledActor, AActor* TargetActor, const FCogAbilityCheat& CheatEffect);
 
     UPROPERTY(Config)
     TArray<FString> AppliedCheats;
+
+    TWeakObjectPtr<const UCogAbilityDataAsset_Cheats> CheatsAsset;
 };

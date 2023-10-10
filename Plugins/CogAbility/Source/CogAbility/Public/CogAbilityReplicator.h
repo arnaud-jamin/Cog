@@ -11,7 +11,7 @@ struct FCogAbilityCheat;
 struct FCogAbilityTweak;
 struct FGameplayTag;
 
-UCLASS(NotBlueprintable, NotBlueprintType, notplaceable, noteditinlinenew, hidedropdown, Transient)
+UCLASS(NotBlueprintable, NotBlueprintType, notplaceable, noteditinlinenew, hidedropdown, Transient, Config = Cog)
 class COGABILITY_API ACogAbilityReplicator : public AActor
 {
     GENERATED_UCLASS_BODY()
@@ -71,4 +71,7 @@ private:
 
     UPROPERTY(Replicated)
     TArray<float> TweakCurrentValues;
+
+    UPROPERTY(Config)
+    TArray<FString> AppliedCheatsOnLocalPawn;
 };

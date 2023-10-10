@@ -188,7 +188,8 @@ void ACogSampleGameState::InitializeCog()
     CogWindowManager->CreateWindow<UCogAbilityWindow_Attributes>("Gameplay.Attributes");
 
     UCogAbilityWindow_Cheats* CheatsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Cheats>("Gameplay.Cheats");
-    CheatsWindow->CheatsAsset = GetFirstAssetByClass<UCogAbilityDataAsset_Cheats>();
+    CheatsWindow->SetCheatsAsset(GetFirstAssetByClass<UCogAbilityDataAsset_Cheats>());
+
     UCogAbilityWindow_Effects* EffectsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Effects>("Gameplay.Effects");
     EffectsWindow->NegativeEffectTag = Tag_Effect_Alignment_Negative;
     EffectsWindow->PositiveEffectTag = Tag_Effect_Alignment_Positive;
