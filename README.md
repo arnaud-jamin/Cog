@@ -32,8 +32,6 @@ Displays the gameplay abilities of the selected actor.
 - Right click an ability to remove it, or open/close the ability separate window.
 - Use the 'Give Ability' menu to manually give an ability from a list defined in a Data Asset.
 
-https://github.com/arnaud-jamin/Cog/assets/13844285/6b7eb010-ba4c-43b9-84a4-b57583f89a64
-
 ### Actions
 Displays the state of Input Action.
 
