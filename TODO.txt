@@ -1,0 +1,24 @@
+- CogImGui: Add a way to create override and create imguiwidget in cogimgui
+- CogImGui: Try to find a global solution to prevent crash when breaking in a blueprint from an imgui action (reset the stack)
+
+- CogDebug: Add log category description
+
+- CogWindow: Try to remove CogWindow dependency to cogimgui. Should only depends on imgui (currently use setdpiscale of cogimgui)
+- CogWindow: Add reset window position menu item or reset layout (window can get far away)
+
+- CogEngine: Save selection window settings (current actor and category)
+- CogEngine: More stats in the stats window
+- CogEngine: Overlay mode of stats.
+- CogEngine: Stat main menu widget could have a tooltip on each stat with a control to change set the emulation (FPS, Ping, Packetloss)
+- CogEngine: Skeleton window selectable have wrong height 
+- CogEngine: Property grid
+- CogEngine: user settings
+
+- CogInput: Add multiple IMC on the input data asset. Maybe propose a current imc
+- CogInput: Add mouse over highlight on the buttons of the gamepad window
+
+- CogAbilities: Apply tweaks on spawn
+
+- CogSample: Add a custom window in sample (changing the character faction)
+- CogSample: Create more abilities
+- CogSample: Add area of effects in the level

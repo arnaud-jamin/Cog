@@ -308,7 +308,7 @@ void UCogWindowManager::DrawMainMenu()
             ImGui::SameLine();
             FCogWindowWidgets::PushStyleCompact();
             FCogWindowWidgets::SetNextItemToShortWidth();
-            ImGui::SliderFloat("", &DPIScale, 0.5f, 2.0f, "%.1f");
+            ImGui::SliderFloat("", &DPIScale, 0.5f, 2.0f, "%.2f");
             if (ImGui::IsItemDeactivatedAfterEdit())
             {
                 bRefreshDPIScale = true;
@@ -380,7 +380,7 @@ void UCogWindowManager::TickDPI()
     const bool IsControlDown = ImGui::GetIO().KeyCtrl;
     if (IsControlDown && MouseWheel != 0)
     {
-        DPIScale = FMath::Clamp(DPIScale + (MouseWheel > 0 ? 0.05f : -0.05f), 0.1f, 2.0f);
+        DPIScale = FMath::Clamp(DPIScale + (MouseWheel > 0 ? 0.05f : -0.05f), 0.5f, 2.0f);
         bRefreshDPIScale = true;
     }
 
