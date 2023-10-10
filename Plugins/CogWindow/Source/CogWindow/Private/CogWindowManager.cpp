@@ -3,6 +3,7 @@
 #include "CogImguiModule.h"
 #include "CogImguiWidget.h"
 #include "CogWindowWidgets.h"
+#include "CogWindow_Spacing.h"
 #include "Engine/Engine.h"
 #include "imgui_internal.h"
 
@@ -27,6 +28,11 @@ void UCogWindowManager::Initialize(UWorld* InWorld, TSharedPtr<SCogImguiWidget> 
     IniHandler.WriteAllFn = UCogWindowManager::SettingsHandler_WriteAll;
     IniHandler.UserData = this;
     ImGui::AddSettingsHandler(&IniHandler);
+
+    SpaceWindows.Add(CreateWindow<UCogWindow_Spacing>("Space 1", false));
+    SpaceWindows.Add(CreateWindow<UCogWindow_Spacing>("Space 2", false));
+    SpaceWindows.Add(CreateWindow<UCogWindow_Spacing>("Space 3", false));
+    SpaceWindows.Add(CreateWindow<UCogWindow_Spacing>("Space 4", false));
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -66,7 +72,9 @@ void UCogWindowManager::Tick(float DeltaTime)
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::Render(float DeltaTime)
 {
-    ImGui::DockSpaceOverViewport(0, ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingInCentralNode);
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0));
+    ImGui::DockSpaceOverViewport(0, ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingInCentralNode | ImGuiDockNodeFlags_AutoHideTabBar);
+    ImGui::PopStyleColor(1);
 
     bool bCompactSaved = bCompactMode;
     if (bCompactSaved)
@@ -92,6 +100,8 @@ void UCogWindowManager::Render(float DeltaTime)
             {
                 ImGui::SetNextWindowBgAlpha(0.35f);
             }
+
+            ImGui::DockSpaceOverViewport(0, ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingInCentralNode | ImGuiDockNodeFlags_AutoHideTabBar);
             Window->Render(DeltaTime);
         }
     }
@@ -272,6 +282,21 @@ void UCogWindowManager::DrawMainMenu()
                     }
                 }
 
+                ImGui::EndMenu();
+            }
+
+            ImGui::Separator();
+
+            if (ImGui::BeginMenu("Spacing"))
+            {
+                for (UCogWindow* SpaceWindow : SpaceWindows)
+                {
+                    bool bSpaceVisible = SpaceWindow->GetIsVisible();
+                    if (ImGui::MenuItem(TCHAR_TO_ANSI(*SpaceWindow->GetName()), nullptr, &bSpaceVisible))
+                    {
+                        SpaceWindow->SetIsVisible(bSpaceVisible);
+                    }
+                }
                 ImGui::EndMenu();
             }
 

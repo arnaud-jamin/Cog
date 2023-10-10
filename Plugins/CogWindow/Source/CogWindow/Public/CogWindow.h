@@ -63,6 +63,8 @@ protected:
 
     virtual void PreRender(ImGuiWindowFlags& WindowFlags) {}
 
+    virtual void PostRender() {}
+
     virtual void RenderContent() {}
 
     virtual bool CheckEditorVisibility();

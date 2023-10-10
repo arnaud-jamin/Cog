@@ -90,6 +90,9 @@ private:
     TArray<UCogWindow*> Windows;
 
     UPROPERTY()
+    TArray<UCogWindow*> SpaceWindows;
+
+    UPROPERTY()
     TArray<UCogWindow*> MainMenuWidgets;
 
     UPROPERTY(Config)
