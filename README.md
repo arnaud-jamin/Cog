@@ -1,5 +1,5 @@
 # Cog
-Cog are debug tools for Unreal Engine built on top of [ImGui](https://github.com/ocornut/imgui)
+Cog is a set of debug tools for Unreal Engine built on top of [ImGui](https://github.com/ocornut/imgui)
 
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/21659aea-2cd8-4ef6-b3b0-5795f5f3246b)
 
