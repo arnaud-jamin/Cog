@@ -170,7 +170,7 @@ Used to apply tweaks to all the spawned actors
 
 ## Debug Functionalities
 
-Cog provides C++ and blueprint functions to log and debug draw within Log Categories. 
+Cog provides C++ and Blueprint functions to log and debug draw within Log Categories. 
 
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/cc0ba4a5-7fa6-44a8-b737-f523bdf94321)
 
