@@ -20,9 +20,9 @@ void UCogEngineWindow_Selection::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Selection::PreRender(ImGuiWindowFlags& WindowFlags)
+UCogEngineWindow_Selection::UCogEngineWindow_Selection()
 {
-    WindowFlags = ImGuiWindowFlags_MenuBar;
+    bHasMenu = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -475,7 +475,7 @@ void UCogEngineWindow_Selection::DrawMainMenuWidget(bool Draw, float& Width)
         ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4((ImGuiCol_FrameBg)));
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::GetStyleColorVec4((ImGuiCol_FrameBgActive)));
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::GetStyleColorVec4((ImGuiCol_FrameBgHovered)));
-        ImGui::SameLine(ImGui::GetCursorPos().x - ResetButtonWidth + (ImGui::GetStyle().WindowPadding.x - 2) * ImGui::GetWindowDpiScale());
+        ImGui::SameLine();
         if (ImGui::Button("X", ImVec2(ResetButtonWidth, 0)))
         {
             FCogDebugSettings::SetSelection(nullptr);

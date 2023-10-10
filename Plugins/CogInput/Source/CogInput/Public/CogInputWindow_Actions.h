@@ -15,13 +15,13 @@ class COGINPUT_API UCogInputWindow_Actions : public UCogWindow
 
 public:
 
-        TWeakObjectPtr<UCogInputDataAsset_Actions> ActionsAsset;
+    UCogInputWindow_Actions();
+
+    TWeakObjectPtr<UCogInputDataAsset_Actions> ActionsAsset;
 
 protected:
 
     void RenderHelp();
-
-    virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;
 
     virtual void RenderContent() override;
 

@@ -9,6 +9,10 @@ class COGENGINE_API UCogEngineWindow_DebugSettings : public UCogWindow
 {
     GENERATED_BODY()
 
+public:
+
+    UCogEngineWindow_DebugSettings();
+
 protected:
 
     virtual void RenderHelp() override;
@@ -16,8 +20,6 @@ protected:
     virtual void PreSaveConfig() override;
 
     virtual void PostInitProperties() override;
-
-    virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;
 
     virtual void RenderContent() override;
 

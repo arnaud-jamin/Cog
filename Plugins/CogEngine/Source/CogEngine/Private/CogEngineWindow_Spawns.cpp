@@ -11,12 +11,6 @@ void UCogEngineWindow_Spawns::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Spawns::PreRender(ImGuiWindowFlags& WindowFlags)
-{
-    Super::PreRender(WindowFlags);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void UCogEngineWindow_Spawns::RenderContent()
 {
     Super::RenderContent();

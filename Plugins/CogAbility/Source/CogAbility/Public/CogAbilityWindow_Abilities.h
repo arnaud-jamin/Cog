@@ -14,14 +14,14 @@ class COGABILITY_API UCogAbilityWindow_Abilities : public UCogWindow
     GENERATED_BODY()
 
 public:
-    
+
+    UCogAbilityWindow_Abilities();
+
     TWeakObjectPtr<UCogAbilityDataAsset_Abilities> AbilitiesAsset;
 
 protected:
 
     virtual void RenderHelp() override;
-
-    virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;
 
     virtual void RenderTick(float DetlaTime) override;
 

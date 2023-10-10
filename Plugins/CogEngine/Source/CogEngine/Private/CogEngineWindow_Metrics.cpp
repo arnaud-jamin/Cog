@@ -32,9 +32,9 @@ void UCogEngineWindow_Metrics::PreSaveConfig()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Metrics::PreRender(ImGuiWindowFlags& WindowFlags)
+UCogEngineWindow_Metrics::UCogEngineWindow_Metrics()
 {
-    WindowFlags = ImGuiWindowFlags_MenuBar;
+    bHasMenu = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

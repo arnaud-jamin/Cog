@@ -57,9 +57,9 @@ void UCogEngineWindow_DebugSettings::PreSaveConfig()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_DebugSettings::PreRender(ImGuiWindowFlags& WindowFlags)
+UCogEngineWindow_DebugSettings::UCogEngineWindow_DebugSettings()
 {
-    WindowFlags = ImGuiWindowFlags_MenuBar;
+    bHasMenu = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

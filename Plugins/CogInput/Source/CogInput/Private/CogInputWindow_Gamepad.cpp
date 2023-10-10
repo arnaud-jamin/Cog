@@ -237,10 +237,6 @@ void UCogInputWindow_Gamepad::RenderContent()
                 }
             }
         }
-        else
-        {
-            ImGui::Text("No Actions in Action Asset");
-        }
     }
     else
     {

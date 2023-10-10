@@ -9,11 +9,13 @@ class COGABILITY_API UCogAbilityWindow_Attributes : public UCogWindow
 {
     GENERATED_BODY()
 
+public:
+
+        UCogAbilityWindow_Attributes();
+
 protected:
 
     virtual void RenderHelp() override;
-
-    virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;
 
     virtual void RenderContent() override;
 

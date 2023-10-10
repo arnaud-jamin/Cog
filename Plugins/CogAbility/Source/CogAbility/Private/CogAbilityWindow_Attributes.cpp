@@ -21,9 +21,9 @@ void UCogAbilityWindow_Attributes::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Attributes::PreRender(ImGuiWindowFlags& WindowFlags)
+UCogAbilityWindow_Attributes::UCogAbilityWindow_Attributes()
 {
-    WindowFlags = ImGuiWindowFlags_MenuBar;
+    bHasMenu = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

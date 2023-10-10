@@ -12,6 +12,8 @@ class COGENGINE_API UCogEngineWindow_Selection : public UCogWindow
 
 public:
 
+    UCogEngineWindow_Selection();
+
     bool GetIsSelecting() const { return bSelectionModeActive; }
 
     void SetCurrentActorSubClass(TSubclassOf<AActor> Value) { SelectedSubClass = Value; }
@@ -31,8 +33,6 @@ protected:
     virtual void RenderHelp() override;
 
     virtual void RenderTick(float DeltaTime) override;
-
-    virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;
 
     virtual void RenderContent() override;
 

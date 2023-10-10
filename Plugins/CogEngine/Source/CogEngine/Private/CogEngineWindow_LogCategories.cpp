@@ -18,9 +18,9 @@ void UCogEngineWindow_LogCategories::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_LogCategories::PreRender(ImGuiWindowFlags& WindowFlags)
+UCogEngineWindow_LogCategories::UCogEngineWindow_LogCategories()
 {
-    WindowFlags = ImGuiWindowFlags_MenuBar;
+    bHasMenu = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

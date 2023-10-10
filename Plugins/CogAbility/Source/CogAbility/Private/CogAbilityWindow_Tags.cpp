@@ -11,9 +11,9 @@ void UCogAbilityWindow_Tags::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Tags::PreRender(ImGuiWindowFlags& WindowFlags)
+UCogAbilityWindow_Tags::UCogAbilityWindow_Tags()
 {
-    Super::PreRender(WindowFlags);
+    bHasMenu = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

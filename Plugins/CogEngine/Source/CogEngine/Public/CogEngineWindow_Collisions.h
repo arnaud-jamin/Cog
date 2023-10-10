@@ -13,13 +13,13 @@ class COGENGINE_API UCogEngineWindow_Collisions : public UCogWindow
 
 public:
 
+    UCogEngineWindow_Collisions();
+
     void SetCollisionsAsset(const UCogEngineDataAsset_Collisions* Asset);
 
 private:
 
     virtual void RenderHelp() override;
-
-    virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;
 
     virtual void RenderContent() override;
 

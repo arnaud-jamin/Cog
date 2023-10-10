@@ -20,9 +20,9 @@ void UCogInputWindow_Actions::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogInputWindow_Actions::PreRender(ImGuiWindowFlags& WindowFlags)
+UCogInputWindow_Actions::UCogInputWindow_Actions()
 {
-    WindowFlags = ImGuiWindowFlags_MenuBar;
+    bHasMenu = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

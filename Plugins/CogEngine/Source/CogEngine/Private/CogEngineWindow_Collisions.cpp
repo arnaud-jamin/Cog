@@ -22,9 +22,9 @@ void UCogEngineWindow_Collisions::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Collisions::PreRender(ImGuiWindowFlags& WindowFlags)
+UCogEngineWindow_Collisions::UCogEngineWindow_Collisions()
 {
-    WindowFlags = ImGuiWindowFlags_MenuBar;
+    bHasMenu = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

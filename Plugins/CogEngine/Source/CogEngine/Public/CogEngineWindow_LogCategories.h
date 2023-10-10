@@ -11,9 +11,9 @@ class COGENGINE_API UCogEngineWindow_LogCategories : public UCogWindow
 
 public:
 
-    virtual void RenderHelp() override;
+    UCogEngineWindow_LogCategories();
 
-    virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;
+    virtual void RenderHelp() override;
 
     virtual void RenderContent() override;
 };

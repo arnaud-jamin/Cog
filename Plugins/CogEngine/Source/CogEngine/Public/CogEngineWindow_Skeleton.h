@@ -35,7 +35,7 @@ public:
     virtual void RenderTick(float DeltaTime) override;
 
 protected:
-    virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;
+
     virtual void OnSelectionChanged(AActor* OldSelection, AActor* NewSelection) override;
 
 private:

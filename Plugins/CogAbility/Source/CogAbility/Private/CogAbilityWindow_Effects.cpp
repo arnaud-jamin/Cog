@@ -18,9 +18,9 @@ void UCogAbilityWindow_Effects::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Effects::PreRender(ImGuiWindowFlags& WindowFlags)
+UCogAbilityWindow_Effects::UCogAbilityWindow_Effects()
 {
-    Super::PreRender(WindowFlags);
+    bHasMenu = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

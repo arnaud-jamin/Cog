@@ -77,11 +77,16 @@ protected:
 
     ULocalPlayer* GetLocalPlayer();
 
+    UPROPERTY(Config)
+    bool bHasMenu = false;
 
 private:
+
     bool bIsVisible = false;
 
     bool bShowInsideMenu = true;
+
+    bool bHideMenu = false;
 
     ImGuiID ID;
 

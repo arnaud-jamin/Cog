@@ -56,6 +56,11 @@ void UCogWindow::Render(float DeltaTime)
 
     const FString WindowTitle = GetTitle() + "##" + Name;
 
+    if (bHasMenu && bHideMenu == false)
+    {
+        WindowFlags |= ImGuiWindowFlags_MenuBar;
+    }
+
     if (ImGui::Begin(TCHAR_TO_ANSI(*WindowTitle), &bIsVisible, WindowFlags))
     {
         if (Owner->GetShowHelp())
@@ -76,6 +81,16 @@ void UCogWindow::Render(float DeltaTime)
                 ImGui::PopStyleColor();
             }
         }
+
+        if (bHasMenu)
+        {
+            if (ImGui::BeginPopupContextWindow())
+            {
+                ImGui::Checkbox("Hide Menu", &bHideMenu);
+                ImGui::EndPopup();
+            }
+        }
+
 
         RenderContent();
         ImGui::End();

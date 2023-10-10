@@ -37,6 +37,7 @@ void UCogLogOutputDevice::Serialize(const TCHAR* Message, ELogVerbosity::Type Ve
 //--------------------------------------------------------------------------------------------------------------------------
 UCogEngineWindow_OutputLog::UCogEngineWindow_OutputLog()
 {
+    bHasMenu = true;
     OutputDevice.OutputLog = this;
 }
 
@@ -146,12 +147,6 @@ void UCogEngineWindow_OutputLog::DrawRow(const char* BufferStart, const FLineInf
     }
 
     ImGui::PopStyleColor();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_OutputLog::PreRender(ImGuiWindowFlags& WindowFlags)
-{
-    WindowFlags = ImGuiWindowFlags_MenuBar;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

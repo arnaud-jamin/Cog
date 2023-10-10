@@ -26,9 +26,27 @@ void UCogAbilityWindow_Cheats::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+UCogAbilityWindow_Cheats::UCogAbilityWindow_Cheats()
+{
+    bHasMenu = true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void UCogAbilityWindow_Cheats::SetCheatsAsset(const UCogAbilityDataAsset_Cheats* Value) 
 {
     CheatsAsset = Value;
+
+    if (bReapplyCheatsBetweenPlays == false)
+    {
+        return;
+    }
+
+    static int32 IsFirstLaunch = true;
+    if (IsFirstLaunch && bReapplyCheatsBetweenLaunches == false)
+    {
+        return;
+    }
+    IsFirstLaunch = false;
 
     if (CheatsAsset == nullptr)
     {
@@ -76,12 +94,29 @@ void UCogAbilityWindow_Cheats::RenderContent()
         return;
     }
 
-    APawn* ControlledActor = GetLocalPlayerPawn();
-
-    if (SelectedActor == ControlledActor)
+    if (ImGui::BeginMenuBar())
     {
-        AppliedCheats.Empty();
+        if (ImGui::BeginMenu("Options"))
+        {
+            ImGui::Checkbox("Reapply Cheats Between Plays", &bReapplyCheatsBetweenPlays);
+
+            if (bReapplyCheatsBetweenPlays == false)
+            {
+                ImGui::BeginDisabled();
+            }
+            ImGui::Checkbox("Reapply Cheats Between Launches", &bReapplyCheatsBetweenLaunches);
+
+            if (bReapplyCheatsBetweenPlays == false)
+            {
+                ImGui::EndDisabled();
+            }
+            ImGui::EndMenu();
+        }
+
+        ImGui::EndMenuBar();
     }
+
+    APawn* ControlledActor = GetLocalPlayerPawn();
 
     if (ImGui::BeginTable("Cheats", 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize))
     {
@@ -91,13 +126,32 @@ void UCogAbilityWindow_Cheats::RenderContent()
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
 
+        bool bHasChanged = false;
+
         int Index = 0;
         for (const FCogAbilityCheat& CheatEffect : CheatsAsset->PersistentEffects)
         {
             ImGui::PushID(Index);
-            AddCheat(ControlledActor, SelectedActor, CheatEffect, true);
+            bHasChanged |= AddCheat(ControlledActor, SelectedActor, CheatEffect, true);
             ImGui::PopID();
             Index++;
+        }
+
+        //----------------------------------------------------------------
+        // When a persistent cheat has been changed, update the applied 
+        // cheats string array to be saved in the config later
+        //----------------------------------------------------------------
+        if (bHasChanged && SelectedActor == ControlledActor)
+        {
+            AppliedCheats.Empty();
+
+            for (const FCogAbilityCheat& CheatEffect : CheatsAsset->PersistentEffects)
+            {
+                if (ACogAbilityReplicator::IsCheatActive(SelectedActor, CheatEffect))
+                {
+                    AppliedCheats.Add(CheatEffect.Name);
+                }
+            }
         }
 
         ImGui::TableNextColumn();
@@ -115,12 +169,14 @@ void UCogAbilityWindow_Cheats::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Cheats::AddCheat(AActor* ControlledActor, AActor* SelectedActor, const FCogAbilityCheat& Cheat, bool IsPersistent)
+bool UCogAbilityWindow_Cheats::AddCheat(AActor* ControlledActor, AActor* SelectedActor, const FCogAbilityCheat& Cheat, bool IsPersistent)
 {
     if (Cheat.Effect == nullptr)
     {
-        return;
+        return false;
     }
+
+    bool bIsPressed = false;
 
     const FGameplayTagContainer& Tags = Cheat.Effect->GetDefaultObject<UGameplayEffect>()->InheritableGameplayEffectTags.CombinedTags;
 
@@ -146,11 +202,7 @@ void UCogAbilityWindow_Cheats::AddCheat(AActor* ControlledActor, AActor* Selecte
         if (ImGui::Checkbox(TCHAR_TO_ANSI(*Cheat.Name), &isEnabled))
         {
             RequestCheat(ControlledActor, SelectedActor, Cheat);
-        }
-
-        if (isEnabled && SelectedActor == ControlledActor)
-        {
-            AppliedCheats.Add(Cheat.Name);
+            bIsPressed = true;
         }
     }
     else
@@ -158,6 +210,7 @@ void UCogAbilityWindow_Cheats::AddCheat(AActor* ControlledActor, AActor* Selecte
         if (ImGui::Button(TCHAR_TO_ANSI(*Cheat.Name), ImVec2(-1, 0)))
         {
             RequestCheat(ControlledActor, SelectedActor, Cheat);
+            bIsPressed = true;
         }
     }
 
@@ -176,6 +229,8 @@ void UCogAbilityWindow_Cheats::AddCheat(AActor* ControlledActor, AActor* Selecte
     }
 
     FCogWindowWidgets::PopBackColor();
+
+    return bIsPressed;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -13,10 +13,13 @@ class COGINPUT_API UCogInputWindow_Gamepad : public UCogWindow
     GENERATED_BODY()
 
 public:
+
     UCogInputWindow_Gamepad();
 
     virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;
+
     virtual void RenderContent() override;
+
     virtual void RenderTick(float DeltaSeconds) override;
 
     TWeakObjectPtr<UCogInputDataAsset_Actions> ActionsAsset;
