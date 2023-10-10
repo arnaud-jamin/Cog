@@ -43,7 +43,8 @@ Displays the gameplay attributes of the selected actor
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/a6329ef1-f775-4e6e-9581-6389f9f4b39c)
 - Attributes can be sorted by name, category or attribute set.
 - Attributes with the Current value greater than the Base value are displayed in green.
-- Attributes with the Current value lower than the Base value are displayed in red. - Use the options 'Show Only Modified' to only show the attributes that have modifiers.
+- Attributes with the Current value lower than the Base value are displayed in red.
+- Use the options 'Show Only Modified' to only show the attributes that have modifiers.
 
 ### Cheats
 Used to apply cheats to the selected actor.
