@@ -165,3 +165,20 @@ Used to apply tweaks to all the spawned actors
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/e8a5cdd5-908d-4ae3-901a-48addd4ce353)
 - The tweaks are used to test various gameplay settings by actor category
 - The tweaks can be configured in a data asset.
+
+## Debug Functionalities
+
+Cog provides C++ and blueprint functions to log and debug draw within Log Categories. 
+
+![image](https://github.com/arnaud-jamin/Cog/assets/13844285/cc0ba4a5-7fa6-44a8-b737-f523bdf94321)
+
+Log and debug functions can be filtered to only what is outputted by the selected actor. 
+
+![image](https://github.com/arnaud-jamin/Cog/assets/13844285/a6f1329e-d49e-410f-8a70-4613aafabb5a)
+
+
+
+
+
+
+
