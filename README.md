@@ -26,10 +26,12 @@ Cog is a set of debug tools for Unreal Engine built on top of [ImGui](https://gi
 ### Abilities
 Displays the gameplay abilities of the selected actor.
 
-![image](https://github.com/arnaud-jamin/Cog/assets/13844285/5eece87c-eba3-45f1-95c5-e132be2133b8)
+[![Abilities](https://github.com/arnaud-jamin/Cog/assets/13844285/cc6cb2af-eb9a-42fd-8ae5-80b5c7b361e9)]()
 - Click the ability checkbox to force its activation or deactivation.
-- Right click an ability to open or close the ability separate window.
-- Use the 'Give Ability' menu to manually give an ability from a list defined in a data asset.
+- Right click an ability to remove it, or open/close the ability separate window.
+- Use the 'Give Ability' menu to manually give an ability from a list defined in a Data Asset.
+
+https://github.com/arnaud-jamin/Cog/assets/13844285/6b7eb010-ba4c-43b9-84a4-b57583f89a64
 
 ### Actions
 Displays the state of Input Action.
