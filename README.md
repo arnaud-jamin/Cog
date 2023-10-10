@@ -17,19 +17,21 @@ Cog is a set of debug tools for Unreal Engine built on top of [ImGui](https://gi
 ## ImGui Windows
 
 ### General Notes
+- Press the [Insert] key or use the 'Cog.ToggleInput' console command to open the Imgui Main Menu.
 - Most windows display their contents based on a selected actor.
 - The selector actor can be chosen using the selection window or widget.
 - Mouse over a window title to display its help. This behavior can be disabled in the Window menu.
 - Window Layouts can be saved/loaded.
 - Windows save their own settings in a Cog.ini file to maintain their state between multiple sessions.
 
-### Abilities
+### Abilities 
+
 Displays the gameplay abilities of the selected actor.
 
-![image](https://github.com/arnaud-jamin/Cog/assets/13844285/5eece87c-eba3-45f1-95c5-e132be2133b8)
+[![Abilities](https://github.com/arnaud-jamin/Cog/assets/13844285/cc6cb2af-eb9a-42fd-8ae5-80b5c7b361e9)]()
 - Click the ability checkbox to force its activation or deactivation.
-- Right click an ability to open or close the ability separate window.
-- Use the 'Give Ability' menu to manually give an ability from a list defined in a data asset.
+- Right click an ability to remove it, or open/close the ability separate window.
+- Use the 'Give Ability' menu to manually give an ability from a list defined in a Data Asset.
 
 ### Actions
 Displays the state of Input Action.
@@ -165,3 +167,20 @@ Used to apply tweaks to all the spawned actors
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/e8a5cdd5-908d-4ae3-901a-48addd4ce353)
 - The tweaks are used to test various gameplay settings by actor category
 - The tweaks can be configured in a data asset.
+
+## Debug Functionalities
+
+Cog provides C++ and Blueprint functions to log and debug draw within Log Categories. 
+
+![image](https://github.com/arnaud-jamin/Cog/assets/13844285/cc0ba4a5-7fa6-44a8-b737-f523bdf94321)
+
+Log and debug functions can be filtered to only what is outputted by the selected actor. 
+
+![image](https://github.com/arnaud-jamin/Cog/assets/13844285/a6f1329e-d49e-410f-8a70-4613aafabb5a)
+
+
+
+
+
+
+
