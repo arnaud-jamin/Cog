@@ -4,6 +4,7 @@
 #include "CogWindow.h"
 #include "CogAbilityWindow_Tweaks.generated.h"
 
+class ACogAbilityReplicator;
 class UCogAbilityDataAsset_Tweaks;
 
 UCLASS()

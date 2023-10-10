@@ -1,105 +1,46 @@
 #include "CogDebugReplicator.h"
 
 #include "CogDebugDraw.h"
+#include "EngineUtils.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/WorldSettings.h"
 #include "Net/Core/PushModel/PushModel.h"
 #include "Net/UnrealNetwork.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-// FCogReplicatorNetPack
+// ACogDebugReplicator
 //--------------------------------------------------------------------------------------------------------------------------
-class FCogReplicatorNetState : public INetDeltaBaseState
+ACogDebugReplicator* ACogDebugReplicator::Spawn(APlayerController* Controller)
 {
-public:
-
-    virtual bool IsStateEqual(INetDeltaBaseState* OtherState) override
+    if (Controller->GetWorld()->GetNetMode() == NM_Client)
     {
-        FCogReplicatorNetState* Other = static_cast<FCogReplicatorNetState*>(OtherState);
-        return (ShapesRepCounter == Other->ShapesRepCounter);
+        return nullptr;
     }
 
-    int32 ShapesRepCounter = 0;
-};
-
-//--------------------------------------------------------------------------------------------------------------------------
-// FCogReplicatorNetPack
-//--------------------------------------------------------------------------------------------------------------------------
-bool FCogReplicatorNetPack::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms)
-{
-    if (DeltaParms.bUpdateUnmappedObjects || Owner == nullptr)
-    {
-        return true;
-    }
-
-    if (DeltaParms.Writer)
-    {
-        const bool bIsOwnerClient = !Owner->bHasAuthority;
-        if (bIsOwnerClient)
-        {
-            return false;
-        }
-
-        FCogReplicatorNetState* OldState = static_cast<FCogReplicatorNetState*>(DeltaParms.OldState);
-        FCogReplicatorNetState* NewState = new FCogReplicatorNetState();
-        check(DeltaParms.NewState);
-        *DeltaParms.NewState = TSharedPtr<INetDeltaBaseState>(NewState);
-
-        //------------------------------------------------------------------------------------------------------------------
-        // Find delta to replicate
-        //------------------------------------------------------------------------------------------------------------------
-        {
-            const bool bMissingOldState = (OldState == nullptr);
-            const bool bShapesChanged = (SavedShapes != Owner->ReplicatedShapes);
-            NewState->ShapesRepCounter = (bMissingOldState ? 0 : OldState->ShapesRepCounter) + (bShapesChanged ? 1 : 0);
-            if (bShapesChanged)
-            {
-                SavedShapes = Owner->ReplicatedShapes;
-                Owner->ReplicatedShapes.Empty();
-            }
-        }
-
-        //------------------------------------------------------------------------------------------------------------------
-        // Write
-        //------------------------------------------------------------------------------------------------------------------
-        {
-            const bool bMissingOldState = (OldState == nullptr);
-            const uint8 ShouldUpdateShapes = bMissingOldState || (OldState->ShapesRepCounter != NewState->ShapesRepCounter);
-
-            FBitWriter& Writer = *DeltaParms.Writer;
-            Writer.WriteBit(ShouldUpdateShapes);
-            if (ShouldUpdateShapes)
-            {
-                Writer << SavedShapes;
-            }
-        }
-    }
-    else if (DeltaParms.Reader)
-    {
-        //------------------------------------------------------------------------------------------------------------------
-        // Read
-        //------------------------------------------------------------------------------------------------------------------
-        FBitReader& Reader = *DeltaParms.Reader;
-        const uint8 ShouldUpdateShapes = Reader.ReadBit();
-        if (ShouldUpdateShapes)
-        {
-            Reader << Owner->ReplicatedShapes;
-        }
-    }
-
-    return true;
+    FActorSpawnParameters SpawnInfo;
+    SpawnInfo.Owner = Controller;
+    return Controller->GetWorld()->SpawnActor<ACogDebugReplicator>(SpawnInfo);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-// ACogDebugReplicator
-//--------------------------------------------------------------------------------------------------------------------------
-void ACogDebugReplicator::Create(APlayerController* Controller)
+ACogDebugReplicator* ACogDebugReplicator::GetLocalReplicator(UWorld& World)
 {
-    if (Controller->GetWorld()->GetNetMode() != NM_Client)
+    for (TActorIterator<ACogDebugReplicator> It(&World, ACogDebugReplicator::StaticClass()); It; ++It)
     {
-        FActorSpawnParameters SpawnInfo;
-        SpawnInfo.Owner = Controller;
-        Controller->GetWorld()->SpawnActor<ACogDebugReplicator>(SpawnInfo);
+        ACogDebugReplicator* Replicator = *It;
+        return Replicator;
+    }
+
+    return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogDebugReplicator::GetRemoteReplicators(UWorld& World, TArray<ACogDebugReplicator*>& Replicators)
+{
+    for (TActorIterator<ACogDebugReplicator> It(&World, ACogDebugReplicator::StaticClass()); It; ++It)
+    {
+        ACogDebugReplicator* Replicator = Cast<ACogDebugReplicator>(*It);
+        Replicators.Add(Replicator);
     }
 }
 
@@ -254,3 +195,86 @@ void ACogDebugReplicator::Server_RequestAllCategoriesVerbosity_Implementation()
 #endif // !UE_BUILD_SHIPPING
 }
 
+//--------------------------------------------------------------------------------------------------------------------------
+// FCogReplicatorNetPack
+//--------------------------------------------------------------------------------------------------------------------------
+class FCogReplicatorNetState : public INetDeltaBaseState
+{
+public:
+
+    virtual bool IsStateEqual(INetDeltaBaseState* OtherState) override
+    {
+        FCogReplicatorNetState* Other = static_cast<FCogReplicatorNetState*>(OtherState);
+        return (ShapesRepCounter == Other->ShapesRepCounter);
+    }
+
+    int32 ShapesRepCounter = 0;
+};
+
+//--------------------------------------------------------------------------------------------------------------------------
+// FCogReplicatorNetPack
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogReplicatorNetPack::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms)
+{
+    if (DeltaParms.bUpdateUnmappedObjects || Owner == nullptr)
+    {
+        return true;
+    }
+
+    if (DeltaParms.Writer)
+    {
+        const bool bIsOwnerClient = !Owner->bHasAuthority;
+        if (bIsOwnerClient)
+        {
+            return false;
+        }
+
+        FCogReplicatorNetState* OldState = static_cast<FCogReplicatorNetState*>(DeltaParms.OldState);
+        FCogReplicatorNetState* NewState = new FCogReplicatorNetState();
+        check(DeltaParms.NewState);
+        *DeltaParms.NewState = TSharedPtr<INetDeltaBaseState>(NewState);
+
+        //------------------------------------------------------------------------------------------------------------------
+        // Find delta to replicate
+        //------------------------------------------------------------------------------------------------------------------
+        {
+            const bool bMissingOldState = (OldState == nullptr);
+            const bool bShapesChanged = (SavedShapes != Owner->ReplicatedShapes);
+            NewState->ShapesRepCounter = (bMissingOldState ? 0 : OldState->ShapesRepCounter) + (bShapesChanged ? 1 : 0);
+            if (bShapesChanged)
+            {
+                SavedShapes = Owner->ReplicatedShapes;
+                Owner->ReplicatedShapes.Empty();
+            }
+        }
+
+        //------------------------------------------------------------------------------------------------------------------
+        // Write
+        //------------------------------------------------------------------------------------------------------------------
+        {
+            const bool bMissingOldState = (OldState == nullptr);
+            const uint8 ShouldUpdateShapes = bMissingOldState || (OldState->ShapesRepCounter != NewState->ShapesRepCounter);
+
+            FBitWriter& Writer = *DeltaParms.Writer;
+            Writer.WriteBit(ShouldUpdateShapes);
+            if (ShouldUpdateShapes)
+            {
+                Writer << SavedShapes;
+            }
+        }
+    }
+    else if (DeltaParms.Reader)
+    {
+        //------------------------------------------------------------------------------------------------------------------
+        // Read
+        //------------------------------------------------------------------------------------------------------------------
+        FBitReader& Reader = *DeltaParms.Reader;
+        const uint8 ShouldUpdateShapes = Reader.ReadBit();
+        if (ShouldUpdateShapes)
+        {
+            Reader << Owner->ReplicatedShapes;
+        }
+    }
+
+    return true;
+}

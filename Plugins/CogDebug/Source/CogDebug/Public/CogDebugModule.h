@@ -16,10 +16,6 @@ public:
 
 	virtual void ShutdownModule() override;
 
-    ACogDebugReplicator* GetLocalReplicator(UWorld& World);
-
-    void GetRemoteReplicators(UWorld& World, TArray<ACogDebugReplicator*>& Replicators);
-
 private:
 
 };

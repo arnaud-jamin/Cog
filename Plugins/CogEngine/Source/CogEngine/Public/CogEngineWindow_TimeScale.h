@@ -4,6 +4,8 @@
 #include "CogWindow.h"
 #include "CogEngineWindow_TimeScale.generated.h"
 
+class ACogEngineReplicator;
+
 UCLASS()
 class COGENGINE_API UCogEngineWindow_TimeScale : public UCogWindow
 {

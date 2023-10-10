@@ -3,9 +3,6 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
-class ACogEngineReplicator;
-class APlayerController;
-
 class COGENGINE_API FCogEngineModule : public IModuleInterface
 {
 public:
@@ -16,15 +13,5 @@ public:
 
 	virtual void ShutdownModule() override;
 
-    ACogEngineReplicator* GetLocalReplicator();
-
-    void SetLocalReplicator(ACogEngineReplicator* Value);
-
-    TArray<TObjectPtr<ACogEngineReplicator>> GetRemoteReplicators() const { return RemoteReplicators; }
-
-    void AddRemoteReplicator(ACogEngineReplicator* Value);
-
 private:
-    TObjectPtr<ACogEngineReplicator> LocalReplicator;
-    TArray<TObjectPtr<ACogEngineReplicator>> RemoteReplicators;
 };

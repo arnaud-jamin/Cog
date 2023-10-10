@@ -90,7 +90,7 @@ bool UCogEngineWindow_Spawns::RenderSpawnAsset(const FCogEngineSpawnEntry& Spawn
 
     if (ImGui::Button(TCHAR_TO_ANSI(*EntryName), ImVec2(-1, 0)))
     {
-        if (ACogEngineReplicator* Replicator = FCogEngineModule::Get().GetLocalReplicator())
+        if (ACogEngineReplicator* Replicator = ACogEngineReplicator::GetLocalReplicator(*GetWorld()))
         {
             Replicator->Server_Spawn(SpawnEntry);
         }

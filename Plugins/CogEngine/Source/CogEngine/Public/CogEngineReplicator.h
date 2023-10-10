@@ -6,6 +6,8 @@
 #include "UObject/ObjectMacros.h"
 #include "CogEngineReplicator.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogCogEngine, Verbose, All);
+
 class APlayerController;
 
 using FCogEnineSpawnFunction = TFunction<void(const FCogEngineSpawnEntry& SpawnEntry)>;
@@ -17,7 +19,12 @@ class COGENGINE_API ACogEngineReplicator : public AActor
     GENERATED_UCLASS_BODY()
 
 public:
-    static void Create(APlayerController* Controller);
+
+    static ACogEngineReplicator* Spawn(APlayerController* Controller);
+
+    static ACogEngineReplicator* GetLocalReplicator(UWorld& World);
+
+    static void GetRemoteReplicators(UWorld& World, TArray<ACogEngineReplicator*>& Replicators);
 
     virtual void BeginPlay() override;
 
@@ -34,6 +41,12 @@ public:
 
     UFUNCTION(Server, Reliable)
     void Server_SetTimeDilation(float Value);
+
+    UFUNCTION(Server, Reliable)
+    void Server_Possess(APawn* Pawn);
+
+    UFUNCTION(Server, Reliable)
+    void Server_ResetPossession();
 
 protected:
 

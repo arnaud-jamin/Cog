@@ -26,9 +26,9 @@ void ACogSamplePlayerController::BeginPlay()
     Super::BeginPlay();
 
 #if USE_COG
-    ACogDebugReplicator::Create(this);
-    ACogAbilityReplicator::Create(this);
-    ACogEngineReplicator::Create(this);
+    ACogDebugReplicator::Spawn(this);
+    ACogAbilityReplicator::Spawn(this);
+    ACogEngineReplicator::Spawn(this);
 #endif //USE_COG
 }
 
@@ -59,14 +59,14 @@ void ACogSamplePlayerController::OnPossess(APawn* InPawn)
         }
     }
 
-    ControlledCharacter = Cast<ACogSampleCharacter>(InPawn);
+    PossessedCharacter = Cast<ACogSampleCharacter>(InPawn);
 
-    if (InitialControlledCharacter == nullptr)
+    if (InitialPossessedCharacter == nullptr)
     {
-        InitialControlledCharacter = ControlledCharacter;
+        InitialPossessedCharacter = PossessedCharacter;
     }
 
-    OnControlledCharacterChanged.Broadcast(this, ControlledCharacter.Get(), OldControlledCharacter);
+    OnControlledCharacterChanged.Broadcast(this, PossessedCharacter.Get(), OldControlledCharacter);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -78,26 +78,26 @@ void ACogSamplePlayerController::AcknowledgePossession(APawn* NewPawn)
 
     Super::AcknowledgePossession(NewPawn);
 
-    if (InitialControlledCharacter == nullptr)
+    if (InitialPossessedCharacter == nullptr)
     {
-        InitialControlledCharacter = Cast<ACogSampleCharacter>(NewPawn);
+        InitialPossessedCharacter = Cast<ACogSampleCharacter>(NewPawn);
     }
 
-    if (ControlledCharacter != nullptr)
+    if (PossessedCharacter != nullptr)
     {
-        ControlledCharacter->AcknowledgeUnpossession();
+        PossessedCharacter->AcknowledgeUnpossession();
     }
 
-    ControlledCharacter = Cast<ACogSampleCharacter>(NewPawn);
-    ControlledCharacter->AcknowledgePossession(this);
+    PossessedCharacter = Cast<ACogSampleCharacter>(NewPawn);
+    PossessedCharacter->AcknowledgePossession(this);
 
-    OnControlledCharacterChanged.Broadcast(this, ControlledCharacter.Get(), OldControlledCharacter);
+    OnControlledCharacterChanged.Broadcast(this, PossessedCharacter.Get(), OldControlledCharacter);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogSamplePlayerController::ControlCharacter(ACogSampleCharacter* NewCharacter)
+void ACogSamplePlayerController::SetPossession(APawn* NewPawn)
 {
-    if (NewCharacter == nullptr || GetPawn() == NewCharacter)
+    if (NewPawn == nullptr || GetPawn() == NewPawn)
     {
         return;
     }
@@ -105,10 +105,10 @@ void ACogSamplePlayerController::ControlCharacter(ACogSampleCharacter* NewCharac
     //-------------------------------------------------------------------------------------------
     // Unplug the current controller so it doesn't conflict with the newly assigned controller
     //-------------------------------------------------------------------------------------------
-    AController* OldController = NewCharacter->GetController();
+    AController* OldController = NewPawn->GetController();
     if (OldController != nullptr)
     {
-        COG_LOG_OBJECT(LogCogPossession, ELogVerbosity::Verbose, this, TEXT("%s unpossess %s"), *GetNameSafe(OldController), *GetNameSafe(NewCharacter));
+        COG_LOG_OBJECT(LogCogPossession, ELogVerbosity::Verbose, this, TEXT("%s unpossess %s"), *GetNameSafe(OldController), *GetNameSafe(NewPawn));
         OldController->UnPossess();
     }
 
@@ -123,8 +123,8 @@ void ACogSamplePlayerController::ControlCharacter(ACogSampleCharacter* NewCharac
     COG_LOG_OBJECT(LogCogPossession, ELogVerbosity::Verbose, this, TEXT("%s unpossess %s"), *GetNameSafe(this), *GetNameSafe(GetPawn()));
     UnPossess();
 
-    COG_LOG_OBJECT(LogCogPossession, ELogVerbosity::Verbose, this, TEXT("%s possess %s"), *GetNameSafe(this), *GetNameSafe(NewCharacter));
-    Possess(NewCharacter);
+    COG_LOG_OBJECT(LogCogPossession, ELogVerbosity::Verbose, this, TEXT("%s possess %s"), *GetNameSafe(this), *GetNameSafe(NewPawn));
+    Possess(NewPawn);
 
     //-------------------------------------------------------------------------------------------
     // Replug the initial controller on the old character. For example, replug the initial
@@ -139,9 +139,9 @@ void ACogSamplePlayerController::ControlCharacter(ACogSampleCharacter* NewCharac
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogSamplePlayerController::ResetControlledPawn()
+void ACogSamplePlayerController::ResetPossession()
 {
-    ControlCharacter(InitialControlledCharacter.Get());
+    SetPossession(InitialPossessedCharacter.Get());
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -170,9 +170,9 @@ void ACogSamplePlayerController::TickTargeting(float DeltaSeconds)
     }
 
 #if USE_COG
-    if (Target != nullptr && ControlledCharacter != nullptr)
+    if (Target != nullptr && PossessedCharacter != nullptr)
     {
-        FCogDebugDraw::Segment(LogCogTargetAcquisition, ControlledCharacter.Get(), ControlledCharacter->GetActorLocation(), Target->GetActorLocation(), FColor::White, false);
+        FCogDebugDraw::Segment(LogCogTargetAcquisition, PossessedCharacter.Get(), PossessedCharacter->GetActorLocation(), Target->GetActorLocation(), FColor::White, false);
     }
 #endif //USE_COG
 }

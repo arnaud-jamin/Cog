@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "CogInterfacePossessor.h"
 #include "GameFramework/PlayerController.h"
 #include "CogSamplePlayerController.generated.h"
 
@@ -15,7 +16,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FCogSampleControlledCharacterChan
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(config=Game)
-class ACogSamplePlayerController : public APlayerController
+class ACogSamplePlayerController 
+    : public APlayerController
+    , public ICogInterfacePossessor
 {
 	GENERATED_BODY()
 
@@ -28,17 +31,17 @@ public:
     virtual void Tick(float DeltaSeconds) override;
 
     //----------------------------------------------------------------------------------------------------------------------
-    // Control
+    // Possession
     //----------------------------------------------------------------------------------------------------------------------
+    UFUNCTION(BlueprintCallable)
+    virtual void SetPossession(APawn* NewPawn) override;
+
+    UFUNCTION(BlueprintCallable)
+    virtual void ResetPossession() override;
+
     virtual void OnPossess(APawn* NewPawn) override;
 
     virtual void AcknowledgePossession(APawn* NewPawn) override;
-
-    UFUNCTION(BlueprintCallable)
-    void ControlCharacter(ACogSampleCharacter* NewCharacter);
-
-    UFUNCTION(BlueprintCallable)
-    void ResetControlledPawn();
 
     UPROPERTY(BlueprintAssignable)
     FCogSampleControlledCharacterChangedEventDelegate OnControlledCharacterChanged;
@@ -57,14 +60,14 @@ public:
 private:
 
     //----------------------------------------------------------------------------------------------------------------------
-    // Control
+    // Possession
     //----------------------------------------------------------------------------------------------------------------------
 
     UPROPERTY(BlueprintReadonly, meta = (AllowPrivateAccess = "true"))
-    TWeakObjectPtr<ACogSampleCharacter> ControlledCharacter = nullptr;
+    TWeakObjectPtr<ACogSampleCharacter> PossessedCharacter = nullptr;
 
     UPROPERTY(BlueprintReadonly, meta = (AllowPrivateAccess = "true"))
-    TWeakObjectPtr<ACogSampleCharacter> InitialControlledCharacter = nullptr;
+    TWeakObjectPtr<ACogSampleCharacter> InitialPossessedCharacter = nullptr;
 
     //----------------------------------------------------------------------------------------------------------------------
     // Targeting

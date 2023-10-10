@@ -516,7 +516,7 @@ void FCogDebugDraw::ReplicateShape(const UObject* WorldContextObject, const FCog
     if (NetMode == NM_DedicatedServer || NetMode == NM_ListenServer)
     {
         TArray<ACogDebugReplicator*> Replicators;
-        FCogDebugModule::Get().GetRemoteReplicators(*World, Replicators);
+        ACogDebugReplicator::GetRemoteReplicators(*World, Replicators);
 
         for (ACogDebugReplicator* Replicator : Replicators)
         {

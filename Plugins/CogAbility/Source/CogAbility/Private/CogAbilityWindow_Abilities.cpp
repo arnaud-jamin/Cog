@@ -117,8 +117,7 @@ void UCogAbilityWindow_Abilities::RenderAbiltiesMenu(AActor* Selection)
 
                     if (ImGui::MenuItem(TCHAR_TO_ANSI(*GetNameSafe(AbilityClass))))
                     {
-                        FCogAbilityModule& Module = FCogAbilityModule::Get();
-                        if (ACogAbilityReplicator* Replicator = Module.GetLocalReplicator())
+                        if (ACogAbilityReplicator* Replicator = ACogAbilityReplicator::GetLocalReplicator(*GetWorld()))
                         {
                             Replicator->GiveAbility(Selection, AbilityClass);
                         }
@@ -431,8 +430,7 @@ void UCogAbilityWindow_Abilities::GameTick(float DeltaTime)
     {
         if (AActor* Selection = GetSelection())
         {
-            FCogAbilityModule& Module = FCogAbilityModule::Get();
-            if (ACogAbilityReplicator* Replicator = Module.GetLocalReplicator())
+            if (ACogAbilityReplicator* Replicator = ACogAbilityReplicator::GetLocalReplicator(*GetWorld()))
             {
                 Replicator->RemoveAbility(Selection, AbilityHandleToRemove);
             }

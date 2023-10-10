@@ -9,13 +9,37 @@
 #include "Net/UnrealNetwork.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::Create(APlayerController* Controller)
+ACogAbilityReplicator* ACogAbilityReplicator::Spawn(APlayerController* Controller)
 {
-    if (Controller->GetWorld()->GetNetMode() != NM_Client)
+    if (Controller->GetWorld()->GetNetMode() == NM_Client)
     {
-        FActorSpawnParameters SpawnInfo;
-        SpawnInfo.Owner = Controller;
-        Controller->GetWorld()->SpawnActor<ACogAbilityReplicator>(SpawnInfo);
+        return nullptr;
+    }
+
+    FActorSpawnParameters SpawnInfo;
+    SpawnInfo.Owner = Controller;
+    return Controller->GetWorld()->SpawnActor<ACogAbilityReplicator>(SpawnInfo);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+ACogAbilityReplicator* ACogAbilityReplicator::GetLocalReplicator(UWorld& World)
+{
+    for (TActorIterator<ACogAbilityReplicator> It(&World, ACogAbilityReplicator::StaticClass()); It; ++It)
+    {
+        ACogAbilityReplicator* Replicator = *It;
+        return Replicator;
+    }
+
+    return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogAbilityReplicator::GetRemoteReplicators(UWorld& World, TArray<ACogAbilityReplicator*>& Replicators)
+{
+    for (TActorIterator<ACogAbilityReplicator> It(&World, ACogAbilityReplicator::StaticClass()); It; ++It)
+    {
+        ACogAbilityReplicator* Replicator = Cast<ACogAbilityReplicator>(*It);
+        Replicators.Add(Replicator);
     }
 }
 
@@ -50,18 +74,6 @@ void ACogAbilityReplicator::BeginPlay()
     Super::BeginPlay();
 
     OwnerPlayerController = Cast<APlayerController>(GetOwner());
-
-    if (OwnerPlayerController != nullptr)
-    {
-        if (OwnerPlayerController->IsLocalController())
-        {
-            FCogAbilityModule::Get().SetLocalReplicator(this);
-        }
-        else
-        {
-            FCogAbilityModule::Get().AddRemoteReplicator(this);
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

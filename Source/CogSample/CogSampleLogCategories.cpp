@@ -29,9 +29,9 @@ namespace CogSampleLog
 
         FCogDebugLog::AddLogCategory(LogCogAbility, "Ability");
         FCogDebugLog::AddLogCategory(LogAbilitySystem, "Ability System");
-        FCogDebugLog::AddLogCategory(LogCogBaseAimRotation, "BaseAimRotation");
+        FCogDebugLog::AddLogCategory(LogCogBaseAimRotation, "Base Aim Rotation");
         FCogDebugLog::AddLogCategory(LogCogCollision, "Collision");
-        FCogDebugLog::AddLogCategory(LogCogControlRotation, "ControlRotation");
+        FCogDebugLog::AddLogCategory(LogCogControlRotation, "Control Rotation");
         FCogDebugLog::AddLogCategory(LogCogInput, "Input");
         FCogDebugLog::AddLogCategory(LogCogPosition, "Position");
         FCogDebugLog::AddLogCategory(LogCogPossession, "Possession");

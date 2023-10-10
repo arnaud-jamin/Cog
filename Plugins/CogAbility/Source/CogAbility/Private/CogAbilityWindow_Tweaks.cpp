@@ -23,8 +23,7 @@ void UCogAbilityWindow_Tweaks::RenderContent()
         return;
     }
 
-    FCogAbilityModule& Module = FCogAbilityModule::Get();
-    ACogAbilityReplicator* Replicator = Module.GetLocalReplicator();
+    ACogAbilityReplicator* Replicator = ACogAbilityReplicator::GetLocalReplicator(*GetWorld());
     if (Replicator == nullptr)
     {
         return;

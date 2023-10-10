@@ -59,8 +59,7 @@ void UCogAbilityWindow_Cheats::SetCheatsAsset(const UCogAbilityDataAsset_Cheats*
         return;
     }
 
-    FCogAbilityModule& Module = FCogAbilityModule::Get();
-    ACogAbilityReplicator* Replicator = Module.GetLocalReplicator();
+    ACogAbilityReplicator* Replicator = ACogAbilityReplicator::GetLocalReplicator(*GetWorld());
     if (Replicator == nullptr)
     {
         return;
@@ -274,8 +273,7 @@ void UCogAbilityWindow_Cheats::RequestCheat(AActor* ControlledActor, AActor* Sel
         Actors.Add(SelectedActor);
     }
 
-    FCogAbilityModule& Module = FCogAbilityModule::Get();
-    if (ACogAbilityReplicator* Replicator = Module.GetLocalReplicator())
+    if (ACogAbilityReplicator* Replicator = ACogAbilityReplicator::GetLocalReplicator(*GetWorld()))
     {
         Replicator->ApplyCheat(ControlledActor, Actors, Cheat);
     }

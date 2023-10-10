@@ -58,9 +58,15 @@ class COGDEBUG_API ACogDebugReplicator : public AActor
     GENERATED_UCLASS_BODY()
 
 public:
-    static void Create(APlayerController* Controller);
+    
+    static ACogDebugReplicator* Spawn(APlayerController* Controller);
+
+    static ACogDebugReplicator* GetLocalReplicator(UWorld& World);
+
+    static void GetRemoteReplicators(UWorld& World, TArray<ACogDebugReplicator*>& Replicators);
 
     virtual void BeginPlay() override;
+    
     virtual void TickActor(float DeltaTime, enum ELevelTick TickType, FActorTickFunction& ThisTickFunction) override;
 
     APlayerController* GetPlayerController() const { return OwnerPlayerController.Get(); }

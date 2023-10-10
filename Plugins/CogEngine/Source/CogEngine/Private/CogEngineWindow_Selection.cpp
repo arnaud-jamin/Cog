@@ -144,7 +144,7 @@ bool UCogEngineWindow_Selection::DrawSelectionCombo()
     //------------------------
     // Actor List
     //------------------------
-    //ImGui::BeginChild("ActorList", ImVec2(-1, -1), false);
+    ImGui::BeginChild("ActorList", ImVec2(-1, -1), false);
 
     TArray<AActor*> Actors;
     for (TActorIterator<AActor> It(GetWorld(), SelectedSubClass); It; ++It)
@@ -194,7 +194,7 @@ bool UCogEngineWindow_Selection::DrawSelectionCombo()
         }
     }
     Clipper.End();
-    //ImGui::EndChild();
+    ImGui::EndChild();
 
     return SelectionChanged;
 }
@@ -220,6 +220,34 @@ void UCogEngineWindow_Selection::DrawActorContextMenu(AActor* Actor)
             ImGui::SetTooltip("Reset the selection to the controlled actor.");
         }
 
+        if (APawn* Pawn = Cast<APawn>(Actor))
+        {
+            if (ImGui::Button("Possess", ImVec2(-1, 0)))
+            {
+                if (ACogEngineReplicator* Replicator = ACogEngineReplicator::GetLocalReplicator(*GetWorld()))
+                {
+                    Replicator->Server_Possess(Pawn);
+                }
+
+            }
+            if (ImGui::IsItemHovered())
+            {
+                ImGui::SetTooltip("Possess this pawn.");
+            }
+
+            if (ImGui::Button("Reset Possession", ImVec2(-1, 0)))
+            {
+                if (ACogEngineReplicator* Replicator = ACogEngineReplicator::GetLocalReplicator(*GetWorld()))
+                {
+                    Replicator->Server_ResetPossession();
+                }
+
+            }
+            if (ImGui::IsItemHovered())
+            {
+                ImGui::SetTooltip("Reset pawn.");
+            }
+        }
 
         ImGui::EndPopup();
     }

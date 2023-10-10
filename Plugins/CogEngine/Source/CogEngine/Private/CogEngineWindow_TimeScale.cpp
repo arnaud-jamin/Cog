@@ -31,7 +31,13 @@ void UCogEngineWindow_TimeScale::RenderContent()
 {
     Super::RenderContent();
 
-    ACogEngineReplicator* Replicator = FCogEngineModule::Get().GetLocalReplicator();
+    UWorld* World = GetWorld();
+    if (World == nullptr)
+    {
+        return;
+    }
+
+    ACogEngineReplicator* Replicator = ACogEngineReplicator::GetLocalReplicator(*World);
     if (Replicator == nullptr)
     {
         return;

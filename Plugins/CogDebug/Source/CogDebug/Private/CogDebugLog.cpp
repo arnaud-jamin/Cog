@@ -98,7 +98,7 @@ ELogVerbosity::Type FCogDebugLog::GetServerVerbosity(FName CategoryName)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugLog::SetServerVerbosity(UWorld& World, FName CategoryName, ELogVerbosity::Type Verbosity)
 {
-    if (ACogDebugReplicator* Replicator = FCogDebugModule::Get().GetLocalReplicator(World))
+    if (ACogDebugReplicator* Replicator = ACogDebugReplicator::GetLocalReplicator(World))
     {
         Replicator->Server_SetCategoryVerbosity(CategoryName, (ECogLogVerbosity)Verbosity);
     }

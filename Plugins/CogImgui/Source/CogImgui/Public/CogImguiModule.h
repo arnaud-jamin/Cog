@@ -26,13 +26,17 @@ public:
     TSharedPtr<SCogImguiWidget> CreateImGuiViewport(UGameViewportClient* GameViewport,  FCogImguiRenderFunction Render, ImFontAtlas* FontAtlas = nullptr);
 
     FCogImguiTextureManager& GetTextureManager() { return TextureManager; }
+    
     ImFontAtlas& GetDefaultFontAtlas() { return DefaultFontAtlas; }
 
     bool GetEnableInput() const { return bEnabledInput; }
+    
     void SetEnableInput(bool Value) { bEnabledInput = Value; }
+    
     void ToggleEnableInput() { bEnabledInput = !bEnabledInput; }
     
     const FCogImGuiKeyInfo& GetToggleInputKey() const { return ToggleInputKey; }
+
     void SetToggleInputKey(const FCogImGuiKeyInfo& Value) { ToggleInputKey = Value; }
 
 private:

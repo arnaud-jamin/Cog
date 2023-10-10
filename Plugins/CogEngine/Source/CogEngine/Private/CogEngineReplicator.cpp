@@ -1,20 +1,52 @@
 #include "CogEngineReplicator.h"
 
+#include "CogDebugLogMacros.h"
+#include "CogInterfacePossessor.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/WorldSettings.h"
+#include "EngineUtils.h"
 #include "Net/Core/PushModel/PushModel.h"
 #include "Net/UnrealNetwork.h"
 
+DEFINE_LOG_CATEGORY(LogCogEngine);
+
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogEngineReplicator::Create(APlayerController* Controller)
+ACogEngineReplicator* ACogEngineReplicator::Spawn(APlayerController* Controller)
 {
-    if (Controller->GetWorld()->GetNetMode() != NM_Client)
+    if (Controller->GetWorld()->GetNetMode() == NM_Client)
     {
-        FActorSpawnParameters SpawnInfo;
-        SpawnInfo.Owner = Controller;
-        Controller->GetWorld()->SpawnActor<ACogEngineReplicator>(SpawnInfo);
+        return nullptr;
+    }
+
+    FActorSpawnParameters SpawnInfo;
+    SpawnInfo.Owner = Controller;
+    ACogEngineReplicator* Replicator = Controller->GetWorld()->SpawnActor<ACogEngineReplicator>(SpawnInfo);
+
+    return Replicator;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+ACogEngineReplicator* ACogEngineReplicator::GetLocalReplicator(UWorld& World)
+{
+    for (TActorIterator<ACogEngineReplicator> It(&World, ACogEngineReplicator::StaticClass()); It; ++It)
+    {
+        ACogEngineReplicator* Replicator = *It;
+        return Replicator;
+    }
+
+    return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogEngineReplicator::GetRemoteReplicators(UWorld& World, TArray<ACogEngineReplicator*>& Replicators)
+{
+    for (TActorIterator<ACogEngineReplicator> It(&World, ACogEngineReplicator::StaticClass()); It; ++It)
+    {
+        ACogEngineReplicator* Replicator = Cast<ACogEngineReplicator>(*It);
+        Replicators.Add(Replicator);
     }
 }
+
 
 //--------------------------------------------------------------------------------------------------------------------------
 ACogEngineReplicator::ACogEngineReplicator(const FObjectInitializer& ObjectInitializer)
@@ -33,6 +65,8 @@ ACogEngineReplicator::ACogEngineReplicator(const FObjectInitializer& ObjectIniti
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogEngineReplicator::BeginPlay()
 {
+    COG_LOG_OBJECT(LogCogEngine, ELogVerbosity::Verbose, this, TEXT(""));
+
     Super::BeginPlay();
 
     UWorld* World = GetWorld();
@@ -42,15 +76,6 @@ void ACogEngineReplicator::BeginPlay()
     bIsLocal = NetMode != NM_DedicatedServer;
 
     OwnerPlayerController = Cast<APlayerController>(GetOwner());
-
-    if (OwnerPlayerController->IsLocalController())
-    {
-        FCogEngineModule::Get().SetLocalReplicator(this);
-    }
-    else
-    {
-        FCogEngineModule::Get().AddRemoteReplicator(this);
-    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -129,3 +154,28 @@ void ACogEngineReplicator::OnRep_TimeDilation()
 #endif // !UE_BUILD_SHIPPING
 }
 
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogEngineReplicator::Server_Possess_Implementation(APawn* Pawn)
+{
+#if !UE_BUILD_SHIPPING
+
+    if (ICogInterfacePossessor* Possessor = Cast<ICogInterfacePossessor>(OwnerPlayerController))
+    {
+        Possessor->SetPossession(Pawn);
+    }
+
+#endif // !UE_BUILD_SHIPPING
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogEngineReplicator::Server_ResetPossession_Implementation()
+{
+#if !UE_BUILD_SHIPPING
+
+    if (ICogInterfacePossessor* Possessor = Cast<ICogInterfacePossessor>(OwnerPlayerController))
+    {
+        Possessor->ResetPossession();
+    }
+
+#endif // !UE_BUILD_SHIPPING
+}

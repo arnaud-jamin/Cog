@@ -13,8 +13,11 @@ class ACogSampleGameState : public AGameStateBase
 	GENERATED_BODY()
 
     ACogSampleGameState(const FObjectInitializer& ObjectInitializer);
+
     virtual void BeginPlay() override;
+
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
     virtual void Tick(float DeltaSeconds) override;
 
 private:
@@ -23,10 +26,18 @@ private:
     TObjectPtr<UObject> CogWindowManagerRef = nullptr;
 
 #if USE_COG
+
     void InitializeCog();
+
     void TickCog(float DeltaTime);
+
     void RenderCog(float DeltaTime);
 
+    void RegisterCommand(const TCHAR* Name, const TCHAR* Help, const FConsoleCommandWithArgsDelegate& Command);
+
+    void CogToggleInput(const TArray<FString>& Args);
+
     TObjectPtr<UCogWindowManager> CogWindowManager = nullptr;
+
 #endif //USE_COG
 };

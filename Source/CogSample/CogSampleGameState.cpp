@@ -136,6 +136,8 @@ void ACogSampleGameState::TickCog(float DeltaSeconds)
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleGameState::InitializeCog()
 {
+    RegisterCommand(TEXT("Cog.ToggleInput"), TEXT(""), FConsoleCommandWithArgsDelegate::CreateUObject(this, &ACogSampleGameState::CogToggleInput));
+
     TSharedPtr<SCogImguiWidget> Widget = FCogImguiModule::Get().CreateImGuiViewport(GEngine->GameViewport, [this](float DeltaTime) { RenderCog(DeltaTime); });
     FCogImguiModule::Get().SetToggleInputKey(FCogImGuiKeyInfo(EKeys::Insert));
 
@@ -224,5 +226,22 @@ void ACogSampleGameState::RenderCog(float DeltaTime)
     CogWindowManager->Render(DeltaTime);
     FCogDebugDrawImGui::Draw();
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSampleGameState::RegisterCommand(const TCHAR* Name, const TCHAR* Help, const FConsoleCommandWithArgsDelegate& Command)
+{
+    IConsoleManager& ConsoleManager = IConsoleManager::Get();
+    if (!ConsoleManager.FindConsoleObject(Name))
+    {
+        ConsoleManager.RegisterConsoleCommand(Name, Help, Command, ECVF_Cheat);
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSampleGameState::CogToggleInput(const TArray<FString>& Args)
+{
+    FCogImguiModule::Get().ToggleEnableInput();
+}
+
 
 #endif //USE_COG

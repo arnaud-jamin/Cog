@@ -18,7 +18,11 @@ class COGABILITY_API ACogAbilityReplicator : public AActor
 
 public:
 
-    static void Create(APlayerController* Controller);
+    static ACogAbilityReplicator* Spawn(APlayerController* Controller);
+
+    static ACogAbilityReplicator* GetLocalReplicator(UWorld& World);
+
+    static void GetRemoteReplicators(UWorld& World, TArray<ACogAbilityReplicator*>& Replicators);
 
     virtual void BeginPlay() override;
 
