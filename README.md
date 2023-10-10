@@ -17,6 +17,7 @@ Cog is a set of debug tools for Unreal Engine built on top of [ImGui](https://gi
 ## ImGui Windows
 
 ### General Notes
+- Press the [Insert] key or use the 'Cog.ToggleInput' console command to open the Imgui Main Menu.
 - Most windows display their contents based on a selected actor.
 - The selector actor can be chosen using the selection window or widget.
 - Mouse over a window title to display its help. This behavior can be disabled in the Window menu.
