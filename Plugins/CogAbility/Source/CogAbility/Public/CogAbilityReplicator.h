@@ -28,7 +28,9 @@ public:
     
     static bool IsCheatActive(const AActor* EffectTarget, const FCogAbilityCheat& Cheat);
 
-    void GiveAbility(AActor* TargetActor, TSubclassOf<UGameplayAbility> AbilityClass);
+    void GiveAbility(AActor* TargetActor, TSubclassOf<UGameplayAbility> AbilityClass) const;
+    
+    void RemoveAbility(AActor* TargetActor, const FGameplayAbilitySpecHandle& Handle) const;
 
     void ResetAllTweaks();
 
@@ -49,6 +51,9 @@ private:
 
     UFUNCTION(Reliable, Server)
     void Server_GiveAbility(AActor* TargetActor, TSubclassOf<UGameplayAbility> AbilityClass) const;
+
+    UFUNCTION(Reliable, Server)
+    void Server_RemoveAbility(AActor* TargetActor, const FGameplayAbilitySpecHandle& Handle) const;
 
     UFUNCTION(Reliable, Server)
     void Server_ResetAllTweaks();

@@ -41,7 +41,7 @@ protected:
 
     virtual void RenderOpenAbilities();
 
-    virtual void RenderAbilityInfo(FGameplayAbilitySpec& Spec);
+    virtual void RenderAbilityInfo(const UAbilitySystemComponent& AbilitySystemComponent, FGameplayAbilitySpec& Spec);
 
     virtual void ProcessAbilityActivation(FGameplayAbilitySpecHandle Handle);
 
@@ -56,6 +56,8 @@ protected:
 private:
 
     FGameplayAbilitySpecHandle AbilityHandleToActivate;
+
+    FGameplayAbilitySpecHandle AbilityHandleToRemove;
 
     TArray<FGameplayAbilitySpecHandle> OpenedAbilities;
 };

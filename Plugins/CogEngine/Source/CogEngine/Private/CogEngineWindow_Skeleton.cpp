@@ -12,6 +12,17 @@ UCogEngineWindow_Skeleton::UCogEngineWindow_Skeleton()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindow_Skeleton::RenderHelp()
+{
+    ImGui::Text(
+        "This window display the bone hierarchy and the skeleton debug draw of the selected actor if it has a Skeletal Mesh. "
+        "Mouse over a bone to highlight it. "
+        "Right click a bone to access more debug display. "
+        "Use the [Ctrl] key to toggle the bone debug draw recursively. "
+    );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void UCogEngineWindow_Skeleton::OnSelectionChanged(AActor* OldSelection, AActor* NewSelection)
 {
     RefreshSkeleton();

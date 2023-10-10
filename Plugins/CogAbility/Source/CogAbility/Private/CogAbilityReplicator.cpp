@@ -133,7 +133,7 @@ bool ACogAbilityReplicator::IsCheatActive(const AActor* EffectTarget, const FCog
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::GiveAbility(AActor* Target, TSubclassOf<UGameplayAbility> AbilityClass)
+void ACogAbilityReplicator::GiveAbility(AActor* Target, TSubclassOf<UGameplayAbility> AbilityClass) const
 {
     Server_GiveAbility(Target, AbilityClass);
 }
@@ -148,18 +148,47 @@ void ACogAbilityReplicator::Server_GiveAbility_Implementation(AActor* TargetActo
         return;
     }
 
-    if (IsValid(AbilityClass) == false)
+    if (AbilitySystem->IsOwnerActorAuthoritative() == false)
     {
         return;
     }
 
-    if (AbilitySystem->IsOwnerActorAuthoritative() == false)
+    if (IsValid(AbilityClass) == false)
     {
         return;
     }
 
     const FGameplayAbilitySpec Spec(AbilityClass, 1, INDEX_NONE, TargetActor);
     AbilitySystem->GiveAbility(Spec);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogAbilityReplicator::RemoveAbility(AActor* TargetActor, const FGameplayAbilitySpecHandle& Handle) const
+{
+    Server_RemoveAbility(TargetActor, Handle);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogAbilityReplicator::Server_RemoveAbility_Implementation(AActor* TargetActor, const FGameplayAbilitySpecHandle& Handle) const
+{
+    UAbilitySystemComponent* AbilitySystem = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(TargetActor, true);
+
+    if (AbilitySystem == nullptr)
+    {
+        return;
+    }
+    
+    if (AbilitySystem->IsOwnerActorAuthoritative() == false)
+    {
+        return;
+    }
+
+    if (Handle.IsValid() == false)
+    {
+        return;
+    }
+
+    AbilitySystem->SetRemoveAbilityOnEnd(Handle);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

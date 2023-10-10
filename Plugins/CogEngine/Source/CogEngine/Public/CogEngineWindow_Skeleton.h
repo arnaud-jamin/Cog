@@ -31,10 +31,13 @@ class COGENGINE_API UCogEngineWindow_Skeleton : public UCogWindow
 public:
     UCogEngineWindow_Skeleton();
 
-    virtual void RenderContent() override;
-    virtual void RenderTick(float DeltaTime) override;
+    virtual void RenderHelp() override;
 
 protected:
+
+    virtual void RenderContent() override;
+
+    virtual void RenderTick(float DeltaTime) override;
 
     virtual void OnSelectionChanged(AActor* OldSelection, AActor* NewSelection) override;
 

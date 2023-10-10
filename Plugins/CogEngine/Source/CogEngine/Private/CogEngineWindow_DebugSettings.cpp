@@ -7,7 +7,7 @@
 void UCogEngineWindow_DebugSettings::RenderHelp()
 {
     ImGui::Text(
-        "This window can be used to setup how the debug display is drawn. "
+        "This window can be used to tweak how the debug display is drawn. "
         "Check each item for more info. "
     );
 }

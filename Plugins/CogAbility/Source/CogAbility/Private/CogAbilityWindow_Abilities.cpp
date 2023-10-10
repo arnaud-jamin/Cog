@@ -68,7 +68,7 @@ void UCogAbilityWindow_Abilities::RenderOpenAbilities()
         bool Open = true;
         if (ImGui::Begin(TCHAR_TO_ANSI(*GetAbilityName(Ability)), &Open))
         {
-            RenderAbilityInfo(*Spec);
+            RenderAbilityInfo(*AbilitySystemComponent, *Spec);
             ImGui::End();
         }
 
@@ -97,18 +97,6 @@ void UCogAbilityWindow_Abilities::RenderContent()
     }
 
     RenderAbiltiesMenu(Selection);
-
-    //TArray<FGameplayAbilitySpec>& Abilities = AbilitySystemComponent->GetActivatableAbilities();
-    //static int FocusedAbilityIndex = INDEX_NONE;
-    //if (FocusedAbilityIndex != INDEX_NONE && FocusedAbilityIndex < Abilities.Num())
-    //{
-    //    RenderAbilityInfo(Abilities[FocusedAbilityIndex]);
-    //    if (ImGui::Button("Close", ImVec2(-1, 0)))
-    //    {
-    //        FocusedAbilityIndex = INDEX_NONE;
-    //    }
-    //    ImGui::Spacing();
-    //}
 
     RenderAbilitiesTable(*AbilitySystemComponent);
 }
@@ -215,7 +203,7 @@ void UCogAbilityWindow_Abilities::RenderAbilitiesTable(UAbilitySystemComponent& 
             if (ImGui::IsItemHovered())
             {
                 FCogWindowWidgets::BeginTableTooltip();
-                RenderAbilityInfo(Spec);
+                RenderAbilityInfo(AbilitySystemComponent, Spec);
                 FCogWindowWidgets::EndTableTooltip();
             }
 
@@ -291,11 +279,10 @@ void UCogAbilityWindow_Abilities::RenderAbilityContextMenu(UAbilitySystemCompone
             ImGui::CloseCurrentPopup();
         }
 
-        //if (ImGui::Button("Open Properties"))
-        //{
-        //    GetOwner()->GetPropertyGrid()->Open(BaseAbility);
-        //    ImGui::CloseCurrentPopup();
-        //}
+        if (ImGui::Button("Remove"))
+        {
+            AbilityHandleToRemove = Spec.Handle;
+        }
 
         ImGui::EndPopup();
     }
@@ -326,12 +313,17 @@ FString UCogAbilityWindow_Abilities::GetAbilityName(const UGameplayAbility* Abil
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Abilities::RenderAbilityInfo(FGameplayAbilitySpec& Spec)
+void UCogAbilityWindow_Abilities::RenderAbilityInfo(const UAbilitySystemComponent& AbilitySystemComponent, FGameplayAbilitySpec& Spec)
 {
     UGameplayAbility* Ability = Spec.GetPrimaryInstance();
     if (Ability == nullptr)
     {
         Ability = Spec.Ability;
+    }
+
+    if (Ability == nullptr)
+    {
+        return;
     }
 
     if (ImGui::BeginTable("Ability", 2, ImGuiTableFlags_Borders))
@@ -376,6 +368,15 @@ void UCogAbilityWindow_Abilities::RenderAbilityInfo(FGameplayAbilitySpec& Spec)
         ImGui::TextColored(TextColor, "Active Count");
         ImGui::TableNextColumn();
         ImGui::Text("%u", Spec.ActiveCount);
+
+        //------------------------
+        // Cooldown
+        //------------------------
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+        ImGui::TextColored(TextColor, "Cooldown");
+        ImGui::TableNextColumn();
+        RenderAbilityCooldown(AbilitySystemComponent, *Ability);
 
         //------------------------
         // Handle
@@ -424,6 +425,20 @@ void UCogAbilityWindow_Abilities::GameTick(float DeltaTime)
     {
         ProcessAbilityActivation(AbilityHandleToActivate);
         AbilityHandleToActivate = FGameplayAbilitySpecHandle();
+    }
+
+    if (AbilityHandleToRemove.IsValid())
+    {
+        if (AActor* Selection = GetSelection())
+        {
+            FCogAbilityModule& Module = FCogAbilityModule::Get();
+            if (ACogAbilityReplicator* Replicator = Module.GetLocalReplicator())
+            {
+                Replicator->RemoveAbility(Selection, AbilityHandleToRemove);
+            }
+        }
+
+        AbilityHandleToRemove = FGameplayAbilitySpecHandle();
     }
 }
 

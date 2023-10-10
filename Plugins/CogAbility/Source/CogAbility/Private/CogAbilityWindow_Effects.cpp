@@ -295,14 +295,10 @@ FString UCogAbilityWindow_Effects::GetEffectName(const UGameplayEffect& Effect)
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogAbilityWindow_Effects::RenderRemainingTime(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffect& ActiveEffect)
 {
-    float StartTime = ActiveEffect.StartWorldTime;
-    float Duration = ActiveEffect.GetDuration();
+    const float StartTime = ActiveEffect.StartWorldTime;
+    const float Duration = ActiveEffect.GetDuration();
 
-    if (Duration <= 0)
-    {
-        ImGui::Text("NA");
-    }
-    else
+    if (Duration >= 0)
     {
         UWorld* World = AbilitySystemComponent.GetWorld();
         const float RemainingTime = StartTime + Duration - World->GetTimeSeconds();

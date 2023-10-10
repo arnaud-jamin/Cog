@@ -7,32 +7,6 @@
 char ImGuiTextBuffer::EmptyString[1] = { 0 };
 
 //--------------------------------------------------------------------------------------------------------------------------
-// FCogLogOutputDevice
-//--------------------------------------------------------------------------------------------------------------------------
-UCogLogOutputDevice::UCogLogOutputDevice()
-{
-    GLog->AddOutputDevice(this);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-UCogLogOutputDevice::~UCogLogOutputDevice()
-{
-    if (GLog != nullptr)
-    {
-        GLog->RemoveOutputDevice(this);
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogLogOutputDevice::Serialize(const TCHAR* Message, ELogVerbosity::Type Verbosity, const class FName& Category)
-{
-    if (OutputLog != nullptr)
-    {
-        OutputLog->AddLog(Message, Verbosity, Category);
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 // FCogWindow_Log
 //--------------------------------------------------------------------------------------------------------------------------
 UCogEngineWindow_OutputLog::UCogEngineWindow_OutputLog()
@@ -300,5 +274,31 @@ void UCogEngineWindow_OutputLog::RenderContent()
     else
     {
         ImGui::EndChild();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// FCogLogOutputDevice
+//--------------------------------------------------------------------------------------------------------------------------
+UCogLogOutputDevice::UCogLogOutputDevice()
+{
+    GLog->AddOutputDevice(this);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+UCogLogOutputDevice::~UCogLogOutputDevice()
+{
+    if (GLog != nullptr)
+    {
+        GLog->RemoveOutputDevice(this);
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogLogOutputDevice::Serialize(const TCHAR* Message, ELogVerbosity::Type Verbosity, const class FName& Category)
+{
+    if (OutputLog != nullptr)
+    {
+        OutputLog->AddLog(Message, Verbosity, Category);
     }
 }
