@@ -279,9 +279,15 @@ void ACogSampleGameState::BeginPlay()
     CogWindowManager = NewObject<UCogWindowManager>(this);
     CogWindowManagerRef = CogWindowManager;
 
-    // Add some windows
+    // Add and configure windows
     CogWindowManager->CreateWindow<UCogEngineWindow_DebugSettings>("Engine.Debug Settings");
     CogWindowManager->CreateWindow<UCogEngineWindow_ImGui>("Engine.ImGui");
+
+    // Add a window that uses a data asset
+    UCogAbilityWindow_Cheats* CheatsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Cheats>("Gameplay.Cheats");
+    CheatsWindow->SetCheatsAsset(GetFirstAssetByClass<UCogAbilityDataAsset_Cheats>());
+```
+
     [...]
 #endif //ENABLE_COG
 }
@@ -308,3 +314,26 @@ void ACogSampleGameState::Tick(float DeltaSeconds)
 #endif //ENABLE_COG
 }
 ```
+
+6. Implement Cog Interfaces of the desired actor classes:
+
+```cpp
+// CogSampleCharacter.h
+UCLASS(config=Game)
+class ACogSampleCharacter : public ACharacter
+    , public IAbilitySystemInterface
+    , public ICogCommonDebugFilteredActorInterface
+    , public ICogCommonAllegianceActorInterface
+    , public ICogSampleTeamInterface
+    , public ICogSampleTargetableInterface
+```
+
+```cpp
+// CogSamplePlayerController.h
+UCLASS(config=Game)
+class ACogSamplePlayerController 
+    : public APlayerController
+    , public ICogCommonPossessorInterface
+```
+
+7. In Unreal Editor create and configure the Data Assets
