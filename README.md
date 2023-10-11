@@ -319,7 +319,7 @@ void ACogSampleGameState::Tick(float DeltaSeconds)
 }
 ```
 
-6. Implement Cog Interfaces of the desired actor classes:
+6. Implement Cog Interfaces on your desired actor classes:
 
 ```cpp
 // CogSampleCharacter.h
