@@ -196,8 +196,8 @@ The Cog repository has the following structure:
 
 Cog has multiple plugins to ease the integration for projects that do not use the `Ability System Component` or `Enhanced Input`. For the next steps, it is assumed all the plugins are used.
 
-1. Setup up module dependencies:
 
+- Setup up module dependencies:
 ```c#
 // CogSample.Build.cs
 using UnrealBuildTool;
@@ -238,8 +238,8 @@ public class CogSample : ModuleRules
 }
 ```
 
-2. In the class of your choice (in the sample we use the GameState class) add a reference to the CogWindowManager:
 
+- In the class of your choice (in the sample we use the GameState class) add a reference to the CogWindowManager:
 ```cpp
 // ACogSampleGameState.h
 #pragma once
@@ -267,8 +267,9 @@ class ACogSampleGameState : public AGameStateBase
 #endif //ENABLE_COG
 };
 ```
-3. Instantiate the CogWindowManager and add some windows:
 
+
+- Instantiate the CogWindowManager and add some windows:
 ```cpp
 // ACogSampleGameState.cpp
 void ACogSampleGameState::BeginPlay()
@@ -295,18 +296,17 @@ void ACogSampleGameState::BeginPlay()
     [...]
 #endif //ENABLE_COG
 }
-
 ```
 
-3. Define which key will toggle the input from the game to Imgui:
 
+- Define which key will toggle the input from the game to Imgui:
 ```cpp
 // ACogSampleGameState.cpp
 FCogImguiModule::Get().SetToggleInputKey(FCogImGuiKeyInfo(EKeys::Insert));
 ```
 
-4. Tick the CogWindowManager:
 
+- Tick the CogWindowManager:
 ```cpp
 // ACogSampleGameState.cpp
 void ACogSampleGameState::Tick(float DeltaSeconds)
@@ -319,8 +319,8 @@ void ACogSampleGameState::Tick(float DeltaSeconds)
 }
 ```
 
-6. Implement Cog Interfaces on your desired actor classes:
 
+- Implement Cog Interfaces on your desired actor classes:
 ```cpp
 // CogSampleCharacter.h
 UCLASS(config=Game)
@@ -340,4 +340,5 @@ class ACogSamplePlayerController
     , public ICogCommonPossessorInterface
 ```
 
-7. In Unreal Editor create and configure the Data Assets
+
+- In Unreal Editor create and configure the Data Assets
