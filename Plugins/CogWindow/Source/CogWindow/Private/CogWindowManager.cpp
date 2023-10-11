@@ -4,6 +4,7 @@
 #include "CogImguiModule.h"
 #include "CogImguiWidget.h"
 #include "CogWindow_Spacing.h"
+#include "CogWindow_Settings.h"
 #include "CogWindowWidgets.h"
 #include "Engine/Engine.h"
 #include "imgui_internal.h"
@@ -33,6 +34,8 @@ void UCogWindowManager::InitializeInternal()
     SpaceWindows.Add(CreateWindow<UCogWindow_Spacing>("Space 2", false));
     SpaceWindows.Add(CreateWindow<UCogWindow_Spacing>("Space 3", false));
     SpaceWindows.Add(CreateWindow<UCogWindow_Spacing>("Space 4", false));
+
+    SettingsWindow = CreateWindow<UCogWindow_Settings>("Window.Settings", false);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -314,36 +317,9 @@ void UCogWindowManager::DrawMainMenu()
 
             ImGui::Separator();
 
-            ImGui::MenuItem("Compact Mode", nullptr, &bCompactMode);
-
-            ImGui::Text("DPI Scale");
-            ImGui::SameLine();
-            FCogWindowWidgets::PushStyleCompact();
-            FCogWindowWidgets::SetNextItemToShortWidth();
-            ImGui::SliderFloat("", &DPIScale, 0.5f, 2.0f, "%.2f");
-            if (ImGui::IsItemDeactivatedAfterEdit())
-            {
-                bRefreshDPIScale = true;
-            }
-            FCogWindowWidgets::PopStyleCompact();
-
-            if (ImGui::IsItemHovered())
-            {
-                ImGui::BeginTooltip();
-                ImGui::TextUnformatted("Change DPi Scale [Mouse Wheel]");
-                ImGui::TextUnformatted("Reset DPi Scale  [Middle Mouse]");
-                ImGui::EndTooltip();
-            }
-
-            ImGui::Separator();
-
-            ImGui::MenuItem("Show Window Help", nullptr, &bShowHelp);
-            if (ImGui::IsItemHovered())
-            {
-                ImGui::BeginTooltip();
-                ImGui::TextUnformatted("Should some help be displayed when the mouse is over a window title ?");
-                ImGui::EndTooltip();
-            }
+            DrawMenuItem(*SettingsWindow, "Settings");
+ 
+            
             ImGui::EndMenu();
         }
 
@@ -370,7 +346,7 @@ void UCogWindowManager::DrawMenu(UCogWindowManager::FMenu& Menu)
 {
     if (Menu.Window != nullptr)
     {
-        Menu.Window->DrawMenuItem(Menu.Name);
+        DrawMenuItem(*Menu.Window, TCHAR_TO_ANSI(*Menu.Name));
     }
     else
     {
@@ -386,21 +362,48 @@ void UCogWindowManager::DrawMenu(UCogWindowManager::FMenu& Menu)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void UCogWindowManager::DrawMenuItem(UCogWindow& Window, const char* MenuItemName)
+{
+    if (bShowWindowsInMainMenu)
+    {
+        ImGui::SetNextWindowSizeConstraints(ImVec2(FCogWindowWidgets::GetFontWidth() * 40, ImGui::GetTextLineHeightWithSpacing() * 1),
+            ImVec2(FCogWindowWidgets::GetFontWidth() * 50, ImGui::GetTextLineHeightWithSpacing() * 60));
+
+        if (ImGui::BeginMenu(MenuItemName))
+        {
+            Window.RenderContent();
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
+        {
+            Window.SetIsVisible(!Window.GetIsVisible());
+        }
+    }
+    else
+    {
+        bool bIsVisible = Window.GetIsVisible();
+        if (ImGui::MenuItem(MenuItemName, nullptr, &bIsVisible))
+        {
+            Window.SetIsVisible(bIsVisible);
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::TickDPI()
 {
     const float MouseWheel = ImGui::GetIO().MouseWheel;
     const bool IsControlDown = ImGui::GetIO().KeyCtrl;
     if (IsControlDown && MouseWheel != 0)
     {
-        DPIScale = FMath::Clamp(DPIScale + (MouseWheel > 0 ? 0.05f : -0.05f), 0.5f, 2.0f);
-        bRefreshDPIScale = true;
+        SetDPIScale(FMath::Clamp(DPIScale + (MouseWheel > 0 ? 0.1f : -0.1f), 0.5f, 2.0f));
     }
 
     const bool IsMiddleMouseClicked = ImGui::GetIO().MouseClicked[2];
     if (IsControlDown && IsMiddleMouseClicked)
     {
-        DPIScale = 1.0f;
-        bRefreshDPIScale = true;
+        SetDPIScale(1.0f);
     }
 }
 
@@ -456,4 +459,16 @@ void UCogWindowManager::SettingsHandler_WriteAll(ImGuiContext* Context, ImGuiSet
             Buffer->appendf("0x%08X\n", Window->GetID());
         }
     }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogWindowManager::SetDPIScale(float Value) 
+{
+    if (DPIScale == Value)
+    {
+        return;
+    }
+
+    DPIScale = Value; 
+    bRefreshDPIScale = true; 
 }

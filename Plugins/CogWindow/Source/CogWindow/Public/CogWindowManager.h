@@ -6,6 +6,7 @@
 #include "CogWindowManager.generated.h"
 
 class UCogWindow;
+class UCogWindow_Settings;
 class UWorld;
 class SCogImguiWidget;
 struct ImGuiSettingsHandler;
@@ -55,11 +56,25 @@ public:
 
     void SetHideAllWindows(bool Value);
 
+    float GetDPIScale() const { return DPIScale; }
+
+    void SetDPIScale(float Value);
+    
     bool GetCompactMode() const { return bCompactMode; }
+
+    void SetCompactMode(bool Value) { bCompactMode = Value; }
 
     bool GetShowHelp() const { return bShowHelp; }
 
+    void SetShowHelp(bool Value) { bShowHelp = Value; }
+
+    bool GetPreviewWindowsInMenu() const { return bShowWindowsInMainMenu; }
+
+    void SetPreviewWindowsInMenu(bool Value) { bShowWindowsInMainMenu = Value; }
+
 protected:
+
+    friend class UCogWindow_Settings;
 
     struct FMenu
     {
@@ -77,6 +92,8 @@ protected:
     FMenu* AddMenu(const FString& Name);
 
     void DrawMenu(FMenu& Menu);
+
+    void DrawMenuItem(UCogWindow& Window, const char* MenuItemName);
 
     static void SettingsHandler_ClearAll(ImGuiContext* ctx, ImGuiSettingsHandler*);
 
@@ -97,6 +114,9 @@ protected:
     TArray<UCogWindow*> SpaceWindows;
 
     UPROPERTY()
+    UCogWindow_Settings* SettingsWindow = nullptr;
+    
+    UPROPERTY()
     TArray<UCogWindow*> MainMenuWidgets;
 
     UPROPERTY(Config)
@@ -111,7 +131,10 @@ protected:
     UPROPERTY(Config)
     bool bShowHelp = true;
 
-    TSharedPtr<SCogImguiWidget> ImGuiWidget;
+    UPROPERTY(Config)
+    bool bShowWindowsInMainMenu = true;
+
+    TSharedPtr<SCogImguiWidget> ImGuiWidget = nullptr;
 
     FMenu MainMenu;
 
@@ -121,5 +144,5 @@ protected:
 
     bool bHideAllWindows = false;
 
-    bool bRefreshDPIScale;
+    bool bRefreshDPIScale = false;
 };

@@ -85,16 +85,15 @@ bool FCogImguiInputHelper::WasKeyInfoJustPressed(APlayerController& PlayerContro
 {
     if (PlayerController.WasInputKeyJustPressed(KeyInfo.Key))
     {
-        if (UPlayerInput* PlayerInput = PlayerController.PlayerInput.Get())
-        {
-            const bool MatchCtrl    = IsCheckBoxStateMatchingValue(KeyInfo.Ctrl,    PlayerInput->IsCtrlPressed());
-            const bool MatchAlt     = IsCheckBoxStateMatchingValue(KeyInfo.Alt,     PlayerInput->IsAltPressed());
-            const bool MatchShift   = IsCheckBoxStateMatchingValue(KeyInfo.Shift,   PlayerInput->IsShiftPressed());
-            const bool MatchCmd     = IsCheckBoxStateMatchingValue(KeyInfo.Cmd,     PlayerInput->IsCmdPressed());
+        const FModifierKeysState& ModifierKeys = FSlateApplication::Get().GetModifierKeys();
 
-            const bool Result = MatchCtrl && MatchAlt && MatchShift && MatchCmd;
-            return Result;
-        }
+        const bool MatchCtrl    = IsCheckBoxStateMatchingValue(KeyInfo.Ctrl,    ModifierKeys.IsControlDown());
+        const bool MatchAlt     = IsCheckBoxStateMatchingValue(KeyInfo.Alt,     ModifierKeys.IsAltDown());
+        const bool MatchShift   = IsCheckBoxStateMatchingValue(KeyInfo.Shift,   ModifierKeys.IsShiftDown());
+        const bool MatchCmd     = IsCheckBoxStateMatchingValue(KeyInfo.Cmd,     ModifierKeys.IsCommandDown());
+
+        const bool Result = MatchCtrl && MatchAlt && MatchShift && MatchCmd;
+        return Result;
     }
 
     return false;

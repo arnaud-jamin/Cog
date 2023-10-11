@@ -5,7 +5,7 @@
 #include "CogImGuiKeyInfo.generated.h"
 
 USTRUCT()
-struct FCogImGuiKeyInfo
+struct COGIMGUI_API FCogImGuiKeyInfo
 {
 	GENERATED_BODY()
 

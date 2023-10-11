@@ -28,9 +28,6 @@ public:
     /** Called every frame without a valid imgui context (outside of the imgui NewFrame/EndFrame) even if the window is hidden. */
     virtual void GameTick(float DeltaTime);
 
-    /** Draw the window menu item. Called when the menu item visible */
-    virtual void DrawMenuItem(const FString& MenuItemName);
-
     virtual void DrawMainMenuWidget(bool Draw, float& Width) {}
 
     ImGuiID GetID() const { return ID; }
@@ -56,6 +53,8 @@ public:
     UCogWindowManager* GetOwner() const { return Owner; }
 
 protected:
+    
+    friend class UCogWindowManager;
 
     virtual const FString& GetTitle() const { return Name; }
 

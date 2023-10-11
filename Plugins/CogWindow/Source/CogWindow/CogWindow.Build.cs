@@ -31,6 +31,7 @@ public class CogWindow : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
+				"InputCore",
 				"CoreUObject",
 				"Engine",
 				"Slate",

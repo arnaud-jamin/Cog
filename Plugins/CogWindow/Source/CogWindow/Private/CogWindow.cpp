@@ -117,31 +117,6 @@ void UCogWindow::GameTick(float DeltaTime)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindow::DrawMenuItem(const FString& MenuItemName)
-{
-    if (bShowInsideMenu)
-    {
-        ImGui::SetNextWindowSizeConstraints(ImVec2(FCogWindowWidgets::GetFontWidth() * 40, ImGui::GetTextLineHeightWithSpacing() * 1),
-                                            ImVec2(FCogWindowWidgets::GetFontWidth() * 50, ImGui::GetTextLineHeightWithSpacing() * 60));
-
-        if (ImGui::BeginMenu(TCHAR_TO_ANSI(*MenuItemName)))
-        {
-            RenderContent();
-            ImGui::EndMenu();
-        }
-        
-        if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
-        {
-            bIsVisible = !bIsVisible;
-        }
-    }
-    else
-    {
-        ImGui::MenuItem(TCHAR_TO_ANSI(*MenuItemName), nullptr, &bIsVisible);
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void UCogWindow::SetSelection(AActor* NewSelection)
 {
     if (CurrentSelection == NewSelection)

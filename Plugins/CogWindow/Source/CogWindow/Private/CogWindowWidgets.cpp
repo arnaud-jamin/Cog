@@ -206,3 +206,72 @@ float FCogWindowWidgets::GetFontWidth()
     return ImGui::GetFontSize() * 0.5f;
 }
 
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::ComboboxEnum(const char* Label, UObject* Object, const char* FieldName, uint8* PointerToEnumValue)
+{
+    const FEnumProperty* EnumProperty = CastField<FEnumProperty>(Object->GetClass()->FindPropertyByName(FName(FieldName)));
+    if (EnumProperty == nullptr)
+    {
+        return false;
+    }
+
+    return ComboboxEnum(Label, EnumProperty, PointerToEnumValue);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::ComboboxEnum(const char* Label, const FEnumProperty* EnumProperty, uint8* PointerToValue)
+{
+    bool HasChanged = false;
+
+    UEnum* Enum = EnumProperty->GetEnum();
+    int64 EnumValue = EnumProperty->GetUnderlyingProperty()->GetSignedIntPropertyValue(PointerToValue);
+    FString EnumValueName = Enum->GetNameStringByValue(EnumValue);
+
+    int64 NewValue;
+    if (ComboboxEnum(Label, Enum, EnumValue, NewValue))
+    {
+        EnumProperty->GetUnderlyingProperty()->SetIntPropertyValue(PointerToValue, NewValue);
+    }
+
+    return HasChanged;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::ComboboxEnum(const char* Label, UEnum* Enum, int64 CurrentValue, int64& NewValue)
+{
+    bool HasChanged = false;
+
+    FString CurrentEntryName = Enum->GetNameStringByValue(CurrentValue);
+
+    if (ImGui::BeginCombo(Label, TCHAR_TO_ANSI(*CurrentEntryName)))
+    {
+        for (int32 EnumIndex = 0; EnumIndex < Enum->NumEnums() - 1; ++EnumIndex)
+        {
+
+#if WITH_EDITORONLY_DATA
+            bool bShouldBeHidden = Enum->HasMetaData(TEXT("Hidden"), EnumIndex) || Enum->HasMetaData(TEXT("Spacer"), EnumIndex);
+            if (bShouldBeHidden)
+                continue;
+#endif //WITH_EDITORONLY_DATA
+
+            FString EnumEntryName = Enum->GetNameStringByIndex(EnumIndex);
+            int64 EnumEntryValue = Enum->GetValueByIndex(EnumIndex);
+
+            bool IsSelected = EnumEntryName == CurrentEntryName;
+
+            if (ImGui::Selectable(TCHAR_TO_ANSI(*EnumEntryName), IsSelected))
+            {
+                HasChanged = true;
+                NewValue = EnumEntryValue;
+            }
+
+            if (IsSelected)
+            {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+        ImGui::EndCombo();
+    }
+
+    return HasChanged;
+}

@@ -2,6 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "imgui.h"
+#include "UObject/ReflectedTypeAccessors.h"
+
+class UEnum;
+class FEnumProperty;
 
 class COGWINDOW_API FCogWindowWidgets
 {
@@ -34,4 +38,36 @@ public:
     static void SetNextItemToShortWidth();
 
     static float GetFontWidth();
+
+    template<typename EnumType>
+    static bool ComboboxEnum(const char* Label, const EnumType CurrentValue, EnumType& NewValue);
+
+    template<typename EnumType>
+    static bool ComboboxEnum(const char* Label, EnumType& Value);
+
+    static bool ComboboxEnum(const char* Label, UEnum* Enum, int64 CurrentValue, int64& NewValue);
+    
+    static bool ComboboxEnum(const char* Label, UObject* Object, const char* FieldName, uint8* PointerToEnumValue);
+    
+    static bool ComboboxEnum(const char* Label, const FEnumProperty* EnumProperty, uint8* PointerToEnumValue);
+
 };
+
+template<typename EnumType>
+bool FCogWindowWidgets::ComboboxEnum(const char* Label, const EnumType CurrentValue, EnumType& NewValue)
+{
+    int64 NewValueInt;
+    if (ComboboxEnum(Label, StaticEnum<EnumType>(), (int64)CurrentValue, NewValueInt))
+    {
+        NewValue = (EnumType)NewValueInt;
+        return true;
+    }
+
+    return false;
+}
+
+template<typename EnumType>
+bool FCogWindowWidgets::ComboboxEnum(const char* Label, EnumType& Value)
+{
+    return ComboboxEnum(Label, Value, Value);
+}

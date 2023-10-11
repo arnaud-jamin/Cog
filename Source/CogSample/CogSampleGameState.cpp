@@ -117,7 +117,7 @@ void ACogSampleGameState::Tick(float DeltaSeconds)
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleGameState::InitializeCog()
 {
-    FCogImguiModule::Get().SetToggleInputKey(FCogImGuiKeyInfo(EKeys::Insert));
+    FCogImguiModule::Get().SetToggleInputKey(FCogImGuiKeyInfo(EKeys::Tab));
     RegisterCommand(TEXT("Cog.ToggleInput"), TEXT(""), FConsoleCommandWithArgsDelegate::CreateUObject(this, &ACogSampleGameState::CogToggleInput));
 
     CogWindowManager = NewObject<UCogWindowManager>(this);
