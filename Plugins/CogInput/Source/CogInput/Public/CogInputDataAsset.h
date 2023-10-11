@@ -1,18 +1,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogInputDataAsset_Actions.generated.h"
+#include "CogInputDataAsset.generated.h"
 
 class UInputAction;
 class UInputMappingContext;
 
 UCLASS(Blueprintable)
-class COGINPUT_API UCogInputDataAsset_Actions : public UPrimaryDataAsset
+class COGINPUT_API UCogInputDataAsset : public UPrimaryDataAsset
 {
     GENERATED_BODY()
 
 public:
-    UCogInputDataAsset_Actions() {}
+    UCogInputDataAsset() {}
 
     UPROPERTY(EditAnywhere)
     TObjectPtr<const UInputMappingContext> MappingContext;

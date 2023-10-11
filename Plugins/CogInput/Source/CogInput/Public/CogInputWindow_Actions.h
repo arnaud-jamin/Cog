@@ -6,7 +6,7 @@
 #include "CogInputWindow_Actions.generated.h"
 
 class UInputAction;
-class UCogInputDataAsset_Actions;
+class UCogInputDataAsset;
 
 UCLASS(Config = Cog)
 class COGINPUT_API UCogInputWindow_Actions : public UCogWindow
@@ -17,7 +17,7 @@ public:
 
     UCogInputWindow_Actions();
 
-    TWeakObjectPtr<UCogInputDataAsset_Actions> ActionsAsset;
+    TWeakObjectPtr<const UCogInputDataAsset> Asset;
 
 protected:
 

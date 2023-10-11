@@ -5,6 +5,7 @@
 #include "CogInputWindow_Gamepad.generated.h"
 
 class UEnhancedPlayerInput;
+class UCogInputDataAsset;
 struct ImDrawList;
 
 UCLASS(Config = Cog)
@@ -22,13 +23,16 @@ public:
 
     virtual void RenderTick(float DeltaSeconds) override;
 
-    TWeakObjectPtr<UCogInputDataAsset_Actions> ActionsAsset;
+    TWeakObjectPtr<const UCogInputDataAsset> Asset;
 
 private:
     
     void AddButton(const FKey& Key, const ImVec2& Position, const ImVec2& Size, const ImVec2& Alignment, float Rounding, ImDrawFlags Flags = 0);
+    
     void AddStick(const FKey& Key2D, const FKey& KeyBool, bool InvertY, float Amplitude, const ImVec2& Position, float Radius);
+    
     void InputContextMenu(const FKey& Key, FCogInjectActionInfo* ActionInfoBool, FCogInjectActionInfo* ActionInfo2D);
+    
     void OnButtonClicked(FCogInjectActionInfo* ActionInfo);
 
     UPROPERTY(Config)
@@ -61,10 +65,16 @@ private:
     TMap<FKey, FCogInjectActionInfo> Actions;
     
     UEnhancedPlayerInput* Input = nullptr;
+
     ImDrawList* DrawList = nullptr;
+    
     float RepeatPeriod = 0.5f;
+    
     float RepeatTime = 0.0f;
+    
     ImVec2 CanvasMin;
+    
     ImVec2 CanvasSize;
+    
     ImVec2 CanvasMax;
 };

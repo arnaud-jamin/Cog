@@ -1,6 +1,7 @@
 #include "CogInputWindow_Gamepad.h"
 
 #include "CogImguiHelper.h"
+#include "CogInputDataAsset.h"
 #include "Engine/LocalPlayer.h"
 #include "EnhancedInputSubsystems.h"
 #include "imgui_internal.h"
@@ -16,10 +17,10 @@ void UCogInputWindow_Gamepad::PreRender(ImGuiWindowFlags& WindowFlags)
     if (bShowAsOverlay)
     {
         WindowFlags = ImGuiWindowFlags_NoTitleBar
-                     | ImGuiWindowFlags_NoScrollbar
-                     | ImGuiWindowFlags_NoCollapse
-                     | ImGuiWindowFlags_NoBackground
-                     | ImGuiWindowFlags_NoResize;
+            | ImGuiWindowFlags_NoScrollbar
+            | ImGuiWindowFlags_NoCollapse
+            | ImGuiWindowFlags_NoBackground
+            | ImGuiWindowFlags_NoResize;
     }
 }
 
@@ -197,7 +198,7 @@ void UCogInputWindow_Gamepad::RenderContent()
         return;
     }
 
-    if (ActionsAsset != nullptr && ActionsAsset->MappingContext != nullptr)
+    if (Asset != nullptr && Asset->MappingContext != nullptr)
     {
         if (Actions.Num() == 0)
         {
@@ -228,7 +229,7 @@ void UCogInputWindow_Gamepad::RenderContent()
             Actions.FindOrAdd(EKeys:: Gamepad_DPad_Right);
             Actions.FindOrAdd(EKeys:: Gamepad_DPad_Left);
 
-            for (const FEnhancedActionKeyMapping& Mapping : ActionsAsset->MappingContext->GetMappings())
+            for (const FEnhancedActionKeyMapping& Mapping : Asset->MappingContext->GetMappings())
             {
                 if (Mapping.Action != nullptr)
                 {

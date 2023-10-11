@@ -20,8 +20,7 @@
 #include "CogAbilityWindow_Tweaks.h"
 #include "CogDebugDrawImGui.h"
 #include "CogDebugPlot.h"
-#include "CogEngineDataAsset_Collisions.h"
-#include "CogEngineDataAsset_Spawns.h"
+#include "CogEngineDataAsset.h"
 #include "CogEngineModule.h"
 #include "CogEngineWindow_Collisions.h"
 #include "CogEngineWindow_DebugSettings.h"
@@ -38,7 +37,7 @@
 #include "CogEngineWindow_Stats.h"
 #include "CogEngineWindow_TimeScale.h"
 #include "CogImguiModule.h"
-#include "CogInputDataAsset_Actions.h"
+#include "CogInputDataAsset.h"
 #include "CogInputWindow_Actions.h"
 #include "CogInputWindow_Gamepad.h"
 #include "CogWindowManager.h"
@@ -127,8 +126,10 @@ void ACogSampleGameState::InitializeCog()
     //---------------------------------------
     // Engine
     //---------------------------------------
+    const UCogEngineDataAsset* EngineAsset = GetFirstAssetByClass<UCogEngineDataAsset>();
+
     UCogEngineWindow_Collisions* CollisionsWindow = CogWindowManager->CreateWindow<UCogEngineWindow_Collisions>("Engine.Collision");
-    CollisionsWindow->SetCollisionsAsset(GetFirstAssetByClass<UCogEngineDataAsset_Collisions>());
+    CollisionsWindow->SetAsset(EngineAsset);
 
     CogWindowManager->CreateWindow<UCogEngineWindow_DebugSettings>("Engine.Debug Settings");
 
@@ -154,7 +155,7 @@ void ACogSampleGameState::InitializeCog()
     CogWindowManager->CreateWindow<UCogEngineWindow_Skeleton>("Engine.Skeleton");
 
     UCogEngineWindow_Spawns* SpawnWindow = CogWindowManager->CreateWindow<UCogEngineWindow_Spawns>("Engine.Spawns");
-    SpawnWindow->SetSpawnsAsset(GetFirstAssetByClass<UCogEngineDataAsset_Spawns>());
+    SpawnWindow->SetAsset(EngineAsset);
 
     UCogEngineWindow_Stats* StatsWindow = CogWindowManager->CreateWindow<UCogEngineWindow_Stats>("Engine.Stats");
 
@@ -163,36 +164,38 @@ void ACogSampleGameState::InitializeCog()
     //---------------------------------------
     // Abilities
     //---------------------------------------
-    const UCogAbilityDataAsset* AbilitiesAsset = GetFirstAssetByClass<UCogAbilityDataAsset>();
+    const UCogAbilityDataAsset* AbilityAsset = GetFirstAssetByClass<UCogAbilityDataAsset>();
 
     UCogAbilityWindow_Abilities* AbilitiesWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Abilities>("Gameplay.Abilities");
-    AbilitiesWindow->Asset = AbilitiesAsset;
+    AbilitiesWindow->Asset = AbilityAsset;
 
     UCogAbilityWindow_Attributes* AttributesWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Attributes>("Gameplay.Attributes");
-    AttributesWindow->Asset = AbilitiesAsset;
+    AttributesWindow->Asset = AbilityAsset;
 
     UCogAbilityWindow_Cheats* CheatsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Cheats>("Gameplay.Cheats");
-    CheatsWindow->SetAsset(AbilitiesAsset);
+    CheatsWindow->SetAsset(AbilityAsset);
 
     UCogAbilityWindow_Effects* EffectsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Effects>("Gameplay.Effects");
-    EffectsWindow->Asset = AbilitiesAsset;
+    EffectsWindow->Asset = AbilityAsset;
 
     UCogAbilityWindow_Pools* PoolsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Pools>("Gameplay.Pools");
-    PoolsWindow->Asset = AbilitiesAsset;
+    PoolsWindow->Asset = AbilityAsset;
 
     CogWindowManager->CreateWindow<UCogAbilityWindow_Tags>("Gameplay.Tags");
 
     UCogAbilityWindow_Tweaks* TweaksWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Tweaks>("Gameplay.Tweaks");
-    TweaksWindow->Asset = AbilitiesAsset;
+    TweaksWindow->Asset = AbilityAsset;
 
     //---------------------------------------
     // Input
     //---------------------------------------
+    const UCogInputDataAsset* InputAsset = GetFirstAssetByClass<UCogInputDataAsset>();
+
     UCogInputWindow_Actions* ActionsWindow = CogWindowManager->CreateWindow<UCogInputWindow_Actions>("Input.Actions");
-    ActionsWindow->ActionsAsset = GetFirstAssetByClass<UCogInputDataAsset_Actions>();
+    ActionsWindow->Asset = InputAsset;
 
     UCogInputWindow_Gamepad* GamepadWindow = CogWindowManager->CreateWindow<UCogInputWindow_Gamepad>("Input.Gamepad");
-    GamepadWindow->ActionsAsset = GetFirstAssetByClass<UCogInputDataAsset_Actions>();
+    GamepadWindow->Asset = InputAsset;
 
     //---------------------------------------
     // Main Menu Widget

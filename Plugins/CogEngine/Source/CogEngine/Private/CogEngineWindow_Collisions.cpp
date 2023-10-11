@@ -2,6 +2,7 @@
 
 #include "CogDebugDrawHelper.h"
 #include "CogDebugSettings.h"
+#include "CogEngineDataAsset.h"
 #include "CogImGuiHelper.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -368,7 +369,7 @@ void UCogEngineWindow_Collisions::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Collisions::SetCollisionsAsset(const UCogEngineDataAsset_Collisions* Asset)
+void UCogEngineWindow_Collisions::SetAsset(const UCogEngineDataAsset* Asset)
 {
     if (Asset == nullptr)
     {

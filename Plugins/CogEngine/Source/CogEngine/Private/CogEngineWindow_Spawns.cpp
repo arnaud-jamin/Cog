@@ -1,5 +1,7 @@
 #include "CogEngineWindow_Spawns.h"
 
+#include "CogEngineDataAsset.h"
+
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogEngineWindow_Spawns::RenderHelp()
 {

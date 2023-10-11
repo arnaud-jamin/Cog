@@ -1,6 +1,6 @@
 #include "CogInputWindow_Actions.h"
 
-#include "CogInputDataAsset_Actions.h"
+#include "CogInputDataAsset.h"
 #include "CogWindowWidgets.h"
 #include "Engine/LocalPlayer.h"
 #include "EnhancedInputSubsystems.h"
@@ -15,7 +15,7 @@ void UCogInputWindow_Actions::RenderHelp()
         "This window displays the current state of each Input Action. "
         "It can also be used to inject inputs to help debugging. "
         "The input action are read from a Input Mapping Context defined in '%s' data asset. "
-        , TCHAR_TO_ANSI(*GetNameSafe(ActionsAsset.Get()))
+        , TCHAR_TO_ANSI(*GetNameSafe(Asset.Get()))
     );
 }
 
@@ -30,13 +30,13 @@ void UCogInputWindow_Actions::RenderContent()
 {
     Super::RenderContent();
 
-    if (ActionsAsset == nullptr)
+    if (Asset == nullptr)
     {
         ImGui::Text("No Actions Asset");
         return;
     }
 
-    if (ActionsAsset->MappingContext == nullptr)
+    if (Asset->MappingContext == nullptr)
     {
         ImGui::Text("No MappingContext");
         return;
@@ -77,7 +77,7 @@ void UCogInputWindow_Actions::RenderContent()
 
     if (Actions.Num() == 0)
     {
-        for (const FEnhancedActionKeyMapping& Mapping : ActionsAsset->MappingContext->GetMappings())
+        for (const FEnhancedActionKeyMapping& Mapping : Asset->MappingContext->GetMappings())
         {
             if (Mapping.Action != nullptr && Actions.ContainsByPredicate([&Mapping](const FCogInjectActionInfo& ActionInfo) { return Mapping.Action == ActionInfo.Action; }) == false)
             {

@@ -4,7 +4,7 @@
 #include "CogWindow.h"
 #include "CogEngineWindow_Spawns.generated.h"
 
-class UCogEngineDataAsset_Spawns;
+class UCogEngineDataAsset;
 struct FCogEngineSpawnGroup;
 
 UCLASS()
@@ -14,9 +14,9 @@ class COGENGINE_API UCogEngineWindow_Spawns : public UCogWindow
 
 public:
 
-    const UCogEngineDataAsset_Spawns* GetSpawnsAsset() const { return SpawnAsset; }
+    const UCogEngineDataAsset* GetSpawnsAsset() const { return SpawnAsset; }
 
-    void SetSpawnsAsset(const UCogEngineDataAsset_Spawns* Value) { SpawnAsset = Value; }
+    void SetAsset(const UCogEngineDataAsset* Value) { SpawnAsset = Value; }
 
 protected:
 
@@ -30,5 +30,5 @@ protected:
 
 private:
 
-    const UCogEngineDataAsset_Spawns* SpawnAsset = nullptr;
+    const UCogEngineDataAsset* SpawnAsset = nullptr;
 };

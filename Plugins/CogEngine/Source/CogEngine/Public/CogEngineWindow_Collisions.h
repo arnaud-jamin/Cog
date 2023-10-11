@@ -15,7 +15,7 @@ public:
 
     UCogEngineWindow_Collisions();
 
-    void SetCollisionsAsset(const UCogEngineDataAsset_Collisions* Asset);
+    void SetAsset(const UCogEngineDataAsset* Asset);
 
 private:
 
@@ -29,7 +29,7 @@ private:
         FColor Color;
     };
 
-    TWeakObjectPtr<UCogEngineDataAsset_Collisions> CollisionsAsset;
+    TWeakObjectPtr<UCogEngineDataAsset> CollisionsAsset;
 
     FChannel Channels[ECC_MAX];
 
