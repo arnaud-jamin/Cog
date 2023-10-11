@@ -2,14 +2,14 @@
 
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetRegistry/IAssetRegistry.h"
-#include "CogSampleDefines.h"
+#include "CogCommon.h"
 #include "CogSampleFunctionLibrary_Tag.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/GameMode.h"
 #include "GameFramework/GameState.h"
 #include "Modules/ModuleManager.h"
 
-#if USE_COG
+#if ENABLE_COG
 #include "CogAbilityDataAsset_Abilities.h"
 #include "CogAbilityDataAsset_Cheats.h"
 #include "CogAbilityDataAsset_Pools.h"
@@ -22,7 +22,6 @@
 #include "CogAbilityWindow_Pools.h"
 #include "CogAbilityWindow_Tags.h"
 #include "CogAbilityWindow_Tweaks.h"
-#include "CogDebugDefines.h"
 #include "CogDebugDrawImGui.h"
 #include "CogDebugPlot.h"
 #include "CogEngineDataAsset_Collisions.h"
@@ -47,7 +46,7 @@
 #include "CogInputWindow_Actions.h"
 #include "CogInputWindow_Gamepad.h"
 #include "CogWindowManager.h"
-#endif //USE_COG
+#endif //ENABLE_COG
 
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -82,6 +81,10 @@ ACogSampleGameState::ACogSampleGameState(const FObjectInitializer & ObjectInitia
 void ACogSampleGameState::BeginPlay()
 {
     Super::BeginPlay();
+
+#if ENABLE_COG
+    InitializeCog();
+#endif //ENABLE_COG
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -89,12 +92,12 @@ void ACogSampleGameState::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
     Super::EndPlay(EndPlayReason);
 
-#if USE_COG
+#if ENABLE_COG
     if (CogWindowManager != nullptr)
     {
         CogWindowManager->Shutdown();
     }
-#endif //USE_COG
+#endif //ENABLE_COG
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -102,48 +105,28 @@ void ACogSampleGameState::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
 
-#if USE_COG
-    TickCog(DeltaSeconds);
-#endif //USE_COG
-}
-
-#if USE_COG
-
-//--------------------------------------------------------------------------------------------------------------------------
-void ACogSampleGameState::TickCog(float DeltaSeconds)
-{
-    //---------------------------------------
-    // Wait for the viewport to be set
-    //---------------------------------------
-    if (GEngine->GameViewport != nullptr)
-    {
-        if (CogWindowManager == nullptr)
-        {
-            InitializeCog();
-        }
-        else 
-        {
-            CogWindowManager->Tick(DeltaSeconds);
-        }
-    }
+#if ENABLE_COG
 
     extern ENGINE_API float GAverageFPS;
     extern ENGINE_API float GAverageMS;
     FCogDebugPlot::PlotValue(this, "Frame Rate", GAverageFPS);
     FCogDebugPlot::PlotValue(this, "Frame Time", GAverageMS);
+
+    CogWindowManager->Tick(DeltaSeconds);
+
+#endif //ENABLE_COG
 }
+
+#if ENABLE_COG
 
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleGameState::InitializeCog()
 {
-    RegisterCommand(TEXT("Cog.ToggleInput"), TEXT(""), FConsoleCommandWithArgsDelegate::CreateUObject(this, &ACogSampleGameState::CogToggleInput));
-
-    TSharedPtr<SCogImguiWidget> Widget = FCogImguiModule::Get().CreateImGuiViewport(GEngine->GameViewport, [this](float DeltaTime) { RenderCog(DeltaTime); });
     FCogImguiModule::Get().SetToggleInputKey(FCogImGuiKeyInfo(EKeys::Insert));
+    RegisterCommand(TEXT("Cog.ToggleInput"), TEXT(""), FConsoleCommandWithArgsDelegate::CreateUObject(this, &ACogSampleGameState::CogToggleInput));
 
     CogWindowManager = NewObject<UCogWindowManager>(this);
     CogWindowManagerRef = CogWindowManager;
-    CogWindowManager->Initialize(GetWorld(), Widget);
 
     //---------------------------------------
     // Engine
@@ -174,7 +157,7 @@ void ACogSampleGameState::InitializeCog()
 
     CogWindowManager->CreateWindow<UCogEngineWindow_Skeleton>("Engine.Skeleton");
 
-    UCogEngineWindow_Spawns* SpawnWindow =CogWindowManager->CreateWindow<UCogEngineWindow_Spawns>("Engine.Spawns");
+    UCogEngineWindow_Spawns* SpawnWindow = CogWindowManager->CreateWindow<UCogEngineWindow_Spawns>("Engine.Spawns");
     SpawnWindow->SetSpawnsAsset(GetFirstAssetByClass<UCogEngineDataAsset_Spawns>());
 
     UCogEngineWindow_Stats* StatsWindow = CogWindowManager->CreateWindow<UCogEngineWindow_Stats>("Engine.Stats");
@@ -221,13 +204,6 @@ void ACogSampleGameState::InitializeCog()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogSampleGameState::RenderCog(float DeltaTime)
-{
-    CogWindowManager->Render(DeltaTime);
-    FCogDebugDrawImGui::Draw();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleGameState::RegisterCommand(const TCHAR* Name, const TCHAR* Help, const FConsoleCommandWithArgsDelegate& Command)
 {
     IConsoleManager& ConsoleManager = IConsoleManager::Get();
@@ -244,4 +220,4 @@ void ACogSampleGameState::CogToggleInput(const TArray<FString>& Args)
 }
 
 
-#endif //USE_COG
+#endif //ENABLE_COG

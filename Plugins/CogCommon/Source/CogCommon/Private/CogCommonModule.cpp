@@ -1,17 +1,17 @@
-#include "CogInterfaceModule.h"
+#include "CogCommonModule.h"
 
-#define LOCTEXT_NAMESPACE "FCogInterfacesModule"
+#define LOCTEXT_NAMESPACE "FCogCommonModule"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogInterfaceModule::StartupModule()
+void FCogCommonModule::StartupModule()
 {
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogInterfaceModule::ShutdownModule()
+void FCogCommonModule::ShutdownModule()
 {
 }
 
 #undef LOCTEXT_NAMESPACE
 	
-IMPLEMENT_MODULE(FCogInterfaceModule, CogInterface)
+IMPLEMENT_MODULE(FCogCommonModule, CogCommon)

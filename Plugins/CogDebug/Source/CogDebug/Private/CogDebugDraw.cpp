@@ -1,13 +1,14 @@
 #include "CogDebugDraw.h"
 
 #include "CogDebugDrawHelper.h"
-#include "CogDebugShape.h"
-#include "CogDebugHelper.h"
 #include "CogDebugDrawImGui.h"
-#include "CogImguiHelper.h"
+#include "CogDebugHelper.h"
 #include "CogDebugLog.h"
 #include "CogDebugModule.h"
 #include "CogDebugReplicator.h"
+#include "CogDebugSettings.h"
+#include "CogDebugShape.h"
+#include "CogImguiHelper.h"
 #include "Engine/SkeletalMesh.h"
 #include "VisualLogger/VisualLogger.h"
 

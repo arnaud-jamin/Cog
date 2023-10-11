@@ -3,9 +3,9 @@
 #include "AbilitySystemLog.h"
 #include "CogSampleDefines.h"
 
-#if USE_COG
+#if ENABLE_COG
 #include "CogDebugLog.h"
-#endif //USE_COG
+#endif //ENABLE_COG
 
 DEFINE_LOG_CATEGORY(LogCogAlways);
 
@@ -24,7 +24,7 @@ namespace CogSampleLog
 {
     void RegiterAllLogCategories()
     {
-#if USE_COG
+#if ENABLE_COG
         FCogDebugLog::AddLogCategory(LogCogAlways, "Always", false);
 
         FCogDebugLog::AddLogCategory(LogCogAbility, "Ability");
@@ -39,7 +39,7 @@ namespace CogSampleLog
         FCogDebugLog::AddLogCategory(LogCogSkeleton, "Skeleton");
         FCogDebugLog::AddLogCategory(LogCogTargetAcquisition, "Target Acquisition");
         FCogDebugLog::AddLogCategory(LogGameplayEffects, "Gameplay Effects");
-#endif //USE_COG
+#endif //ENABLE_COG
     }
 }
 

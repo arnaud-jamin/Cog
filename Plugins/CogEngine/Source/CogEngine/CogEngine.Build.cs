@@ -22,7 +22,7 @@ public class CogEngine : ModuleRules
 			new string[]
 			{
 				"Core",
-                "CogInterface",
+                "CogCommon",
                 "CogImgui",
                 "CogDebug",
                 "CogWindow",

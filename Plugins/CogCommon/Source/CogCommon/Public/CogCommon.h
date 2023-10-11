@@ -1,19 +1,18 @@
-#pragma  once
+#pragma once
 
 #include "CoreMinimal.h"
-#include "CogDebugDefines.h"
-#include "CogDebugSettings.h"
 #include "Templates/IsArrayOrRefOfType.h"
 
-#if !ENABLE_COG
+#ifndef ENABLE_COG
+#define ENABLE_COG !UE_BUILD_SHIPPING
+#endif
 
-#define COG_LOG_ACTIVE_FOR_OBJECT(Object)                                       (0)
-#define COG_LOG(LogCategory, Verbosity, Format, ...)                            (0)
-#define COG_LOG_FUNC(LogCategory, Verbosity, Format, ...)                       (0)
-#define COG_LOG_OBJECT(LogCategory, Verbosity, Actor, Format, ...)              (0)
-#define COG_LOG_OBJECT_NO_CONTEXT(LogCategory, Verbosity, Actor, Format, ...)   (0)
+#if ENABLE_COG
 
-#else //!ENABLE_COG
+#include "CogDebugSettings.h"
+
+#define IF_COG(expr)            { expr; }
+#define COG_LOG_CATEGORY        FLogCategoryBase
 
 //--------------------------------------------------------------------------------------------------------------------------
 #define COG_LOG_ACTIVE_FOR_OBJECT(Object)   (FCogDebugSettings::IsDebugActiveForObject(Object))
@@ -49,5 +48,17 @@
         COG_LOG(LogCategory, Verbosity, TEXT("%s - %s"), *GetNameSafe(Object), *FString::Printf(Format, ##__VA_ARGS__));    \
     }                                                                                                                       \
 
+#else //ENABLE_COG
 
-#endif //!ENABLE_COG
+#define IF_COG(expr)            (0)
+#define COG_LOG_CATEGORY        FNoLoggingCategory
+#define COG_LOG_ABILITY(...)    (0)
+
+#define COG_LOG_ACTIVE_FOR_OBJECT(Object)                                       (0)
+#define COG_LOG(LogCategory, Verbosity, Format, ...)                            (0)
+#define COG_LOG_FUNC(LogCategory, Verbosity, Format, ...)                       (0)
+#define COG_LOG_OBJECT(LogCategory, Verbosity, Actor, Format, ...)              (0)
+#define COG_LOG_OBJECT_NO_CONTEXT(LogCategory, Verbosity, Actor, Format, ...)   (0)
+
+#endif //ENABLE_COG
+

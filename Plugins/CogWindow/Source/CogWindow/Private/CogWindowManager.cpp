@@ -1,9 +1,10 @@
 #include "CogWindowManager.h"
 
+#include "CogDebugDrawImGui.h"
 #include "CogImguiModule.h"
 #include "CogImguiWidget.h"
-#include "CogWindowWidgets.h"
 #include "CogWindow_Spacing.h"
+#include "CogWindowWidgets.h"
 #include "Engine/Engine.h"
 #include "imgui_internal.h"
 
@@ -13,10 +14,9 @@ UCogWindowManager::UCogWindowManager()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::Initialize(UWorld* InWorld, TSharedPtr<SCogImguiWidget> InImGuiWidget)
+void UCogWindowManager::InitializeInternal()
 {
-    World = InWorld;
-    ImGuiWidget = InImGuiWidget;
+    ImGuiWidget = FCogImguiModule::Get().CreateImGuiViewport(GEngine->GameViewport, [this](float DeltaTime) { Render(DeltaTime); });
 
     ImGuiSettingsHandler IniHandler;
     IniHandler.TypeName = "Cog";
@@ -50,6 +50,16 @@ void UCogWindowManager::Shutdown()
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::Tick(float DeltaTime)
 {
+    if (GEngine->GameViewport == nullptr)
+    {
+        return;
+    }
+
+    if (ImGuiWidget.IsValid() == false)
+    {
+        InitializeInternal();
+    }
+    
     if (LayoutToLoad != -1)
     {
         FString Filename = FCogImguiHelper::GetIniFilePath(FString::Printf(TEXT("ImGui_Layout_%d"), LayoutToLoad));
@@ -112,6 +122,8 @@ void UCogWindowManager::Render(float DeltaTime)
     }
 
     TickDPI();
+
+    FCogDebugDrawImGui::Draw();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -2,7 +2,7 @@
   "FileVersion": 1,
   "Version": 1,
   "VersionName": "1.0",
-  "FriendlyName": "CogInterface",
+  "FriendlyName": "CogCommon",
   "Description": "",
   "Category": "Other",
   "CreatedBy": "Arnaud Jamin",
@@ -16,7 +16,7 @@
   "Installed": false,
   "Modules": [
     {
-      "Name": "CogInterface",
+      "Name": "CogCommon",
       "Type": "Runtime",
       "LoadingPhase": "Default"
     }

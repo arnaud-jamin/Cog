@@ -47,7 +47,7 @@ private:
 
     bool bWasAvoidanceEnabled = false;
 
-#if USE_COG
+#if ENABLE_COG
 
     FVector DebugLastBottomLocation = FVector::ZeroVector;
 
@@ -55,7 +55,7 @@ private:
 
     bool DebugIsPositionCorrected = false;
 
-#endif //USE_COG
+#endif //ENABLE_COG
 
 
     //----------------------------------------------------------------------------------------------------------------------

@@ -1,18 +1,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogCommon.h"
 
-#ifndef USE_COG
-#define USE_COG (ENABLE_DRAW_DEBUG && !NO_LOGGING)
-#endif
+#if ENABLE_COG
 
-#if USE_COG
-
-#include "CogDebugLogMacros.h"
 #include "CogDebugSettings.h"
-
-#define IF_COG(expr)        { expr; }
-#define COG_LOG_CATEGORY    FLogCategoryBase
 
 #define COG_LOG_ABILITY(Verbosity, Ability, Format, ...)                                                                    \
     if (Ability != nullptr)                                                                                                 \
@@ -28,10 +21,8 @@
         }                                                                                                                   \
     }                                                                                                                       \
 
-#else //USE_COG
+#else //ENABLE_COG
 
-#define IF_COG(expr)            (0)
-#define COG_LOG_CATEGORY        FNoLoggingCategory
 #define COG_LOG_ABILITY(...)    (0)
 
-#endif //USE_COG
+#endif //ENABLE_COG

@@ -9,10 +9,10 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/PlayerController.h"
 
-#if USE_COG
+#if ENABLE_COG
 #include "CogDebugDraw.h"
 #include "CogDebugLog.h"
-#endif //USE_COG
+#endif //ENABLE_COG
 
 //--------------------------------------------------------------------------------------------------------------------------
 // FCogSampleTargetTargetAcquisitionParams
@@ -125,13 +125,13 @@ void UCogSampleTargetAcquisition::FindBestTarget(
     //----------------------------------------------------------------------------------------------------------------------
     // Draw the ScreenSearchDirection if valid
     //----------------------------------------------------------------------------------------------------------------------
-#if USE_COG
+#if ENABLE_COG
     const FVector2D SearchDirectionNormalized = (TargetSwitchSearchDirection.IsNearlyZero() == false) ? TargetSwitchSearchDirection.GetSafeNormal() : FVector2D::ZeroVector;
     if (SearchDirectionNormalized.IsNearlyZero() == false)
     {
         FCogDebugDraw::Segment2D(LogCogTargetAcquisition, Controller, FVector2D::ZeroVector, FVector2D(SearchDirectionNormalized.X, -SearchDirectionNormalized.Y), FColor(255, 255, 0, 255), bIsDebugPersistent);
     }
-#endif //USE_COG
+#endif //ENABLE_COG
 
     static const FName TraceTag(TEXT("FindLockTarget_GatherTargets"));
     FCollisionQueryParams QueryParams(TraceTag, SCENE_QUERY_STAT_ONLY(CogSampleTargetAcquisition), false);
@@ -285,7 +285,7 @@ void UCogSampleTargetAcquisition::FindBestTargetInCandidates(
     // Draw screen limits
     //----------------------------------------------------------------------------------------------------------------------
 
-#if USE_COG
+#if ENABLE_COG
 
     FCogDebugDraw::Circle2D(LogCogTargetAcquisition, Controller, ScreenCrosshairPosition, 5.0f, FColor(255, 255, 255, 255), bIsDebugPersistent);
 
@@ -312,7 +312,7 @@ void UCogSampleTargetAcquisition::FindBestTargetInCandidates(
                 bIsDebugPersistent);
         }
     }
-#endif //USE_COG
+#endif //ENABLE_COG
 
     const FRotator YawRotation = GetReferentialRotation(Character, YawReferential);
     const FVector YawDirection = YawRotation.Vector();
@@ -545,7 +545,7 @@ bool UCogSampleTargetAcquisition::EvaluateCandidate(
     //--------------------------------------------------------------------------------------------------------------
     // Draw the score of each candidate
     //--------------------------------------------------------------------------------------------------------------
-#if USE_COG
+#if ENABLE_COG
 
     if (FCogDebugLog::IsLogCategoryActive(LogCogTargetAcquisition))
     {
@@ -597,7 +597,7 @@ bool UCogSampleTargetAcquisition::EvaluateCandidate(
         FCogDebugDraw::String(LogCogTargetAcquisition, EvalParams.Controller, Text, CandidateTargetLocation, FColor::White, EvalParams.IsDebugPersistent);
     }
     
-#endif //USE_COG
+#endif //ENABLE_COG
 
     return true;
 }
@@ -669,13 +669,13 @@ bool UCogSampleTargetAcquisition::ComputeCandidateScreenLocation(
                 bFoundValidCandidate = true;
             }
 
-#if USE_COG
+#if ENABLE_COG
             const FColor CapsuleColor = (ScreenCenterToCapsuleDistance > 0.0f) ? FColor(255, 255, 255, 100) : FColor(0, 255, 0, 200);
             FCogDebugDraw::Segment2D(LogCogTargetAcquisition, CandidateActor, CapsuleBot2D + FVector2D(CapsuleRadius2D, 0), CapsuleTop2D + FVector2D(CapsuleRadius2D, 0), CapsuleColor, Params.IsDebugPersistent);
             FCogDebugDraw::Segment2D(LogCogTargetAcquisition, CandidateActor, CapsuleBot2D - FVector2D(CapsuleRadius2D, 0), CapsuleTop2D - FVector2D(CapsuleRadius2D, 0), CapsuleColor, Params.IsDebugPersistent);
             FCogDebugDraw::Circle2D(LogCogTargetAcquisition, CandidateActor, CapsuleTop2D, CapsuleRadius2D, CapsuleColor, Params.IsDebugPersistent);
             FCogDebugDraw::Circle2D(LogCogTargetAcquisition, CandidateActor, CapsuleBot2D, CapsuleRadius2D, CapsuleColor, Params.IsDebugPersistent);
-#endif //USE_COG
+#endif //ENABLE_COG
         }
     }
     else
@@ -688,12 +688,12 @@ bool UCogSampleTargetAcquisition::ComputeCandidateScreenLocation(
         }
     }
 
-#if USE_COG
+#if ENABLE_COG
     if (bFoundValidCandidate)
     {
         FCogDebugDraw::Circle2D(LogCogTargetAcquisition, CandidateActor, CandidateClosestScreenLocation, 2.0f, FColor(0, 255, 0, 255), Params.IsDebugPersistent);
     }
-#endif //USE_COG
+#endif //ENABLE_COG
 
     return bFoundValidCandidate;
 }

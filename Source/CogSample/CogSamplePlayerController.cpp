@@ -1,19 +1,18 @@
 #include "CogSamplePlayerController.h"
 
-#include "CogDebugLogMacros.h"
+#include "CogCommon.h"
 #include "CogSampleDefines.h"
 #include "CogSampleCharacter.h"
 #include "CogSampleLogCategories.h"
 #include "CogSampleTargetAcquisition.h"
 #include "Net/UnrealNetwork.h"
 
-#if USE_COG
+#if ENABLE_COG
 #include "CogAbilityReplicator.h"
-#include "CogDebugDefines.h"
 #include "CogDebugDraw.h"
 #include "CogDebugReplicator.h"
 #include "CogEngineReplicator.h"
-#endif //USE_COG
+#endif //ENABLE_COG
 
 //--------------------------------------------------------------------------------------------------------------------------
 ACogSamplePlayerController::ACogSamplePlayerController()
@@ -25,11 +24,11 @@ void ACogSamplePlayerController::BeginPlay()
 {
     Super::BeginPlay();
 
-#if USE_COG
+#if ENABLE_COG
     ACogDebugReplicator::Spawn(this);
     ACogAbilityReplicator::Spawn(this);
     ACogEngineReplicator::Spawn(this);
-#endif //USE_COG
+#endif //ENABLE_COG
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -169,12 +168,12 @@ void ACogSamplePlayerController::TickTargeting(float DeltaSeconds)
         SetTarget(Result.Target);
     }
 
-#if USE_COG
+#if ENABLE_COG
     if (Target != nullptr && PossessedCharacter != nullptr)
     {
         FCogDebugDraw::Segment(LogCogTargetAcquisition, PossessedCharacter.Get(), PossessedCharacter->GetActorLocation(), Target->GetActorLocation(), FColor::White, false);
     }
-#endif //USE_COG
+#endif //ENABLE_COG
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

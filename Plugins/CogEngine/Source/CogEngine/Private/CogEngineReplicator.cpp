@@ -1,7 +1,7 @@
 #include "CogEngineReplicator.h"
 
-#include "CogDebugLogMacros.h"
-#include "CogInterfacePossessor.h"
+#include "CogCommon.h"
+#include "CogCommonPossessorInterface.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/WorldSettings.h"
 #include "EngineUtils.h"
@@ -159,7 +159,7 @@ void ACogEngineReplicator::Server_Possess_Implementation(APawn* Pawn)
 {
 #if !UE_BUILD_SHIPPING
 
-    if (ICogInterfacePossessor* Possessor = Cast<ICogInterfacePossessor>(OwnerPlayerController))
+    if (ICogCommonPossessorInterface* Possessor = Cast<ICogCommonPossessorInterface>(OwnerPlayerController))
     {
         Possessor->SetPossession(Pawn);
     }
@@ -172,7 +172,7 @@ void ACogEngineReplicator::Server_ResetPossession_Implementation()
 {
 #if !UE_BUILD_SHIPPING
 
-    if (ICogInterfacePossessor* Possessor = Cast<ICogInterfacePossessor>(OwnerPlayerController))
+    if (ICogCommonPossessorInterface* Possessor = Cast<ICogCommonPossessorInterface>(OwnerPlayerController))
     {
         Possessor->ResetPossession();
     }

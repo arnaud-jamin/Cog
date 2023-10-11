@@ -19,8 +19,6 @@ class COGWINDOW_API UCogWindowManager : public UObject
 public:
     UCogWindowManager();
 
-    void Initialize(UWorld* World, TSharedPtr<SCogImguiWidget> InImGuiWidget);
-
     void Shutdown();
 
     void SortMainMenu();
@@ -61,7 +59,7 @@ public:
 
     bool GetShowHelp() const { return bShowHelp; }
 
-private:
+protected:
 
     struct FMenu
     {
@@ -69,6 +67,8 @@ private:
         UCogWindow* Window = nullptr;
         TArray<FMenu> SubMenus;
     };
+
+    void InitializeInternal();
 
     void RefreshDPIScale();
 
@@ -79,9 +79,13 @@ private:
     void DrawMenu(FMenu& Menu);
 
     static void SettingsHandler_ClearAll(ImGuiContext* ctx, ImGuiSettingsHandler*);
+
     static void SettingsHandler_ApplyAll(ImGuiContext* ctx, ImGuiSettingsHandler*);
+
     static void* SettingsHandler_ReadOpen(ImGuiContext*, ImGuiSettingsHandler*, const char* name);
+
     static void SettingsHandler_ReadLine(ImGuiContext*, ImGuiSettingsHandler*, void* entry, const char* line);
+
     static void SettingsHandler_WriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler, ImGuiTextBuffer* buf);
     
     void TickDPI();
@@ -109,10 +113,13 @@ private:
 
     TSharedPtr<SCogImguiWidget> ImGuiWidget;
 
-    TWeakObjectPtr<UWorld> World;
     FMenu MainMenu;
+
     int32 LayoutToLoad = -1;
+
     int32 HideAllWindowsCounter = 0;
+
     bool bHideAllWindows = false;
+
     bool bRefreshDPIScale;
 };

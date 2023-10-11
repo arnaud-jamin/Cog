@@ -1,6 +1,6 @@
 #include "CogDebugSettings.h"
 
-#include "CogInterfaceDebugFilteredActor.h"
+#include "CogCommonDebugFilteredActorInterface.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 TWeakObjectPtr<AActor> FCogDebugSettings::Selection;
@@ -92,7 +92,7 @@ bool FCogDebugSettings::IsDebugActiveForObject(const UObject* WorldContextObject
             return true;
         }
 
-        if (Cast<ICogInterfacesDebugFilteredActor>(Outer))
+        if (Cast<ICogCommonDebugFilteredActorInterface>(Outer))
         {
             return false;
         }

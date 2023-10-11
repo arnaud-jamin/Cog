@@ -9,10 +9,10 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/Character.h"
 
-#if USE_COG
+#if ENABLE_COG
 #include "CogDebugDraw.h"
 #include "CogDebugPlot.h"
-#endif //USE_COG
+#endif //ENABLE_COG
 
 //--------------------------------------------------------------------------------------------------------------------------
 // UCogSampleCharacterMovementComponent::FCogSampleSavedMove
@@ -209,17 +209,17 @@ void UCogSampleCharacterMovementComponent::BeginPlay()
 {
     Super::BeginPlay();
 
-#if USE_COG
+#if ENABLE_COG
     const ACharacter* Character = GetCharacterOwner();
     const UCapsuleComponent* CapsuleComponent = Character->GetCapsuleComponent();
     DebugLastBottomLocation = Character->GetActorLocation() - FVector::UpVector * CapsuleComponent->GetScaledCapsuleHalfHeight();
-#endif //USE_COG
+#endif //ENABLE_COG
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSampleCharacterMovementComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-#if USE_COG
+#if ENABLE_COG
 
     const ACharacter* Character = GetCharacterOwner();
     const UCapsuleComponent* CapsuleComponent = Character->GetCapsuleComponent();
@@ -232,11 +232,11 @@ void UCogSampleCharacterMovementComponent::TickComponent(float DeltaTime, enum E
         FCogDebugPlot::PlotValue(GetPawnOwner(), "Move Input Local Y", FVector::DotProduct(GetPawnOwner()->GetActorForwardVector(), GetPendingInputVector()));
     }
 
-#endif //USE_COG
+#endif //ENABLE_COG
 
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-#if USE_COG
+#if ENABLE_COG
        
     const FVector DebugLocation = Character->GetActorLocation();
     const FVector DebugBottomLocation = DebugLocation - FVector::UpVector * CapsuleComponent->GetScaledCapsuleHalfHeight();
@@ -294,7 +294,7 @@ void UCogSampleCharacterMovementComponent::TickComponent(float DeltaTime, enum E
     DebugLastVelocity = Velocity;
     DebugIsPositionCorrected = false;
 
-#endif //USE_COG
+#endif //ENABLE_COG
 
 }
 
@@ -303,9 +303,9 @@ bool UCogSampleCharacterMovementComponent::ClientUpdatePositionAfterServerUpdate
 {
     bool Result = Super::ClientUpdatePositionAfterServerUpdate();
 
-#if USE_COG
+#if ENABLE_COG
     DebugIsPositionCorrected = true;
-#endif //USE_COG
+#endif //ENABLE_COG
 
     return Result;
 }

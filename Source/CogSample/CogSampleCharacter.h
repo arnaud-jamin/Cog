@@ -4,10 +4,10 @@
 #include "AbilitySystemInterface.h"
 #include "ActiveGameplayEffectHandle.h"
 #include "AttributeSet.h"
-#include "CogSampleDefines.h"
-#include "CogInterfaceAllegianceActor.h"
-#include "CogInterfaceDebugFilteredActor.h"
+#include "CogCommonAllegianceActorInterface.h"
+#include "CogCommonDebugFilteredActorInterface.h"
 #include "CogSampleDamageEvent.h"
+#include "CogSampleDefines.h"
 #include "CogSampleTargetableInterface.h"
 #include "CogSampleTeamInterface.h"
 #include "GameFramework/Character.h"
@@ -65,8 +65,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCogSampleCharacterEventDelegate, AC
 UCLASS(config=Game)
 class ACogSampleCharacter : public ACharacter
     , public IAbilitySystemInterface
-    , public ICogInterfacesDebugFilteredActor
-    , public ICogInterfacesAllegianceActor
+    , public ICogCommonDebugFilteredActorInterface
+    , public ICogCommonAllegianceActorInterface
     , public ICogSampleTeamInterface
     , public ICogSampleTargetableInterface
 {
@@ -108,7 +108,7 @@ public:
     // ICogInterfacesAllegianceActor overrides
     //----------------------------------------------------------------------------------------------------------------------
     
-    ECogInterfacesAllegiance GetAllegianceWithOtherActor(const AActor* OtherActor) const override;
+    ECogCommonAllegiance GetAllegianceWithOtherActor(const AActor* OtherActor) const override;
 
     //----------------------------------------------------------------------------------------------------------------------
     // ICogSampleTargetInterface overrides

@@ -14,10 +14,10 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "ScalableFloat.h"
 
-#if USE_COG
+#if ENABLE_COG
 #include "CogDebugDraw.h"
 #include "CogDebugLog.h"
-#endif //USE_COG
+#endif //ENABLE_COG
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSampleFunctionLibrary_Gameplay::AdjustAttributeForMaxChange(UAbilitySystemComponent* AbilityComponent, FGameplayAttributeData& AffectedAttribute, float OldValue, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty)

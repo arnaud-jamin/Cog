@@ -8,8 +8,8 @@ public class CogSample : ModuleRules
 
 		PublicDependencyModuleNames.AddRange(new string[] 
         { 
-            "CogDebug",
-            "Core", 
+            "CogCommon",
+            "Core",
             "CoreUObject", 
             "Engine", 
             "EnhancedInput",
@@ -25,8 +25,8 @@ public class CogSample : ModuleRules
         {
             PublicDependencyModuleNames.AddRange(new string[]
             {
+                "CogDebug",
                 "CogImgui",
-                "CogInterface",
                 "CogWindow",
                 "CogEngine",
                 "CogInput",

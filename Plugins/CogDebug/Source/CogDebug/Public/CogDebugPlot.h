@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogDebugDefines.h"
+#include "CogCommon.h"
 #include "imgui.h"
 #include "implot.h"
 

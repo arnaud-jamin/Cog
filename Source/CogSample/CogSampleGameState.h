@@ -25,13 +25,9 @@ private:
     UPROPERTY()
     TObjectPtr<UObject> CogWindowManagerRef = nullptr;
 
-#if USE_COG
+#if ENABLE_COG
 
     void InitializeCog();
-
-    void TickCog(float DeltaTime);
-
-    void RenderCog(float DeltaTime);
 
     void RegisterCommand(const TCHAR* Name, const TCHAR* Help, const FConsoleCommandWithArgsDelegate& Command);
 
@@ -39,5 +35,5 @@ private:
 
     TObjectPtr<UCogWindowManager> CogWindowManager = nullptr;
 
-#endif //USE_COG
+#endif //ENABLE_COG
 };

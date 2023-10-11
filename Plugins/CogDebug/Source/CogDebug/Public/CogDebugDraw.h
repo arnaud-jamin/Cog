@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogDebugLogMacros.h"
+#include "CogCommon.h"
 
 class USkeletalMeshComponent;
 struct FCogDebugShape;

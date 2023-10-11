@@ -1,7 +1,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogDebugLogMacros.h"
 
 struct COGDEBUG_API FCogDebugSettings
 {

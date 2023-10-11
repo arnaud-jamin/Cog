@@ -1,6 +1,6 @@
 #include "CogDebugPlotBlueprint.h"
 
-#include "CogDebugDefines.h"
+#include "CogCommon.h"
 #include "CogDebugPlot.h"
 
 //--------------------------------------------------------------------------------------------------------------------------

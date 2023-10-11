@@ -1,17 +1,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogInterfacePossessor.generated.h"
+#include "CogCommonPossessorInterface.generated.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 UINTERFACE(MinimalAPI, Blueprintable)
-class UCogInterfacePossessor : public UInterface
+class UCogCommonPossessorInterface : public UInterface
 {
     GENERATED_BODY()
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
-class ICogInterfacePossessor
+class ICogCommonPossessorInterface
 {
     GENERATED_BODY()
 

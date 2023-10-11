@@ -23,7 +23,7 @@ public class CogDebug : ModuleRules
 			{
 				"Core",
                 "CogImgui",
-                "CogInterface",
+                "CogCommon",
             }
             );
 			

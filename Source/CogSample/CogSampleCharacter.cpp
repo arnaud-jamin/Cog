@@ -1,8 +1,7 @@
 #include "CogSampleCharacter.h"
 
 #include "Camera/CameraComponent.h"
-#include "CogDebugLogMacros.h"
-#include "CogDebugMetric.h"
+#include "CogCommon.h"
 #include "CogSampleAttributeSet_Health.h"
 #include "CogSampleAttributeSet_Misc.h"
 #include "CogSampleCharacterMovementComponent.h"
@@ -24,10 +23,11 @@
 #include "Net/Core/PushModel/PushModel.h"
 #include "Net/UnrealNetwork.h"
 
-#if USE_COG
+#if ENABLE_COG
 #include "CogDebugDraw.h"
+#include "CogDebugMetric.h"
 #include "CogDebugPlot.h"
-#endif //USE_COG
+#endif //ENABLE_COG
 
 //--------------------------------------------------------------------------------------------------------------------------
 ACogSampleCharacter::ACogSampleCharacter(const FObjectInitializer& ObjectInitializer)
@@ -476,18 +476,18 @@ void ACogSampleCharacter::Look(const FInputActionValue& Value)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ECogInterfacesAllegiance ACogSampleCharacter::GetAllegianceWithOtherActor(const AActor* OtherActor) const
+ECogCommonAllegiance ACogSampleCharacter::GetAllegianceWithOtherActor(const AActor* OtherActor) const
 {
     ECogSampleAllegiance Allegiance = UCogSampleFunctionLibrary_Team::GetActorsAllegiance(this, OtherActor);
 
     switch (Allegiance)
     {
-    case ECogSampleAllegiance::Enemy:       return ECogInterfacesAllegiance::Enemy;
-    case ECogSampleAllegiance::Friendly:    return ECogInterfacesAllegiance::Friendly;
-    case ECogSampleAllegiance::Neutral:     return ECogInterfacesAllegiance::Neutral;
+    case ECogSampleAllegiance::Enemy:       return ECogCommonAllegiance::Enemy;
+    case ECogSampleAllegiance::Friendly:    return ECogCommonAllegiance::Friendly;
+    case ECogSampleAllegiance::Neutral:     return ECogCommonAllegiance::Neutral;
     }
 
-    return ECogInterfacesAllegiance::Neutral;
+    return ECogCommonAllegiance::Neutral;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -495,9 +495,9 @@ void ACogSampleCharacter::HandleDamageReceived(const FCogSampleDamageEventParams
 {
     OnDamageReceived.Broadcast(Params);
 
-#if USE_COG
+#if ENABLE_COG
     FCogDebugMetric::AddMetric(this, "Damage Received", Params.MitigatedDamage, Params.UnmitigatedDamage, false);
-#endif //USE_COG
+#endif //ENABLE_COG
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -505,9 +505,9 @@ void ACogSampleCharacter::HandleDamageDealt(const FCogSampleDamageEventParams& P
 {
     OnDamageDealt.Broadcast(Params);
 
-#if USE_COG
+#if ENABLE_COG
     FCogDebugMetric::AddMetric(this, "Damage Dealt", Params.MitigatedDamage, Params.UnmitigatedDamage, false);
-#endif //USE_COG
+#endif //ENABLE_COG
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -553,21 +553,21 @@ void ACogSampleCharacter::OnRevived(AActor* InInstigator, AActor* InCauser, cons
 // ----------------------------------------------------------------------------------------------------------------
 void ACogSampleCharacter::OnGameplayEffectAdded(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& GameplayEffectSpec, FActiveGameplayEffectHandle Handle)
 {
-#if USE_COG
+#if ENABLE_COG
     FCogDebugPlot::PlotEvent(this, "Effects", GameplayEffectSpec.Def->GetFName(), GameplayEffectSpec.GetDuration() == 0.0f)
                     .AddParam("Name", AbilitySystemComponent->CleanupName(GetNameSafe(GameplayEffectSpec.Def)))
                     .AddParam("Effect Instigator", GetNameSafe(GameplayEffectSpec.GetEffectContext().GetInstigator()))
                     .AddParam("Effect Level", GameplayEffectSpec.GetLevel())
                     .AddParam("Effect Duration", GameplayEffectSpec.GetDuration());
-#endif //USE_COG
+#endif //ENABLE_COG
 }
 
 // ----------------------------------------------------------------------------------------------------------------
 void ACogSampleCharacter::OnGameplayEffectRemoved(const FActiveGameplayEffect& RemovedGameplayEffect)
 {
-#if USE_COG
+#if ENABLE_COG
     FCogDebugPlot::PlotEventStop(this, "Effects", RemovedGameplayEffect.Spec.Def->GetFName());
-#endif //USE_COG
+#endif //ENABLE_COG
 }
 
 // ----------------------------------------------------------------------------------------------------------------

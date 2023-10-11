@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
-#include "CogInterfacePossessor.h"
+#include "CogCommonPossessorInterface.h"
 #include "GameFramework/PlayerController.h"
 #include "CogSamplePlayerController.generated.h"
 
@@ -18,7 +18,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FCogSampleControlledCharacterChan
 UCLASS(config=Game)
 class ACogSamplePlayerController 
     : public APlayerController
-    , public ICogInterfacePossessor
+    , public ICogCommonPossessorInterface
 {
 	GENERATED_BODY()
 

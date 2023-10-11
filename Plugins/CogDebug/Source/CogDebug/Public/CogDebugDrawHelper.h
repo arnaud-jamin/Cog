@@ -1,7 +1,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogDebugDefines.h"
 
 namespace EDrawDebugTrace { enum Type; }
 
