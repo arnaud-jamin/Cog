@@ -3,21 +3,10 @@ Cog is a set of debug tools for Unreal Engine built on top of [ImGui](https://gi
 
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/21659aea-2cd8-4ef6-b3b0-5795f5f3246b)
 
-## Project Structure
-
-- `CogSample` - A Sample that demonstrate various Cog functionalities. The project was saved in Unreal 5.1
-- `Plugins/CogAbility` - ImGui windows for the Gameplay Ability System (Abilities, Effects, Tags, ...)
-- `Plugins/CogInput` - ImGui windows for the Enhanced Input library (Input action, Gamepad)
-- `Plugins/CogEngine` - ImGui windows for the core unreal engine functionalities (Log, Stats, Time, Collisions, Skeleton, ...)
-- `Plugins/CogWindow` - ImGui window management (Base Window, Layout)
-- `Plugins/CogDebug` - Debug functionalities (Log, Debug Draw, Plot, Metric, ...)
-- `Plugins/CogImGui` - Integration of Imgui for Unreal, inspired by [UnrealImGui](https://github.com/segross/UnrealImGui)
-- `Plugins/CogInterface` - Interfaces implemented by actors to inspect them
-
 ## ImGui Windows
 
 ### General Notes
-- Press the [Insert] key or use the 'Cog.ToggleInput' console command to open the Imgui Main Menu.
+- Press the `[Insert]` key or use the `Cog.ToggleInput` console command to open the Imgui Main Menu.
 - Most windows display their contents based on a selected actor.
 - The selector actor can be chosen using the selection window or widget.
 - Mouse over a window title to display its help. This behavior can be disabled in the Window menu.
@@ -178,9 +167,78 @@ Log and debug functions can be filtered to only what is outputted by the selecte
 
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/a6f1329e-d49e-410f-8a70-4613aafabb5a)
 
+## Setup
 
+### Testing the sample
 
+You must have Unreal 5.1 or greater and Visual Studio to launch the sample
 
+1. Download the code
+2. Right Click `Cog.uproject` and click `Generate Visual Studio project files`
+3. Open Cog.sln
+4. Select the `DebugGame Editor` or `Development Editor` solution configuration
+5. Make sure `Cog` is set as the startup project
+6. Start Debugging (F5)
+7. Once in Unreal, press Play (Alt+P)
+8. Press the `[Insert]` key or use the `Cog.ToggleInput` console command to open the Imgui Main Menu.
+
+### Integrating Cog into your project
+
+The Cog repository has the following structure:
+- `CogSample` - A Sample that demonstrate various Cog functionalities. The project was saved in Unreal 5.1
+- `Plugins/CogAbility` - ImGui windows for the Gameplay Ability System (Abilities, Effects, Tags, ...)
+- `Plugins/CogInput` - ImGui windows for the Enhanced Input library (Input action, Gamepad)
+- `Plugins/CogEngine` - ImGui windows for the core unreal engine functionalities (Log, Stats, Time, Collisions, Skeleton, ...)
+- `Plugins/CogWindow` - ImGui window management (Base Window, Layout)
+- `Plugins/CogDebug` - Debug functionalities (Log, Debug Draw, Plot, Metric, ...)
+- `Plugins/CogImGui` - Integration of Imgui for Unreal, inspired by [UnrealImGui](https://github.com/segross/UnrealImGui)
+- `Plugins/CogInterface` - Interfaces implemented by actors to inspect them
+
+The reason for having multiple plugins is to ease the integration for projects that do not use the `Ability System Component` or `Enhanced Input`.
+For the next step of the setup, it is assumed all the plugins are used.
+
+1. Setup up module dependencies:
+
+```c#
+using UnrealBuildTool;
+
+public class CogSample : ModuleRules
+{
+    public CogSample(ReadOnlyTargetRules Target) : base(Target)
+    {
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+        PublicDependencyModuleNames.AddRange(new string[] 
+        { 
+            "CogCommon",  // The CogCommon is required on all target configuration
+            "Core",
+            "CoreUObject", 
+            "Engine", 
+            "EnhancedInput",
+            "GameplayTasks",
+            "GameplayAbilities",
+            "GameplayTags",
+            "HeadMountedDisplay", 
+            "InputCore", 
+            "NetCore",
+        });
+
+        // Other Cog plugins can be added only for specific target configuration
+        if (Target.Configuration != UnrealTargetConfiguration.Shipping)
+        {
+            PublicDependencyModuleNames.AddRange(new string[]
+            {
+                "CogDebug",
+                "CogImgui",
+                "CogWindow",
+                "CogEngine",
+                "CogInput",
+                "CogAbility",
+            });
+        }
+    }
+}
+```
+ 
 
 
 
