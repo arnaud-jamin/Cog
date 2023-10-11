@@ -217,7 +217,6 @@ public class CogSample : ModuleRules
             "GameplayTasks",
             "GameplayAbilities",
             "GameplayTags",
-            "HeadMountedDisplay", 
             "InputCore", 
             "NetCore",
         });
