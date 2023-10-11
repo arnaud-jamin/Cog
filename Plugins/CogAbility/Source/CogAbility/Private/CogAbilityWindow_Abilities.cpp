@@ -1,13 +1,11 @@
 #include "CogAbilityWindow_Abilities.h"
 
-#include "CogAbilityDataAsset_Abilities.h"
+#include "CogAbilityDataAsset.h"
 #include "CogAbilityHelper.h"
+#include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
 #include "imgui.h"
 #include "imgui_internal.h"
-
-ImVec4 ActiveColor(1.0f, 0.8f, 0.0f, 1.0f);
-ImVec4 DeactiveColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogAbilityWindow_Abilities::RenderHelp()
@@ -17,7 +15,7 @@ void UCogAbilityWindow_Abilities::RenderHelp()
     "Click the ability check box to force its activation or deactivation. "
     "Right click an ability to open or close the ability separate window. "
     "Use the 'Give Ability' menu to manually give an ability from a list defined in the '%s' data asset. "
-    , TCHAR_TO_ANSI(*GetNameSafe(AbilitiesAsset.Get())));
+    , TCHAR_TO_ANSI(*GetNameSafe(Asset.Get())));
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -108,10 +106,10 @@ void UCogAbilityWindow_Abilities::RenderAbiltiesMenu(AActor* Selection)
     {
         if (ImGui::BeginMenu("Give Ability"))
         {
-            if (AbilitiesAsset != nullptr)
+            if (Asset != nullptr)
             {
                 int Index = 0;
-                for (TSubclassOf<UGameplayAbility> AbilityClass : AbilitiesAsset->Abilities)
+                for (TSubclassOf<UGameplayAbility> AbilityClass : Asset->Abilities)
                 {
                     ImGui::PushID(Index);
 
@@ -164,7 +162,11 @@ void UCogAbilityWindow_Abilities::RenderAbilitiesTable(UAbilitySystemComponent& 
 
             ImGui::PushID(Index);
 
-            ImVec4 Color = Spec.ActiveCount > 0 ? ActiveColor : DeactiveColor;
+            ImVec4 Color(1.0f, 1.0f, 1.0f, 1.0f);
+            if (Asset != nullptr)
+            {
+                Color = FCogImguiHelper::ToImVec4(Spec.ActiveCount > 0 ? Asset->AbilityActiveColor : Asset->AbilityInactiveColor);
+            }
             ImGui::PushStyleColor(ImGuiCol_Text, Color);
 
             //------------------------
@@ -332,6 +334,12 @@ void UCogAbilityWindow_Abilities::RenderAbilityInfo(const UAbilitySystemComponen
         ImGui::TableSetupColumn("Property");
         ImGui::TableSetupColumn("Value");
 
+        ImVec4 Color(1.0f, 1.0f, 1.0f, 1.0f);
+        if (Asset != nullptr)
+        {
+            Color = FCogImguiHelper::ToImVec4(Spec.ActiveCount > 0 ? Asset->AbilityActiveColor : Asset->AbilityInactiveColor);
+        }
+
         //------------------------
         // Name
         //------------------------
@@ -339,7 +347,6 @@ void UCogAbilityWindow_Abilities::RenderAbilityInfo(const UAbilitySystemComponen
         ImGui::TableNextColumn();
         ImGui::TextColored(TextColor, "Name");
         ImGui::TableNextColumn();
-        ImVec4 Color = Spec.ActiveCount > 0 ? ActiveColor : DeactiveColor;
         ImGui::PushStyleColor(ImGuiCol_Text, Color);
         ImGui::Text("%s", TCHAR_TO_ANSI(*GetAbilityName(Ability)));
         ImGui::PopStyleColor(1);

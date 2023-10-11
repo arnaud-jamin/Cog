@@ -5,7 +5,7 @@
 #include "CogAbilityWindow_Abilities.generated.h"
 
 class UGameplayAbility;
-class UCogAbilityDataAsset_Abilities;
+class UCogAbilityDataAsset;
 struct FGameplayAbilitySpec;
 
 UCLASS()
@@ -17,7 +17,7 @@ public:
 
     UCogAbilityWindow_Abilities();
 
-    TWeakObjectPtr<UCogAbilityDataAsset_Abilities> AbilitiesAsset;
+    TWeakObjectPtr<const UCogAbilityDataAsset> Asset;
 
 protected:
 

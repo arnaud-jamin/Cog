@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogSampleDefines.h"
+#include "CogCommon.h"
 #include "GameFramework/GameStateBase.h"
 #include "CogSampleGameState.generated.h"
 
@@ -10,7 +10,7 @@ class UCogWindowManager;
 UCLASS()
 class ACogSampleGameState : public AGameStateBase
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
     ACogSampleGameState(const FObjectInitializer& ObjectInitializer);
 
@@ -22,6 +22,9 @@ class ACogSampleGameState : public AGameStateBase
 
 private:
 
+    //--------------------------------------------------------------
+    // To make sure it doesn't get garbage collected.
+    //--------------------------------------------------------------
     UPROPERTY()
     TObjectPtr<UObject> CogWindowManagerRef = nullptr;
 

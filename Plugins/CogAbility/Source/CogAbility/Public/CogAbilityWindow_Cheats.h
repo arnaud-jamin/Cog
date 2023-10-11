@@ -5,7 +5,7 @@
 #include "CogAbilityWindow_Cheats.generated.h"
 
 class AActor;
-class UCogAbilityDataAsset_Cheats;
+class UCogAbilityDataAsset;
 struct FCogAbilityCheat;
 
 UCLASS(Config = Cog)
@@ -17,9 +17,9 @@ public:
 
     UCogAbilityWindow_Cheats();
 
-    const UCogAbilityDataAsset_Cheats* GetCheatsAsset() const { return CheatsAsset.Get(); }
+    const UCogAbilityDataAsset* GetAsset() const { return Asset.Get(); }
 
-    void SetCheatsAsset(const UCogAbilityDataAsset_Cheats* Value);
+    void SetAsset(const UCogAbilityDataAsset* Value);
 
 protected:
 
@@ -42,5 +42,5 @@ private:
     UPROPERTY(Config)
     TArray<FString> AppliedCheats;
 
-    TWeakObjectPtr<const UCogAbilityDataAsset_Cheats> CheatsAsset;
+    TWeakObjectPtr<const UCogAbilityDataAsset> Asset;
 };

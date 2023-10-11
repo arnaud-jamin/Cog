@@ -1,6 +1,7 @@
 #include "CogAbilityWindow_Tweaks.h"
 
 #include "AbilitySystemComponent.h"
+#include "CogAbilityDataAsset.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogAbilityWindow_Tweaks::RenderHelp()
@@ -9,7 +10,7 @@ void UCogAbilityWindow_Tweaks::RenderHelp()
         "This window can be used to apply tweaks to all the loaded actors. "
         "The tweaks are used to test various gameplay settings by actor category. "
         "The tweaks can be configured in the '%s' data asset. "
-        , TCHAR_TO_ANSI(*GetNameSafe(TweaksAsset.Get()))
+        , TCHAR_TO_ANSI(*GetNameSafe(Asset.Get()))
     );
 }
 
@@ -18,7 +19,7 @@ void UCogAbilityWindow_Tweaks::RenderContent()
 {
     Super::RenderContent();
 
-    if (TweaksAsset == nullptr)
+    if (Asset == nullptr)
     {
         return;
     }
@@ -41,9 +42,9 @@ void UCogAbilityWindow_Tweaks::RenderContent()
 
     int32 CurrentTweakProfileIndex = Replicator->GetTweakProfileIndex();
     FName CurrentProfileName = FName("None");
-    if (TweaksAsset->TweakProfiles.IsValidIndex(CurrentTweakProfileIndex))
+    if (Asset->TweakProfiles.IsValidIndex(CurrentTweakProfileIndex))
     {
-        CurrentProfileName = TweaksAsset->TweakProfiles[CurrentTweakProfileIndex].Name;
+        CurrentProfileName = Asset->TweakProfiles[CurrentTweakProfileIndex].Name;
     }
 
     if (ImGui::BeginCombo("Profile", TCHAR_TO_ANSI(*CurrentProfileName.ToString())))
@@ -52,18 +53,18 @@ void UCogAbilityWindow_Tweaks::RenderContent()
             bool IsSelected = CurrentTweakProfileIndex == INDEX_NONE;
             if (ImGui::Selectable("None", IsSelected))
             {
-                Replicator->SetTweakProfile(TweaksAsset.Get(), INDEX_NONE);
+                Replicator->SetTweakProfile(Asset.Get(), INDEX_NONE);
             }
         }
 
-        for (int32 TweakProfileIndex = 0; TweakProfileIndex < TweaksAsset->TweakProfiles.Num(); ++TweakProfileIndex)
+        for (int32 TweakProfileIndex = 0; TweakProfileIndex < Asset->TweakProfiles.Num(); ++TweakProfileIndex)
         {
-            const FCogAbilityTweakProfile& TweakProfile = TweaksAsset->TweakProfiles[TweakProfileIndex];
+            const FCogAbilityTweakProfile& TweakProfile = Asset->TweakProfiles[TweakProfileIndex];
             bool IsSelected = TweakProfileIndex == CurrentTweakProfileIndex;
 
             if (ImGui::Selectable(TCHAR_TO_ANSI(*TweakProfile.Name.ToString()), IsSelected))
             {
-                Replicator->SetTweakProfile(TweaksAsset.Get(), TweakProfileIndex);
+                Replicator->SetTweakProfile(Asset.Get(), TweakProfileIndex);
             }
         }
         ImGui::EndCombo();
@@ -71,12 +72,12 @@ void UCogAbilityWindow_Tweaks::RenderContent()
 
     ImGui::Separator();
 
-    if (ImGui::BeginTable("Tweaks", 1 + TweaksAsset->TweaksCategories.Num(), ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize))
+    if (ImGui::BeginTable("Tweaks", 1 + Asset->TweaksCategories.Num(), ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize))
     {
         ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthStretch);
-        for (int32 TweakCategoryIndex = 0; TweakCategoryIndex < TweaksAsset->TweaksCategories.Num(); ++TweakCategoryIndex)
+        for (int32 TweakCategoryIndex = 0; TweakCategoryIndex < Asset->TweaksCategories.Num(); ++TweakCategoryIndex)
         {
-            FCogAbilityTweakCategory& Category = TweaksAsset->TweaksCategories[TweakCategoryIndex];
+            const FCogAbilityTweakCategory& Category = Asset->TweaksCategories[TweakCategoryIndex];
             ImGui::TableSetupColumn(TCHAR_TO_ANSI(*Category.Name), ImGuiTableColumnFlags_WidthStretch);
         }
         ImGui::TableHeadersRow();
@@ -84,7 +85,7 @@ void UCogAbilityWindow_Tweaks::RenderContent()
         ImGui::TableNextRow();
 
         int32 TweakIndex = 0;
-        for (FCogAbilityTweak& Tweak : TweaksAsset->Tweaks)
+        for (const FCogAbilityTweak& Tweak : Asset->Tweaks)
         {
             if (Tweak.Effect != nullptr)
             {
@@ -93,7 +94,7 @@ void UCogAbilityWindow_Tweaks::RenderContent()
                 ImGui::TableNextColumn();
                 ImGui::Text("%s", TCHAR_TO_ANSI(*Tweak.Name.ToString()));
 
-                for (int TweakCategoryIndex = 0; TweakCategoryIndex < TweaksAsset->TweaksCategories.Num(); ++TweakCategoryIndex)
+                for (int TweakCategoryIndex = 0; TweakCategoryIndex < Asset->TweaksCategories.Num(); ++TweakCategoryIndex)
                 {
                     ImGui::TableNextColumn();
                     ImGui::PushID(TweakCategoryIndex);
@@ -113,22 +114,22 @@ void UCogAbilityWindow_Tweaks::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogAbilityWindow_Tweaks::DrawTweak(ACogAbilityReplicator* Replicator, int32 TweakIndex, int32 TweakCategoryIndex)
 {
-    if (TweaksAsset->TweaksCategories.IsValidIndex(TweakCategoryIndex) == false)
+    if (Asset->TweaksCategories.IsValidIndex(TweakCategoryIndex) == false)
     {
         return;
     }
 
-    float* Value = Replicator->GetTweakCurrentValuePtr(TweaksAsset.Get(), TweakIndex, TweakCategoryIndex);
+    float* Value = Replicator->GetTweakCurrentValuePtr(Asset.Get(), TweakIndex, TweakCategoryIndex);
     if (Value == nullptr)
     {
         return;
     }
 
-    const FCogAbilityTweakCategory& Category = TweaksAsset->TweaksCategories[TweakCategoryIndex];
+    const FCogAbilityTweakCategory& Category = Asset->TweaksCategories[TweakCategoryIndex];
 
     FCogWindowWidgets::PushBackColor(FCogImguiHelper::ToImVec4(Category.Color));
     ImGui::PushItemWidth(-1);
-    ImGui::SliderFloat("##Value", Value, TweaksAsset->TweakMinValue, TweaksAsset->TweakMaxValue, "%+0.0f%%", 1.0f);
+    ImGui::SliderFloat("##Value", Value, Asset->TweakMinValue, Asset->TweakMaxValue, "%+0.0f%%", 1.0f);
     ImGui::PopItemWidth();
     FCogWindowWidgets::PopBackColor();
 
@@ -146,6 +147,6 @@ void UCogAbilityWindow_Tweaks::DrawTweak(ACogAbilityReplicator* Replicator, int3
 
     if (bUpdateValue)
     {
-        Replicator->SetTweakValue(TweaksAsset.Get(), TweakIndex, TweakCategoryIndex, *Value);
+        Replicator->SetTweakValue(Asset.Get(), TweakIndex, TweakCategoryIndex, *Value);
     }
 }

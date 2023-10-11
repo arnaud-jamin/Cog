@@ -216,13 +216,13 @@ void ACogAbilityReplicator::Server_ResetAllTweaks_Implementation()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::SetTweakValue(const UCogAbilityDataAsset_Tweaks* TweaksAsset, int32 TweakIndex, int32 TweakCategoryIndex, float Value)
+void ACogAbilityReplicator::SetTweakValue(const UCogAbilityDataAsset* TweaksAsset, int32 TweakIndex, int32 TweakCategoryIndex, float Value)
 {
     Server_SetTweakValue(TweaksAsset, TweakIndex, TweakCategoryIndex, Value);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::Server_SetTweakValue_Implementation(const UCogAbilityDataAsset_Tweaks* TweaksAsset, int32 TweakIndex, int32 TweakCategoryIndex, float Value)
+void ACogAbilityReplicator::Server_SetTweakValue_Implementation(const UCogAbilityDataAsset* TweaksAsset, int32 TweakIndex, int32 TweakCategoryIndex, float Value)
 {
     if (TweaksAsset == nullptr)
     {
@@ -252,7 +252,7 @@ void ACogAbilityReplicator::Server_SetTweakValue_Implementation(const UCogAbilit
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::ApplyAllTweaksOnActor(const UCogAbilityDataAsset_Tweaks* TweaksAsset, int32 TweakCategoryIndex, AActor* Actor)
+void ACogAbilityReplicator::ApplyAllTweaksOnActor(const UCogAbilityDataAsset* TweaksAsset, int32 TweakCategoryIndex, AActor* Actor)
 {
     if (TweaksAsset == nullptr)
     {
@@ -297,7 +297,7 @@ void ACogAbilityReplicator::ApplyTweakOnActor(AActor* Actor, const FCogAbilityTw
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-float ACogAbilityReplicator::GetTweakCurrentValue(const UCogAbilityDataAsset_Tweaks* TweaksAsset, int32 TweakIndex, int32 TweakCategoryIndex)
+float ACogAbilityReplicator::GetTweakCurrentValue(const UCogAbilityDataAsset* TweaksAsset, int32 TweakIndex, int32 TweakCategoryIndex)
 {
     float* Value = GetTweakCurrentValuePtr(TweaksAsset, TweakIndex, TweakCategoryIndex);
     if (Value == nullptr)
@@ -309,7 +309,7 @@ float ACogAbilityReplicator::GetTweakCurrentValue(const UCogAbilityDataAsset_Twe
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-float* ACogAbilityReplicator::GetTweakCurrentValuePtr(const UCogAbilityDataAsset_Tweaks* TweaksAsset, int32 TweakIndex, int32 TweakCategoryIndex)
+float* ACogAbilityReplicator::GetTweakCurrentValuePtr(const UCogAbilityDataAsset* TweaksAsset, int32 TweakIndex, int32 TweakCategoryIndex)
 {
     TweakCurrentValues.SetNum(TweaksAsset->Tweaks.Num() * TweaksAsset->TweaksCategories.Num());
 
@@ -324,7 +324,7 @@ float* ACogAbilityReplicator::GetTweakCurrentValuePtr(const UCogAbilityDataAsset
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::SetTweakCurrentValue(const UCogAbilityDataAsset_Tweaks* TweaksAsset, int32 TweakIndex, int32 TweakCategoryIndex, float Value)
+void ACogAbilityReplicator::SetTweakCurrentValue(const UCogAbilityDataAsset* TweaksAsset, int32 TweakIndex, int32 TweakCategoryIndex, float Value)
 {
     if (TweaksAsset == nullptr)
     {
@@ -344,13 +344,13 @@ void ACogAbilityReplicator::SetTweakCurrentValue(const UCogAbilityDataAsset_Twea
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::SetTweakProfile(const UCogAbilityDataAsset_Tweaks* TweaksAsset, int32 ProfileIndex)
+void ACogAbilityReplicator::SetTweakProfile(const UCogAbilityDataAsset* TweaksAsset, int32 ProfileIndex)
 {
     Server_SetTweakProfile(TweaksAsset, ProfileIndex);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::Server_SetTweakProfile_Implementation(const UCogAbilityDataAsset_Tweaks* TweaksAsset, int32 ProfileIndex)
+void ACogAbilityReplicator::Server_SetTweakProfile_Implementation(const UCogAbilityDataAsset* TweaksAsset, int32 ProfileIndex)
 {
     if (TweaksAsset == nullptr)
     {
@@ -396,7 +396,7 @@ void ACogAbilityReplicator::Server_SetTweakProfile_Implementation(const UCogAbil
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::GetActorsFromTweakCategory(const UCogAbilityDataAsset_Tweaks* TweaksAsset, int32 TweakCategoryIndex, TArray<AActor*>& Actors)
+void ACogAbilityReplicator::GetActorsFromTweakCategory(const UCogAbilityDataAsset* TweaksAsset, int32 TweakCategoryIndex, TArray<AActor*>& Actors)
 {
     if (TweaksAsset == nullptr)
     {

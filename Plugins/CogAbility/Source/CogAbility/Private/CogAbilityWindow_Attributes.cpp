@@ -2,7 +2,9 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
+#include "CogAbilityDataAsset.h"
 #include "CogAbilityHelper.h"
+#include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
 #include "AttributeSet.h"
 #include "EngineUtils.h"
@@ -190,21 +192,24 @@ void UCogAbilityWindow_Attributes::RenderContent()
 
                             ImGui::TableNextRow();
 
-                            ImVec4 Color;
-                            if (CurrentValue > BaseValue)
+                            FLinearColor Color = FLinearColor::White;
+                            if (Asset != nullptr)
                             {
-                                Color = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
-                            }
-                            else if (CurrentValue < BaseValue)
-                            {
-                                Color = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
-                            }
-                            else
-                            {
-                                Color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+                                if (CurrentValue > BaseValue)
+                                {
+                                    Color = Asset->PositiveEffectColor;
+                                }
+                                else if (CurrentValue < BaseValue)
+                                {
+                                    Color = Asset->NegativeEffectColor; 
+                                }
+                                else
+                                {
+                                    Color = Asset->NeutralEffectColor;
+                                }
                             }
 
-                            ImGui::PushStyleColor(ImGuiCol_Text, Color);
+                            ImGui::PushStyleColor(ImGuiCol_Text, FCogImguiHelper::ToImVec4(Color));
 
                             //------------------------
                             // Name
@@ -228,7 +233,7 @@ void UCogAbilityWindow_Attributes::RenderContent()
                                 FCogWindowWidgets::EndTableTooltip();
                             }
 
-                            ImGui::PushStyleColor(ImGuiCol_Text, Color);
+                            ImGui::PushStyleColor(ImGuiCol_Text, FCogImguiHelper::ToImVec4(Color));
 
                             //------------------------
                             // Base Value

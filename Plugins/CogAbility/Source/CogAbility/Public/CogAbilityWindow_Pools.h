@@ -5,7 +5,7 @@
 #include "CogWindow.h"
 #include "CogAbilityWindow_Pools.generated.h"
 
-class UCogAbilityDataAsset_Pools;
+class UCogAbilityDataAsset;
 class UAbilitySystemComponent;
 struct FCogAbilityPool;
 
@@ -16,7 +16,7 @@ class COGABILITY_API UCogAbilityWindow_Pools : public UCogWindow
 
 public:
     
-    TWeakObjectPtr<UCogAbilityDataAsset_Pools> PoolsAsset;
+    TWeakObjectPtr<const UCogAbilityDataAsset> Asset;
 
 protected:
 

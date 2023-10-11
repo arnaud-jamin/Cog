@@ -5,6 +5,7 @@
 #include "CogWindowManager.h"
 #include "CogWindowWidgets.h"
 #include "EngineUtils.h"
+#include "GameFramework/Character.h"
 #include "imgui.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -23,6 +24,7 @@ void UCogEngineWindow_Selection::RenderHelp()
 UCogEngineWindow_Selection::UCogEngineWindow_Selection()
 {
     bHasMenu = true;
+    SubClasses = { AActor::StaticClass(), ACharacter::StaticClass() };
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

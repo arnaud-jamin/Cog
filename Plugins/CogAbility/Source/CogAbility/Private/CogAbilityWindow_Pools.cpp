@@ -1,6 +1,7 @@
 #include "CogAbilityWindow_Pools.h"
 
 #include "AbilitySystemComponent.h"
+#include "CogAbilityDataAsset.h"
 #include "CogImguiHelper.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -9,7 +10,7 @@ void UCogAbilityWindow_Pools::RenderHelp()
     ImGui::Text(
         "This window displays attributes of the selected actor as pools. "
         "The pools can be configured in the '%s' data asset."
-        , TCHAR_TO_ANSI(*GetNameSafe(PoolsAsset.Get()))
+        , TCHAR_TO_ANSI(*GetNameSafe(Asset.Get()))
     );
 }
 
@@ -18,7 +19,7 @@ void UCogAbilityWindow_Pools::RenderContent()
 {
     Super::RenderContent();
 
-    if (PoolsAsset == nullptr)
+    if (Asset == nullptr)
     {
         return;
     }
@@ -34,7 +35,7 @@ void UCogAbilityWindow_Pools::RenderContent()
         ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
         ImGui::TableSetupColumn("Pool", ImGuiTableColumnFlags_WidthStretch);
 
-        for (const FCogAbilityPool& Pool : PoolsAsset->Pools)
+        for (const FCogAbilityPool& Pool : Asset->Pools)
         {
             DrawPool(AbilitySystem, Pool);
         }

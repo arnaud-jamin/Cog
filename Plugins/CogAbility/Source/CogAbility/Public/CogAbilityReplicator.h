@@ -6,7 +6,7 @@
 
 class AActor;
 class UAbilitySystemComponent;
-class UCogAbilityDataAsset_Tweaks;
+class UCogAbilityDataAsset;
 struct FCogAbilityCheat;
 struct FCogAbilityTweak;
 struct FGameplayTag;
@@ -38,15 +38,15 @@ public:
 
     void ResetAllTweaks();
 
-    void SetTweakValue(const UCogAbilityDataAsset_Tweaks* TweaksAsset, int32 TweakIndex, int32 CategoryIndex, float Value);
+    void SetTweakValue(const UCogAbilityDataAsset* TweaksAsset, int32 TweakIndex, int32 CategoryIndex, float Value);
 
-    void SetTweakProfile(const UCogAbilityDataAsset_Tweaks* TweaksAsset, int32 ProfileIndex);
+    void SetTweakProfile(const UCogAbilityDataAsset* TweaksAsset, int32 ProfileIndex);
 
     int32 GetTweakProfileIndex() const { return TweakProfileIndex; }
 
-    float GetTweakCurrentValue(const UCogAbilityDataAsset_Tweaks* TweaksAsset, int32 TweakIndex, int32 CategoryIndex);
+    float GetTweakCurrentValue(const UCogAbilityDataAsset* TweaksAsset, int32 TweakIndex, int32 CategoryIndex);
 
-    float* GetTweakCurrentValuePtr(const UCogAbilityDataAsset_Tweaks* TweaksAsset, int32 TweakIndex, int32 CategoryIndex);
+    float* GetTweakCurrentValuePtr(const UCogAbilityDataAsset* TweaksAsset, int32 TweakIndex, int32 CategoryIndex);
 
 private:
 
@@ -63,15 +63,15 @@ private:
     void Server_ResetAllTweaks();
 
     UFUNCTION(Reliable, Server)
-    void Server_SetTweakValue(const UCogAbilityDataAsset_Tweaks* TweaksAsset, int32 TweakIndex, int32 TweakCategoryIndex, float Value);
+    void Server_SetTweakValue(const UCogAbilityDataAsset* TweaksAsset, int32 TweakIndex, int32 TweakCategoryIndex, float Value);
 
     UFUNCTION(Reliable, Server)
-    void Server_SetTweakProfile(const UCogAbilityDataAsset_Tweaks* TweaksAsset, int32 ProfileIndex);
+    void Server_SetTweakProfile(const UCogAbilityDataAsset* TweaksAsset, int32 ProfileIndex);
 
-    void SetTweakCurrentValue(const UCogAbilityDataAsset_Tweaks* TweaksAsset, int32 TweakIndex, int32 CategoryIndex, float Value);
+    void SetTweakCurrentValue(const UCogAbilityDataAsset* TweaksAsset, int32 TweakIndex, int32 CategoryIndex, float Value);
     void ApplyTweakOnActor(AActor* Actor, const FCogAbilityTweak& Tweak, float Value, const FGameplayTag& SetByCallerMagnitudeTag);
-    void ApplyAllTweaksOnActor(const UCogAbilityDataAsset_Tweaks* TweaksAsset, int32 TweakCategoryIndex, AActor* Actor);
-    void GetActorsFromTweakCategory(const UCogAbilityDataAsset_Tweaks* TweaksAsset, int32 CategoryIndex, TArray<AActor*>& Actors);
+    void ApplyAllTweaksOnActor(const UCogAbilityDataAsset* TweaksAsset, int32 TweakCategoryIndex, AActor* Actor);
+    void GetActorsFromTweakCategory(const UCogAbilityDataAsset* TweaksAsset, int32 CategoryIndex, TArray<AActor*>& Actors);
 
     TObjectPtr<APlayerController> OwnerPlayerController;
 

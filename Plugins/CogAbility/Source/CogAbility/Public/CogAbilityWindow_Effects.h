@@ -5,6 +5,8 @@
 #include "CogWindow.h"
 #include "CogAbilityWindow_Effects.generated.h"
 
+class UCogAbilityDataAsset;
+
 UCLASS()
 class COGABILITY_API UCogAbilityWindow_Effects : public UCogWindow
 {
@@ -14,9 +16,7 @@ public:
 
     UCogAbilityWindow_Effects();
 
-    FGameplayTag NegativeEffectTag;
-
-    FGameplayTag PositiveEffectTag;
+    TWeakObjectPtr<const UCogAbilityDataAsset> Asset;
 
 protected:
 

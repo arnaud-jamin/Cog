@@ -5,7 +5,7 @@
 #include "CogAbilityWindow_Tweaks.generated.h"
 
 class ACogAbilityReplicator;
-class UCogAbilityDataAsset_Tweaks;
+class UCogAbilityDataAsset;
 
 UCLASS()
 class COGABILITY_API UCogAbilityWindow_Tweaks : public UCogWindow
@@ -13,7 +13,7 @@ class COGABILITY_API UCogAbilityWindow_Tweaks : public UCogWindow
     GENERATED_BODY()
 
 public:
-        TWeakObjectPtr<UCogAbilityDataAsset_Tweaks> TweaksAsset;
+        TWeakObjectPtr<const UCogAbilityDataAsset> Asset;
 
 protected:
 

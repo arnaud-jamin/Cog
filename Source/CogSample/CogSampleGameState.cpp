@@ -2,7 +2,6 @@
 
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetRegistry/IAssetRegistry.h"
-#include "CogCommon.h"
 #include "CogSampleFunctionLibrary_Tag.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/GameMode.h"
@@ -10,10 +9,7 @@
 #include "Modules/ModuleManager.h"
 
 #if ENABLE_COG
-#include "CogAbilityDataAsset_Abilities.h"
-#include "CogAbilityDataAsset_Cheats.h"
-#include "CogAbilityDataAsset_Pools.h"
-#include "CogAbilityDataAsset_Tweaks.h"
+#include "CogAbilityDataAsset.h"
 #include "CogAbilityModule.h"
 #include "CogAbilityWindow_Abilities.h"
 #include "CogAbilityWindow_Attributes.h"
@@ -167,25 +163,27 @@ void ACogSampleGameState::InitializeCog()
     //---------------------------------------
     // Abilities
     //---------------------------------------
-    UCogAbilityWindow_Abilities* AbilitiesWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Abilities>("Gameplay.Abilities");
-    AbilitiesWindow->AbilitiesAsset = GetFirstAssetByClass<UCogAbilityDataAsset_Abilities>();
+    const UCogAbilityDataAsset* AbilitiesAsset = GetFirstAssetByClass<UCogAbilityDataAsset>();
 
-    CogWindowManager->CreateWindow<UCogAbilityWindow_Attributes>("Gameplay.Attributes");
+    UCogAbilityWindow_Abilities* AbilitiesWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Abilities>("Gameplay.Abilities");
+    AbilitiesWindow->Asset = AbilitiesAsset;
+
+    UCogAbilityWindow_Attributes* AttributesWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Attributes>("Gameplay.Attributes");
+    AttributesWindow->Asset = AbilitiesAsset;
 
     UCogAbilityWindow_Cheats* CheatsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Cheats>("Gameplay.Cheats");
-    CheatsWindow->SetCheatsAsset(GetFirstAssetByClass<UCogAbilityDataAsset_Cheats>());
+    CheatsWindow->SetAsset(AbilitiesAsset);
 
     UCogAbilityWindow_Effects* EffectsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Effects>("Gameplay.Effects");
-    EffectsWindow->NegativeEffectTag = Tag_Effect_Alignment_Negative;
-    EffectsWindow->PositiveEffectTag = Tag_Effect_Alignment_Positive;
+    EffectsWindow->Asset = AbilitiesAsset;
 
     UCogAbilityWindow_Pools* PoolsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Pools>("Gameplay.Pools");
-    PoolsWindow->PoolsAsset = GetFirstAssetByClass<UCogAbilityDataAsset_Pools>();
+    PoolsWindow->Asset = AbilitiesAsset;
 
     CogWindowManager->CreateWindow<UCogAbilityWindow_Tags>("Gameplay.Tags");
 
     UCogAbilityWindow_Tweaks* TweaksWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Tweaks>("Gameplay.Tweaks");
-    TweaksWindow->TweaksAsset = GetFirstAssetByClass<UCogAbilityDataAsset_Tweaks>();
+    TweaksWindow->Asset = AbilitiesAsset;
 
     //---------------------------------------
     // Input

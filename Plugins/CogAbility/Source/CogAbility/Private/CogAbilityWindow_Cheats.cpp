@@ -1,7 +1,7 @@
 #include "CogAbilityWindow_Cheats.h"
 
 #include "AbilitySystemGlobals.h"
-#include "CogAbilityDataAsset_Cheats.h"
+#include "CogAbilityDataAsset.h"
 #include "CogAbilityReplicator.h"
 #include "CogCommonAllegianceActorInterface.h"
 #include "CogDebugDraw.h"
@@ -21,7 +21,7 @@ void UCogAbilityWindow_Cheats::RenderHelp()
         "   [CTRL]  to apply the cheat to controlled actor\n"
         "   [ALT]   to apply the cheat to the allies of the selected actor\n"
         "   [SHIFT] to apply the cheat to the enemies of the selected actor\n"
-        , TCHAR_TO_ANSI(*GetNameSafe(CheatsAsset.Get()))
+        , TCHAR_TO_ANSI(*GetNameSafe(Asset.Get()))
     );
 }
 
@@ -32,9 +32,9 @@ UCogAbilityWindow_Cheats::UCogAbilityWindow_Cheats()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Cheats::SetCheatsAsset(const UCogAbilityDataAsset_Cheats* Value) 
+void UCogAbilityWindow_Cheats::SetAsset(const UCogAbilityDataAsset* Value) 
 {
-    CheatsAsset = Value;
+    Asset = Value;
 
     if (bReapplyCheatsBetweenPlays == false)
     {
@@ -48,7 +48,7 @@ void UCogAbilityWindow_Cheats::SetCheatsAsset(const UCogAbilityDataAsset_Cheats*
     }
     IsFirstLaunch = false;
 
-    if (CheatsAsset == nullptr)
+    if (Asset == nullptr)
     {
         return;
     }
@@ -69,7 +69,7 @@ void UCogAbilityWindow_Cheats::SetCheatsAsset(const UCogAbilityDataAsset_Cheats*
 
     for (const FString& AppliedCheatName : AppliedCheats)
     {
-        if (const FCogAbilityCheat* Cheat = CheatsAsset->PersistentEffects.FindByPredicate(
+        if (const FCogAbilityCheat* Cheat = Asset->PersistentEffects.FindByPredicate(
             [AppliedCheatName](const FCogAbilityCheat& Cheat) { return Cheat.Name == AppliedCheatName; }))
         {
             Replicator->ApplyCheat(LocalPawn, Targets, *Cheat);
@@ -88,7 +88,7 @@ void UCogAbilityWindow_Cheats::RenderContent()
         return;
     }
 
-    if (CheatsAsset == nullptr)
+    if (Asset == nullptr)
     {
         return;
     }
@@ -128,7 +128,7 @@ void UCogAbilityWindow_Cheats::RenderContent()
         bool bHasChanged = false;
 
         int Index = 0;
-        for (const FCogAbilityCheat& CheatEffect : CheatsAsset->PersistentEffects)
+        for (const FCogAbilityCheat& CheatEffect : Asset->PersistentEffects)
         {
             ImGui::PushID(Index);
             bHasChanged |= AddCheat(ControlledActor, SelectedActor, CheatEffect, true);
@@ -144,7 +144,7 @@ void UCogAbilityWindow_Cheats::RenderContent()
         {
             AppliedCheats.Empty();
 
-            for (const FCogAbilityCheat& CheatEffect : CheatsAsset->PersistentEffects)
+            for (const FCogAbilityCheat& CheatEffect : Asset->PersistentEffects)
             {
                 if (ACogAbilityReplicator::IsCheatActive(SelectedActor, CheatEffect))
                 {
@@ -155,7 +155,7 @@ void UCogAbilityWindow_Cheats::RenderContent()
 
         ImGui::TableNextColumn();
 
-        for (const FCogAbilityCheat& CheatEffect : CheatsAsset->InstantEffects)
+        for (const FCogAbilityCheat& CheatEffect : Asset->InstantEffects)
         {
             ImGui::PushID(Index);
             AddCheat(ControlledActor, SelectedActor, CheatEffect, false);
@@ -180,17 +180,17 @@ bool UCogAbilityWindow_Cheats::AddCheat(AActor* ControlledActor, AActor* Selecte
     const FGameplayTagContainer& Tags = Cheat.Effect->GetDefaultObject<UGameplayEffect>()->InheritableGameplayEffectTags.CombinedTags;
 
     FLinearColor Color;
-    if (Tags.HasTag(CheatsAsset->NegativeEffectTag))
+    if (Tags.HasTag(Asset->NegativeEffectTag))
     {
-        Color = CheatsAsset->NegativeEffectColor;
+        Color = Asset->NegativeEffectColor;
     }
-    else if (Tags.HasTag(CheatsAsset->PositiveEffectTag))
+    else if (Tags.HasTag(Asset->PositiveEffectTag))
     {
-        Color = CheatsAsset->PositiveEffectColor;
+        Color = Asset->PositiveEffectColor;
     }
     else
     {
-        Color = CheatsAsset->NeutralEffectColor;
+        Color = Asset->NeutralEffectColor;
     }
         
     FCogWindowWidgets::PushBackColor(FCogImguiHelper::ToImVec4(Color));

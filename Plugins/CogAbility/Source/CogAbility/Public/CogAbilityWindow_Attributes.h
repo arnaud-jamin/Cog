@@ -4,6 +4,8 @@
 #include "CogWindow.h"
 #include "CogAbilityWindow_Attributes.generated.h"
 
+class UCogAbilityDataAsset;
+
 UCLASS(Config = Cog)
 class COGABILITY_API UCogAbilityWindow_Attributes : public UCogWindow
 {
@@ -12,6 +14,8 @@ class COGABILITY_API UCogAbilityWindow_Attributes : public UCogWindow
 public:
 
         UCogAbilityWindow_Attributes();
+
+        TWeakObjectPtr<const UCogAbilityDataAsset> Asset;
 
 protected:
 

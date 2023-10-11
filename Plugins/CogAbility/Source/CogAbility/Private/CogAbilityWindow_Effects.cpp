@@ -3,6 +3,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
 #include "AttributeSet.h"
+#include "CogAbilityDataAsset.h"
 #include "CogAbilityHelper.h"
 #include "CogWindowWidgets.h"
 #include "EngineUtils.h"
@@ -20,7 +21,7 @@ void UCogAbilityWindow_Effects::RenderHelp()
 //--------------------------------------------------------------------------------------------------------------------------
 UCogAbilityWindow_Effects::UCogAbilityWindow_Effects()
 {
-    bHasMenu = true;
+    bHasMenu = false;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -88,21 +89,24 @@ void UCogAbilityWindow_Effects::RenderEffectRow(const UAbilitySystemComponent& A
 
     const FGameplayTagContainer& Tags = Effect.InheritableGameplayEffectTags.CombinedTags;
 
-    ImVec4 Color;
-    if (Tags.HasTag(NegativeEffectTag))
+    FLinearColor Color = FLinearColor::White;
+    if (Asset != nullptr)
     {
-        Color = ImVec4(1.0f, 0.5f, 0.5f, 1.0f);
-    }
-    else if (Tags.HasTag(PositiveEffectTag))
-    {
-        Color = ImVec4(0.5f, 1.0f, 0.5f, 1.0f);
-    }
-    else
-    {
-        Color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+        if (Tags.HasTag(Asset->NegativeEffectTag))
+        {
+            Color = Asset->NegativeEffectColor;
+        }
+        else if (Tags.HasTag(Asset->PositiveEffectTag))
+        {
+            Color = Asset->PositiveEffectColor;
+        }
+        else
+        {
+            Color = Asset->NeutralEffectColor;
+        }
     }
 
-    ImGui::PushStyleColor(ImGuiCol_Text, Color);
+    ImGui::PushStyleColor(ImGuiCol_Text, FCogImguiHelper::ToImVec4(Color));
 
     if (ImGui::Selectable(TCHAR_TO_ANSI(*GetEffectName(Effect)), Selected == Index, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap | ImGuiSelectableFlags_AllowDoubleClick))
     {
