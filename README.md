@@ -182,7 +182,7 @@ You must have Unreal 5.1 or greater and Visual Studio to launch the sample
 7. Once in Unreal, press Play (Alt+P)
 8. Press the `[Insert]` key or use the `Cog.ToggleInput` console command to open the Imgui Main Menu.
 
-### Integrating Cog into your project
+### Integrating Cog in your project
 
 The Cog repository has the following structure:
 - `CogSample` - A Sample that demonstrate various Cog functionalities. The project was saved in Unreal 5.1
@@ -192,14 +192,14 @@ The Cog repository has the following structure:
 - `Plugins/CogWindow` - ImGui window management (Base Window, Layout)
 - `Plugins/CogDebug` - Debug functionalities (Log, Debug Draw, Plot, Metric, ...)
 - `Plugins/CogImGui` - Integration of Imgui for Unreal, inspired by [UnrealImGui](https://github.com/segross/UnrealImGui)
-- `Plugins/CogInterface` - Interfaces implemented by actors to inspect them
+- `Plugins/CogCommon` - Common headers
 
-The reason for having multiple plugins is to ease the integration for projects that do not use the `Ability System Component` or `Enhanced Input`.
-For the next step of the setup, it is assumed all the plugins are used.
+Cog has multiple plugins to ease the integration for projects that do not use the `Ability System Component` or `Enhanced Input`. For the next steps, it is assumed all the plugins are used.
 
 1. Setup up module dependencies:
 
 ```c#
+// CogSample.Build.cs
 using UnrealBuildTool;
 
 public class CogSample : ModuleRules
@@ -217,7 +217,6 @@ public class CogSample : ModuleRules
             "GameplayTasks",
             "GameplayAbilities",
             "GameplayTags",
-            "HeadMountedDisplay", 
             "InputCore", 
             "NetCore",
         });
@@ -238,7 +237,74 @@ public class CogSample : ModuleRules
     }
 }
 ```
- 
 
+2. In the class of your choice (in the sample we use the GameState class) add a reference to the CogWindowManager:
 
+```cpp
+// ACogSampleGameState.h
+#pragma once
 
+#include "CoreMinimal.h"
+#include "CogCommon.h"
+#include "GameFramework/GameStateBase.h"
+#include "CogSampleGameState.generated.h"
+
+class UCogWindowManager;
+
+UCLASS()
+class ACogSampleGameState : public AGameStateBase
+{
+    GENERATED_BODY()
+
+    [...]
+
+    // To make sure it doesn't get garbage collected.
+    UPROPERTY()
+    TObjectPtr<UObject> CogWindowManagerRef = nullptr;
+
+#if ENABLE_COG
+    TObjectPtr<UCogWindowManager> CogWindowManager = nullptr;
+#endif //ENABLE_COG
+};
+```
+3. Instantiate the CogWindowManager and add some windows:
+
+```cpp
+// ACogSampleGameState.cpp
+void ACogSampleGameState::BeginPlay()
+{
+    Super::BeginPlay();
+
+#if ENABLE_COG
+    CogWindowManager = NewObject<UCogWindowManager>(this);
+    CogWindowManagerRef = CogWindowManager;
+
+    // Add some windows
+    CogWindowManager->CreateWindow<UCogEngineWindow_DebugSettings>("Engine.Debug Settings");
+    CogWindowManager->CreateWindow<UCogEngineWindow_ImGui>("Engine.ImGui");
+    [...]
+#endif //ENABLE_COG
+}
+
+```
+
+3. Define which key will toggle the input from the game to Imgui:
+
+```cpp
+// ACogSampleGameState.cpp
+FCogImguiModule::Get().SetToggleInputKey(FCogImGuiKeyInfo(EKeys::Insert));
+```
+
+4. Tick the CogWindowManager:
+
+```cpp
+// ACogSampleGameState.cpp
+void ACogSampleGameState::Tick(float DeltaSeconds)
+{
+    Super::Tick(DeltaSeconds);
+
+#if ENABLE_COG
+    CogWindowManager->Tick(DeltaSeconds);
+#endif //ENABLE_COG
+}
+```
