@@ -279,14 +279,18 @@ void ACogSampleGameState::BeginPlay()
     CogWindowManager = NewObject<UCogWindowManager>(this);
     CogWindowManagerRef = CogWindowManager;
 
-    // Add and configure windows
+    // Add windows
     CogWindowManager->CreateWindow<UCogEngineWindow_DebugSettings>("Engine.Debug Settings");
     CogWindowManager->CreateWindow<UCogEngineWindow_ImGui>("Engine.ImGui");
 
-    // Add a window that uses a data asset
-    UCogAbilityWindow_Cheats* CheatsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Cheats>("Gameplay.Cheats");
-    CheatsWindow->SetCheatsAsset(GetFirstAssetByClass<UCogAbilityDataAsset_Cheats>());
-```
+    // Add windows that uses a data asset. The data asset must be created inside Unreal Editor.
+    const UCogAbilityDataAsset* AbilitiesAsset = GetFirstAssetByClass<UCogAbilityDataAsset>();
+
+    UCogAbilityWindow_Abilities* AbilitiesWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Abilities>("Gameplay.Abilities");
+    AbilitiesWindow->Asset = AbilitiesAsset;
+
+    UCogAbilityWindow_Attributes* AttributesWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Attributes>("Gameplay.Attributes");
+    AttributesWindow->Asset = AbilitiesAsset;
 
     [...]
 #endif //ENABLE_COG
