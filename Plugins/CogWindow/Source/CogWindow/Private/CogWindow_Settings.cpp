@@ -7,6 +7,7 @@
 UCogWindow_Settings::UCogWindow_Settings()
 {
     bHasMenu = false;
+    ToggleInputKey.Key = EKeys::Tab;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -14,7 +15,10 @@ void UCogWindow_Settings::PostInitProperties()
 {
     Super::PostInitProperties();
 
-    FCogImguiModule::Get().SetToggleInputKey(ToggleInputKey);
+    if (ToggleInputKey.Key != EKeys::Invalid)
+    {
+        FCogImguiModule::Get().SetToggleInputKey(ToggleInputKey);
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

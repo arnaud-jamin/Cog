@@ -30,10 +30,10 @@ void UCogWindowManager::InitializeInternal()
     IniHandler.UserData = this;
     ImGui::AddSettingsHandler(&IniHandler);
 
-    SpaceWindows.Add(CreateWindow<UCogWindow_Spacing>("Space 1", false));
-    SpaceWindows.Add(CreateWindow<UCogWindow_Spacing>("Space 2", false));
-    SpaceWindows.Add(CreateWindow<UCogWindow_Spacing>("Space 3", false));
-    SpaceWindows.Add(CreateWindow<UCogWindow_Spacing>("Space 4", false));
+    SpaceWindows.Add(CreateWindow<UCogWindow_Spacing>("Spacing 1", false));
+    SpaceWindows.Add(CreateWindow<UCogWindow_Spacing>("Spacing 2", false));
+    SpaceWindows.Add(CreateWindow<UCogWindow_Spacing>("Spacing 3", false));
+    SpaceWindows.Add(CreateWindow<UCogWindow_Spacing>("Spacing 4", false));
 
     SettingsWindow = CreateWindow<UCogWindow_Settings>("Window.Settings", false);
 }
