@@ -293,6 +293,10 @@ void UCogInputWindow_Gamepad::RenderContent()
     ImGui::Dummy(bShowAsOverlay ? CanvasMax - CanvasMin : ContentSize);
     if (ImGui::BeginPopupContextItem())
     {
+        if (ImGui::Button("Close", ImVec2(-1.0f, 0)))
+        {
+            SetIsVisible(false);
+        }
         ImGui::Checkbox("Overlay", &bShowAsOverlay);
         ImGui::Separator();
         ImGui::Checkbox("Invert Left Stick Y", &bInvertLeftStickY);

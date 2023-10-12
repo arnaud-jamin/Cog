@@ -80,6 +80,9 @@ void ACogSampleCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 
     DOREPLIFETIME_WITH_PARAMS_FAST(ACogSampleCharacter, ActiveAbilityHandles, Params);
     DOREPLIFETIME_WITH_PARAMS_FAST(ACogSampleCharacter, Team, Params);
+    
+    Params.Condition = COND_None;
+    DOREPLIFETIME_WITH_PARAMS_FAST(ACogSampleCharacter, Scale, Params);
 }
 
 
@@ -117,7 +120,8 @@ void ACogSampleCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void ACogSampleCharacter::MarkComponentsAsPendingKill()
 {
     Super::MarkComponentsAsPendingKill();
-    ShutdownAbilitySystem();
+
+    UnregisterFromAbilitySystemEvents();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -262,6 +266,16 @@ void ACogSampleCharacter::InitializeAbilitySystem()
         MARK_PROPERTY_DIRTY_FROM_NAME(ACogSampleCharacter, ActiveAbilityHandles, this);
     }
 
+    bIsAbilitySystemInitialized = true;
+
+    AbilitySystem->AddLooseGameplayTags(InitialTags);
+
+    TryFinishInitialize();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSampleCharacter::RegisterToAbilitySystemEvents()
+{
     //----------------------------------------
     // Register to Tag change events
     //----------------------------------------
@@ -280,32 +294,10 @@ void ACogSampleCharacter::InitializeAbilitySystem()
     //----------------------------------------
     GameplayEffectAddedHandle = AbilitySystem->OnActiveGameplayEffectAddedDelegateToSelf.AddUObject(this, &ACogSampleCharacter::OnGameplayEffectAdded);
     GameplayEffectRemovedHandle = AbilitySystem->OnAnyGameplayEffectRemovedDelegate().AddUObject(this, &ACogSampleCharacter::OnGameplayEffectRemoved);
-
-    bIsAbilitySystemInitialized = true;
-
-    TryFinishInitialize();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogSampleCharacter::TryFinishInitialize()
-{
-    if (bIsInitialized)
-    {
-        return;
-    }
-
-    if (HasActorBegunPlay() == false)
-    {
-        return;
-    }
-
-    bIsInitialized = true;
-
-    OnInitialized.Broadcast(this);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void ACogSampleCharacter::ShutdownAbilitySystem()
+void ACogSampleCharacter::UnregisterFromAbilitySystemEvents()
 {
     //----------------------------------------
    // Unregister to Attribute events
@@ -325,10 +317,28 @@ void ACogSampleCharacter::ShutdownAbilitySystem()
     //----------------------------------------
     AbilitySystem->OnActiveGameplayEffectAddedDelegateToSelf.Remove(GameplayEffectAddedHandle);
     AbilitySystem->OnAnyGameplayEffectRemovedDelegate().Remove(GameplayEffectRemovedHandle);
-
-
-    AbilitySystem->ClearActorInfo();
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSampleCharacter::TryFinishInitialize()
+{
+    if (bIsInitialized)
+    {
+        return;
+    }
+
+    if (HasActorBegunPlay() == false)
+    {
+        return;
+    }
+
+    RegisterToAbilitySystemEvents();
+
+    bIsInitialized = true;
+
+    OnInitialized.Broadcast(this);
+}
+
 
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -615,7 +625,15 @@ void ACogSampleCharacter::OnGhostTagNewOrRemoved(const FGameplayTag InTag, int32
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleCharacter::OnScaleAttributeChanged(const FOnAttributeChangeData& Data)
 {
-    SetActorScale3D(FVector(Data.NewValue));
+    Scale = Data.NewValue;
+    MARK_PROPERTY_DIRTY_FROM_NAME(ACogSampleCharacter, Scale, this);
+    OnRep_Scale();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSampleCharacter::OnRep_Scale()
+{
+    SetActorScale3D(FVector(Scale));
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

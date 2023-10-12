@@ -69,6 +69,9 @@ private:
     UPROPERTY(Config)
     float Border = 0.02f;
 
+    UPROPERTY(Config)
+    float RepeatPeriod = 0.5f;
+
     UPROPERTY()
     TWeakObjectPtr<const UCogInputDataAsset> Asset;
 
@@ -77,8 +80,6 @@ private:
     UEnhancedPlayerInput* Input = nullptr;
 
     ImDrawList* DrawList = nullptr;
-    
-    float RepeatPeriod = 0.5f;
     
     float RepeatTime = 0.0f;
     

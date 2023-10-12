@@ -252,6 +252,13 @@ void UCogAbilityWindow_Abilities::RenderAbilitiesTable(UAbilitySystemComponent& 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogAbilityWindow_Abilities::RenderAbilityCooldown(const UAbilitySystemComponent& AbilitySystemComponent, UGameplayAbility& Ability)
 {
+    FGameplayAbilitySpec* Spec = Ability.GetCurrentAbilitySpec();
+
+    if (Spec == nullptr)
+    {
+        return;
+    }
+
     float RemainingTime, CooldownDuration;
     Ability.GetCooldownTimeRemainingAndDuration(Ability.GetCurrentAbilitySpec()->Handle, AbilitySystemComponent.AbilityActorInfo.Get(), RemainingTime, CooldownDuration);
 

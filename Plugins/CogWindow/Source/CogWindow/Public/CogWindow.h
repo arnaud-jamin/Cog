@@ -78,10 +78,10 @@ protected:
 
     ULocalPlayer* GetLocalPlayer();
 
+protected:
+
     UPROPERTY(Config)
     bool bHasMenu = false;
-
-private:
 
     bool bIsVisible = false;
 

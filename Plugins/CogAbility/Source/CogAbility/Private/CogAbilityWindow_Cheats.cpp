@@ -268,7 +268,7 @@ void UCogAbilityWindow_Cheats::RequestCheat(AActor* ControlledActor, AActor* Sel
                 
                 if (ICogCommonAllegianceActorInterface* AllegianceInterface = Cast<ICogCommonAllegianceActorInterface>(OtherActor))
                 {
-                    AllegianceInterface->GetAllegianceWithOtherActor(ControlledActor);
+                    Allegiance = AllegianceInterface->GetAllegianceWithOtherActor(ControlledActor);
                 }
 
                 if ((IsShiftDown && (Allegiance == ECogCommonAllegiance::Enemy))

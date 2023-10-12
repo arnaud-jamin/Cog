@@ -36,7 +36,6 @@ private:
     UPROPERTY(Config)
     float RepeatPeriod = 0.5f;
 
-    UPROPERTY(Config)
     float RepeatTime = 0.0f;
 
     UPROPERTY()

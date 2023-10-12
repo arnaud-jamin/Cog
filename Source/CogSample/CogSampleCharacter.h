@@ -205,6 +205,9 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Ability)
     TArray<TSubclassOf<UGameplayEffect>> Effects;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Ability)
+    FGameplayTagContainer InitialTags;
+
     UPROPERTY(BlueprintAssignable)
     FCogSampleCharacterEventDelegate OnInitialized;
 
@@ -261,7 +264,9 @@ private:
 
     void InitializeAbilitySystem();
 
-    void ShutdownAbilitySystem();
+    void RegisterToAbilitySystemEvents();
+
+    void UnregisterFromAbilitySystemEvents();
 
     void OnGameplayEffectAdded(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& GameplayEffectSpec, FActiveGameplayEffectHandle Handle);
 
@@ -276,11 +281,17 @@ private:
     void UpdateActiveAbilitySlots();
 
     UFUNCTION()
+    void OnRep_Scale();
+
+    UFUNCTION()
     void OnRep_ActiveAbilityHandles();
 
     UPROPERTY(ReplicatedUsing=OnRep_ActiveAbilityHandles, Transient)
     TArray<FGameplayAbilitySpecHandle> ActiveAbilityHandles;
     
+    UPROPERTY(ReplicatedUsing = OnRep_Scale, Transient)
+    float Scale = 1.0f;
+
     FDelegateHandle GameplayEffectAddedHandle;
 
     FDelegateHandle GameplayEffectRemovedHandle;

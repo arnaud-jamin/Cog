@@ -2,6 +2,7 @@
 
 #include "CogDebugMetric.h"
 #include "CogImguiHelper.h"
+#include "CogWindowWidgets.h"
 #include "imgui.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -81,29 +82,32 @@ void UCogEngineWindow_Metrics::RenderContent()
         ImGui::EndMenuBar();
     }
 
+    if (GetWorld()->GetNetMode() == ENetMode::NM_Client)
+    {
+        ImGui::Text("Currently not available on client");
+        return;
+    }
+
     if (FCogDebugMetric::Metrics.IsEmpty())
     {
-        ImGui::BeginDisabled();
         ImGui::Text("No metric received yet");
-        ImGui::EndDisabled();
+        return;
     }
-    else
+
+    int32 Index = 0;
+    for (auto& Entry : FCogDebugMetric::Metrics)
     {
-        int32 Index = 0;
-        for (auto& Entry : FCogDebugMetric::Metrics)
+        FName MetricName = Entry.Key;
+        FCogDebugMetricEntry& Metric = Entry.Value;
+
+        if (ImGui::CollapsingHeader(TCHAR_TO_ANSI(*MetricName.ToString()), ImGuiTreeNodeFlags_DefaultOpen))
         {
-            FName MetricName = Entry.Key;
-            FCogDebugMetricEntry& Metric = Entry.Value;
-
-            if (ImGui::CollapsingHeader(TCHAR_TO_ANSI(*MetricName.ToString()), ImGuiTreeNodeFlags_DefaultOpen))
-            {
-                ImGui::PushID(Index);
-                DrawMetric(Metric);
-                ImGui::PopID();
-            }
-
-            Index++;
+            ImGui::PushID(Index);
+            DrawMetric(Metric);
+            ImGui::PopID();
         }
+
+        Index++;
     }
 }
 
