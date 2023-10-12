@@ -3,10 +3,11 @@ Cog is a set of debug tools for Unreal Engine built on top of [ImGui](https://gi
 
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/21659aea-2cd8-4ef6-b3b0-5795f5f3246b)
 
-- Cog provides specific ImGui windows to inspect and configure various Unreal features (Enhanced Inputs, Gameplay Abilities, Core Engine)
-- Cog provides a window mangement with persistent configuration and layouts.
-- Cog provides C++ and Blueprint functions to log and debug draw within Log Categories.
-- Cog provides some control over the server (spawning, debug draw, logging) 
+- Cog provides:
+  - ImGui windows to inspect and configure various Unreal features (Enhanced Inputs, Gameplay Abilities, Core Engine)
+  - Window mangement with persistent configuration and layouts.
+  - C++ and Blueprint functions to log and debug draw within Log Categories.
+  - Control over the server regarding debug draw, logging, spawning, cheats.
 
 ## Windows
 
