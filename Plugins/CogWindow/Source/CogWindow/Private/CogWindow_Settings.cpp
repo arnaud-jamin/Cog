@@ -90,4 +90,13 @@ void UCogWindow_Settings::RenderContent()
     {
         FCogImguiModule::Get().SetToggleInputKey(ToggleInputKey);
     }
+
+    ImGui::Separator();
+
+    ImGui::Spacing();
+    ImGui::Spacing();
+    if (ImGui::Button("Reset All Windows Config"))
+    {
+        GetOwner()->ResetAllWindowsConfig();
+    }
 }

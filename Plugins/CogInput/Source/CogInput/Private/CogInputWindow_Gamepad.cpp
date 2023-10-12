@@ -25,6 +25,22 @@ void UCogInputWindow_Gamepad::PreRender(ImGuiWindowFlags& WindowFlags)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void UCogInputWindow_Gamepad::ResetConfig()
+{
+    Super::ResetConfig();
+
+    bShowAsOverlay = false;
+    bInvertRightStickY = false;
+    bInvertLeftStickY = false;
+    BackgroundColor = FVector4f(0.03f, 0.03f, 0.03f, 1.0f);
+    ButtonColor = FVector4f(0.2f, 0.2f, 0.2f, 1.0f);
+    BorderColor = FVector4f(0.03f, 0.03f, 0.03f, 1.0f);
+    PressedColor = FVector4f(0.6f, 0.6f, 0.6f, 1.0f);
+    InjectColor = FVector4f(1.0f, 0.5f, 0.0f, 0.5f);
+    Border = 0.02f;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void UCogInputWindow_Gamepad::InputContextMenu(const FKey& Key, FCogInjectActionInfo* ActionInfoButton, FCogInjectActionInfo* ActionInfo2D)
 {
     if (ImGui::BeginPopupContextItem())

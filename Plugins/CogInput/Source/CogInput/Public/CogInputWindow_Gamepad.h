@@ -17,13 +17,17 @@ public:
 
     UCogInputWindow_Gamepad();
 
+    TWeakObjectPtr<const UCogInputDataAsset> Asset;
+
+protected:
+
+    virtual void ResetConfig() override;
+
     virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;
 
     virtual void RenderContent() override;
 
     virtual void RenderTick(float DeltaSeconds) override;
-
-    TWeakObjectPtr<const UCogInputDataAsset> Asset;
 
 private:
     

@@ -18,6 +18,8 @@ public:
 
 protected:
 
+    virtual void ResetConfig() override;
+
     virtual void PostInitProperties() override;
 
     virtual void PreSaveConfig() override;

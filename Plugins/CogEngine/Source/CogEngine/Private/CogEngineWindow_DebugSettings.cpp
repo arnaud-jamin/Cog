@@ -13,6 +13,28 @@ void UCogEngineWindow_DebugSettings::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindow_DebugSettings::ResetConfig()
+{
+    Super::ResetConfig();
+
+    FilterBySelection = true;
+    Persistent = false;
+    TextShadow = true;
+    Fade2D = true;
+    Duration = 3.0f;
+    DepthPriority = 0;
+    Segments = 12;
+    Thickness = 0.0f;
+    ServerThickness = 2.0f;
+    ServerColorMultiplier = 0.8f;
+    ArrowSize = 10.0f;
+    AxesScale = 1.0f;
+    GradientColorIntensity = 0.0f;
+    GradientColorSpeed = 2.0f;
+    TextSize = 1.0f;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void UCogEngineWindow_DebugSettings::PostInitProperties()
 {
     Super::PostInitProperties();

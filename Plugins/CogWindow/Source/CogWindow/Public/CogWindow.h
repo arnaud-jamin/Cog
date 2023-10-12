@@ -17,6 +17,8 @@ public:
     
     virtual void Initialize() {}
 
+    virtual void ResetConfig() {}
+
     virtual void PreSaveConfig() {}
 
     /** Called every frame with a valid imgui context if the window is visible.  */

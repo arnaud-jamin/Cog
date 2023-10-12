@@ -32,6 +32,15 @@ UCogAbilityWindow_Cheats::UCogAbilityWindow_Cheats()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void UCogAbilityWindow_Cheats::ResetConfig()
+{
+    Super::ResetConfig();
+
+    bReapplyCheatsBetweenPlays = true;
+    bReapplyCheatsBetweenLaunches = true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void UCogAbilityWindow_Cheats::SetAsset(const UCogAbilityDataAsset* Value) 
 {
     Asset = Value;

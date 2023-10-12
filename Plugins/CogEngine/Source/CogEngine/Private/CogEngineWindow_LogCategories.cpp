@@ -24,6 +24,14 @@ UCogEngineWindow_LogCategories::UCogEngineWindow_LogCategories()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindow_LogCategories::ResetConfig()
+{
+    Super::ResetConfig();
+
+    FCogDebugLog::DeactivateAllLogCateories(*GetWorld());
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void UCogEngineWindow_LogCategories::RenderContent()
 {
     Super::RenderContent();

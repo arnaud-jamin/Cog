@@ -23,6 +23,17 @@ void UCogEngineWindow_OutputLog::RenderHelp()
     "The verbosity of each log category can be configured in the 'Log Categories' window. "
     );
 }
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindow_OutputLog::ResetConfig()
+{
+    Super::ResetConfig();
+
+    AutoScroll = true;
+    ShowFrame = true;
+    ShowCategory = true;
+    ShowVerbosity = false;
+    ShowAsTable = false;
+}
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogEngineWindow_OutputLog::Clear()

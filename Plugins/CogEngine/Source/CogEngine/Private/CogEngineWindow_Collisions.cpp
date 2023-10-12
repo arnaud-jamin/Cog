@@ -29,7 +29,21 @@ UCogEngineWindow_Collisions::UCogEngineWindow_Collisions()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindow_Collisions::ResetConfig() 
+{
+    Super::ResetConfig();
 
+    ObjectTypesToQuery = 0;
+    ProfileIndex = 0;
+    QueryType = 0;
+    QueryDistance = 5000.0f;
+    QueryThickness = 0.0f;
+    UseComplexCollisions = false;
+    ShowActorsNames = false;
+    ShowQuery = false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void UCogEngineWindow_Collisions::RenderContent()
 {
     Super::RenderContent();

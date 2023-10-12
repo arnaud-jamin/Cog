@@ -472,3 +472,12 @@ void UCogWindowManager::SetDPIScale(float Value)
     DPIScale = Value; 
     bRefreshDPIScale = true; 
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogWindowManager::ResetAllWindowsConfig()
+{
+    for (UCogWindow* Window : Windows)
+    {
+        Window->ResetConfig();
+    }
+}

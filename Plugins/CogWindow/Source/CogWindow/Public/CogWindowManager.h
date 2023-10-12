@@ -72,6 +72,8 @@ public:
 
     void SetPreviewWindowsInMenu(bool Value) { bShowWindowsInMainMenu = Value; }
 
+    void ResetAllWindowsConfig();
+
 protected:
 
     friend class UCogWindow_Settings;

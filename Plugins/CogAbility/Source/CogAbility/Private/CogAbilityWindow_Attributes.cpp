@@ -29,6 +29,17 @@ UCogAbilityWindow_Attributes::UCogAbilityWindow_Attributes()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void UCogAbilityWindow_Attributes::ResetConfig()
+{
+    Super::ResetConfig();
+
+    bSortByNameSetting = true;
+    bGroupByAttributeSetSetting = false;
+    bGroupByCategorySetting = false;
+    bShowOnlyModified = false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void UCogAbilityWindow_Attributes::RenderContent()
 {
     Super::RenderContent();

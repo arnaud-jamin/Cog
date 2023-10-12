@@ -14,6 +14,16 @@ void UCogEngineWindow_Metrics::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindow_Metrics::ResetConfig()
+{
+    Super::ResetConfig();
+
+    MaxDurationSetting = 0.0f;
+    RestartDelaySetting = 5.0f;
+    PostInitProperties();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void UCogEngineWindow_Metrics::PostInitProperties()
 {
     Super::PostInitProperties();

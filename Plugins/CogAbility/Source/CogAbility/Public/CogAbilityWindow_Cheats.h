@@ -23,6 +23,8 @@ public:
 
 protected:
 
+    virtual void ResetConfig() override;
+
     virtual void RenderHelp() override;
 
     virtual void RenderContent() override;

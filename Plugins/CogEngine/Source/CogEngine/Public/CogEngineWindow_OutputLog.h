@@ -40,6 +40,8 @@ protected:
 
     virtual void RenderHelp() override;
 
+    virtual void ResetConfig() override;
+
     virtual void RenderContent() override;
 
 private:

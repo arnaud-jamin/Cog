@@ -13,6 +13,8 @@ public:
 
     UCogEngineWindow_LogCategories();
 
+    virtual void ResetConfig() override;
+
     virtual void RenderHelp() override;
 
     virtual void RenderContent() override;
