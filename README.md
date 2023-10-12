@@ -3,15 +3,17 @@ Cog is a set of debug tools for Unreal Engine built on top of [ImGui](https://gi
 
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/21659aea-2cd8-4ef6-b3b0-5795f5f3246b)
 
-## ImGui Windows
+- Cog provides specific ImGui windows to inspect and configure various Unreal features (Enhanced Inputs, Gameplay Abilities, Core Engine)
+- Cog provides a window mangement with persistent configuration and layouts.
+- Cog provides C++ and Blueprint functions to log and debug draw within Log Categories.
+- Cog provides some control over the server (spawning, debug draw, logging) 
 
-### General Notes
-- Press the `[Insert]` key or use the `Cog.ToggleInput` console command to open the Imgui Main Menu.
+## Windows
+
+- In the sample press the `[Tab]` key or use the `Cog.ToggleInput` console command to open the ImGui Main Menu.
 - Most windows display their contents based on a selected actor.
-- The selector actor can be chosen using the selection window or widget.
-- Mouse over a window title to display its help. This behavior can be disabled in the Window menu.
-- Window Layouts can be saved/loaded.
-- Windows save their own settings in a Cog.ini file to maintain their state between multiple sessions.
+- The selector actor can be chosen using the `Engine/Selection` window or widget.
+- Mouse over a window title to display its help.
 
 ### Abilities 
 
