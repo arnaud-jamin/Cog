@@ -13,7 +13,12 @@ class COGABILITY_API UCogAbilityWindow_Tweaks : public UCogWindow
     GENERATED_BODY()
 
 public:
-        TWeakObjectPtr<const UCogAbilityDataAsset> Asset;
+
+    UCogAbilityWindow_Tweaks();
+
+    const UCogAbilityDataAsset* GetAsset() const { return Asset.Get(); }
+
+    void SetAsset(const UCogAbilityDataAsset* Value) { Asset = Value; }
 
 protected:
 
@@ -24,4 +29,7 @@ protected:
     virtual void DrawTweak(ACogAbilityReplicator* Replicator, int32 TweakIndex, int32 TweakCategoryIndex);
 
 private:
+
+    UPROPERTY()
+    TWeakObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
 };

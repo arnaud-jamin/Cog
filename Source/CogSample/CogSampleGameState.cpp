@@ -167,24 +167,24 @@ void ACogSampleGameState::InitializeCog()
     const UCogAbilityDataAsset* AbilityAsset = GetFirstAssetByClass<UCogAbilityDataAsset>();
 
     UCogAbilityWindow_Abilities* AbilitiesWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Abilities>("Gameplay.Abilities");
-    AbilitiesWindow->Asset = AbilityAsset;
+    AbilitiesWindow->SetAsset(AbilityAsset);
 
     UCogAbilityWindow_Attributes* AttributesWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Attributes>("Gameplay.Attributes");
-    AttributesWindow->Asset = AbilityAsset;
+    AttributesWindow->SetAsset(AbilityAsset);
 
     UCogAbilityWindow_Cheats* CheatsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Cheats>("Gameplay.Cheats");
     CheatsWindow->SetAsset(AbilityAsset);
 
     UCogAbilityWindow_Effects* EffectsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Effects>("Gameplay.Effects");
-    EffectsWindow->Asset = AbilityAsset;
+    EffectsWindow->SetAsset(AbilityAsset);
 
     UCogAbilityWindow_Pools* PoolsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Pools>("Gameplay.Pools");
-    PoolsWindow->Asset = AbilityAsset;
+    PoolsWindow->SetAsset(AbilityAsset);
 
     CogWindowManager->CreateWindow<UCogAbilityWindow_Tags>("Gameplay.Tags");
 
     UCogAbilityWindow_Tweaks* TweaksWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Tweaks>("Gameplay.Tweaks");
-    TweaksWindow->Asset = AbilityAsset;
+    TweaksWindow->SetAsset(AbilityAsset);
 
     //---------------------------------------
     // Input
@@ -192,10 +192,10 @@ void ACogSampleGameState::InitializeCog()
     const UCogInputDataAsset* InputAsset = GetFirstAssetByClass<UCogInputDataAsset>();
 
     UCogInputWindow_Actions* ActionsWindow = CogWindowManager->CreateWindow<UCogInputWindow_Actions>("Input.Actions");
-    ActionsWindow->Asset = InputAsset;
+    ActionsWindow->SetAsset(InputAsset);
 
     UCogInputWindow_Gamepad* GamepadWindow = CogWindowManager->CreateWindow<UCogInputWindow_Gamepad>("Input.Gamepad");
-    GamepadWindow->Asset = InputAsset;
+    GamepadWindow->SetAsset(InputAsset);
 
     //---------------------------------------
     // Main Menu Widget

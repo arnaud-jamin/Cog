@@ -99,7 +99,7 @@ void UCogWindowManager::Render(float DeltaTime)
     {
         if (FCogImguiModule::Get().GetEnableInput())
         {
-            DrawMainMenu();
+            RenderMainMenu();
         }
     }
 
@@ -253,13 +253,13 @@ UCogWindowManager::FMenu* UCogWindowManager::AddMenu(const FString& Name)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::DrawMainMenu()
+void UCogWindowManager::RenderMainMenu()
 {
     if (ImGui::BeginMainMenuBar())
     {
         for (UCogWindowManager::FMenu& Menu : MainMenu.SubMenus)
         {
-            DrawMenu(Menu);
+            RenderMenu(Menu);
         }
 
         if (ImGui::BeginMenu("Window"))
@@ -317,7 +317,7 @@ void UCogWindowManager::DrawMainMenu()
 
             ImGui::Separator();
 
-            DrawMenuItem(*SettingsWindow, "Settings");
+            RenderMenuItem(*SettingsWindow, "Settings");
  
             
             ImGui::EndMenu();
@@ -342,11 +342,11 @@ void UCogWindowManager::DrawMainMenu()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::DrawMenu(UCogWindowManager::FMenu& Menu)
+void UCogWindowManager::RenderMenu(UCogWindowManager::FMenu& Menu)
 {
     if (Menu.Window != nullptr)
     {
-        DrawMenuItem(*Menu.Window, TCHAR_TO_ANSI(*Menu.Name));
+        RenderMenuItem(*Menu.Window, TCHAR_TO_ANSI(*Menu.Name));
     }
     else
     {
@@ -354,7 +354,7 @@ void UCogWindowManager::DrawMenu(UCogWindowManager::FMenu& Menu)
         {
             for (UCogWindowManager::FMenu& SubMenu : Menu.SubMenus)
             {
-                DrawMenu(SubMenu);
+                RenderMenu(SubMenu);
             }
             ImGui::EndMenu();
         }
@@ -362,7 +362,7 @@ void UCogWindowManager::DrawMenu(UCogWindowManager::FMenu& Menu)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::DrawMenuItem(UCogWindow& Window, const char* MenuItemName)
+void UCogWindowManager::RenderMenuItem(UCogWindow& Window, const char* MenuItemName)
 {
     if (bShowWindowsInMainMenu)
     {

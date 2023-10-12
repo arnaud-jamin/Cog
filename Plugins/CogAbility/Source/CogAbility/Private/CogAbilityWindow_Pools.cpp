@@ -1,8 +1,11 @@
 #include "CogAbilityWindow_Pools.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystemGlobals.h"
 #include "CogAbilityDataAsset.h"
 #include "CogImguiHelper.h"
+#include "CogWindowWidgets.h"
+#include "imgui_internal.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogAbilityWindow_Pools::RenderHelp()

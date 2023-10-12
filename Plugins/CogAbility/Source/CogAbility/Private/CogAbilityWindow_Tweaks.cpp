@@ -2,6 +2,15 @@
 
 #include "AbilitySystemComponent.h"
 #include "CogAbilityDataAsset.h"
+#include "CogAbilityReplicator.h"
+#include "CogImguiHelper.h"
+#include "CogWindowWidgets.h"
+
+//--------------------------------------------------------------------------------------------------------------------------
+UCogAbilityWindow_Tweaks::UCogAbilityWindow_Tweaks()
+{
+    bHasMenu = true;
+}
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogAbilityWindow_Tweaks::RenderHelp()

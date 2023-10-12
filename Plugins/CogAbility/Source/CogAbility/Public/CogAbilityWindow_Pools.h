@@ -16,7 +16,9 @@ class COGABILITY_API UCogAbilityWindow_Pools : public UCogWindow
 
 public:
     
-    TWeakObjectPtr<const UCogAbilityDataAsset> Asset;
+    const UCogAbilityDataAsset* GetAsset() const { return Asset.Get(); }
+
+    void SetAsset(const UCogAbilityDataAsset* Value) { Asset  = Value; }
 
 protected:
 
@@ -26,4 +28,6 @@ protected:
 
     virtual void DrawPool(const UAbilitySystemComponent* AbilitySystemComponent, const FCogAbilityPool& Pool);
 
+    UPROPERTY()
+    TWeakObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
 };

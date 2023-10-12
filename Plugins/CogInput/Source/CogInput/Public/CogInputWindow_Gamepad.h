@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogInjectActionInfo.h"
 #include "CogWindow.h"
 #include "CogInputWindow_Gamepad.generated.h"
 
@@ -17,7 +18,9 @@ public:
 
     UCogInputWindow_Gamepad();
 
-    TWeakObjectPtr<const UCogInputDataAsset> Asset;
+    const UCogInputDataAsset* GetAsset() const { return Asset.Get(); }
+
+    void SetAsset(const UCogInputDataAsset* Value) { Asset = Value; }
 
 protected:
 
@@ -65,6 +68,9 @@ private:
 
     UPROPERTY(Config)
     float Border = 0.02f;
+
+    UPROPERTY()
+    TWeakObjectPtr<const UCogInputDataAsset> Asset;
 
     TMap<FKey, FCogInjectActionInfo> Actions;
     

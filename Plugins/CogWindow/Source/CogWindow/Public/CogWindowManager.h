@@ -89,13 +89,13 @@ protected:
 
     void RefreshDPIScale();
 
-    void DrawMainMenu();
+    void RenderMainMenu();
     
     FMenu* AddMenu(const FString& Name);
 
-    void DrawMenu(FMenu& Menu);
+    void RenderMenu(FMenu& Menu);
 
-    void DrawMenuItem(UCogWindow& Window, const char* MenuItemName);
+    void RenderMenuItem(UCogWindow& Window, const char* MenuItemName);
 
     static void SettingsHandler_ClearAll(ImGuiContext* ctx, ImGuiSettingsHandler*);
 

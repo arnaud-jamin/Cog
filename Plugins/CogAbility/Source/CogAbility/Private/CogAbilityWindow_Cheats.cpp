@@ -6,6 +6,7 @@
 #include "CogCommonAllegianceActorInterface.h"
 #include "CogDebugDraw.h"
 #include "CogImguiHelper.h"
+#include "CogWindowWidgets.h"
 #include "EngineUtils.h"
 #include "GameFramework/Character.h"
 #include "imgui.h"
@@ -94,11 +95,13 @@ void UCogAbilityWindow_Cheats::RenderContent()
     AActor* SelectedActor = GetSelection();
     if (SelectedActor == nullptr)
     {
+        ImGui::Text("Invlid Selection");
         return;
     }
 
     if (Asset == nullptr)
     {
+        ImGui::Text("Invalid Asset");
         return;
     }
 

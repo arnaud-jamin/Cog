@@ -1,6 +1,9 @@
 #include "CogEngineWindow_Spawns.h"
 
 #include "CogEngineDataAsset.h"
+#include "CogEngineReplicator.h"
+#include "CogImguiHelper.h"
+#include "CogWindowWidgets.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogEngineWindow_Spawns::RenderHelp()
@@ -8,7 +11,7 @@ void UCogEngineWindow_Spawns::RenderHelp()
     ImGui::Text(
         "This window can be used to spawn new actors in the world. "
         "The spawn list can be configured in the '%s' data asset. "
-        , TCHAR_TO_ANSI(*GetNameSafe(SpawnAsset))
+        , TCHAR_TO_ANSI(*GetNameSafe(Asset.Get()))
     );
 }
 
@@ -17,12 +20,12 @@ void UCogEngineWindow_Spawns::RenderContent()
 {
     Super::RenderContent();
 
-    if (SpawnAsset == nullptr)
+    if (Asset == nullptr)
     {
         return;
     }
 
-    for (const FCogEngineSpawnGroup& SpawnGroup : SpawnAsset->SpawnGroups)
+    for (const FCogEngineSpawnGroup& SpawnGroup : Asset->SpawnGroups)
     {
         RenderSpawnGroup(SpawnGroup);
     }

@@ -4,7 +4,7 @@
 #include "CogWindow.h"
 #include "CogEngineWindow_Collisions.generated.h"
 
-class UCogEngineDataAsset_Collisions;
+class UCogEngineDataAsset;
 
 UCLASS(Config = Cog)
 class COGENGINE_API UCogEngineWindow_Collisions : public UCogWindow
@@ -15,7 +15,9 @@ public:
 
     UCogEngineWindow_Collisions();
 
-    void SetAsset(const UCogEngineDataAsset* Asset);
+    const UCogEngineDataAsset* GetAsset() const { return Asset.Get(); }
+
+    void SetAsset(const UCogEngineDataAsset* Value);
 
 private:
 
@@ -30,8 +32,6 @@ private:
         bool IsValid = false;
         FColor Color;
     };
-
-    TWeakObjectPtr<UCogEngineDataAsset> CollisionsAsset;
 
     FChannel Channels[ECC_MAX];
 
@@ -58,4 +58,7 @@ private:
 
     UPROPERTY(Config)
     bool ShowQuery = false;
+
+    UPROPERTY()
+    TWeakObjectPtr<const UCogEngineDataAsset> Asset = nullptr;
 };

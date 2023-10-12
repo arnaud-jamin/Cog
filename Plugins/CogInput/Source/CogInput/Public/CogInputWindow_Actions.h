@@ -17,7 +17,9 @@ public:
 
     UCogInputWindow_Actions();
 
-    TWeakObjectPtr<const UCogInputDataAsset> Asset;
+    const UCogInputDataAsset* GetAsset() const { return Asset.Get(); }
+
+    void SetAsset(const UCogInputDataAsset* Value) { Asset = Value; }
 
 protected:
 
@@ -36,6 +38,9 @@ private:
 
     UPROPERTY(Config)
     float RepeatTime = 0.0f;
+
+    UPROPERTY()
+    TWeakObjectPtr<const UCogInputDataAsset> Asset = nullptr;
 
     TArray<FCogInjectActionInfo> Actions;
 };

@@ -2,9 +2,11 @@
 
 #include "CogImguiHelper.h"
 #include "CogInputDataAsset.h"
+#include "CogWindowWidgets.h"
 #include "Engine/LocalPlayer.h"
 #include "EnhancedInputSubsystems.h"
 #include "imgui_internal.h"
+#include "InputMappingContext.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCogInputWindow_Gamepad::UCogInputWindow_Gamepad()

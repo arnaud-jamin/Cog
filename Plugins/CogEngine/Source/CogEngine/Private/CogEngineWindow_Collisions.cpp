@@ -18,7 +18,7 @@ void UCogEngineWindow_Collisions::RenderHelp()
     ImGui::Text("This window is used to inspect collisions by performing a collision query with the selected channels. "
         "The query can be configured in the options. "
         "The displayed collision channels can be configured in the '%s' data asset. "
-        , TCHAR_TO_ANSI(*GetNameSafe(CollisionsAsset.Get()))
+        , TCHAR_TO_ANSI(*GetNameSafe(Asset.Get()))
     );
 }
 
@@ -383,8 +383,10 @@ void UCogEngineWindow_Collisions::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Collisions::SetAsset(const UCogEngineDataAsset* Asset)
+void UCogEngineWindow_Collisions::SetAsset(const UCogEngineDataAsset* Value)
 {
+    Asset = Value;
+
     if (Asset == nullptr)
     {
         return;

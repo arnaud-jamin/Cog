@@ -1,7 +1,10 @@
 #include "CogAbilityWindow_Abilities.h"
 
+#include "AbilitySystemGlobals.h"
+#include "AbilitySystemComponent.h"
 #include "CogAbilityDataAsset.h"
 #include "CogAbilityHelper.h"
+#include "CogAbilityReplicator.h"
 #include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
 #include "imgui.h"
@@ -290,13 +293,13 @@ void UCogAbilityWindow_Abilities::RenderAbilityContextMenu(UAbilitySystemCompone
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Abilities::OpenAbility(FGameplayAbilitySpecHandle Handle)
+void UCogAbilityWindow_Abilities::OpenAbility(const FGameplayAbilitySpecHandle& Handle)
 {
     OpenedAbilities.AddUnique(Handle);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Abilities::CloseAbility(FGameplayAbilitySpecHandle Handle)
+void UCogAbilityWindow_Abilities::CloseAbility(const FGameplayAbilitySpecHandle& Handle)
 {
     OpenedAbilities.Remove(Handle);
 }
@@ -448,7 +451,7 @@ void UCogAbilityWindow_Abilities::GameTick(float DeltaTime)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Abilities::ProcessAbilityActivation(FGameplayAbilitySpecHandle Handle)
+void UCogAbilityWindow_Abilities::ProcessAbilityActivation(const FGameplayAbilitySpecHandle& Handle)
 {
     AActor* Selection = GetSelection();
     if (Selection == nullptr)

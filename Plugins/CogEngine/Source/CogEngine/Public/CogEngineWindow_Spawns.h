@@ -6,6 +6,7 @@
 
 class UCogEngineDataAsset;
 struct FCogEngineSpawnGroup;
+struct FCogEngineSpawnEntry;
 
 UCLASS()
 class COGENGINE_API UCogEngineWindow_Spawns : public UCogWindow
@@ -14,9 +15,9 @@ class COGENGINE_API UCogEngineWindow_Spawns : public UCogWindow
 
 public:
 
-    const UCogEngineDataAsset* GetSpawnsAsset() const { return SpawnAsset; }
+    const UCogEngineDataAsset* GetAsset() const { return Asset.Get(); }
 
-    void SetAsset(const UCogEngineDataAsset* Value) { SpawnAsset = Value; }
+    void SetAsset(const UCogEngineDataAsset* Value) { Asset = Value; }
 
 protected:
 
@@ -30,5 +31,6 @@ protected:
 
 private:
 
-    const UCogEngineDataAsset* SpawnAsset = nullptr;
+    UPROPERTY()
+    TWeakObjectPtr<const UCogEngineDataAsset> Asset = nullptr;
 };

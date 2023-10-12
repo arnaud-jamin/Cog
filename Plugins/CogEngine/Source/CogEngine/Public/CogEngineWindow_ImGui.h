@@ -16,9 +16,14 @@ public:
     virtual void RenderContent() override;
 
 private:
+
     bool bShowImguiDemo = false;
+
     bool bShowImguiPlot = false;
+
     bool bShowImguiMetric = false;
+
     bool bShowImguiDebugLog = false;
+
     bool bShowImguiStyleEditor = false;
 };

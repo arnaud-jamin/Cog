@@ -2,7 +2,9 @@
 
 #include "imgui.h"
 #include "CogImguiHelper.h"
+#include "CogWindowWidgets.h"
 #include "Engine/Engine.h"
+
 
 #define SCALABILITY_NUM_LEVELS 5
 

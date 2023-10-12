@@ -2,8 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
+#include "GameplayAbilitySpecHandle.h"
 #include "CogAbilityWindow_Abilities.generated.h"
 
+class UAbilitySystemComponent;
 class UGameplayAbility;
 class UCogAbilityDataAsset;
 struct FGameplayAbilitySpec;
@@ -17,7 +19,9 @@ public:
 
     UCogAbilityWindow_Abilities();
 
-    TWeakObjectPtr<const UCogAbilityDataAsset> Asset;
+    const UCogAbilityDataAsset* GetAsset() const { return Asset.Get(); }
+
+    void SetAsset(const UCogAbilityDataAsset* Value) { Asset = Value; }
 
 protected:
 
@@ -43,15 +47,15 @@ protected:
 
     virtual void RenderAbilityInfo(const UAbilitySystemComponent& AbilitySystemComponent, FGameplayAbilitySpec& Spec);
 
-    virtual void ProcessAbilityActivation(FGameplayAbilitySpecHandle Handle);
+    virtual void ProcessAbilityActivation(const FGameplayAbilitySpecHandle& Handle);
 
     virtual void ActivateAbility(UAbilitySystemComponent& AbilitySystemComponent, FGameplayAbilitySpec& Spec);
 
     virtual void DeactivateAbility(UAbilitySystemComponent& AbilitySystemComponent, FGameplayAbilitySpec& Spec);
 
-    virtual void OpenAbility(FGameplayAbilitySpecHandle Handle);
+    virtual void OpenAbility(const FGameplayAbilitySpecHandle& Handle);
 
-    virtual void CloseAbility(FGameplayAbilitySpecHandle Handle);
+    virtual void CloseAbility(const FGameplayAbilitySpecHandle& Handle);
 
 private:
 
@@ -60,4 +64,7 @@ private:
     FGameplayAbilitySpecHandle AbilityHandleToRemove;
 
     TArray<FGameplayAbilitySpecHandle> OpenedAbilities;
+
+    UPROPERTY()
+    TWeakObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
 };

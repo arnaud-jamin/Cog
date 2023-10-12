@@ -9,7 +9,7 @@ public class CogSampleTarget : TargetRules
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_1;
 		ExtraModuleNames.Add("CogSample");
-        //bUseUnityBuild = false;
-        //bUsePCHFiles = false;
+        bUseUnityBuild = false;
+        bUsePCHFiles = false;
     }
 }

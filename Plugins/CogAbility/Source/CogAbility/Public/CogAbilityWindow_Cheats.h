@@ -44,5 +44,6 @@ private:
     UPROPERTY(Config)
     TArray<FString> AppliedCheats;
 
-    TWeakObjectPtr<const UCogAbilityDataAsset> Asset;
+    UPROPERTY()
+    TWeakObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
 };

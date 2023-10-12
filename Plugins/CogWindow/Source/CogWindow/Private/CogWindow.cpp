@@ -87,6 +87,11 @@ void UCogWindow::Render(float DeltaTime)
             if (ImGui::BeginPopupContextWindow())
             {
                 ImGui::Checkbox("Hide Menu", &bHideMenu);
+
+                if (ImGui::Button("Reset"))
+                {
+                    ResetConfig();
+                }
                 ImGui::EndPopup();
             }
         }
