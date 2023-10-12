@@ -1,5 +1,6 @@
 #include "CogDebugShape.h"
 
+#include "CogCommon.h"
 #include "CogDebugDrawHelper.h"
 #include "DrawDebugHelpers.h"
 
@@ -167,8 +168,8 @@ FCogDebugShape FCogDebugShape::MakeBox(const FVector& Center, const FRotator& Ro
     FCogDebugShape NewElement;
 
     NewElement.ShapeData.Add(Center);
-    NewElement.ShapeData.Add(FVector(Rotation.Pitch, Rotation.Yaw, Rotation.Roll));
     NewElement.ShapeData.Add(Extent);
+    NewElement.ShapeData.Add(FVector(Rotation.Pitch, Rotation.Yaw, Rotation.Roll));
 
     NewElement.Color = Color;
     NewElement.Type = ECogDebugShape::Box;
@@ -190,7 +191,7 @@ void FCogDebugShape::DrawBox(UWorld* World)
             World,
             ShapeData[0],
             ShapeData[1],
-            FQuat(FRotator(ShapeData[1].X, ShapeData[1].Y, ShapeData[1].Z)),
+            FQuat(FRotator(ShapeData[2].X, ShapeData[2].Y, ShapeData[2].Z)),
             FCogDebugSettings::ModulateServerColor(Color),
             FCogDebugSettings::GetDebugPersistent(bPersistent),
             FCogDebugSettings::GetDebugDuration(bPersistent),

@@ -295,18 +295,21 @@ void UCogAbilityWindow_Attributes::DrawAttributeInfo(const UAbilitySystemCompone
         const float BaseValue = AbilitySystemComponent.GetNumericAttributeBase(Attribute);
         const float CurrentValue = AbilitySystemComponent.GetNumericAttribute(Attribute);
 
-        ImVec4 Color;
-        if (CurrentValue > BaseValue)
+        FLinearColor Color = FLinearColor::White;
+        if (Asset != nullptr)
         {
-            Color = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
-        }
-        else if (CurrentValue < BaseValue)
-        {
-            Color = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
-        }
-        else
-        {
-            Color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+            if (CurrentValue > BaseValue)
+            {
+                Color = Asset->PositiveEffectColor;
+            }
+            else if (CurrentValue < BaseValue)
+            {
+                Color = Asset->NegativeEffectColor;
+            }
+            else
+            {
+                Color = Asset->NeutralEffectColor;
+            }
         }
 
         //------------------------
@@ -334,7 +337,7 @@ void UCogAbilityWindow_Attributes::DrawAttributeInfo(const UAbilitySystemCompone
         ImGui::TableNextColumn();
         ImGui::TextColored(TextColor, "Current Value");
         ImGui::TableNextColumn();
-        ImGui::PushStyleColor(ImGuiCol_Text, Color);
+        ImGui::PushStyleColor(ImGuiCol_Text, FCogImguiHelper::ToImVec4(Color));
         ImGui::Text("%0.2f", CurrentValue);
         ImGui::PopStyleColor(1);
 
@@ -354,6 +357,68 @@ void UCogAbilityWindow_Attributes::DrawAttributeInfo(const UAbilitySystemCompone
             {
                 const FModifierSpec& ModSpec = ActiveEffect->Spec.Modifiers[i];
                 const FGameplayModifierInfo& ModInfo = ActiveEffect->Spec.Def->Modifiers[i];
+                const float ModValue = ModSpec.GetEvaluatedMagnitude();
+
+                FLinearColor ModColor = FLinearColor::White;
+                if (Asset != nullptr)
+                {
+                    ModColor = Asset->NeutralEffectColor;
+
+                    switch (ModInfo.ModifierOp)
+                    {
+                        case EGameplayModOp::Additive:
+                        {
+                            if (ModValue > 0.0f)
+                            {
+                                ModColor = Asset->PositiveEffectColor;
+                            }
+                            else if (ModValue < 0.0f)
+                            {
+                                ModColor = Asset->NegativeEffectColor;
+                            }
+                            break;
+                        }
+
+                        case EGameplayModOp::Multiplicitive:
+                        {
+                            if (ModValue > 1.0f)
+                            {
+                                ModColor = Asset->PositiveEffectColor;
+                            }
+                            else if (ModValue < 1.0f)
+                            {
+                                ModColor = Asset->NegativeEffectColor;
+                            }
+                            break;
+                        }
+
+                        case EGameplayModOp::Division:
+                        {
+                            if (ModValue < 1.0f)
+                            {
+                                ModColor = Asset->PositiveEffectColor;
+                            }
+                            else if (ModValue > 1.0f)
+                            {
+                                ModColor = Asset->NegativeEffectColor;
+                            }
+                            break;
+                        }
+
+                        case EGameplayModOp::Override:
+                        {
+                            if (ModValue > BaseValue)
+                            {
+                                ModColor = Asset->PositiveEffectColor;
+                            }
+                            else if (ModValue < BaseValue)
+                            {
+                                ModColor = Asset->NegativeEffectColor;
+                            }
+                            break;
+                        }
+                    }
+                }
 
                 if (ModInfo.Attribute == Attribute)
                 {
@@ -365,7 +430,7 @@ void UCogAbilityWindow_Attributes::DrawAttributeInfo(const UAbilitySystemCompone
                     ImGui::TableNextColumn();
                     ImGui::Text("%s", TCHAR_TO_ANSI(*FCogAbilityHelper::CleanupName(GetNameSafe(ActiveEffect->Spec.Def))));
                     ImGui::Text("%s", TCHAR_TO_ANSI(*EGameplayModOpToString(ModInfo.ModifierOp)));
-                    ImGui::Text("%0.2f", ModSpec.GetEvaluatedMagnitude());
+                    ImGui::TextColored(FCogImguiHelper::ToImVec4(ModColor), "%0.2f", ModSpec.GetEvaluatedMagnitude());
                 }
             }
         }
