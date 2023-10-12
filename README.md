@@ -198,7 +198,6 @@ The Cog repository has the following structure:
 
 Cog has multiple plugins to ease the integration for projects that do not use the `Ability System Component` or `Enhanced Input`. For the next steps, it is assumed all the plugins are used.
 
-
 - Setup up module dependencies:
 ```c#
 // CogSample.Build.cs
@@ -286,7 +285,7 @@ void ACogSampleGameState::BeginPlay()
     CogWindowManager->CreateWindow<UCogEngineWindow_DebugSettings>("Engine.Debug Settings");
     CogWindowManager->CreateWindow<UCogEngineWindow_ImGui>("Engine.ImGui");
 
-    // Add windows that uses a data asset. The data asset must be created inside Unreal Editor.
+    // Add windows that uses a data asset. The data asset must be created inside Unreal Editor.    
     const UCogAbilityDataAsset* AbilitiesAsset = GetFirstAssetByClass<UCogAbilityDataAsset>();
 
     UCogAbilityWindow_Abilities* AbilitiesWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Abilities>("Gameplay.Abilities");
@@ -327,11 +326,10 @@ void ACogSampleGameState::Tick(float DeltaSeconds)
 // CogSampleCharacter.h
 UCLASS(config=Game)
 class ACogSampleCharacter : public ACharacter
-    , public IAbilitySystemInterface
+    [...]
     , public ICogCommonDebugFilteredActorInterface
     , public ICogCommonAllegianceActorInterface
-    , public ICogSampleTeamInterface
-    , public ICogSampleTargetableInterface
+    [...]
 ```
 
 ```cpp
@@ -342,5 +340,11 @@ class ACogSamplePlayerController
     , public ICogCommonPossessorInterface
 ```
 
-__
-- In Unreal Editor create and configure the Data Assets
+- In Unreal Editor create and configure the following Data Assets:
+  - CogAbilityDataAsset
+  - CogEngineDataAsset
+  - CogInputDataAsset
+  
+  
+ 
+
