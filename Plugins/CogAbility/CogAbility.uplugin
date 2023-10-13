@@ -23,19 +23,7 @@
   ],
   "Plugins": [
     {
-      "Name": "CogImgui",
-      "Enabled": true
-    },
-    {
-      "Name": "CogCommon",
-      "Enabled": true
-    },
-    {
-      "Name": "CogDebug",
-      "Enabled": true
-    },
-    {
-      "Name": "CogWindow",
+      "Name": "Cog",
       "Enabled": true
     },
     {
