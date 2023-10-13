@@ -193,11 +193,12 @@ The Cog repository has the following structure:
 - `CogSample` - A Sample that demonstrate various Cog functionalities. The project was saved in Unreal 5.1
 - `Plugins/CogAbility` - ImGui windows for the Gameplay Ability System (Abilities, Effects, Tags, ...)
 - `Plugins/CogInput` - ImGui windows for the Enhanced Input library (Input action, Gamepad)
-- `Plugins/CogEngine` - ImGui windows for the core unreal engine functionalities (Log, Stats, Time, Collisions, Skeleton, ...)
-- `Plugins/CogWindow` - ImGui window management (Base Window, Layout)
-- `Plugins/CogDebug` - Debug functionalities (Log, Debug Draw, Plot, Metric, ...)
-- `Plugins/CogImGui` - Integration of Imgui for Unreal, inspired by [UnrealImGui](https://github.com/segross/UnrealImGui)
-- `Plugins/CogCommon` - Common headers
+- `Plugins/Cog` - The main Cog plugin which contains the following modules
+  - `CogEngine` - ImGui windows for the core unreal engine functionalities (Log, Stats, Time, Collisions, Skeleton, ...)
+  - `CogWindow` - ImGui window management (Base Window, Layout)
+  - `CogDebug` - Debug functionalities (Log, Debug Draw, Plot, Metric, ...)
+  - `CogImGui` - Integration of Imgui for Unreal, inspired by [UnrealImGui](https://github.com/segross/UnrealImGui)
+  - `CogCommon` - Common headers such as Unreal interfaces which cannot be easily excluded from a shipping build
 
 Cog has multiple plugins to ease the integration for projects that do not use the `Ability System Component` or `Enhanced Input`. For the next steps, it is assumed all the plugins are used.
 
