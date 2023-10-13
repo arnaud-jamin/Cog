@@ -3,9 +3,7 @@ Cog is a set of debug tools for Unreal Engine built on top of [ImGui](https://gi
 
 ![Cog](https://github.com/arnaud-jamin/Cog/assets/13844285/21659aea-2cd8-4ef6-b3b0-5795f5f3246b)
 
-Video Showcase:
-
-[![Cog](https://i9.ytimg.com/vi/ea5hz3cFcMM/mqdefault.jpg?sqp=CJD4oqkG-oaymwEmCMACELQB8quKqQMa8AEB-AGWCYAC0AWKAgwIABABGE4gVihlMA8=&rs=AOn4CLBdXbwkaB3bgVMm2v7onADZjJO3UA)](https://www.youtube.com/watch?v=ea5hz3cFcMM)
+This [Video](https://www.youtube.com/watch?v=ea5hz3cFcMM) showcase various tools.
 
 - Cog provides:
   - ImGui windows to inspect and configure various Unreal features (Enhanced Inputs, Gameplay Abilities, Core Engine)
