@@ -625,7 +625,14 @@ void ACogSampleCharacter::OnGhostTagNewOrRemoved(const FGameplayTag InTag, int32
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleCharacter::OnScaleAttributeChanged(const FOnAttributeChangeData& Data)
 {
-    Scale = Data.NewValue;
+    //----------------------------------------------------------------------------------
+    // 'Data.NewValue' is not used because it seems to only corresponds to the changes 
+    // of the BaseValue which do not account for the temporary modifiers.
+    //----------------------------------------------------------------------------------
+    
+    const float CurrentScaleValue = AbilitySystem->GetNumericAttribute(Data.Attribute);
+    Scale = CurrentScaleValue;
+
     MARK_PROPERTY_DIRTY_FROM_NAME(ACogSampleCharacter, Scale, this);
     OnRep_Scale();
 }

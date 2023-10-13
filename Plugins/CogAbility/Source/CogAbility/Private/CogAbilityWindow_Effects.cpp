@@ -88,26 +88,7 @@ void UCogAbilityWindow_Effects::RenderEffectRow(const UAbilitySystemComponent& A
     //------------------------
     ImGui::TableNextColumn();
 
-    const FGameplayTagContainer& Tags = Effect.InheritableGameplayEffectTags.CombinedTags;
-
-    FLinearColor Color = FLinearColor::White;
-    if (Asset != nullptr)
-    {
-        if (Tags.HasTag(Asset->NegativeEffectTag))
-        {
-            Color = Asset->NegativeEffectColor;
-        }
-        else if (Tags.HasTag(Asset->PositiveEffectTag))
-        {
-            Color = Asset->PositiveEffectColor;
-        }
-        else
-        {
-            Color = Asset->NeutralEffectColor;
-        }
-    }
-
-    ImGui::PushStyleColor(ImGuiCol_Text, FCogImguiHelper::ToImVec4(Color));
+    ImGui::PushStyleColor(ImGuiCol_Text, GetEffectColor(Effect));
 
     if (ImGui::Selectable(TCHAR_TO_ANSI(*GetEffectName(Effect)), Selected == Index, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap | ImGuiSelectableFlags_AllowDoubleClick))
     {
@@ -263,6 +244,7 @@ void UCogAbilityWindow_Effects::RenderEffectInfo(const UAbilitySystemComponent& 
         {
             const FModifierSpec& ModSpec = ActiveEffect.Spec.Modifiers[i];
             const FGameplayModifierInfo& ModInfo = ActiveEffect.Spec.Def->Modifiers[i];
+            const float AttributeBaseValue = AbilitySystemComponent.GetNumericAttributeBase(ModInfo.Attribute);
 
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
@@ -272,7 +254,7 @@ void UCogAbilityWindow_Effects::RenderEffectInfo(const UAbilitySystemComponent& 
             ImGui::TableNextColumn();
             ImGui::Text("%s", TCHAR_TO_ANSI(*ModInfo.Attribute.GetName()));
             ImGui::Text("%s", TCHAR_TO_ANSI(*EGameplayModOpToString(ModInfo.ModifierOp)));
-            ImGui::Text("%0.2f", ModSpec.GetEvaluatedMagnitude());
+            ImGui::TextColored(GetEffectModifierColor(ModSpec, ModInfo, AttributeBaseValue), "%0.2f", ModSpec.GetEvaluatedMagnitude());
         }
 
         ImGui::EndTable();
@@ -355,3 +337,17 @@ void UCogAbilityWindow_Effects::RenderPrediction(const FActiveGameplayEffect& Ac
 
     ImGui::Text("%s", TCHAR_TO_ANSI(*PredictionString));
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+ImVec4 UCogAbilityWindow_Effects::GetEffectColor(const UGameplayEffect& Effect) const
+{
+    return FCogAbilityHelper::GetEffectColor(Asset.Get(), Effect);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+ImVec4 UCogAbilityWindow_Effects::GetEffectModifierColor(const FModifierSpec& ModSpec, const FGameplayModifierInfo& ModInfo, float BaseValue) const
+{
+    const float ModValue = ModSpec.GetEvaluatedMagnitude();
+    return FCogAbilityHelper::GetEffectModifierColor(Asset.Get(), ModSpec.GetEvaluatedMagnitude(), ModInfo.ModifierOp, BaseValue);
+}
+

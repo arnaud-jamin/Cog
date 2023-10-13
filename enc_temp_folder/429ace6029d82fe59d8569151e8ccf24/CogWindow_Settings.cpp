@@ -24,18 +24,18 @@ void UCogWindow_Settings::PostInitProperties()
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindow_Settings::RenderContent()
 {
+    ImGui::Checkbox("Compact Mode", &GetOwner()->bCompactMode);
+
+    ImGui::Checkbox("Show Windows In Main Menu", &GetOwner()->bShowWindowsInMainMenu);
+    
+    ImGui::Checkbox("Show Window Help", &GetOwner()->bShowHelp);
+
     FCogWindowWidgets::SetNextItemToShortWidth();
     ImGui::SliderFloat("DPI Scale", &GetOwner()->DPIScale, 0.5f, 2.0f, "%.1f");
     if (ImGui::IsItemDeactivatedAfterEdit())
     {
         GetOwner()->bRefreshDPIScale = true;
     }
-
-    ImGui::Checkbox("Compact Mode", &GetOwner()->bCompactMode);
-
-    ImGui::Checkbox("Show Windows In Main Menu", &GetOwner()->bShowWindowsInMainMenu);
-    
-    ImGui::Checkbox("Show Window Help", &GetOwner()->bShowHelp);
 
     if (ImGui::IsItemHovered())
     {

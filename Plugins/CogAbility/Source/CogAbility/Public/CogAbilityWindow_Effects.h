@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "CogWindow.h"
+#include "imgui.h"
 #include "CogAbilityWindow_Effects.generated.h"
 
 class UAbilitySystemComponent;
@@ -10,6 +11,9 @@ class UCogAbilityDataAsset;
 class UGameplayEffect;
 struct FActiveGameplayEffect;
 struct FActiveGameplayEffectHandle;
+struct FGameplayModifierInfo;
+struct FModifierSpec;
+namespace EGameplayModOp { enum Type; };
 
 UCLASS()
 class COGABILITY_API UCogAbilityWindow_Effects : public UCogWindow
@@ -45,6 +49,10 @@ protected:
     virtual void RenderPrediction(const FActiveGameplayEffect& ActiveEffect, bool Short);
 
     virtual FString GetEffectName(const UGameplayEffect& Effect);
+
+    ImVec4 GetEffectColor(const UGameplayEffect& Effect) const;
+
+    ImVec4 GetEffectModifierColor(const FModifierSpec& ModSpec, const FGameplayModifierInfo& ModInfo, float BaseValue) const;
 
     UPROPERTY()
     TWeakObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;

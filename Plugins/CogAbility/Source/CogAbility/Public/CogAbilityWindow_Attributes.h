@@ -7,6 +7,8 @@
 class UAbilitySystemComponent;
 class UCogAbilityDataAsset;
 struct FGameplayAttribute;
+struct FModifierSpec;
+struct FGameplayModifierInfo;
 
 UCLASS(Config = Cog)
 class COGABILITY_API UCogAbilityWindow_Attributes : public UCogWindow
@@ -30,6 +32,10 @@ protected:
     virtual void RenderContent() override;
 
     virtual void DrawAttributeInfo(const UAbilitySystemComponent& AbilitySystemComponent, const FGameplayAttribute& Attribute);
+
+    virtual ImVec4 GetEffectModifierColor(const FModifierSpec& ModSpec, const FGameplayModifierInfo& ModInfo, float BaseValue) const;
+
+    virtual ImVec4 GetAttributeColor(const UAbilitySystemComponent& AbilitySystemComponent, const FGameplayAttribute& Attribute) const;
 
 private:
 
