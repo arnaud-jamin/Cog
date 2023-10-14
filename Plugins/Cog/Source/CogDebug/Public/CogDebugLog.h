@@ -11,8 +11,13 @@ DECLARE_LOG_CATEGORY_EXTERN(LogCogServerDebug, Verbose, All);
 struct COGDEBUG_API FCogDebugLogCategoryInfo
 {
     FLogCategoryBase* LogCategory = nullptr;
+    
     ELogVerbosity::Type ServerVerbosity = ELogVerbosity::NoLogging;
+    
     FString DisplayName;
+
+    FString Description;
+
     bool bVisible = true;
 
     FString GetDisplayName() const;
@@ -21,7 +26,7 @@ struct COGDEBUG_API FCogDebugLogCategoryInfo
 //--------------------------------------------------------------------------------------------------------------------------
 struct COGDEBUG_API FCogDebugLog
 {
-    static void AddLogCategory(FLogCategoryBase& LogCategory, const FString& DisplayName = "", bool bVisible = true);
+    static void AddLogCategory(FLogCategoryBase& LogCategory, const FString& DisplayName = "", const FString& Description = "", bool bVisible = true);
 
     static bool IsVerbosityActive(ELogVerbosity::Type Verbosity);
 

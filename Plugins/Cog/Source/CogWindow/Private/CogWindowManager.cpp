@@ -323,16 +323,25 @@ void UCogWindowManager::RenderMainMenu()
             ImGui::EndMenu();
         }
 
+        const float MinCursorX = ImGui::GetCursorPosX();
         float CursorX = ImGui::GetWindowWidth();
 
         for (UCogWindow* Window : MainMenuWidgets)
         {
             float Width = 0.0f;
-            Window->DrawMainMenuWidget(false, Width);
+            Window->RenderMainMenuWidget(false, Width);
+
+            //-------------------------------------------
+            // Stop drawing if there is not enough room
+            //-------------------------------------------
+            if (CursorX - Width < MinCursorX)
+            {
+                break;
+            }
 
             CursorX -= Width;
             ImGui::SetCursorPosX(CursorX);
-            Window->DrawMainMenuWidget(true, Width);
+            Window->RenderMainMenuWidget(true, Width);
 
             CursorX -= ImGui::GetStyle().ItemSpacing.x;
         }

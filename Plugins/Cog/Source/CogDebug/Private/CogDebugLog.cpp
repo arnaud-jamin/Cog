@@ -34,7 +34,7 @@ FString FCogDebugLogCategoryInfo::GetDisplayName() const
 //--------------------------------------------------------------------------------------------------------------------------
 // FCogDebugLogCategoryManager
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugLog::AddLogCategory(FLogCategoryBase& LogCategory, const FString& DisplayName, bool bVisible)
+void FCogDebugLog::AddLogCategory(FLogCategoryBase& LogCategory, const FString& DisplayName, const FString& Description, bool bVisible)
 {
     LogCategories.Add(LogCategory.GetCategoryName(), 
         FCogDebugLogCategoryInfo
@@ -42,6 +42,7 @@ void FCogDebugLog::AddLogCategory(FLogCategoryBase& LogCategory, const FString& 
             &LogCategory, 
             ELogVerbosity::NumVerbosity,
             DisplayName,
+            Description,
             bVisible,
             });
 }

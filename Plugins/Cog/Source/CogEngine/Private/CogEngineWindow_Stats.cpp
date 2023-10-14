@@ -1,5 +1,6 @@
 #include "CogEngineWindow_Stats.h"
 
+#include "CogWindowWidgets.h"
 #include "Engine/Engine.h"
 #include "Engine/NetConnection.h"
 #include "GameFramework/PlayerState.h"
@@ -52,7 +53,7 @@ void UCogEngineWindow_Stats::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Stats::DrawMainMenuWidget(bool Draw, float& Width)
+void UCogEngineWindow_Stats::RenderMainMenuWidget(bool Draw, float& Width)
 {
     Width = FCogWindowWidgets::GetFontWidth() * 25;
 

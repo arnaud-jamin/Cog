@@ -23,5 +23,5 @@ protected:
 
     virtual void RenderContent() override;
 
-    virtual void DrawMainMenuWidget(bool Draw, float& Width) override;
+    virtual void RenderMainMenuWidget(bool Draw, float& Width) override;
 };

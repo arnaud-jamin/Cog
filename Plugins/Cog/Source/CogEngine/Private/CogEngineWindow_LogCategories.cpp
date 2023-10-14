@@ -97,7 +97,8 @@ void UCogEngineWindow_LogCategories::RenderContent()
         FLogCategoryBase* Category = CategoryInfo.LogCategory;
 
         ImGui::PushID(Index);
-        FString CategoryFriendlyName = CategoryInfo.GetDisplayName();
+        const char* CategoryFriendlyName = TCHAR_TO_ANSI(*CategoryInfo.GetDisplayName());
+        const char* CategoryDescription = TCHAR_TO_ANSI(*CategoryInfo.Description);
 
         if (bShowAllVerbosity == false)
         {
@@ -114,7 +115,15 @@ void UCogEngineWindow_LogCategories::RenderContent()
 
                 if (ImGui::Checkbox("##Server", &IsActive))
                 {
-                    ELogVerbosity::Type NewVerbosity = IsActive ? (IsControlDown ? ELogVerbosity::VeryVerbose : ELogVerbosity::Verbose) : ELogVerbosity::Warning;
+                    ELogVerbosity::Type NewVerbosity;
+                    if (IsControlDown && Verbosity != ELogVerbosity::VeryVerbose)
+                    {
+                        NewVerbosity = ELogVerbosity::VeryVerbose;
+                    }
+                    else
+                    {
+                        NewVerbosity = IsActive ? ELogVerbosity::Verbose : ELogVerbosity::Warning;
+                    }
                     FCogDebugLog::SetServerVerbosity(*World, CategoryName, NewVerbosity);
                 }
 
@@ -123,9 +132,11 @@ void UCogEngineWindow_LogCategories::RenderContent()
                     ImGui::PopStyleColor(1);
                 }
 
-                if (ImGui::IsItemHovered())
+                if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
                 {
                     ImGui::BeginTooltip();
+                    ImGui::Separator();
+                    ImGui::Text("%s", CategoryDescription);
                     ImGui::Text("Server");
                     ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, IsControlDown ? 1.0f : 0.5f), "Very Verbose   [CTRL]");
                     ImGui::EndTooltip();
@@ -140,12 +151,20 @@ void UCogEngineWindow_LogCategories::RenderContent()
 
                 if (Verbosity == ELogVerbosity::VeryVerbose)
                 {
-                    ImGui::PushStyleColor(ImGuiCol_CheckMark, IM_COL32(255, 0, 0, 200));
+                    ImGui::PushStyleColor(ImGuiCol_CheckMark, IM_COL32(255, 128, 0, 200));
                 }
 
-                if (ImGui::Checkbox(TCHAR_TO_ANSI(*CategoryFriendlyName), &IsActive))
+                if (ImGui::Checkbox(CategoryFriendlyName, &IsActive))
                 {
-                    ELogVerbosity::Type NewVerbosity = IsActive ? (IsControlDown ? ELogVerbosity::VeryVerbose : ELogVerbosity::Verbose) : ELogVerbosity::Warning;
+                    ELogVerbosity::Type NewVerbosity;
+                    if (IsControlDown && Verbosity != ELogVerbosity::VeryVerbose)
+                    {
+                        NewVerbosity = ELogVerbosity::VeryVerbose;
+                    }
+                    else
+                    {
+                        NewVerbosity = IsActive ? ELogVerbosity::Verbose : ELogVerbosity::Warning;
+                    }
                     Category->SetVerbosity(NewVerbosity);
                 }
 
@@ -154,9 +173,11 @@ void UCogEngineWindow_LogCategories::RenderContent()
                     ImGui::PopStyleColor(1);
                 }
 
-                if (ImGui::IsItemHovered())
+                if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
                 {
                     ImGui::BeginTooltip();
+                    ImGui::Text("%s", CategoryDescription);
+                    ImGui::Separator();
                     if (IsClient)
                     {
                         ImGui::Text("Local Client");
@@ -187,9 +208,11 @@ void UCogEngineWindow_LogCategories::RenderContent()
                     ImGui::EndCombo();
                 }
 
-                if (ImGui::IsItemHovered())
+                if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
                 {
                     ImGui::BeginTooltip();
+                    ImGui::Text("%s", CategoryDescription);
+                    ImGui::Separator();
                     ImGui::Text("Server");
                     ImGui::EndTooltip();
                 }
@@ -215,16 +238,18 @@ void UCogEngineWindow_LogCategories::RenderContent()
                     ImGui::EndCombo();
                 }
 
-                if (IsClient && ImGui::IsItemHovered())
+                if (IsClient && ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
                 {
                     ImGui::BeginTooltip();
+                    ImGui::Text("%s", CategoryDescription);
+                    ImGui::Separator();
                     ImGui::Text("Local Client");
                     ImGui::EndTooltip();
                 }
             }
 
             ImGui::SameLine();
-            ImGui::Text("%s", TCHAR_TO_ANSI(*CategoryFriendlyName));
+            ImGui::Text("%s", CategoryFriendlyName);
         }
 
         ImGui::PopID();

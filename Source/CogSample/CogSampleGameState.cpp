@@ -25,6 +25,7 @@
 #include "CogEngineWindow_Collisions.h"
 #include "CogEngineWindow_DebugSettings.h"
 #include "CogEngineWindow_ImGui.h"
+#include "CogEngineWindow_Inspector.h"
 #include "CogEngineWindow_LogCategories.h"
 #include "CogEngineWindow_NetEmulation.h"
 #include "CogEngineWindow_OutputLog.h"
@@ -134,6 +135,8 @@ void ACogSampleGameState::InitializeCog()
     CogWindowManager->CreateWindow<UCogEngineWindow_DebugSettings>("Engine.Debug Settings");
 
     CogWindowManager->CreateWindow<UCogEngineWindow_ImGui>("Engine.ImGui");
+
+    CogWindowManager->CreateWindow<UCogEngineWindow_Inspector>("Engine.Inspector");
 
     CogWindowManager->CreateWindow<UCogEngineWindow_LogCategories>("Engine.Log Categories");
 

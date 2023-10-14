@@ -30,7 +30,8 @@ public:
     /** Called every frame without a valid imgui context (outside of the imgui NewFrame/EndFrame) even if the window is hidden. */
     virtual void GameTick(float DeltaTime);
 
-    virtual void DrawMainMenuWidget(bool Draw, float& Width) {}
+    /**  */
+    virtual void RenderMainMenuWidget(bool Draw, float& Width) {}
 
     ImGuiID GetID() const { return ID; }
 
@@ -58,7 +59,7 @@ protected:
     
     friend class UCogWindowManager;
 
-    virtual const FString& GetTitle() const { return Name; }
+    virtual FString GetTitle() const { return Name; }
 
     virtual void RenderHelp();
 
@@ -81,13 +82,11 @@ protected:
 protected:
 
     UPROPERTY(Config)
+    bool bHideMenu = false;
+
     bool bHasMenu = false;
 
     bool bIsVisible = false;
-
-    bool bShowInsideMenu = true;
-
-    bool bHideMenu = false;
 
     ImGuiID ID;
 

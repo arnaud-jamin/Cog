@@ -25,20 +25,20 @@ namespace CogSampleLog
     void RegiterAllLogCategories()
     {
 #if ENABLE_COG
-        FCogDebugLog::AddLogCategory(LogCogAlways, "Always", false);
+        FCogDebugLog::AddLogCategory(LogCogAlways, "Always", "Debug Category that is always active", false);
 
-        FCogDebugLog::AddLogCategory(LogCogAbility, "Ability");
-        FCogDebugLog::AddLogCategory(LogAbilitySystem, "Ability System");
-        FCogDebugLog::AddLogCategory(LogCogBaseAimRotation, "Base Aim Rotation");
-        FCogDebugLog::AddLogCategory(LogCogCollision, "Collision");
-        FCogDebugLog::AddLogCategory(LogCogControlRotation, "Control Rotation");
-        FCogDebugLog::AddLogCategory(LogCogInput, "Input");
-        FCogDebugLog::AddLogCategory(LogCogPosition, "Position");
-        FCogDebugLog::AddLogCategory(LogCogPossession, "Possession");
-        FCogDebugLog::AddLogCategory(LogCogRotation, "Rotation");
-        FCogDebugLog::AddLogCategory(LogCogSkeleton, "Skeleton");
-        FCogDebugLog::AddLogCategory(LogCogTargetAcquisition, "Target Acquisition");
-        FCogDebugLog::AddLogCategory(LogGameplayEffects, "Gameplay Effects");
+        FCogDebugLog::AddLogCategory(LogCogAbility, "Ability", "Log and debug draw of gameplay abilities");
+        FCogDebugLog::AddLogCategory(LogAbilitySystem, "Ability System", "Unreal Ability System Log");
+        FCogDebugLog::AddLogCategory(LogCogBaseAimRotation, "Base Aim Rotation", "Debug Draw of a Character BaseAimRotation");
+        FCogDebugLog::AddLogCategory(LogCogCollision, "Collision", "Debug Draw a Character Collision");
+        FCogDebugLog::AddLogCategory(LogCogControlRotation, "Control Rotation", "Debug Draw of the Character Control Rotation");
+        FCogDebugLog::AddLogCategory(LogCogInput, "Input", "Log about the input actions");
+        FCogDebugLog::AddLogCategory(LogCogPosition, "Position", "Debug draw of a character position");
+        FCogDebugLog::AddLogCategory(LogCogPossession, "Possession", "Log about the possession of player controller over a Character");
+        FCogDebugLog::AddLogCategory(LogCogRotation, "Rotation", "Debug Draw a Character Rotation");
+        FCogDebugLog::AddLogCategory(LogCogSkeleton, "Skeleton", "Debug Draw a Character Skeleton");
+        FCogDebugLog::AddLogCategory(LogCogTargetAcquisition, "Target Acquisition", "Debug Draw a Character Collision");
+        FCogDebugLog::AddLogCategory(LogGameplayEffects, "Gameplay Effects", "Unreal Gameplay Effect Log");
 #endif //ENABLE_COG
     }
 }

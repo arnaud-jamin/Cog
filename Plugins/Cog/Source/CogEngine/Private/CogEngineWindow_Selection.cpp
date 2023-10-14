@@ -1,6 +1,7 @@
 #include "CogEngineWindow_Selection.h"
 
 #include "CogDebugDraw.h"
+#include "CogEngineReplicator.h"
 #include "CogImguiModule.h"
 #include "CogWindowManager.h"
 #include "CogWindowWidgets.h"
@@ -421,7 +422,7 @@ bool UCogEngineWindow_Selection::ComputeBoundingBoxScreenPosition(const APlayerC
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Selection::DrawMainMenuWidget(bool Draw, float& Width)
+void UCogEngineWindow_Selection::RenderMainMenuWidget(bool Draw, float& Width)
 {
     const float PickButtonWidth = FCogWindowWidgets::GetFontWidth() * 6;
     const float SelectionButtonWidth = FCogWindowWidgets::GetFontWidth() * 30;

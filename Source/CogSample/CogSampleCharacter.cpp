@@ -369,6 +369,8 @@ void ACogSampleCharacter::SetupPlayerInputComponent(class UInputComponent* Playe
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleCharacter::OnAbilityInputStarted(const FInputActionValue& Value, int32 Index)
 {
+    COG_LOG_OBJECT(LogCogInput, ELogVerbosity::Verbose, this, TEXT("%d"), Index);
+
     if (ActiveAbilityHandles.IsValidIndex(Index) == false)
     {
         return;
@@ -388,6 +390,8 @@ void ACogSampleCharacter::OnAbilityInputStarted(const FInputActionValue& Value, 
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleCharacter::OnAbilityInputCompleted(const FInputActionValue& Value, int32 Index)
 {
+    COG_LOG_OBJECT(LogCogInput, ELogVerbosity::Verbose, this, TEXT("%d"), Index);
+
     if (ActiveAbilityHandles.IsValidIndex(Index) == false)
     {
         return;
