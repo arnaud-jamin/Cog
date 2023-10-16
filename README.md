@@ -78,8 +78,16 @@ Display the state of the gamepad
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/734dd08a-5b9f-44cf-8d24-9bf257f08ec6)
 - Can be used to inject inputs to help debugging, as loosing window focus when breaking in the code doesn't affect the state of injected inputs unlike real inputs.
 
+### Inspector
+Used to inspect and modify an Object properties 
+
+![image](https://github.com/arnaud-jamin/Cog/assets/13844285/e6ed8841-40cc-4491-b46f-517e6cd7f296)
+- Inspect the selected actor by default 
+- Favorites can be added with a custom function defining what happens when the user press the Apply button (typically this can be used to modify and apply the Game User Settings)
+- Manage a history of inspected objects.
+
 ### Log Categories
-This window can be used to activate and deactivate log categories
+Can be used to activate and deactivate log categories
 
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/7ced2751-c3bc-43a3-9280-d11a34bf0482)
 - Activating a log category set its verbosity to VeryVerbose.
@@ -89,12 +97,12 @@ This window can be used to activate and deactivate log categories
 - The log categories are used to filter both the output log and the debug draw.
 
 ### Metric
-This window gather various values sent by the selected actor and compte their rate per second. This is typically useful to compute the damage dealt or received per second.
+Gather various values sent by the selected actor and compte their rate per second. This is typically useful to compute the damage dealt or received per second.
 
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/64d3cb7c-8731-4897-9ef9-b0868148ebe2)
 
 ### Net Emulation
-This window is used to configure the network emulation
+Used to configure the network emulation
 
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/97103f15-fae8-4fe9-8189-8fdbcab5cb20)
 
@@ -121,7 +129,7 @@ Used to configure the rendering quality.
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/4866b54c-5efa-4efa-a841-74ac8e1713c0)
 
 ### Skeleton
-This window display the bone hierarchy and the skeleton debug draw of the selected actor if it has a Skeletal Mesh.
+Display the bone hierarchy and the skeleton debug draw of the selected actor if it has a Skeletal Mesh.
 
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/19648e3d-70dc-45bc-940d-e53eb9a99871)
 - Mouse over a bone to highlight it.
@@ -129,11 +137,18 @@ This window display the bone hierarchy and the skeleton debug draw of the select
 - Use the [Ctrl] key to toggle the bone debug draw recursively.
         
 ### Selection
-This window can be used to select an actor either by picking an actor in the world or by selecting an actor in the actor list.
+Used to select an actor either by picking an actor in the world or by selecting an actor in the actor list.
 
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/67cf9019-85c0-449f-88bf-0fc4841f8795)
 - The actor list can be filtered by actor type (Actor, Character, etc).
 - The current selection is used by various debug windows to filter out their content.
+
+### Settings
+Configure the settings of Cog Windows.
+
+![image](https://github.com/arnaud-jamin/Cog/assets/13844285/edd6a701-9a50-41fa-b7df-90fd11cc2937)
+- Can configure the input key to toggle the input focus between the game and imgui
+- Can change the DPI Scaling
 
 ### Spawn
 Used to spawn new actors in the world. The spawn list can be configured in a Data Asset.
