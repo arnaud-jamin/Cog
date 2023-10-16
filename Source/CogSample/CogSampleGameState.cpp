@@ -18,6 +18,7 @@
 #include "CogAbilityWindow_Pools.h"
 #include "CogAbilityWindow_Tags.h"
 #include "CogAbilityWindow_Tweaks.h"
+#include "CogAIWindow_Blackboard.h"
 #include "CogDebugDrawImGui.h"
 #include "CogDebugPlot.h"
 #include "CogEngineDataAsset.h"
@@ -201,6 +202,14 @@ void ACogSampleGameState::InitializeCog()
 
     UCogAbilityWindow_Tweaks* TweaksWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Tweaks>("Gameplay.Tweaks");
     TweaksWindow->SetAsset(AbilityAsset);
+
+    //---------------------------------------
+    // AI
+    //---------------------------------------
+    //const UCogAIDataAsset* InputAsset = GetFirstAssetByClass<UCogAIDataAsset>();
+
+    UCogAIWindow_Blackboard* BlackboardWindow = CogWindowManager->CreateWindow<UCogAIWindow_Blackboard>("AI.Blackboard");
+    //BlackboardWindow->SetAsset(InputAsset);
 
     //---------------------------------------
     // Input

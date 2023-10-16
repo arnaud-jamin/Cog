@@ -28,8 +28,9 @@ public class CogSample : ModuleRules
                 "CogImgui",
                 "CogWindow",
                 "CogEngine",
-                "CogInput",
                 "CogAbility",
+                "CogAI",
+                "CogInput",
             });
         }
     }
