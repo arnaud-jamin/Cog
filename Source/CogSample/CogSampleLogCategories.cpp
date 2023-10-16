@@ -10,6 +10,7 @@
 DEFINE_LOG_CATEGORY(LogCogAlways);
 
 DEFINE_LOG_CATEGORY(LogCogAbility);
+DEFINE_LOG_CATEGORY(LogCogAI);
 DEFINE_LOG_CATEGORY(LogCogBaseAimRotation);
 DEFINE_LOG_CATEGORY(LogCogCollision);
 DEFINE_LOG_CATEGORY(LogCogControlRotation);
@@ -28,6 +29,7 @@ namespace CogSampleLog
         FCogDebugLog::AddLogCategory(LogCogAlways, "Always", "Debug Category that is always active", false);
 
         FCogDebugLog::AddLogCategory(LogCogAbility, "Ability", "Log and debug draw of gameplay abilities");
+        FCogDebugLog::AddLogCategory(LogCogAI, "AI", "Log and debug draw of AI behaviors");
         FCogDebugLog::AddLogCategory(LogAbilitySystem, "Ability System", "Unreal Ability System Log");
         FCogDebugLog::AddLogCategory(LogCogBaseAimRotation, "Base Aim Rotation", "Debug Draw of a Character BaseAimRotation");
         FCogDebugLog::AddLogCategory(LogCogCollision, "Collision", "Debug Draw a Character Collision");

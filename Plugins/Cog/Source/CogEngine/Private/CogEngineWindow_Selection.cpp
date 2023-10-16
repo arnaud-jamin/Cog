@@ -203,7 +203,6 @@ bool UCogEngineWindow_Selection::DrawSelectionCombo()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 void UCogEngineWindow_Selection::DrawActorContextMenu(AActor* Actor)
 {
     //------------------------
