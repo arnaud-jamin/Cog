@@ -33,9 +33,9 @@ void UCogAbilityWindow_Attributes::ResetConfig()
 {
     Super::ResetConfig();
 
-    bSortByNameSetting = true;
-    bGroupByAttributeSetSetting = false;
-    bGroupByCategorySetting = false;
+    bSortByName = true;
+    bGroupByAttributeSet = false;
+    bGroupByCategory = false;
     bShowOnlyModified = false;
 }
 
@@ -54,9 +54,9 @@ void UCogAbilityWindow_Attributes::RenderContent()
     {
         if (ImGui::BeginMenu("Options"))
         {
-            ImGui::Checkbox("Sort by name", &bSortByNameSetting);
-            ImGui::Checkbox("Group by attribute set", &bGroupByAttributeSetSetting);
-            ImGui::Checkbox("Group by category", &bGroupByCategorySetting);
+            ImGui::Checkbox("Sort by name", &bSortByName);
+            ImGui::Checkbox("Group by attribute set", &bGroupByAttributeSet);
+            ImGui::Checkbox("Group by category", &bGroupByCategory);
             ImGui::Checkbox("Show Only Modified", &bShowOnlyModified);
             ImGui::EndMenu();
         }
@@ -66,10 +66,18 @@ void UCogAbilityWindow_Attributes::RenderContent()
         ImGui::EndMenuBar();
     }
 
-    bool bGroupByAttributeSet = Filter.IsActive() == false && bShowOnlyModified == false && bGroupByAttributeSetSetting;
-    bool bGroupByCategory = Filter.IsActive() == false && bShowOnlyModified == false && bGroupByCategorySetting;
+    bool bGroupByAttributeSetValue = Filter.IsActive() == false && bShowOnlyModified == false && bGroupByAttributeSet;
+    bool bGroupByCategoryValue = Filter.IsActive() == false && bShowOnlyModified == false && bGroupByCategory;
 
-    if (ImGui::BeginTable("Attributes", 3, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize | ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable))
+    if (ImGui::BeginTable("Attributes", 3, ImGuiTableFlags_SizingFixedFit 
+                                         | ImGuiTableFlags_Resizable 
+                                         | ImGuiTableFlags_NoBordersInBodyUntilResize 
+                                         | ImGuiTableFlags_ScrollY 
+                                         | ImGuiTableFlags_RowBg 
+                                         | ImGuiTableFlags_BordersOuter 
+                                         | ImGuiTableFlags_BordersV 
+                                         | ImGuiTableFlags_Reorderable 
+                                         | ImGuiTableFlags_Hideable))
     {
         ImGui::TableSetupScrollFreeze(0, 1);
         ImGui::TableSetupColumn("Attribute");
@@ -89,7 +97,7 @@ void UCogAbilityWindow_Attributes::RenderContent()
             // Add an tree node categories are shown
             //------------------------------------------------------------------------------------------
             bool bOpenAttributeSet = true;
-            if (bGroupByAttributeSet)
+            if (bGroupByAttributeSetValue)
             {
                 ImGui::TableNextRow();
                 ImGui::TableNextColumn();
@@ -114,7 +122,7 @@ void UCogAbilityWindow_Attributes::RenderContent()
                 // Sort attributes by category to make sure categories are displayed in alphabetical order
                 //------------------------------------------------------------------------------------------
 #if WITH_EDITORONLY_DATA
-                if (bGroupByCategory)
+                if (bGroupByCategoryValue)
                 {
                     AllAttributes.Sort([](const FGameplayAttribute& Attribute1, const FGameplayAttribute& Attribute2)
                         {
@@ -134,7 +142,7 @@ void UCogAbilityWindow_Attributes::RenderContent()
                     FString Category = TEXT("Default");
 
 #if WITH_EDITORONLY_DATA
-                    if (bGroupByCategory)
+                    if (bGroupByCategoryValue)
                     {
                         FString ActualCategory = Attribute.GetUProperty() != nullptr ? Attribute.GetUProperty()->GetMetaData(TEXT("Category")) : "";
                         if (ActualCategory.IsEmpty() == false)
@@ -153,7 +161,7 @@ void UCogAbilityWindow_Attributes::RenderContent()
                     // Add a tree node with the name of the category if categories are shown
                     //------------------------------------------------------------------------------------------
                     bool bOpenCategory = true;
-                    if (bGroupByCategory)
+                    if (bGroupByCategoryValue)
                     {
                         ImGui::TableNextRow();
                         ImGui::TableNextColumn();
@@ -167,7 +175,7 @@ void UCogAbilityWindow_Attributes::RenderContent()
                         //------------------------------------------------------------------------------------------
                         // Sort attributes within a category by their name
                         //------------------------------------------------------------------------------------------
-                        if (bSortByNameSetting)
+                        if (bSortByName)
                         {
                             AttributesInCategory.Sort([](const FGameplayAttribute& Lhs, const FGameplayAttribute& Rhs)
                                 {
@@ -264,14 +272,14 @@ void UCogAbilityWindow_Attributes::RenderContent()
                         }
                     }
 
-                    if (bOpenCategory && bGroupByCategory)
+                    if (bOpenCategory && bGroupByCategoryValue)
                     {
                         ImGui::TreePop();
                     }
                 }
             }
 
-            if (bOpenAttributeSet && bGroupByAttributeSet)
+            if (bOpenAttributeSet && bGroupByAttributeSetValue)
             {
                 ImGui::TreePop();
             }

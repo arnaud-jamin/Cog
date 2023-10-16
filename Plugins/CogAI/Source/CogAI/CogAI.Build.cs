@@ -34,8 +34,9 @@ public class CogAI : ModuleRules
 			{
 				"CoreUObject",
 				"Engine",
-			}
-			);
+                "AIModule",
+            }
+            );
 		
 		
 		DynamicallyLoadedModuleNames.AddRange(

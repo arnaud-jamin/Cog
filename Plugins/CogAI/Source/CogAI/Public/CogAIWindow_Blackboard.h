@@ -4,7 +4,8 @@
 #include "CogWindow.h"
 #include "CogAIWindow_Blackboard.generated.h"
 
-class UCogAIDataAsset;
+namespace FBlackboard { typedef uint8 FKey; }
+class UBlackboardData;
 
 UCLASS(Config = Cog)
 class COGAI_API UCogAIWindow_Blackboard : public UCogWindow
@@ -15,10 +16,6 @@ public:
 
     UCogAIWindow_Blackboard();
 
-    //const UCogAIDataAsset* GetAsset() const { return Asset.Get(); }
-
-    //void SetAsset(const UCogAIDataAsset* Value) { Asset = Value; }
-
 protected:
 
     void RenderHelp();
@@ -27,7 +24,9 @@ protected:
 
 private:
 
+    UPROPERTY(Config)
+    bool bSortByName = true;
 
-    //UPROPERTY()
-    //TWeakObjectPtr<const UCogAIDataAsset> Asset = nullptr;
+    ImGuiTextFilter Filter;
+
 };

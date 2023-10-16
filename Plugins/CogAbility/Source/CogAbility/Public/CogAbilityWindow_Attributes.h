@@ -40,13 +40,13 @@ protected:
 private:
 
     UPROPERTY(Config)
-    bool bSortByNameSetting = true;
+    bool bSortByName = true;
 
     UPROPERTY(Config)
-    bool bGroupByAttributeSetSetting = false;
+    bool bGroupByAttributeSet = false;
 
     UPROPERTY(Config)
-    bool bGroupByCategorySetting = false;
+    bool bGroupByCategory = false;
 
     UPROPERTY(Config)
     bool bShowOnlyModified = false;
