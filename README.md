@@ -170,7 +170,7 @@ Displays the gameplay tags of the selected actor.
 Used to change the game global time scale. 
 
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/d19198c5-37dd-400d-a09f-7a5077eb2511)
-- If changed on a client the time scale is also modified on the game server, and reolicated to the other clients.
+- If changed on a client the time scale is also modified on the game server, and replicated to the other clients.
 
 ### Tweaks
 Used to apply tweaks to all the spawned actors
