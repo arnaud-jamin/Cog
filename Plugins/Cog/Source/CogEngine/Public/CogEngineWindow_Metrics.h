@@ -32,7 +32,7 @@ protected:
 
     virtual void DrawMetric(FCogDebugMetricEntry& Metric);
 
-    virtual void DrawMetricRow(const char* Title, float MitigatedValue, float UnmitigatedValue, const ImVec4& Color);
+    virtual void DrawMetricRow(const char* RowTitle, float MitigatedValue, float UnmitigatedValue, const ImVec4& Color);
 
 private:
 

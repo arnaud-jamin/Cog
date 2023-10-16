@@ -259,7 +259,7 @@ void UCogWindowManager::RenderMainMenu()
     {
         for (UCogWindowManager::FMenu& Menu : MainMenu.SubMenus)
         {
-            RenderMenu(Menu);
+            RenderOptionMenu(Menu);
         }
 
         if (ImGui::BeginMenu("Window"))
@@ -351,7 +351,7 @@ void UCogWindowManager::RenderMainMenu()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::RenderMenu(UCogWindowManager::FMenu& Menu)
+void UCogWindowManager::RenderOptionMenu(UCogWindowManager::FMenu& Menu)
 {
     if (Menu.Window != nullptr)
     {
@@ -363,7 +363,7 @@ void UCogWindowManager::RenderMenu(UCogWindowManager::FMenu& Menu)
         {
             for (UCogWindowManager::FMenu& SubMenu : Menu.SubMenus)
             {
-                RenderMenu(SubMenu);
+                RenderOptionMenu(SubMenu);
             }
             ImGui::EndMenu();
         }

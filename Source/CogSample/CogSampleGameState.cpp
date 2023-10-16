@@ -42,6 +42,9 @@
 #include "CogInputWindow_Actions.h"
 #include "CogInputWindow_Gamepad.h"
 #include "CogWindowManager.h"
+
+#include "GameFramework/GameUserSettings.h"
+
 #endif //ENABLE_COG
 
 
@@ -136,7 +139,17 @@ void ACogSampleGameState::InitializeCog()
 
     CogWindowManager->CreateWindow<UCogEngineWindow_ImGui>("Engine.ImGui");
 
-    CogWindowManager->CreateWindow<UCogEngineWindow_Inspector>("Engine.Inspector");
+    UCogEngineWindow_Inspector* Inspector = CogWindowManager->CreateWindow<UCogEngineWindow_Inspector>("Engine.Inspector");
+    Inspector->AddFavorite(GEngine->GetGameUserSettings(), [](UObject* Object)
+    {
+        if (UGameUserSettings* UserSettings = Cast<UGameUserSettings>(Object))
+        {
+            UserSettings->ApplySettings(true);
+        }
+    });
+
+    
+
 
     CogWindowManager->CreateWindow<UCogEngineWindow_LogCategories>("Engine.Log Categories");
 

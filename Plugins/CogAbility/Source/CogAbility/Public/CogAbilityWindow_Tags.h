@@ -4,6 +4,10 @@
 #include "CogWindow.h"
 #include "CogAbilityWindow_Tags.generated.h"
 
+class UAbilitySystemComponent;
+struct FGameplayTagContainer;
+struct FGameplayTag;
+
 UCLASS()
 class COGABILITY_API UCogAbilityWindow_Tags : public UCogWindow
 {
@@ -19,7 +23,7 @@ protected:
 
     virtual void RenderContent() override;
 
-    virtual void DrawTagContainer(const FString& Title, const UAbilitySystemComponent& AbilitySystemComponent, FGameplayTagContainer& TagContainer);
+    virtual void DrawTagContainer(const FString& TagContainerName, const UAbilitySystemComponent& AbilitySystemComponent, FGameplayTagContainer& TagContainer);
 
     virtual void DrawTag(const UAbilitySystemComponent& AbilitySystemComponent, const FGameplayTag& Tag);
 };

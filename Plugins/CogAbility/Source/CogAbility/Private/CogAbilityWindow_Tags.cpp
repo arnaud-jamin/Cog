@@ -1,6 +1,7 @@
 #include "CogAbilityWindow_Tags.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystemGlobals.h"
 #include "CogAbilityHelper.h"
 #include "CogWindowWidgets.h"
 
@@ -93,12 +94,12 @@ void UCogAbilityWindow_Tags::DrawTag(const UAbilitySystemComponent& AbilitySyste
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Tags::DrawTagContainer(const FString& Title, const UAbilitySystemComponent& AbilitySystemComponent, FGameplayTagContainer& TagContainer)
+void UCogAbilityWindow_Tags::DrawTagContainer(const FString& TagContainerName, const UAbilitySystemComponent& AbilitySystemComponent, FGameplayTagContainer& TagContainer)
 {
-    if (ImGui::BeginTable(TCHAR_TO_ANSI(*Title), 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_BordersOuterV))
+    if (ImGui::BeginTable(TCHAR_TO_ANSI(*TagContainerName), 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_BordersOuterV))
     {
         ImGui::TableSetupColumn("Count");
-        ImGui::TableSetupColumn(TCHAR_TO_ANSI(*Title));
+        ImGui::TableSetupColumn(TCHAR_TO_ANSI(*TagContainerName));
         ImGui::TableHeadersRow();
 
         TArray<FGameplayTag> Tags;

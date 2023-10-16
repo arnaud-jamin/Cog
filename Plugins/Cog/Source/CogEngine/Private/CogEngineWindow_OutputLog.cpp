@@ -1,6 +1,7 @@
 #include "CogEngineWindow_OutputLog.h"
 
 #include "CogDebugHelper.h"
+#include "CogWindowWidgets.h"
 #include "Engine/Engine.h"
 #include "Misc/StringBuilder.h"
 
@@ -285,6 +286,16 @@ void UCogEngineWindow_OutputLog::RenderContent()
     else
     {
         ImGui::EndChild();
+    }
+
+    if (ImGui::BeginPopupContextItem())
+    {
+        if (ImGui::MenuItem("Clear"))
+        {
+            Clear();
+        }
+
+        ImGui::EndPopup();
     }
 }
 

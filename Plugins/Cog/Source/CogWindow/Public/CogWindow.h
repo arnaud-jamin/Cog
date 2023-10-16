@@ -59,7 +59,7 @@ protected:
     
     friend class UCogWindowManager;
 
-    virtual FString GetTitle() const { return Name; }
+    virtual const FString& GetTitle() const { return Title; }
 
     virtual void RenderHelp();
 
@@ -93,6 +93,8 @@ protected:
     FString FullName;
 
     FString Name;
+
+    FString Title;
 
     UCogWindowManager* Owner = nullptr;
 

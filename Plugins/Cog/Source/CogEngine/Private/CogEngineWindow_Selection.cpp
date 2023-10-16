@@ -426,7 +426,7 @@ void UCogEngineWindow_Selection::RenderMainMenuWidget(bool Draw, float& Width)
 {
     const float PickButtonWidth = FCogWindowWidgets::GetFontWidth() * 6;
     const float SelectionButtonWidth = FCogWindowWidgets::GetFontWidth() * 30;
-    const float ResetButtonWidth = FCogWindowWidgets::GetFontWidth() * 2;
+    const float ResetButtonWidth = FCogWindowWidgets::GetFontWidth() * 3;
     Width = PickButtonWidth + SelectionButtonWidth + ResetButtonWidth;
 
     if (Draw == false)
@@ -477,9 +477,7 @@ void UCogEngineWindow_Selection::RenderMainMenuWidget(bool Draw, float& Width)
     {
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
         ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
-        ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4((ImGuiCol_FrameBg)));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::GetStyleColorVec4((ImGuiCol_FrameBgActive)));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::GetStyleColorVec4((ImGuiCol_FrameBgHovered)));
+        ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(0, 0, 0, 0));
         ImGui::SameLine();
         FString SelectionName = GetNameSafe(GlobalSelection);
 
@@ -492,7 +490,7 @@ void UCogEngineWindow_Selection::RenderMainMenuWidget(bool Draw, float& Width)
             ImGui::SetTooltip("Current Selection: %s", TCHAR_TO_ANSI(*SelectionName));
         }
 
-        ImGui::PopStyleColor(3);
+        ImGui::PopStyleColor(1);
         ImGui::PopStyleVar(2);
 
         DrawActorContextMenu(GlobalSelection);
@@ -503,9 +501,7 @@ void UCogEngineWindow_Selection::RenderMainMenuWidget(bool Draw, float& Width)
     //-----------------------------------
     {
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
-        ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4((ImGuiCol_FrameBg)));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::GetStyleColorVec4((ImGuiCol_FrameBgActive)));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::GetStyleColorVec4((ImGuiCol_FrameBgHovered)));
+        ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(0, 0, 0, 0));
         ImGui::SameLine();
         if (ImGui::Button("X", ImVec2(ResetButtonWidth, 0)))
         {
@@ -516,7 +512,7 @@ void UCogEngineWindow_Selection::RenderMainMenuWidget(bool Draw, float& Width)
         {
             ImGui::SetTooltip("Reset the selection to the controlled actor.");
         }
-        ImGui::PopStyleColor(3);
+        ImGui::PopStyleColor(1);
         ImGui::PopStyleVar(1);
     }
 }

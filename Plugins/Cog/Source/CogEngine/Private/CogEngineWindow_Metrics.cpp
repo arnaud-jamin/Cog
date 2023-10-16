@@ -164,11 +164,11 @@ void UCogEngineWindow_Metrics::DrawMetric(FCogDebugMetricEntry& Metric)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Metrics::DrawMetricRow(const char* Title, float MitigatedValue, float UnmitigatedValue, const ImVec4& Color)
+void UCogEngineWindow_Metrics::DrawMetricRow(const char* RowTitle, float MitigatedValue, float UnmitigatedValue, const ImVec4& Color)
 {
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
-    ImGui::Selectable(Title, false, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap | ImGuiSelectableFlags_AllowDoubleClick);
+    ImGui::Selectable(RowTitle, false, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap | ImGuiSelectableFlags_AllowDoubleClick);
     ImGui::TableNextColumn();
     ImGui::TextColored(Color, "%.1f", MitigatedValue);
     ImGui::TableNextColumn();

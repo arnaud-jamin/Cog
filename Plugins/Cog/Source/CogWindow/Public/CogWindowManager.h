@@ -93,7 +93,7 @@ protected:
     
     FMenu* AddMenu(const FString& Name);
 
-    void RenderMenu(FMenu& Menu);
+    void RenderOptionMenu(FMenu& Menu);
 
     void RenderMenuItem(UCogWindow& Window, const char* MenuItemName);
 

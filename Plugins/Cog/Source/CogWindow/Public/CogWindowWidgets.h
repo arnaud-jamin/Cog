@@ -29,7 +29,7 @@ public:
 
     static void AddTextWithShadow(ImDrawList* DrawList, const ImVec2& Position, ImU32 Color, const char* TextBegin, const char* TextEnd = NULL);
 
-    static void MenuSearchBar(ImGuiTextFilter& Filter);
+    static void MenuSearchBar(ImGuiTextFilter& Filter, float Width = -1.0f);
 
     static void PushBackColor(const ImVec4& Color);
 

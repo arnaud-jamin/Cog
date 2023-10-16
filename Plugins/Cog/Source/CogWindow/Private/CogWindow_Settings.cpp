@@ -1,6 +1,8 @@
 #include "CogWindow_Settings.h"
 
 #include "CogImguiModule.h"
+#include "CogWindowManager.h"
+#include "CogWindowWidgets.h"
 #include "InputCoreTypes.h"
 
 //--------------------------------------------------------------------------------------------------------------------------

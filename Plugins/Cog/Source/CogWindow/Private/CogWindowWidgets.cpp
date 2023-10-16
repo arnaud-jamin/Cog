@@ -160,18 +160,27 @@ void FCogWindowWidgets::AddTextWithShadow(ImDrawList* DrawList, const ImVec2& Po
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogWindowWidgets::MenuSearchBar(ImGuiTextFilter& Filter)
+void FCogWindowWidgets::MenuSearchBar(ImGuiTextFilter& Filter, float Width /*= -1*/)
 {
+    ImGuiWindow* Window = FCogImguiHelper::GetCurrentWindow();
     ImGui::SameLine();
-    const float Pos1 = ImGui::GetCursorPosX();
-    Filter.Draw("", -1);
-    const float Pos2 = ImGui::GetCursorPosX();
+    ImVec2 Pos1 = Window->DC.CursorPos;
+    Filter.Draw("", Width);
+    ImVec2 Pos2 = Window->DC.CursorPos;
+
     if (ImGui::IsItemActive() == false && Filter.Filters.empty())
     {
-        ImGui::SetCursorPosX(Pos1 + 3);
-        ImGui::TextDisabled("Search");
+        static const char* Text = "Search";
+        const float Height = ImGui::GetFrameHeight();
+        ImGuiContext& g = *ImGui::GetCurrentContext();
+        ImVec2 Min = Pos1 + ImVec2(g.Style.ItemSpacing.x, 0.0f);
+        ImVec2 Max = Pos2 + ImVec2(-g.Style.ItemSpacing.x, Height);
+        ImRect BB(Min, Max);
+        ImVec2 TextSize = ImGui::CalcTextSize(Text, NULL);
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 128));
+        ImGui::RenderTextClipped(Min, Max, Text, NULL, &TextSize, ImVec2(0.0f, 0.5f), &BB);
+        ImGui::PopStyleColor();
     }
-    ImGui::SetCursorPosX(Pos2);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

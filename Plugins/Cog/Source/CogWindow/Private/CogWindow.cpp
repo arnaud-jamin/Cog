@@ -23,6 +23,8 @@ void UCogWindow::SetFullName(const FString& InFullName)
         Name = FullName;
     }
 
+    Title = Name;
+
     ID = ImHashStr(TCHAR_TO_ANSI(*FullName));
 }
 

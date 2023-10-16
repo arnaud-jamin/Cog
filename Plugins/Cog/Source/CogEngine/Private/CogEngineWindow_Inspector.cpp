@@ -20,26 +20,49 @@ void UCogEngineWindow_Inspector::RenderHelp()
 UCogEngineWindow_Inspector::UCogEngineWindow_Inspector()
 {
     bHasMenu = true;
-    PropertyGridFlags = ECogEngineInspectorFlags_ShowCategories
-                      | ECogEngineInspectorFlags_SortByName
-                      | ECogEngineInspectorFlags_ShowDisplayName
-                      | ECogEngineInspectorFlags_DisplaySearch
-                      | ECogEngineInspectorFlags_DisplayOptions;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FString UCogEngineWindow_Inspector::GetTitle() const
+void UCogEngineWindow_Inspector::SetInspectedObject(UObject* Value)
 {
-    return FString::Printf(TEXT("%s: %s###Inspector"),
-        *GetName(),
-        InspectedObject != nullptr ? *InspectedObject->GetName() : TEXT("none"));
+    if (InspectedObject == Value)
+    {
+        return;
+    }
+
+    InspectedObject = Value;
+    
+    if (InspectedObject != GetSelection())
+    {
+        bSyncWithSelection = false;
+    }
+
+    if (HistoryIndex != History.Num() - 1)
+    {
+        History.SetNum(HistoryIndex + 1);
+    }
+    
+    if (History.Num() > 9)
+    {
+        History.RemoveAt(0);
+    }
+
+    HistoryIndex = History.Add(Value);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Inspector::InspectObject(const UObject* Object)
+void UCogEngineWindow_Inspector::AddFavorite(UObject* Object)
 {
-    InspectedObject = Object;
-    SetIsVisible(true);
+    Favorite& Favorite = Favorites.AddDefaulted_GetRef();
+    Favorite.Object = Object;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindow_Inspector::AddFavorite(UObject* Object, FCogEngineInspectorApplyFunction ApplyFunction)
+{
+    Favorite& Favorite = Favorites.AddDefaulted_GetRef();
+    Favorite.Object = Object;
+    Favorite.ApplyFunction = ApplyFunction;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -47,99 +70,226 @@ void UCogEngineWindow_Inspector::RenderContent()
 {
     Super::RenderContent();
 
-    if (InspectedObject == nullptr)
+    RenderMenu();
+
+    //--------------------------
+    // Objects to inspect Combo
+    //--------------------------
+
+    if (bSyncWithSelection || InspectedObject == nullptr)
     {
-        InspectedObject = GetSelection();
+        SetInspectedObject(GetSelection());
     }
 
-    if (InspectedObject.IsValid() == false)
+    if (InspectedObject == nullptr)
     {
         return;
     }
 
-    RenderMenu(*this, PropertyFilter, PropertyGridFlags);
-    RenderInspector(*this, InspectedObject.Get(), PropertyFilter, PropertyGridFlags);
+    FCogEngineInspectorApplyFunction ApplyFunction = FindObjectApplyFunction(InspectedObject.Get());
+
+    ImGui::BeginChild("Inspector", ImVec2(-1, ApplyFunction != nullptr ? -ImGui::GetFrameHeightWithSpacing() : -1), false);
+
+    RenderInspector();
+
+    ImGui::EndChild();
+
+    if (ApplyFunction != nullptr)
+    {
+        if (ImGui::Button("Apply", ImVec2(-1, 0)))
+        {
+            ApplyFunction(InspectedObject.Get());
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Inspector::RenderMenu(FCogEngineInspectorHost& Host, ImGuiTextFilter& Filter, ECogEngineInspectorFlags& Flags)
+FCogEngineInspectorApplyFunction UCogEngineWindow_Inspector::FindObjectApplyFunction(const UObject* Object) const
 {
-    bool ShowDisplayName =      (Flags & ECogEngineInspectorFlags_ShowDisplayName) != 0;
-    bool ShowRowBackground =    (Flags & ECogEngineInspectorFlags_ShowRowBackground) != 0;
-    bool ShowBorders =          (Flags & ECogEngineInspectorFlags_ShowBorders) != 0;
-    bool ShowCategories =       (Flags & ECogEngineInspectorFlags_ShowCategories) != 0;
-    bool SortByName =           (Flags & ECogEngineInspectorFlags_SortByName) != 0;
+    for (const Favorite& Favorite : Favorites)
+    {
+        if (Favorite.Object == Object)
+        {
+            return Favorite.ApplyFunction;
+        }
+    }
 
-    Flags &= ~ECogEngineInspectorFlags_ShowDisplayName;
-    Flags &= ~ECogEngineInspectorFlags_ShowRowBackground;
-    Flags &= ~ECogEngineInspectorFlags_ShowBorders;
-    Flags &= ~ECogEngineInspectorFlags_ShowCategories;
-    Flags &= ~ECogEngineInspectorFlags_SortByName;
-    Flags &= ~ECogEngineInspectorFlags_CollapseAllCategories;
-    Flags &= ~ECogEngineInspectorFlags_ExpandAllCategories;
+    return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindow_Inspector::RenderMenu()
+{
+    bCollapseAllCategories = false;
+    bExpandAllCategories = false;
 
     if (ImGui::BeginMenuBar())
     {
-        if (Flags & ECogEngineInspectorFlags_DisplayOptions)
+        ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(0, 0, 0, 0));
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
+
+        int32 NewHistoryIndex = INDEX_NONE;
+
+        //-----------------------------------
+        // Backward / Foward
+        //-----------------------------------
         {
-            if (ImGui::BeginMenu("Options"))
+            if (ImGui::ArrowButton("##Backward", ImGuiDir_Left))
             {
-                if (ImGui::MenuItem("Collapse all categories"))
-                {
-                    Flags |= ECogEngineInspectorFlags_CollapseAllCategories;
-                }
+                NewHistoryIndex = FMath::Max(0, HistoryIndex - 1);
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
+            {
+                ImGui::SetTooltip("Backward");
+            }
 
-                if (ImGui::MenuItem("Expand all categories"))
-                {
-                    Flags |= ECogEngineInspectorFlags_ExpandAllCategories;
-                }
-
-                ImGui::Separator();
-
-                ImGui::Checkbox("Show background", &ShowRowBackground);
-                ImGui::Checkbox("Show borders", &ShowBorders);
-#if WITH_EDITORONLY_DATA
-                ImGui::Checkbox("Show display name", &ShowDisplayName);
-                ImGui::Checkbox("Show categories", &ShowCategories);
-#endif  // WITH_EDITORONLY_DATA
-                ImGui::Checkbox("Sort by name", &SortByName);
-
-                ImGui::Separator();
-
-                ImGui::MenuItem("Help");
-                if (ImGui::IsItemHovered())
-                {
-                    ImGui::BeginTooltip();
-                    ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-                    ImGui::TextUnformatted("Tips:");
-                    ImGui::TextUnformatted(" - Press [CTRL] over a property to see more informations");
-                    ImGui::PopTextWrapPos();
-                    ImGui::EndTooltip();
-                }
-
-                ImGui::EndMenu();
+            if (ImGui::ArrowButton("##Foward", ImGuiDir_Right))
+            {
+                NewHistoryIndex = FMath::Min(History.Num(), HistoryIndex + 1);
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
+            {
+                ImGui::SetTooltip("Forward");
             }
         }
 
-        if (Flags & ECogEngineInspectorFlags_DisplaySearch)
+        //-----------------------------------
+        // Current Inspected Object
+        //-----------------------------------
+        const char* InspectedObjectName = TCHAR_TO_ANSI(*GetNameSafe(InspectedObject.Get()));
+        ImVec2 Pos = ImGui::GetCursorScreenPos();
         {
-            FCogWindowWidgets::MenuSearchBar(Filter);
+            ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
+            ImGui::SameLine();
+
+            if (ImGui::Button(InspectedObjectName, ImVec2(FCogWindowWidgets::GetFontWidth() * 20, 0)))
+            {
+                ImGui::OpenPopup("SelectionPopup");
+            }
+            if (ImGui::IsItemHovered())
+            {
+                ImGui::SetTooltip("Current Inspected Object: %s", InspectedObjectName);
+            }
+
+            ImGui::PopStyleVar(1);
+        }
+
+        if (ImGui::IsItemHovered())
+        {
+            ImGui::SetTooltip("%s", InspectedObjectName);
+        }
+
+        ImGui::PopStyleColor(1);
+        ImGui::PopStyleVar(1);
+
+        //-----------------------------------
+        // Popup
+        //-----------------------------------
+        ImGui::SetNextWindowPos(Pos + ImVec2(0, ImGui::GetFrameHeight()));
+        if (ImGui::BeginPopup("SelectionPopup"))
+        {
+            ImGui::BeginChild("Popup", ImVec2(FCogWindowWidgets::GetFontWidth() * 30, FCogWindowWidgets::GetFontWidth() * 40), false);
+
+            //-----------------------------------
+            // FAVORITES
+            //-----------------------------------
+            ImGui::SeparatorText("FAVORITES");
+
+            if (ImGui::MenuItem("Selection"))
+            {
+                SetInspectedObject(GetSelection());
+                ImGui::CloseCurrentPopup();
+            }
+
+            for (Favorite& Favorite : Favorites)
+            {
+                const TWeakObjectPtr<UObject>& Object = Favorite.Object;
+                if (ImGui::MenuItem(TCHAR_TO_ANSI(*GetNameSafe(Object.Get()))))
+                {
+                    SetInspectedObject(Object.Get());
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+
+            //-----------------------------------
+            // HISTORY
+            //-----------------------------------
+            ImGui::Spacing();
+            ImGui::SeparatorText("HISTORY");
+            for (int32 i = History.Num() - 1; i >= 0; i--)
+            {
+                const TWeakObjectPtr<const UObject>& Object = History[i];
+                if (ImGui::MenuItem(TCHAR_TO_ANSI(*GetNameSafe(Object.Get())), nullptr, i == HistoryIndex))
+                {
+                    NewHistoryIndex = i;
+                    ImGui::CloseCurrentPopup();
+                }
+            }
+
+            ImGui::EndChild();
+            ImGui::EndPopup();
+        }
+
+        //-----------------------------------
+        // Apply history selection
+        //-----------------------------------
+        if (NewHistoryIndex != INDEX_NONE)
+        {
+            if (History.IsValidIndex(NewHistoryIndex))
+            {
+                HistoryIndex = NewHistoryIndex;
+                InspectedObject = History[HistoryIndex];
+                bSyncWithSelection = false;
+            }
+        }
+
+        //-----------------------------------
+        // Search
+        //-----------------------------------
+        FCogWindowWidgets::MenuSearchBar(Filter, -FCogWindowWidgets::GetFontWidth() * 9);
+
+        //-----------------------------------
+        // Options
+        //-----------------------------------
+        if (ImGui::BeginMenu("Options"))
+        {
+            ImGui::Checkbox("Sync With Selection", &bSyncWithSelection);
+            if (ImGui::IsItemHovered())
+            {
+                ImGui::SetTooltip("Should the inspector be synced with the actor selection ?");
+            }
+
+            ImGui::Separator();
+
+            ImGui::Checkbox("Sort by name", &bSortByName);
+            ImGui::Checkbox("Show background", &bShowRowBackground);
+            ImGui::Checkbox("Show borders", &bShowBorders);
+#if WITH_EDITORONLY_DATA
+            ImGui::Checkbox("Show display name", &bShowDisplayName);
+            ImGui::Checkbox("Show categories", &bShowCategories);
+
+            ImGui::Separator();
+            if (ImGui::MenuItem("Collapse all categories", nullptr, false, bShowCategories))
+            {
+                bCollapseAllCategories = true;
+            }
+            if (ImGui::MenuItem("Expand all categories", nullptr, false, bShowCategories))
+            {
+                bExpandAllCategories = true;
+            }
+#endif  // WITH_EDITORONLY_DATA
+
+            ImGui::EndMenu();
         }
 
         ImGui::EndMenuBar();
     }
-
-    Flags |= ShowDisplayName ? ECogEngineInspectorFlags_ShowDisplayName : 0;
-    Flags |= ShowRowBackground ? ECogEngineInspectorFlags_ShowRowBackground : 0;
-    Flags |= ShowBorders ? ECogEngineInspectorFlags_ShowBorders : 0;
-    Flags |= ShowCategories ? ECogEngineInspectorFlags_ShowCategories : 0;
-    Flags |= SortByName ? ECogEngineInspectorFlags_SortByName : 0;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
-bool UCogEngineWindow_Inspector::RenderInspector(FCogEngineInspectorHost& Host, const UObject* Object, ImGuiTextFilter& Filter, ECogEngineInspectorFlags Flags)
+bool UCogEngineWindow_Inspector::RenderInspector()
 {
+    const UObject* Object = GetInspectedObject();
     if (Object == nullptr)
     {
         return false;
@@ -165,7 +315,7 @@ bool UCogEngineWindow_Inspector::RenderInspector(FCogEngineInspectorHost& Host, 
     // Render properties with categories
     //----------------------------------------------------------------------
 
-    if ((Flags & ECogEngineInspectorFlags_ShowCategories) != 0)
+    if ((bShowCategories) != 0)
     {
         IsPropertyGridRendered = true;
 
@@ -180,21 +330,21 @@ bool UCogEngineWindow_Inspector::RenderInspector(FCogEngineInspectorHost& Host, 
         int TableIndex = 0;
         for (auto& Entry : PropertiesByCategories)
         {
-            if ((Flags & ECogEngineInspectorFlags_ExpandAllCategories) != 0)
+            if ((bExpandAllCategories) != 0)
             {
                 ImGui::SetNextItemOpen(true);
             }
-            else if ((Flags & ECogEngineInspectorFlags_CollapseAllCategories) != 0)
+            else if ((bCollapseAllCategories) != 0)
             {
                 ImGui::SetNextItemOpen(false);
             }
 
             if (ImGui::CollapsingHeader(TCHAR_TO_ANSI(*Entry.Key), nullptr, ImGuiTreeNodeFlags_DefaultOpen))
             {
-                if (RenderBegin(Host, Flags))
+                if (RenderBegin())
                 {
-                    HasChanged |= RenderPropertyList(Host, Entry.Value, (uint8*)Object, Flags);
-                    RenderEnd(Host);
+                    HasChanged |= RenderPropertyList(Entry.Value, (uint8*)Object);
+                    RenderEnd();
                 }
             }
             TableIndex++;
@@ -208,10 +358,10 @@ bool UCogEngineWindow_Inspector::RenderInspector(FCogEngineInspectorHost& Host, 
     //----------------------------------------------------------------------
     if (IsPropertyGridRendered == false)
     {
-        if (RenderBegin(Host, Flags))
+        if (RenderBegin())
         {
-            HasChanged = RenderPropertyList(Host, Properties, (uint8*)Object, Flags);
-            RenderEnd(Host);
+            HasChanged = RenderPropertyList(Properties, (uint8*)Object);
+            RenderEnd();
         }
     }
 
@@ -219,12 +369,12 @@ bool UCogEngineWindow_Inspector::RenderInspector(FCogEngineInspectorHost& Host, 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderBegin(FCogEngineInspectorHost& Host, ECogEngineInspectorFlags Flags)
+bool UCogEngineWindow_Inspector::RenderBegin()
 {
     FCogWindowWidgets::PushStyleCompact();
 
     ImGuiTableFlags TableFlags = ImGuiTableFlags_Resizable;
-    if ((Flags & ECogEngineInspectorFlags_ShowBorders) != 0)
+    if ((bShowBorders) != 0)
     {
         TableFlags |= ImGuiTableFlags_Borders;
     }
@@ -233,7 +383,7 @@ bool UCogEngineWindow_Inspector::RenderBegin(FCogEngineInspectorHost& Host, ECog
         TableFlags |= ImGuiTableFlags_NoBordersInBodyUntilResize;
     }
 
-    if ((Flags & ECogEngineInspectorFlags_ShowRowBackground) != 0)
+    if ((bShowRowBackground) != 0)
     {
         TableFlags |= ImGuiTableFlags_RowBg;
     }
@@ -249,18 +399,18 @@ bool UCogEngineWindow_Inspector::RenderBegin(FCogEngineInspectorHost& Host, ECog
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Inspector::RenderEnd(FCogEngineInspectorHost& Host)
+void UCogEngineWindow_Inspector::RenderEnd()
 {
     ImGui::EndTable();
     FCogWindowWidgets::PopStyleCompact();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FString UCogEngineWindow_Inspector::GetPropertyName(const FProperty& Property, ECogEngineInspectorFlags Flags)
+FString UCogEngineWindow_Inspector::GetPropertyName(const FProperty& Property)
 {
 #if WITH_EDITORONLY_DATA
 
-    if (((Flags & ECogEngineInspectorFlags_ShowDisplayName) != 0) && Property.GetDisplayNameText().IsEmpty() == false)
+    if (bShowDisplayName && Property.GetDisplayNameText().IsEmpty() == false)
     {
         return Property.GetDisplayNameText().ToString();
     }
@@ -275,14 +425,11 @@ FString UCogEngineWindow_Inspector::GetPropertyName(const FProperty& Property, E
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderPropertyList(FCogEngineInspectorHost& Host,
-    TArray<const FProperty*>& Properties,
-    uint8* PointerToValue,
-    ECogEngineInspectorFlags Flags)
+bool UCogEngineWindow_Inspector::RenderPropertyList(TArray<const FProperty*>& Properties, uint8* PointerToValue)
 {
-    if ((Flags & ECogEngineInspectorFlags_SortByName) != 0)
+    if (bSortByName)
     {
-        Properties.Sort([Flags](const FProperty& Lhs, const FProperty& Rhs) { return GetPropertyName(Lhs, Flags) < GetPropertyName(Rhs, Flags); });
+        Properties.Sort([this](const FProperty& Lhs, const FProperty& Rhs) { return GetPropertyName(Lhs) < GetPropertyName(Rhs); });
     }
 
     bool HasChanged = false;
@@ -291,7 +438,7 @@ bool UCogEngineWindow_Inspector::RenderPropertyList(FCogEngineInspectorHost& Hos
     {
         ImGui::PushID(index++);
         uint8* InnerPointerToValue = Property->ContainerPtrToValuePtr<uint8>(PointerToValue);
-        HasChanged |= RenderProperty(Host, Property, InnerPointerToValue, -1, Flags);
+        HasChanged |= RenderProperty(Property, InnerPointerToValue, -1);
         ImGui::PopID();
     }
 
@@ -299,11 +446,7 @@ bool UCogEngineWindow_Inspector::RenderPropertyList(FCogEngineInspectorHost& Hos
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderProperty(FCogEngineInspectorHost& Host,
-    const FProperty* Property,
-    uint8* PointerToValue,
-    int IndexInArray,
-    ECogEngineInspectorFlags Flags)
+bool UCogEngineWindow_Inspector::RenderProperty(const FProperty* Property, uint8* PointerToValue, int IndexInArray)
 {
     bool HasChanged = false;
 
@@ -316,24 +459,24 @@ bool UCogEngineWindow_Inspector::RenderProperty(FCogEngineInspectorHost& Host,
     ImGui::TableSetColumnIndex(0);
     ImGui::AlignTextToFramePadding();
 
-    FString Name;
+    FString PropertyName;
     if (IndexInArray != -1)
     {
-        Name = FString::Printf(TEXT("[%d]"), IndexInArray);
+        PropertyName = FString::Printf(TEXT("[%d]"), IndexInArray);
     }
     else
     {
-        Name = GetPropertyName(*Property, Flags);
+        PropertyName = GetPropertyName(*Property);
     }
 
     bool ShowChildren = false;
-    if (HasPropertyAnyChildren(Host, Property, PointerToValue))
+    if (HasPropertyAnyChildren(Property, PointerToValue))
     {
-        ShowChildren = ImGui::TreeNodeEx(TCHAR_TO_ANSI(*Name), ImGuiTreeNodeFlags_SpanFullWidth);
+        ShowChildren = ImGui::TreeNodeEx(TCHAR_TO_ANSI(*PropertyName), ImGuiTreeNodeFlags_SpanFullWidth);
     }
     else
     {
-        ImGui::TreeNodeEx(TCHAR_TO_ANSI(*Name), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanFullWidth);
+        ImGui::TreeNodeEx(TCHAR_TO_ANSI(*PropertyName), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanFullWidth);
     }
 
     //--------------------------------------------------------------------------------------
@@ -346,12 +489,6 @@ bool UCogEngineWindow_Inspector::RenderProperty(FCogEngineInspectorHost& Host,
 
         if (ImGui::BeginTable("Infos", 2, ImGuiTableFlags_RowBg))
         {
-            ImGui::TableNextRow();
-            ImGui::TableNextColumn();
-            ImGui::Text("Name:");
-            ImGui::TableNextColumn();
-            ImGui::Text("%s", TCHAR_TO_ANSI(*Property->GetName()));
-
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
             ImGui::Text("Type:");
@@ -395,24 +532,22 @@ bool UCogEngineWindow_Inspector::RenderProperty(FCogEngineInspectorHost& Host,
         ImGui::PopTextWrapPos();
         ImGui::EndTooltip();
     }
-        
-#if WITH_EDITORONLY_DATA
-    if (Property->HasMetaData("Tooltip"))
+    else if (Property->HasMetaData("Tooltip"))
     {
         if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
         {
             ImGui::BeginTooltip();
             ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
 
-            ImGui::Text(TCHAR_TO_ANSI(*GetPropertyName(*Property, Flags)));
-            ImGui::Separator();
+#if WITH_EDITORONLY_DATA
             ImGui::Text(TCHAR_TO_ANSI(*Property->GetToolTipText(false).ToString()));
-
+#endif // WITH_EDITORONLY_DATA
+            ImGui::Text("Details [CTRL]");
             ImGui::PopTextWrapPos();
             ImGui::EndTooltip();
         }
     }
-#endif  // WITH_EDITORONLY_DATA
+
 
     //--------------------------------------------------------------------------------------
     // Render Property Value
@@ -423,72 +558,72 @@ bool UCogEngineWindow_Inspector::RenderProperty(FCogEngineInspectorHost& Host,
 
     if (const FBoolProperty* BoolProperty = CastField<FBoolProperty>(Property))
     {
-        HasChanged = RenderBool(Host, BoolProperty, PointerToValue);
+        HasChanged = RenderBool(BoolProperty, PointerToValue);
     }
     else if (const FByteProperty* ByteProperty = CastField<FByteProperty>(Property))
     {
-        HasChanged = RenderByte(Host, ByteProperty, PointerToValue);
+        HasChanged = RenderByte(ByteProperty, PointerToValue);
     }
     else if (const FInt8Property* Int8Property = CastField<FInt8Property>(Property))
     {
-        HasChanged = RenderInt8(Host, Int8Property, PointerToValue);
+        HasChanged = RenderInt8(Int8Property, PointerToValue);
     }
     else if (const FIntProperty* IntProperty = CastField<FIntProperty>(Property))
     {
-        HasChanged = RenderInt(Host, IntProperty, PointerToValue);
+        HasChanged = RenderInt(IntProperty, PointerToValue);
     }
     else if (const FUInt32Property* UInt32Property = CastField<FUInt32Property>(Property))
     {
-        HasChanged = RenderUInt32(Host, UInt32Property, PointerToValue);
+        HasChanged = RenderUInt32(UInt32Property, PointerToValue);
     }
     else if (const FInt64Property* Int64Property = CastField<FInt64Property>(Property))
     {
-        HasChanged = RenderInt64(Host, Int64Property, PointerToValue);
+        HasChanged = RenderInt64(Int64Property, PointerToValue);
     }
     else if (const FFloatProperty* FloatProperty = CastField<FFloatProperty>(Property))
     {
-        HasChanged = RenderFloat(Host, FloatProperty, PointerToValue);
+        HasChanged = RenderFloat(FloatProperty, PointerToValue);
     }
     else if (const FDoubleProperty* DoubleProperty = CastField<FDoubleProperty>(Property))
     {
-        HasChanged = RenderDouble(Host, DoubleProperty, PointerToValue);
+        HasChanged = RenderDouble(DoubleProperty, PointerToValue);
     }
     else if (const FEnumProperty* EnumProperty = CastField<FEnumProperty>(Property))
     {
-        HasChanged = RenderEnum(Host, EnumProperty, PointerToValue);
+        HasChanged = RenderEnum(EnumProperty, PointerToValue);
     }
     else if (const FStrProperty* StrProperty = CastField<FStrProperty>(Property))
     {
-        HasChanged = RenderString(Host, StrProperty, PointerToValue);
+        HasChanged = RenderString(StrProperty, PointerToValue);
     }
     else if (const FNameProperty* NameProperty = CastField<FNameProperty>(Property))
     {
-        HasChanged = RenderName(Host, NameProperty, PointerToValue);
+        HasChanged = RenderName(NameProperty, PointerToValue);
     }
     else if (const FTextProperty* TextProperty = CastField<FTextProperty>(Property))
     {
-        HasChanged = RenderText(Host, TextProperty, PointerToValue);
+        HasChanged = RenderText(TextProperty, PointerToValue);
     }
     else if (const FClassProperty* ClassProperty = CastField<FClassProperty>(Property))
     {
-        HasChanged = RenderClass(Host, ClassProperty);
+        HasChanged = RenderClass(ClassProperty);
     }
     else if (const FInterfaceProperty* InterfaceProperty = CastField<FInterfaceProperty>(Property))
     {
-        HasChanged = RenderInterface(Host, InterfaceProperty);
+        HasChanged = RenderInterface(InterfaceProperty);
     }
     else if (const FStructProperty* StructProperty = CastField<FStructProperty>(Property))
     {
-        HasChanged = RenderStruct(Host, StructProperty, PointerToValue, ShowChildren, Flags);
+        HasChanged = RenderStruct(StructProperty, PointerToValue, ShowChildren);
     }
     else if (const FObjectProperty* ObjectProperty = CastField<FObjectProperty>(Property))
     {
         UObject* ReferencedObject = ObjectProperty->GetObjectPropertyValue(PointerToValue);
-        HasChanged = RenderObject(Host, ReferencedObject, ShowChildren, Flags);
+        HasChanged = RenderObject(ReferencedObject, ShowChildren);
     }
     else if (const FArrayProperty* ArrayProperty = CastField<FArrayProperty>(Property))
     {
-        HasChanged = RenderArray(Host, ArrayProperty, PointerToValue, ShowChildren, Flags);
+        HasChanged = RenderArray(ArrayProperty, PointerToValue, ShowChildren);
     }
     else if (const FDelegateProperty* DelegateProperty = CastField<FDelegateProperty>(Property))
     {
@@ -512,7 +647,7 @@ bool UCogEngineWindow_Inspector::RenderProperty(FCogEngineInspectorHost& Host,
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderBool(FCogEngineInspectorHost& Host, const FBoolProperty* BoolProperty, uint8* PointerToValue)
+bool UCogEngineWindow_Inspector::RenderBool(const FBoolProperty* BoolProperty, uint8* PointerToValue)
 {
     bool HasChanged = false;
 
@@ -527,7 +662,7 @@ bool UCogEngineWindow_Inspector::RenderBool(FCogEngineInspectorHost& Host, const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderByte(FCogEngineInspectorHost& Host, const FByteProperty* ByteProperty, uint8* PointerToValue)
+bool UCogEngineWindow_Inspector::RenderByte(const FByteProperty* ByteProperty, uint8* PointerToValue)
 {
     bool HasChanged = false;
 
@@ -542,7 +677,7 @@ bool UCogEngineWindow_Inspector::RenderByte(FCogEngineInspectorHost& Host, const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderInt8(FCogEngineInspectorHost& Host, const FInt8Property* Int8Property, uint8* PointerToValue)
+bool UCogEngineWindow_Inspector::RenderInt8(const FInt8Property* Int8Property, uint8* PointerToValue)
 {
     bool HasChanged = false;
 
@@ -557,7 +692,7 @@ bool UCogEngineWindow_Inspector::RenderInt8(FCogEngineInspectorHost& Host, const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderInt(FCogEngineInspectorHost& Host, const FIntProperty* IntProperty, uint8* PointerToValue)
+bool UCogEngineWindow_Inspector::RenderInt(const FIntProperty* IntProperty, uint8* PointerToValue)
 {
     bool HasChanged = false;
 
@@ -572,7 +707,7 @@ bool UCogEngineWindow_Inspector::RenderInt(FCogEngineInspectorHost& Host, const 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderInt64(FCogEngineInspectorHost& Host, const FInt64Property* Int64Property, uint8* PointerToValue)
+bool UCogEngineWindow_Inspector::RenderInt64(const FInt64Property* Int64Property, uint8* PointerToValue)
 {
     bool HasChanged = false;
 
@@ -587,7 +722,7 @@ bool UCogEngineWindow_Inspector::RenderInt64(FCogEngineInspectorHost& Host, cons
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderUInt32(FCogEngineInspectorHost& Host, const FUInt32Property* UInt32Property, uint8* PointerToValue)
+bool UCogEngineWindow_Inspector::RenderUInt32(const FUInt32Property* UInt32Property, uint8* PointerToValue)
 {
     bool HasChanged = false;
 
@@ -602,7 +737,7 @@ bool UCogEngineWindow_Inspector::RenderUInt32(FCogEngineInspectorHost& Host, con
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderFloat(FCogEngineInspectorHost& Host, const FFloatProperty* FloatProperty, uint8* PointerToValue)
+bool UCogEngineWindow_Inspector::RenderFloat(const FFloatProperty* FloatProperty, uint8* PointerToValue)
 {
     bool HasChanged = false;
 
@@ -617,7 +752,7 @@ bool UCogEngineWindow_Inspector::RenderFloat(FCogEngineInspectorHost& Host, cons
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderDouble(FCogEngineInspectorHost& Host, const FDoubleProperty* DoubleProperty, uint8* PointerToValue)
+bool UCogEngineWindow_Inspector::RenderDouble(const FDoubleProperty* DoubleProperty, uint8* PointerToValue)
 {
     bool HasChanged = false;
 
@@ -632,13 +767,13 @@ bool UCogEngineWindow_Inspector::RenderDouble(FCogEngineInspectorHost& Host, con
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderEnum(FCogEngineInspectorHost& Host, const FEnumProperty* EnumProperty, uint8* PointerToValue)
+bool UCogEngineWindow_Inspector::RenderEnum(const FEnumProperty* EnumProperty, uint8* PointerToValue)
 {
     return FCogWindowWidgets::ComboboxEnum("##Enum", EnumProperty, PointerToValue);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderString(FCogEngineInspectorHost& Host, const FStrProperty* StrProperty, uint8* PointerToValue)
+bool UCogEngineWindow_Inspector::RenderString(const FStrProperty* StrProperty, uint8* PointerToValue)
 {
     FString Text;
     StrProperty->ExportTextItem_Direct(Text, PointerToValue, nullptr, nullptr, PPF_None, nullptr);
@@ -657,19 +792,19 @@ bool UCogEngineWindow_Inspector::RenderString(FCogEngineInspectorHost& Host, con
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderName(FCogEngineInspectorHost& Host, const FNameProperty* NameProperty, uint8* PointerToValue)
+bool UCogEngineWindow_Inspector::RenderName(const FNameProperty* NameProperty, uint8* PointerToValue)
 {
-    FString Name;
-    NameProperty->ExportTextItem_Direct(Name, PointerToValue, nullptr, nullptr, PPF_None, nullptr);
+    FString NameValue;
+    NameProperty->ExportTextItem_Direct(NameValue, PointerToValue, nullptr, nullptr, PPF_None, nullptr);
     ImGui::BeginDisabled();
-    ImGui::Text("%s", TCHAR_TO_ANSI(*Name));
+    ImGui::Text("%s", TCHAR_TO_ANSI(*NameValue));
     ImGui::EndDisabled();
 
     return false;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderText(FCogEngineInspectorHost& Host, const FTextProperty* TextProperty, uint8* PointerToValue)
+bool UCogEngineWindow_Inspector::RenderText(const FTextProperty* TextProperty, uint8* PointerToValue)
 {
     FString Text;
     TextProperty->ExportTextItem_Direct(Text, PointerToValue, nullptr, nullptr, PPF_None, nullptr);
@@ -681,7 +816,7 @@ bool UCogEngineWindow_Inspector::RenderText(FCogEngineInspectorHost& Host, const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderObject(FCogEngineInspectorHost& Host, UObject* Object, bool ShowChildren, ECogEngineInspectorFlags Flags)
+bool UCogEngineWindow_Inspector::RenderObject(UObject* Object, bool ShowChildren)
 {
     if (Object == nullptr)
     {
@@ -699,7 +834,7 @@ bool UCogEngineWindow_Inspector::RenderObject(FCogEngineInspectorHost& Host, UOb
     ImGui::SameLine();
     if (ImGui::Button("...", ImVec2(0, 0)))
     {
-        Host.InspectObject(Object);
+        SetInspectedObject(Object);
     }
 
     bool HasChanged = false;
@@ -712,7 +847,7 @@ bool UCogEngineWindow_Inspector::RenderObject(FCogEngineInspectorHost& Host, UOb
             Properties.AddUnique(*It);
         }
 
-        HasChanged |= RenderPropertyList(Host, Properties, (uint8*)Object, Flags);
+        HasChanged |= RenderPropertyList(Properties, (uint8*)Object);
 
         ImGui::TreePop();
     }
@@ -721,11 +856,7 @@ bool UCogEngineWindow_Inspector::RenderObject(FCogEngineInspectorHost& Host, UOb
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderStruct(FCogEngineInspectorHost& Host,
-    const FStructProperty* StructProperty,
-    uint8* PointerToValue,
-    bool ShowChildren,
-    ECogEngineInspectorFlags Flags)
+bool UCogEngineWindow_Inspector::RenderStruct(const FStructProperty* StructProperty, uint8* PointerToValue, bool ShowChildren)
 {
     ImGui::BeginDisabled();
     ImGui::Text("%s", TCHAR_TO_ANSI(*StructProperty->Struct->GetClass()->GetName()));
@@ -741,7 +872,7 @@ bool UCogEngineWindow_Inspector::RenderStruct(FCogEngineInspectorHost& Host,
             Properties.AddUnique(*It);
         }
 
-        HasChanged |= RenderPropertyList(Host, Properties, PointerToValue, Flags);
+        HasChanged |= RenderPropertyList(Properties, PointerToValue);
 
         ImGui::TreePop();
     }
@@ -750,7 +881,7 @@ bool UCogEngineWindow_Inspector::RenderStruct(FCogEngineInspectorHost& Host,
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderClass(FCogEngineInspectorHost& Host, const FClassProperty* ClassProperty)
+bool UCogEngineWindow_Inspector::RenderClass(const FClassProperty* ClassProperty)
 {
     if (ClassProperty->MetaClass == nullptr)
     {
@@ -769,7 +900,7 @@ bool UCogEngineWindow_Inspector::RenderClass(FCogEngineInspectorHost& Host, cons
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderInterface(FCogEngineInspectorHost& Host, const FInterfaceProperty* InterfaceProperty)
+bool UCogEngineWindow_Inspector::RenderInterface(const FInterfaceProperty* InterfaceProperty)
 {
     UClass* Class = InterfaceProperty->InterfaceClass;
     if (Class == nullptr)
@@ -789,11 +920,7 @@ bool UCogEngineWindow_Inspector::RenderInterface(FCogEngineInspectorHost& Host, 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderArray(FCogEngineInspectorHost& Host,
-    const FArrayProperty* ArrayProperty,
-    uint8* PointerToValue,
-    bool ShowChildren,
-    ECogEngineInspectorFlags Flags)
+bool UCogEngineWindow_Inspector::RenderArray(const FArrayProperty* ArrayProperty, uint8* PointerToValue, bool ShowChildren)
 {
     FScriptArrayHelper Helper(ArrayProperty, PointerToValue);
     int32 Num = Helper.Num();
@@ -809,7 +936,7 @@ bool UCogEngineWindow_Inspector::RenderArray(FCogEngineInspectorHost& Host,
         for (int32 i = 0; i < Num; ++i)
         {
             ImGui::PushID(i);
-            HasChanged |= RenderProperty(Host, ArrayProperty->Inner, Helper.GetRawPtr(i), i, Flags);
+            HasChanged |= RenderProperty(ArrayProperty->Inner, Helper.GetRawPtr(i), i);
             ImGui::PopID();
         }
         ImGui::TreePop();
@@ -819,7 +946,7 @@ bool UCogEngineWindow_Inspector::RenderArray(FCogEngineInspectorHost& Host,
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::HasPropertyAnyChildren(FCogEngineInspectorHost& Host, const FProperty* Property, uint8* PointerToValue)
+bool UCogEngineWindow_Inspector::HasPropertyAnyChildren(const FProperty* Property, uint8* PointerToValue)
 {
     if (const FStructProperty* StructProperty = CastField<FStructProperty>(Property))
     {
@@ -858,3 +985,6 @@ bool UCogEngineWindow_Inspector::HasPropertyAnyChildren(FCogEngineInspectorHost&
 
     return false;
 }
+
+
+
