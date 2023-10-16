@@ -532,6 +532,7 @@ bool UCogEngineWindow_Inspector::RenderProperty(const FProperty* Property, uint8
         ImGui::PopTextWrapPos();
         ImGui::EndTooltip();
     }
+#if WITH_EDITORONLY_DATA
     else if (Property->HasMetaData("Tooltip"))
     {
         if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
@@ -539,14 +540,13 @@ bool UCogEngineWindow_Inspector::RenderProperty(const FProperty* Property, uint8
             ImGui::BeginTooltip();
             ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
 
-#if WITH_EDITORONLY_DATA
             ImGui::Text(TCHAR_TO_ANSI(*Property->GetToolTipText(false).ToString()));
-#endif // WITH_EDITORONLY_DATA
             ImGui::Text("Details [CTRL]");
             ImGui::PopTextWrapPos();
             ImGui::EndTooltip();
         }
     }
+#endif // WITH_EDITORONLY_DATA
 
 
     //--------------------------------------------------------------------------------------
