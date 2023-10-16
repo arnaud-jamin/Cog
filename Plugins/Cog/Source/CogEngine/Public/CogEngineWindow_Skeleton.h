@@ -42,7 +42,7 @@ protected:
     virtual void OnSelectionChanged(AActor* OldSelection, AActor* NewSelection) override;
 
 private:
-    void DrawBoneEntry(int32 BoneIndex, bool OpenAllChildren);
+    void RenderBoneEntry(int32 BoneIndex, bool OpenAllChildren);
     void SetChildrenVisibility(int32 BoneIndex, bool IsVisible);
     void DrawSkeleton();
     void RefreshSkeleton();

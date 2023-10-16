@@ -114,13 +114,13 @@ void UCogEngineWindow_Skeleton::RenderContent()
     ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, FCogWindowWidgets::GetFontWidth());
 
     HoveredBoneIndex = INDEX_NONE;
-    DrawBoneEntry(0, false);
+    RenderBoneEntry(0, false);
 
     ImGui::PopStyleVar();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Skeleton::DrawBoneEntry(int32 BoneIndex, bool OpenAllChildren)
+void UCogEngineWindow_Skeleton::RenderBoneEntry(int32 BoneIndex, bool OpenAllChildren)
 {
     if (BonesInfos.IsValidIndex(BoneIndex) == false)
     {
@@ -202,6 +202,7 @@ void UCogEngineWindow_Skeleton::DrawBoneEntry(int32 BoneIndex, bool OpenAllChild
         // Checkbox
         //------------------------
         ImGui::SameLine();
+        FCogWindowWidgets::PushStyleCompact();
         if (ImGui::Checkbox("##Visible", &BoneInfo.ShowBone))
         {
             if (IsControlDown)
@@ -217,6 +218,7 @@ void UCogEngineWindow_Skeleton::DrawBoneEntry(int32 BoneIndex, bool OpenAllChild
                 BoneInfo.ShowTrajectory = false;
             }
         }
+        FCogWindowWidgets::PopStyleCompact();
 
         const bool HasCustomVisiblity = BoneInfo.ShowName || BoneInfo.ShowAxes || BoneInfo.ShowLocalVelocity || BoneInfo.ShowTrajectory;
         if (HasCustomVisiblity)
@@ -239,13 +241,13 @@ void UCogEngineWindow_Skeleton::DrawBoneEntry(int32 BoneIndex, bool OpenAllChild
     {
         for (int32 ChildIndex : BoneInfo.Children)
         {
-            DrawBoneEntry(ChildIndex, OpenAllChildren);
+            RenderBoneEntry(ChildIndex, OpenAllChildren);
         }
     }
 
     if (ShowNode)
     {
-        if (OpenChildren && ShowNode)
+        if (OpenChildren)
         {
             ImGui::TreePop();
         }

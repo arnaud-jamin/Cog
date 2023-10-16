@@ -4,9 +4,6 @@
 #include "CogWindow.h"
 #include "CogAIWindow_Blackboard.generated.h"
 
-namespace FBlackboard { typedef uint8 FKey; }
-class UBlackboardData;
-
 UCLASS(Config = Cog)
 class COGAI_API UCogAIWindow_Blackboard : public UCogWindow
 {
@@ -28,5 +25,4 @@ private:
     bool bSortByName = true;
 
     ImGuiTextFilter Filter;
-
 };
