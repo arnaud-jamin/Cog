@@ -102,7 +102,7 @@ Used to inspect and modify an Object properties
 ### Log Categories
 Can be used to activate and deactivate log categories
 
-![Log Categories](https://github.com/arnaud-jamin/Cog/assets/13844285/7ced2751-c3bc-43a3-9280-d11a34bf0482)
+![Log Categories](https://github.com/arnaud-jamin/Cog/assets/13844285/b35ba24b-85e2-4264-8230-fb4a3899715b)
 - Activating a log category set its verbosity to VeryVerbose.
 - Deactivating a log category set its verbosity to Warning.
 - The detailed verbosity of each log category can be shown by using the Option menu.
