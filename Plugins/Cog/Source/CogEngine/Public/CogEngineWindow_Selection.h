@@ -5,7 +5,7 @@
 #include "CogWindow.h"
 #include "CogEngineWindow_Selection.generated.h"
 
-UCLASS()
+UCLASS(Config = Cog)
 class COGENGINE_API UCogEngineWindow_Selection : public UCogWindow
 {
     GENERATED_BODY()
@@ -16,19 +16,23 @@ public:
 
     bool GetIsSelecting() const { return bSelectionModeActive; }
 
-    void SetCurrentActorSubClass(TSubclassOf<AActor> Value) { SelectedSubClass = Value; }
+    const TArray<TSubclassOf<AActor>>& GetActorClasses() const { return ActorClasses; }
 
-    TSubclassOf<AActor> GetCurrentActorSubClass() const { return SelectedSubClass; }
-
-    const TArray<TSubclassOf<AActor>>& GetActorSubClasses() const { return SubClasses; }
-
-    void SetActorSubClasses(const TArray<TSubclassOf<AActor>>& Value) { SubClasses = Value; }
+    void SetActorClasses(const TArray<TSubclassOf<AActor>>& Value) { ActorClasses = Value; }
 
     ETraceTypeQuery GetTraceType() const { return TraceType; }
 
     void SetTraceType(ETraceTypeQuery Value) { TraceType = Value; }
 
+    void TryReapplySelection() const;
+
 protected:
+
+    virtual void ResetConfig() override;
+
+    virtual void PreSaveConfig() override;
+
+    virtual void PostInitProperties() override;
 
     virtual void RenderHelp() override;
 
@@ -48,6 +52,8 @@ protected:
 
 private:
 
+    TSubclassOf<AActor> GetSelectedActorClass() const;
+
     void TickSelectionMode();
 
     void ToggleSelectionMode();
@@ -58,6 +64,15 @@ private:
 
     bool ComputeBoundingBoxScreenPosition(const APlayerController* PlayerController, const FVector& Origin, const FVector& Extent, FVector2D& Min, FVector2D& Max);
 
+    UPROPERTY(Config)
+    bool bReapplySelection = true;
+
+    UPROPERTY(Config)
+    FString SelectionName;
+
+    UPROPERTY(Config)
+    int32 SelectedClassIndex = 0;
+
     FVector LastSelectedActorLocation = FVector::ZeroVector;
 
     bool bSelectionModeActive = false;
@@ -66,9 +81,7 @@ private:
 
     int32 WaitInputReleased = 0;
 
-    TSubclassOf<AActor> SelectedSubClass;
-
-    TArray<TSubclassOf<AActor>> SubClasses;
+    TArray<TSubclassOf<AActor>> ActorClasses;
 
     ETraceTypeQuery TraceType = TraceTypeQuery1;
 };

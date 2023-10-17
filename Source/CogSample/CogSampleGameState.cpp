@@ -164,8 +164,7 @@ void ACogSampleGameState::InitializeCog()
     CogWindowManager->CreateWindow<UCogEngineWindow_Plots>("Engine.Plots");
 
     UCogEngineWindow_Selection* SelectionWindow = CogWindowManager->CreateWindow<UCogEngineWindow_Selection>("Engine.Selection");
-    SelectionWindow->SetActorSubClasses({ AActor::StaticClass(), AGameModeBase::StaticClass(), AGameStateBase::StaticClass(), ACharacter::StaticClass() });
-    SelectionWindow->SetCurrentActorSubClass(ACharacter::StaticClass());
+    SelectionWindow->SetActorClasses({ ACharacter::StaticClass(), AActor::StaticClass(), AGameModeBase::StaticClass(), AGameStateBase::StaticClass() });
     SelectionWindow->SetTraceType(UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Pawn));
 
     CogWindowManager->CreateWindow<UCogEngineWindow_Scalability>("Engine.Scalability");
