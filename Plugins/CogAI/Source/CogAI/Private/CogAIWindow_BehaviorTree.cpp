@@ -92,30 +92,20 @@ void UCogAIWindow_BehaviorTree::RenderContent()
 
     if (RootNodeInstanced != nullptr)
     {
-        RenderNode(BehaviorTreeComponent, RootNodeInstanced, false);
+        RenderNode(*BehaviorTreeComponent, const_cast<UBTNode*>(RootNodeInstanced), false);
     }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAIWindow_BehaviorTree::RenderNode(UBehaviorTreeComponent* BehaviorTreeComponent, const UBTNode* Node, bool OpenAllChildren)
+void UCogAIWindow_BehaviorTree::RenderNode(UBehaviorTreeComponent& BehaviorTreeComponent, UBTNode* Node, bool OpenAllChildren)
 {
-    FString NodeNameStr;
-    if (const UBTTask_BlueprintBase* Wait = Cast<UBTTask_BlueprintBase>(Node))
-    {
-        NodeNameStr = Node->GetNodeName();
-    }
-    else 
-    {
-        NodeNameStr = Node->GetStaticDescription();
-    }
-
-    const char* NodeName = TCHAR_TO_ANSI(*NodeNameStr);
+    const char* NodeName = TCHAR_TO_ANSI(*Node->GetNodeName());
     const bool ShowNode = Filter.PassFilter(NodeName);
 
     const UBTCompositeNode* CompositeNode = Cast<UBTCompositeNode>(Node);
 
     bool IsActive = false;
-    for (const UBTNode* ActiveParentNode = BehaviorTreeComponent->GetActiveNode(); ActiveParentNode != nullptr; ActiveParentNode = ActiveParentNode->GetParentNode())
+    for (const UBTNode* ActiveParentNode = BehaviorTreeComponent.GetActiveNode(); ActiveParentNode != nullptr; ActiveParentNode = ActiveParentNode->GetParentNode())
     {
         if (Node == ActiveParentNode)
         {
@@ -171,11 +161,66 @@ void UCogAIWindow_BehaviorTree::RenderNode(UBehaviorTreeComponent* BehaviorTreeC
         //------------------------
         if (ImGui::IsItemHovered())
         {
-            ImGui::BeginTooltip();
-            ImGui::BeginDisabled();
-            ImGui::Text(NodeName);
-            ImGui::EndDisabled();
-            ImGui::EndTooltip();
+            FCogWindowWidgets::BeginTableTooltip();
+
+            if (ImGui::BeginTable("Effect", 2, ImGuiTableFlags_Borders))
+            {
+                ImGui::TableSetupColumn("Property");
+                ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+
+                const ImVec4 TextColor(1.0f, 1.0f, 1.0f, 0.5f);
+
+                //------------------------
+                // Name
+                //------------------------
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::TextColored(TextColor, "Name");
+                ImGui::TableNextColumn();
+                ImGui::Text("%s", NodeName);
+
+                //------------------------
+                // Static Description
+                //------------------------
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::TextColored(TextColor, "Description");
+                ImGui::TableNextColumn();
+                ImGui::Text("%s", TCHAR_TO_ANSI(*Node->GetStaticDescription()));
+
+                //------------------------
+                // Runtime Values
+                //------------------------
+                TArray<FString> RunTimeValues;
+                uint8* NodeMemory = BehaviorTreeComponent.GetNodeMemory(Node, BehaviorTreeComponent.GetActiveInstanceIdx());
+                Node->DescribeRuntimeValues(BehaviorTreeComponent, NodeMemory, EBTDescriptionVerbosity::Detailed, RunTimeValues);
+
+                for (const FString& RuntimeValue : RunTimeValues)
+                {
+                    ImGui::TableNextRow();
+
+                    FString Left, Right;
+                    if (RuntimeValue.Split(TEXT(": "), &Left, &Right))
+                    {
+                        ImGui::TableNextColumn();
+                        ImGui::TextColored(TextColor, TCHAR_TO_ANSI(*Left));
+
+                        ImGui::TableNextColumn();
+                        ImGui::Text("%s", TCHAR_TO_ANSI(*Right));
+                    }
+                    else
+                    {
+                        ImGui::TableNextColumn();
+                        ImGui::TextColored(TextColor, "Value");
+                        ImGui::TableNextColumn();
+                        ImGui::Text(TCHAR_TO_ANSI(*RuntimeValue));
+                    }
+                }
+
+                ImGui::EndTable();
+            }
+
+            FCogWindowWidgets::EndTableTooltip();
         }
 
         //------------------------
@@ -213,7 +258,7 @@ void UCogAIWindow_BehaviorTree::RenderNode(UBehaviorTreeComponent* BehaviorTreeC
         {
             for (int32 i = 0; i < CompositeNode->GetChildrenNum(); ++i)
             {
-                const UBTNode* ChildNode = CompositeNode->GetChildNode(i);
+                UBTNode* ChildNode = CompositeNode->GetChildNode(i);
                 RenderNode(BehaviorTreeComponent, ChildNode, OpenAllChildren);
             }
         }

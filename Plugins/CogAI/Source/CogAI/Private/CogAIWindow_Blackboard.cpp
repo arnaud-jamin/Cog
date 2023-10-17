@@ -82,6 +82,29 @@ void UCogAIWindow_Blackboard::RenderContent()
         return;
     }
 
+    TArray<const FBlackboardEntry*> Keys;
+    uint8 Offset = 0;
+    for (UBlackboardData* It = BlackboardAsset; It; It = It->Parent)
+    {
+        for (int32 KeyID = 0; KeyID < It->Keys.Num(); KeyID++)
+        {
+            if (const FBlackboardEntry* Key = BlackboardAsset->GetKey(KeyID))
+            {
+                Keys.Add(Key);
+            }
+        }
+        Offset += It->Keys.Num();
+    }
+    
+    if (bSortByName)
+    {
+        Keys.Sort([](const FBlackboardEntry& Key1, const FBlackboardEntry& Key2)
+        {
+            return Key1.EntryName.Compare(Key1.EntryName) < 0;
+        });
+    }
+
+
     if (ImGui::BeginTable("Blackboard", 3, ImGuiTableFlags_SizingFixedFit 
                                          | ImGuiTableFlags_Resizable 
                                          | ImGuiTableFlags_NoBordersInBodyUntilResize 
@@ -101,39 +124,43 @@ void UCogAIWindow_Blackboard::RenderContent()
 
         const FString CommonTypePrefix = UBlackboardKeyType::StaticClass()->GetName().AppendChar(TEXT('_'));
 
-        uint8 Offset = 0;
-        for (UBlackboardData* It = BlackboardAsset; It; It = It->Parent)
+        for (int32 KeyID = 0; KeyID < Keys.Num(); ++KeyID)
         {
-            for (int32 KeyID = 0; KeyID < It->Keys.Num(); KeyID++)
+            const FBlackboardEntry* Key = Keys[KeyID];
+            if (Key == nullptr)
             {
-                const FBlackboardEntry* Key = BlackboardAsset->GetKey(KeyID);
-                if (Key == nullptr)
-                {
-                    continue;
-                }
-                
-                const char* KeyName = TCHAR_TO_ANSI(*Key->EntryName.ToString());
-                if (Filter.PassFilter(KeyName) == false)
-                {
-                    continue;
-                }
-
-                ImGui::TableNextRow();
-
-                ImGui::TableNextColumn();
-                const FString FullKeyType = Key->KeyType ? GetNameSafe(Key->KeyType->GetClass()) : FString();
-                const FString DescKeyType = FullKeyType.StartsWith(CommonTypePrefix) ? FullKeyType.RightChop(CommonTypePrefix.Len()) : FullKeyType;
-                ImGui::Text("%s", TCHAR_TO_ANSI(*DescKeyType));
-
-                ImGui::TableNextColumn();
-                ImGui::Text("%s", KeyName);
-
-                ImGui::TableNextColumn();
-                const uint8* ValueData = Blackboard->GetKeyRawData(KeyID);
-                FString ValueDesc = Key->KeyType && ValueData ? *(Key->KeyType->WrappedDescribeValue(*Blackboard, ValueData)) : TEXT("Empty");
-                ImGui::Text("%s", TCHAR_TO_ANSI(*ValueDesc));
+                continue;
             }
-            Offset += It->Keys.Num();
+                
+            const char* KeyName = TCHAR_TO_ANSI(*Key->EntryName.ToString());
+            if (Filter.PassFilter(KeyName) == false)
+            {
+                continue;
+            }
+
+            ImGui::TableNextRow();
+
+            //------------------------
+            // Type
+            //------------------------
+            ImGui::TableNextColumn();
+            const FString FullKeyType = Key->KeyType ? GetNameSafe(Key->KeyType->GetClass()) : FString();
+            const FString DescKeyType = FullKeyType.StartsWith(CommonTypePrefix) ? FullKeyType.RightChop(CommonTypePrefix.Len()) : FullKeyType;
+            ImGui::Text("%s", TCHAR_TO_ANSI(*DescKeyType));
+
+            //------------------------
+            // Name
+            //------------------------
+            ImGui::TableNextColumn();
+            ImGui::Text("%s", KeyName);
+
+            //------------------------
+            // Value
+            //------------------------
+            ImGui::TableNextColumn();
+            const uint8* ValueData = Blackboard->GetKeyRawData(KeyID);
+            FString ValueDesc = Key->KeyType && ValueData ? *(Key->KeyType->WrappedDescribeValue(*Blackboard, ValueData)) : TEXT("Empty");
+            ImGui::Text("%s", TCHAR_TO_ANSI(*ValueDesc));
         }
 
         ImGui::EndTable();

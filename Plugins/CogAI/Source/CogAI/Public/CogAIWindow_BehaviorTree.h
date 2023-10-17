@@ -22,7 +22,7 @@ protected:
 
     virtual void RenderContent() override;
 
-    virtual void RenderNode(UBehaviorTreeComponent* BehaviorTreeComponent, const UBTNode* Node, bool OpenAllChildren);
+    virtual void RenderNode(UBehaviorTreeComponent& BehaviorTreeComponent, UBTNode* Node, bool OpenAllChildren);
 
 private:
 
