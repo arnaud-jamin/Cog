@@ -133,7 +133,7 @@ Displays attributes of the selected actor as pools.
 - The pools can be configured in a data asset.
 
 ### Plots 
-Plots values and events overtime. When applicable, only the values of the selected actor are displayed.
+Plots values and events overtime. When applicable, only the values and events of the selected actor are displayed.
 
 ![Plots](https://github.com/arnaud-jamin/Cog/assets/13844285/def95b7b-ae59-4a8b-bc21-b07922e1fc6f)
 - The following code snippets show how to plot values and events:
