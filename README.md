@@ -48,7 +48,7 @@ Displays the gameplay attributes of the selected actor.
 ### Behavior Tree
 Displays the behavior tree of the selected actor.
 
-![Behavior Tree](https://github.com/arnaud-jamin/Cog/assets/13844285/2e3ab30f-414a-497d-be08-605e1d299d23)
+![Behavior Tree](https://github.com/arnaud-jamin/Cog/assets/13844285/c799e85f-b641-4d6f-9476-54a5cbd73c65)
 
 ### Blackboard 
 Displays the blackboard of the selected actor.
