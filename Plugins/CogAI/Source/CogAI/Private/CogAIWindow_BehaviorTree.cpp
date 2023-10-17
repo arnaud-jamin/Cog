@@ -4,6 +4,7 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BTCompositeNode.h"
 #include "BehaviorTree/BTNode.h"
+#include "BehaviorTree/Tasks/BTTask_BlueprintBase.h"
 #include "BehaviorTree/Tasks/BTTask_Wait.h"
 #include "BrainComponent.h"
 #include "CogWindowWidgets.h"
@@ -98,7 +99,17 @@ void UCogAIWindow_BehaviorTree::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogAIWindow_BehaviorTree::RenderNode(UBehaviorTreeComponent* BehaviorTreeComponent, const UBTNode* Node, bool OpenAllChildren)
 {
-    const char* NodeName = TCHAR_TO_ANSI(*Node->GetNodeName());
+    FString NodeNameStr;
+    if (const UBTTask_BlueprintBase* Wait = Cast<UBTTask_BlueprintBase>(Node))
+    {
+        NodeNameStr = Node->GetNodeName();
+    }
+    else 
+    {
+        NodeNameStr = Node->GetStaticDescription();
+    }
+
+    const char* NodeName = TCHAR_TO_ANSI(*NodeNameStr);
     const bool ShowNode = Filter.PassFilter(NodeName);
 
     const UBTCompositeNode* CompositeNode = Cast<UBTCompositeNode>(Node);
@@ -162,13 +173,7 @@ void UCogAIWindow_BehaviorTree::RenderNode(UBehaviorTreeComponent* BehaviorTreeC
         {
             ImGui::BeginTooltip();
             ImGui::BeginDisabled();
-            ImGui::Text(TCHAR_TO_ANSI(*Node->GetStaticDescription()));
-
-            if (const UBTTask_Wait* Wait = Cast<UBTTask_Wait>(Node))
-            {
-                ImGui::Text("Wait: %0.2fs", Wait->WaitTime);
-            }
-
+            ImGui::Text(NodeName);
             ImGui::EndDisabled();
             ImGui::EndTooltip();
         }

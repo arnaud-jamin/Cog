@@ -39,7 +39,7 @@ namespace CogSampleLog
         FCogDebugLog::AddLogCategory(LogCogPossession, "Possession", "Log about the possession of player controller over a Character");
         FCogDebugLog::AddLogCategory(LogCogRotation, "Rotation", "Debug Draw a Character Rotation");
         FCogDebugLog::AddLogCategory(LogCogSkeleton, "Skeleton", "Debug Draw a Character Skeleton");
-        FCogDebugLog::AddLogCategory(LogCogTargetAcquisition, "Target Acquisition", "Debug Draw a Character Collision");
+        FCogDebugLog::AddLogCategory(LogCogTargetAcquisition, "Target Acquisition", "Debug Draw the target acquisition debug draw");
         FCogDebugLog::AddLogCategory(LogGameplayEffects, "Gameplay Effects", "Unreal Gameplay Effect Log");
 #endif //ENABLE_COG
     }
