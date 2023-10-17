@@ -7,7 +7,7 @@ Cog is a set of debug tools for Unreal Engine built on top of [Dear ImGui](https
 - [Sample Executable](https://drive.google.com/file/d/1T7jQFoZ5rd6goBtDH-FCbjn6Kr1RzUCE/view?usp=sharing) (300 MB)
 
 Cog provides:
-- ImGui windows to inspect and configure various Unreal systems (Enhanced Inputs, Gameplay Abilities, Core Engine)
+- ImGui windows to inspect and configure various Unreal systems (Core Engine, Enhanced Inputs, Gameplay Abilities, AI)
 - Window mangement with persistent configuration and layouts.
 - C++ and Blueprint functions to log and debug draw within Log Categories.
 - Control over the server regarding debug draw, logging, spawning, cheats.
@@ -112,6 +112,11 @@ Can be used to activate and deactivate log categories
 
 ### Metric
 Gather various values sent by the selected actor and compte their rate per second. This is typically useful to compute the damage dealt or received per second.
+- The following code shows how to add a metric:
+```cpp
+// Adding a metric
+FCogDebugMetric::AddMetric(this, "Damage Dealt", Params.MitigatedDamage, Params.UnmitigatedDamage, false);
+```
 
 ![Metric](https://github.com/arnaud-jamin/Cog/assets/13844285/64d3cb7c-8731-4897-9ef9-b0868148ebe2)
 
@@ -136,10 +141,10 @@ Displays attributes of the selected actor as pools.
 Plots values and events overtime. When applicable, only the values and events of the selected actor are displayed.
 
 ![Plots](https://github.com/arnaud-jamin/Cog/assets/13844285/def95b7b-ae59-4a8b-bc21-b07922e1fc6f)
-- The following code snippets show how to plot values and events:
+- The following code shows how to plot values and events:
 ```cpp
     // Plotting a value
-    FCogDebugPlot::PlotValue(Character, "Speed", Velocity.Length());
+    FCogDebugPlot::PlotValue(this, "Speed", Velocity.Length());
 
     // Starting an event
     FCogDebugPlot::PlotEvent(this, "Effects", GameplayEffectSpec.Def->GetFName(), GameplayEffectSpec.GetDuration() == 0.0f)
