@@ -375,7 +375,8 @@ void UCogWindowManager::RenderMenuItem(UCogWindow& Window, const char* MenuItemN
 {
     if (bShowWindowsInMainMenu)
     {
-        ImGui::SetNextWindowSizeConstraints(ImVec2(FCogWindowWidgets::GetFontWidth() * 40, ImGui::GetTextLineHeightWithSpacing() * 1),
+        ImGui::SetNextWindowSizeConstraints(
+            ImVec2(FCogWindowWidgets::GetFontWidth() * 40, ImGui::GetTextLineHeightWithSpacing() * 5),
             ImVec2(FCogWindowWidgets::GetFontWidth() * 50, ImGui::GetTextLineHeightWithSpacing() * 60));
 
         if (ImGui::BeginMenu(MenuItemName))

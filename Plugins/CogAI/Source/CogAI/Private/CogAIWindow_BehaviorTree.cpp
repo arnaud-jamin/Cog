@@ -7,6 +7,7 @@
 #include "BehaviorTree/Tasks/BTTask_BlueprintBase.h"
 #include "BehaviorTree/Tasks/BTTask_Wait.h"
 #include "BrainComponent.h"
+#include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
 #include "GameFramework/Pawn.h"
 #include "imgui_internal.h"
@@ -35,6 +36,8 @@ void UCogAIWindow_BehaviorTree::RenderContent()
     {
         if (ImGui::BeginMenu("Options"))
         {
+            ImGui::ColorEdit4("Active Color", (float*)&ActiveColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("Inactive Color", (float*)&InactiveColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
             ImGui::EndMenu();
         }
 
@@ -78,6 +81,19 @@ void UCogAIWindow_BehaviorTree::RenderContent()
         return;
     }
 
+
+    UBehaviorTree* RootTree = BehaviorTreeComponent->GetRootTree();
+    if (CurrentTree != RootTree)
+    {
+        if (ImGui::CollapsingHeader(TCHAR_TO_ANSI(*GetNameSafe(RootTree)), nullptr, ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            RenderNode(*BehaviorTreeComponent, RootTree->RootNode, false);
+
+            ImGui::Spacing();
+            ImGui::Spacing();
+        }
+    }
+
     //----------------------------------------------------------------------------------------
     // If we use the current tree root node it doesn't seem to be the one instanced.
     // Not sure if there is a better way to access it, but we find the root node from 
@@ -92,7 +108,10 @@ void UCogAIWindow_BehaviorTree::RenderContent()
 
     if (RootNodeInstanced != nullptr)
     {
-        RenderNode(*BehaviorTreeComponent, const_cast<UBTNode*>(RootNodeInstanced), false);
+        if (ImGui::CollapsingHeader(TCHAR_TO_ANSI(*GetNameSafe(CurrentTree)), nullptr, ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            RenderNode(*BehaviorTreeComponent, const_cast<UBTNode*>(RootNodeInstanced), false);
+        }
     }
 }
 
@@ -104,15 +123,7 @@ void UCogAIWindow_BehaviorTree::RenderNode(UBehaviorTreeComponent& BehaviorTreeC
 
     const UBTCompositeNode* CompositeNode = Cast<UBTCompositeNode>(Node);
 
-    bool IsActive = false;
-    for (const UBTNode* ActiveParentNode = BehaviorTreeComponent.GetActiveNode(); ActiveParentNode != nullptr; ActiveParentNode = ActiveParentNode->GetParentNode())
-    {
-        if (Node == ActiveParentNode)
-        {
-            IsActive = true;
-            break;
-        }
-    }
+    const bool IsActive = BehaviorTreeComponent.IsExecutingBranch(Node);
 
     bool OpenChildren = false;
 
@@ -245,7 +256,7 @@ void UCogAIWindow_BehaviorTree::RenderNode(UBehaviorTreeComponent& BehaviorTreeC
         // Name
         //------------------------
         ImGui::SameLine();
-        ImVec4 NameColor = IsActive ? ImVec4(0.0f, 1.0f, 0.0f, 1.0f) : ImVec4(1.0f, 1.0f, 1.0f, 0.6f);
+        const ImVec4 NameColor = IsActive ? FCogImguiHelper::ToImVec4(ActiveColor) : FCogImguiHelper::ToImVec4(InactiveColor);
         ImGui::TextColored(NameColor, "%s", NodeName);
     }
 

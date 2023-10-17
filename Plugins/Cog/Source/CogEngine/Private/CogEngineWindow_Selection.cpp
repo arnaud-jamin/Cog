@@ -288,7 +288,7 @@ void UCogEngineWindow_Selection::DrawActorContextMenu(AActor* Actor)
     //------------------------
     // ContextMenu
     //------------------------
-    ImGui::SetNextWindowSize(ImVec2(FCogWindowWidgets::GetFontWidth() * 20, 0));
+    ImGui::SetNextWindowSize(ImVec2(FCogWindowWidgets::GetFontWidth() * 30, 0));
     if (ImGui::BeginPopupContextItem())
     {
         if (ImGui::Button("Reset Selection", ImVec2(-1, 0)))
@@ -330,6 +330,10 @@ void UCogEngineWindow_Selection::DrawActorContextMenu(AActor* Actor)
                 ImGui::SetTooltip("Reset pawn.");
             }
         }
+
+        ImGui::Separator();
+
+        ImGui::Checkbox("Save selection", &bReapplySelection);
 
         ImGui::EndPopup();
     }

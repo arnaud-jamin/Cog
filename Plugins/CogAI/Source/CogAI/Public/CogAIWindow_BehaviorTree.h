@@ -26,5 +26,11 @@ protected:
 
 private:
 
+    UPROPERTY(Config)
+    FVector4f ActiveColor = FVector4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+    UPROPERTY(Config)
+    FVector4f InactiveColor = FVector4f(1.0f, 1.0f, 1.0f, 0.2f);
+
     ImGuiTextFilter Filter;
 };
