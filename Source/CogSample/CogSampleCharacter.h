@@ -272,8 +272,6 @@ private:
 
     void OnGameplayEffectRemoved(const FActiveGameplayEffect& RemovedGameplayEffect);
 
-    void OnCooldownEffectUpdated(const FActiveGameplayEffect& GameplayEffect, bool bIsEffectRemoved);
-
     void OnGhostTagNewOrRemoved(const FGameplayTag InTag, int32 NewCount);
 
     void OnScaleAttributeChanged(const FOnAttributeChangeData& Data);
