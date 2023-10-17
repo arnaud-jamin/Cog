@@ -7,17 +7,18 @@ Cog is a set of debug tools for Unreal Engine built on top of [Dear ImGui](https
 - [Sample Executable](https://drive.google.com/file/d/1T7jQFoZ5rd6goBtDH-FCbjn6Kr1RzUCE/view?usp=sharing) (300 MB)
 
 Cog provides:
-- ImGui windows to inspect and configure various Unreal features (Enhanced Inputs, Gameplay Abilities, Core Engine)
+- ImGui windows to inspect and configure various Unreal systems (Enhanced Inputs, Gameplay Abilities, Core Engine)
 - Window mangement with persistent configuration and layouts.
 - C++ and Blueprint functions to log and debug draw within Log Categories.
 - Control over the server regarding debug draw, logging, spawning, cheats.
 
-## Windows
-
-- In the sample press the `[Tab]` key or use the `Cog.ToggleInput` console command to open the ImGui Main Menu.
-- Most windows display their contents based on a selected actor.
-- The selector actor can be chosen using the `Engine/Selection` window or widget.
+General Info:
+- Cog can be used both in editor and package builds. It is disabled by default on shipping builds.
+- Press the `[Tab]` key or use the `Cog.ToggleInput` console command to open the ImGui Main Menu.
 - Mouse over a window title to display its help.
+- Most windows display their contents based on a selected actor. The selector actor can be chosen using the `Engine/Selection` window or widget.
+
+## Cog Windows
 
 ### Abilities 
 
@@ -131,27 +132,24 @@ Displays attributes of the selected actor as pools.
 ![Pools](https://github.com/arnaud-jamin/Cog/assets/13844285/7bb1aadd-9c0b-439f-b263-5ed842d0cd69)
 - The pools can be configured in a data asset.
 
-### Plots
-Plots values overtime. When applicable, only the values of the selected actor are displayed.
+### Plots 
+Plots values and events overtime. When applicable, only the values of the selected actor are displayed.
 
-![Plots](https://github.com/arnaud-jamin/Cog/assets/13844285/bc134e95-4887-4245-b34d-c030464f644a)
+![Plots](https://github.com/arnaud-jamin/Cog/assets/13844285/def95b7b-ae59-4a8b-bc21-b07922e1fc6f)
+- The following code snippets show how to plot values and events:
+```cpp
+    // Plotting a value
+    FCogDebugPlot::PlotValue(Character, "Speed", Velocity.Length());
 
-- Handle both float values and discrete events.
-- Here is an exemple to push a float values:
-```cpp
-#if ENABLE_COG
-FCogDebugPlot::PlotValue(Character, "Speed", Velocity.Length());
-#endif //ENABLE_COG
-```
-- Here is an exemple to push an event:
-```cpp
-#if ENABLE_COG
+    // Starting an event
     FCogDebugPlot::PlotEvent(this, "Effects", GameplayEffectSpec.Def->GetFName(), GameplayEffectSpec.GetDuration() == 0.0f)
                     .AddParam("Name", AbilitySystemComponent->CleanupName(GetNameSafe(GameplayEffectSpec.Def)))
                     .AddParam("Effect Instigator", GetNameSafe(GameplayEffectSpec.GetEffectContext().GetInstigator()))
                     .AddParam("Effect Level", GameplayEffectSpec.GetLevel())
                     .AddParam("Effect Duration", GameplayEffectSpec.GetDuration());
-#endif //ENABLE_COG
+
+    // Stopping an event
+    FCogDebugPlot::PlotEventStop(this, "Effects", RemovedGameplayEffect.Spec.Def->GetFName());
 ```
 
 ### Scalability
