@@ -5,7 +5,6 @@
 - CogWindow: Try to remove CogWindow dependency to cogimgui. Should only depends on imgui (currently use setdpiscale of cogimgui)
 - CogWindow: Add reset window position menu item or reset layout (window can get far away)
 
-- CogEngine: Save selection window settings (current actor and category)
 - CogEngine: More stats in the stats window
 - CogEngine: Overlay mode of stats.
 - CogEngine: Stat main menu widget could have a tooltip on each stat with a control to change set the emulation (FPS, Ping, Packetloss)
