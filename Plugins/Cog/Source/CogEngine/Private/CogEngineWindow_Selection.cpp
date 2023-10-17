@@ -58,6 +58,12 @@ void UCogEngineWindow_Selection::PostInitProperties()
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogEngineWindow_Selection::TryReapplySelection() const
 {
+    UWorld* World = GetWorld();
+    if (World == nullptr)
+    {
+        return;
+    }
+
     if (bReapplySelection == false)
     {
         return;
@@ -75,7 +81,7 @@ void UCogEngineWindow_Selection::TryReapplySelection() const
     }
 
     TArray<AActor*> Actors;
-    for (TActorIterator<AActor> It(GetWorld(), SelectedClass); It; ++It)
+    for (TActorIterator<AActor> It(World, SelectedClass); It; ++It)
     {
         AActor* Actor = *It;
         if (GetNameSafe(Actor) == SelectionName)
