@@ -139,7 +139,7 @@ Plots values and events overtime. When applicable, only the values and events of
 - The following code snippets show how to plot values and events:
 ```cpp
     // Plotting a value
-    FCogDebugPlot::PlotValue(Character, "Speed", Velocity.Length());
+    FCogDebugPlot::PlotValue(this, "Speed", Velocity.Length());
 
     // Starting an event
     FCogDebugPlot::PlotEvent(this, "Effects", GameplayEffectSpec.Def->GetFName(), GameplayEffectSpec.GetDuration() == 0.0f)
