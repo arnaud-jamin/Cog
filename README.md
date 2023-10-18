@@ -117,7 +117,7 @@ Gather various values sent by the selected actor and compte their rate per secon
 - The following code shows how to add a metric:
 ```cpp
 // Adding a metric
-FCogDebugMetric::AddMetric(this, "Damage Dealt", Params.MitigatedDamage, Params.UnmitigatedDamage, false);
+FCogDebugMetric::AddMetric(this, "Damage Dealt", MitigatedDamage, UnmitigatedDamage, false);
 ```
 
 
