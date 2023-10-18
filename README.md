@@ -111,14 +111,15 @@ Can be used to activate and deactivate log categories
 - The log categories are used to filter both the output log and the debug draw.
 
 ### Metric
-Gather various values sent by the selected actor and compte their rate per second. This is typically useful to compute the damage dealt or received per second.
+Gather various values sent by the selected actor and compte their rate per second. This is typically used to compute the damage dealt or received per second.
+
+![Metric](https://github.com/arnaud-jamin/Cog/assets/13844285/64d3cb7c-8731-4897-9ef9-b0868148ebe2)
 - The following code shows how to add a metric:
 ```cpp
 // Adding a metric
 FCogDebugMetric::AddMetric(this, "Damage Dealt", Params.MitigatedDamage, Params.UnmitigatedDamage, false);
 ```
 
-![Metric](https://github.com/arnaud-jamin/Cog/assets/13844285/64d3cb7c-8731-4897-9ef9-b0868148ebe2)
 
 ### Net Emulation
 Used to configure the network emulation
