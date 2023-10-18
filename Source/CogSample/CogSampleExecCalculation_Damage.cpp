@@ -1,8 +1,11 @@
 #include "CogSampleExecCalculation_Damage.h"
 
+#include "CogSampleAbilitySystemComponent.h"
 #include "CogSampleAttributeSet_Health.h"
 #include "CogSampleCharacter.h"
+#include "CogSampleDamageableInterface.h"
 #include "CogSampleFunctionLibrary_Tag.h"
+#include "CogSampleGameplayEffectContext.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 struct FCogSampleDamageStatics
@@ -37,21 +40,36 @@ UCogSampleExecCalculation_Damage::UCogSampleExecCalculation_Damage()
 void UCogSampleExecCalculation_Damage::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, OUT FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {
     const FGameplayEffectSpec& EffectSpec = ExecutionParams.GetOwningSpec();
-    const FGameplayEffectContextHandle Context = EffectSpec.GetContext();
+    FGameplayEffectContextHandle EffectContext = EffectSpec.GetContext();
 
     FAggregatorEvaluateParameters EvaluationParameters;
     EvaluationParameters.SourceTags = EffectSpec.CapturedSourceTags.GetAggregatedTags();
     EvaluationParameters.TargetTags = EffectSpec.CapturedTargetTags.GetAggregatedTags();
 
-    UAbilitySystemComponent* TargetAbilitySystem = ExecutionParams.GetTargetAbilitySystemComponent();
-    UAbilitySystemComponent* SourceAbilitySystem = ExecutionParams.GetSourceAbilitySystemComponent();
-    ACogSampleCharacter* TargetCharacter = (TargetAbilitySystem != nullptr) ? Cast<ACogSampleCharacter>(TargetAbilitySystem->AbilityActorInfo.IsValid() ? TargetAbilitySystem->GetAvatarActor() : nullptr) : nullptr;
-    ACogSampleCharacter* SourceCharacter = (SourceAbilitySystem != nullptr) ? Cast<ACogSampleCharacter>(SourceAbilitySystem->AbilityActorInfo.IsValid() ? SourceAbilitySystem->GetAvatarActor() : nullptr) : nullptr;
+    UCogSampleAbilitySystemComponent* TargetAbilitySystem = Cast<UCogSampleAbilitySystemComponent>(ExecutionParams.GetTargetAbilitySystemComponent());
+    AActor* TargetActor = (TargetAbilitySystem != nullptr) ? TargetAbilitySystem->GetAvatarActor() : nullptr;
 
-    if (TargetCharacter == nullptr)
+    UCogSampleAbilitySystemComponent* SourceAbilitySystem = Cast<UCogSampleAbilitySystemComponent>(ExecutionParams.GetSourceAbilitySystemComponent());
+    AActor* SourceActor = (SourceAbilitySystem != nullptr) ? SourceAbilitySystem->GetAvatarActor() : nullptr;
+
+    if (TargetActor == nullptr)
     {
         return;
     }
+
+    FHitResult HitResult;
+    if (const FHitResult* HitResultPtr = EffectContext.GetHitResult())
+    {
+        HitResult = *HitResultPtr;
+    }
+    else
+    {
+        HitResult.Location = TargetActor->GetActorLocation();
+        HitResult.Normal = TargetActor->GetActorForwardVector();
+        HitResult.ImpactNormal = TargetActor->GetActorForwardVector();
+        EffectContext.AddHitResult(HitResult, true);
+    }
+
 
     FGameplayTagContainer SpecAssetTags;
     EffectSpec.GetAllAssetTags(SpecAssetTags);
@@ -88,16 +106,75 @@ void UCogSampleExecCalculation_Damage::Execute_Implementation(const FGameplayEff
         OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(UCogSampleAttributeSet_Health::GetHealthAttribute(), EGameplayModOp::Additive, -MitigatedDamage));
 
         FCogSampleDamageEventParams Params;
-        Params.DamageDealer = SourceCharacter;
-        Params.DamageReceiver = TargetCharacter;
+        Params.DamageDealer = SourceActor;
+        Params.DamageReceiver = TargetActor;
         Params.MitigatedDamage = MitigatedDamage;
         Params.UnmitigatedDamage = UnmitigatedDamage;
 
-        TargetCharacter->HandleDamageReceived(Params);
-
-        if (SourceCharacter != nullptr)
+        if (ICogSampleDamageableInterface* DamageReceiver = Cast<ICogSampleDamageableInterface>(TargetActor))
         {
-            SourceCharacter->HandleDamageDealt(Params);
+            DamageReceiver->HandleDamageReceived(Params);
+        }
+
+        if (ICogSampleDamageableInterface* DamageDealer = Cast<ICogSampleDamageableInterface>(SourceActor))
+        {
+            DamageDealer->HandleDamageDealt(Params);
+        }
+    }
+
+    UCogSampleFunctionLibrary_Damage::ExecuteDamageGameplayCue(TargetAbilitySystem, HitResult, MitigatedDamage, EffectContext, false);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleFunctionLibrary_Damage::ExecuteDamageGameplayCue(
+    UCogSampleAbilitySystemComponent* TargetAbilitySystem,
+    const FHitResult& HitResult,
+    float Damage,
+    const FGameplayEffectContextHandle& EffectContext,
+    bool IsPredicted)
+{
+    ensure(TargetAbilitySystem);
+    if (TargetAbilitySystem == nullptr)
+    {
+        return;
+    }
+
+    AActor* TargetActor = TargetAbilitySystem->GetAvatarActor();
+    if (TargetActor == nullptr)
+    {
+        return;
+    }
+
+    FCogSampleGameplayEffectContext* TypedContext = FCogSampleGameplayEffectContext::ExtractEffectContext(EffectContext);
+    ensure(TypedContext);
+    if (TypedContext == nullptr)
+    {
+        return;
+    }
+
+    TypedContext->bGameplayCueIsPredicted = IsPredicted;
+
+    //-----------------------------------------------------------------------------------------------------
+    // We check for >= 1 instead of >= 0 because we can use damage values between 0 and 1.
+    //-----------------------------------------------------------------------------------------------------
+    if (Damage > 0.0f)
+    {
+        FGameplayCueParameters GameplayCueParameters;
+        GameplayCueParameters.RawMagnitude = Damage;
+        GameplayCueParameters.EffectContext = EffectContext;
+        GameplayCueParameters.Instigator = TypedContext->GetInstigator();
+        GameplayCueParameters.EffectCauser = TypedContext->GetEffectCauser();
+        GameplayCueParameters.PhysicalMaterial = HitResult.PhysMaterial;
+        GameplayCueParameters.Location = HitResult.Location;
+        GameplayCueParameters.Normal = HitResult.ImpactNormal;
+
+        if (IsPredicted)
+        {
+            TargetAbilitySystem->ExecuteGameplayCueLocal(Tag_GameplayCue_DamageReceived, GameplayCueParameters);
+        }
+        else
+        {
+            TargetAbilitySystem->ExecuteGameplayCue(Tag_GameplayCue_DamageReceived, GameplayCueParameters);
         }
     }
 }

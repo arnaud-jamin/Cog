@@ -2,6 +2,7 @@
 
 #include "Camera/CameraComponent.h"
 #include "CogCommon.h"
+#include "CogSampleAbilitySystemComponent.h"
 #include "CogSampleAttributeSet_Health.h"
 #include "CogSampleAttributeSet_Misc.h"
 #include "CogSampleCharacterMovementComponent.h"
@@ -64,7 +65,7 @@ ACogSampleCharacter::ACogSampleCharacter(const FObjectInitializer& ObjectInitial
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-    AbilitySystem = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystem"));
+    AbilitySystem = CreateDefaultSubobject<UCogSampleAbilitySystemComponent>(TEXT("AbilitySystem"));
     AbilitySystem->SetIsReplicated(true);
     AbilitySystem->SetReplicationMode(EGameplayEffectReplicationMode::Full);
 }
@@ -798,3 +799,24 @@ void ACogSampleCharacter::GetTargetCapsules(TArray<const UCapsuleComponent*>& Ca
     Capsules.Add(GetCapsuleComponent());
 }
 
+//--------------------------------------------------------------------------------------------------------------------------
+bool ACogSampleCharacter::GetMontage(FName MontageName, UAnimMontage*& Montage, bool bPrintWarning) const
+{
+    Montage = nullptr;
+
+    if (MontageTable == nullptr)
+    {
+        return false;
+    }
+
+    static FString ContextString(TEXT("GetMontage"));
+    FCogSampleMontageTableRow* Row = MontageTable->FindRow<FCogSampleMontageTableRow>(MontageName, ContextString, bPrintWarning);
+
+    if (Row == nullptr)
+    {
+        return false;
+    }
+
+    Montage = Row->Montage;
+    return Montage != nullptr;
+}

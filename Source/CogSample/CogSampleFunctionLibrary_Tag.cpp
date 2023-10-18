@@ -34,6 +34,8 @@ UE_DEFINE_GAMEPLAY_TAG(Tag_Effect_Type_Heal_Full, "Effect.Type.Heal.Full");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Effect_Type_Heal_Revive, "Effect.Type.Heal.Revive");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Effect_Type_Hidden, "Effect.Type.Hidden");
 
+UE_DEFINE_GAMEPLAY_TAG(Tag_GameplayCue_DamageReceived, "GameplayCue.DamageReceived");
+
 UE_DEFINE_GAMEPLAY_TAG(Tag_Status_Dead, "Status.Dead");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Status_Ghost, "Status.Ghost");
 UE_DEFINE_GAMEPLAY_TAG(Tag_Status_Immobilized, "Status.Immobilized");
