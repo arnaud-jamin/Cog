@@ -1,6 +1,12 @@
 # Visual Studio 2015 user specific files
 .vs/
 
+# Rider user specific files
+.idea/
+
+# Rider UnrealLink plugin, as the IDE will install and update itself
+Plugins/Developer/RiderLink/
+
 # Compiled Object files
 *.slo
 *.lo

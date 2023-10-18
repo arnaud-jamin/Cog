@@ -1,3 +1,4 @@
+#pragma once
 #include "CoreMinimal.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogCogAlways, VeryVerbose, All);
@@ -16,5 +17,5 @@ DECLARE_LOG_CATEGORY_EXTERN(LogCogTargetAcquisition, Warning, All);
 
 namespace CogSampleLog
 {
-    void RegiterAllLogCategories();
+    void RegisterAllLogCategories();
 }

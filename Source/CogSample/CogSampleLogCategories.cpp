@@ -23,7 +23,7 @@ DEFINE_LOG_CATEGORY(LogCogTargetAcquisition);
 
 namespace CogSampleLog
 {
-    void RegiterAllLogCategories()
+    void RegisterAllLogCategories()
     {
 #if ENABLE_COG
         FCogDebugLog::AddLogCategory(LogCogAlways, "Always", "Debug Category that is always active", false);
