@@ -244,22 +244,31 @@ void ACogSampleCharacter::InitializeAbilitySystem()
             AbilitySystem->GiveAbility(Spec);
         }
 
-        int32 Index = 0;
-        for (FActiveAbilityInfo& AbilityInfo : ActiveAbilities)
+        for (int32 i = 0; i < ActiveAbilities.Num(); ++i)
         {
+            const FActiveAbilityInfo& AbilityInfo = ActiveAbilities[i];
             const FGameplayAbilitySpec Spec(AbilityInfo.Ability, 1, INDEX_NONE, this);
-            FGameplayAbilitySpecHandle Handle = AbilitySystem->GiveAbility(Spec);
+            const FGameplayAbilitySpecHandle Handle = AbilitySystem->GiveAbility(Spec);
             ActiveAbilityHandles.Add(Handle);
 
-            if (FGameplayAbilitySpec* AddedSpec = AbilitySystem->FindAbilitySpecFromHandle(Handle))
+            const FGameplayAbilitySpec* AddedSpec = AbilitySystem->FindAbilitySpecFromHandle(Handle);
+            if (AddedSpec == nullptr)
             {
-                if (UCogSampleGameplayAbility* Ab = Cast<UCogSampleGameplayAbility>(AddedSpec->GetPrimaryInstance()))
-                {
-                    Ab->SetCooldownTag(UCogSampleFunctionLibrary_Tag::ActiveAbilityCooldownTags[Index]);
-                }
+                continue;
             }
 
-            Index++;
+            UCogSampleGameplayAbility* Ability = Cast<UCogSampleGameplayAbility>(AddedSpec->GetPrimaryInstance());
+            if (Ability == nullptr)
+            {
+                continue;
+            }
+            
+            if (UCogSampleFunctionLibrary_Tag::ActiveAbilityCooldownTags.IsValidIndex(i) == false)
+            {
+                continue;
+            }
+            
+            Ability->SetCooldownTag(UCogSampleFunctionLibrary_Tag::ActiveAbilityCooldownTags[i]);
         }
 
         UpdateActiveAbilitySlots();
