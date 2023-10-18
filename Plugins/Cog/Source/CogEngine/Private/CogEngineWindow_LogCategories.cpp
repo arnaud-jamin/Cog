@@ -1,6 +1,7 @@
 #include "CogEngineWindow_LogCategories.h"
 
 #include "CogDebugHelper.h"
+#include "CogDebugSettings.h"
 #include "CogWindowWidgets.h"
 #include "CogDebugLog.h"
 
@@ -48,6 +49,8 @@ void UCogEngineWindow_LogCategories::RenderContent()
     {
         if (ImGui::BeginMenu("Options"))
         {
+            FCogWindowWidgets::HelpMarker("If checked, only show the debug of the currently selected actor. Otherwise show the debug of all actors.");
+
             ImGui::Checkbox("Show detailed verbosity", &bShowAllVerbosity);
             ImGui::SameLine();
             FCogWindowWidgets::HelpMarker("Show the verbosity level of each log category.");

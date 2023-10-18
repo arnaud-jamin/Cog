@@ -514,18 +514,27 @@ void FCogDebugDraw::ReplicateShape(const UObject* WorldContextObject, const FCog
     }
 
     const ENetMode NetMode = World->GetNetMode();
-    if (NetMode == NM_DedicatedServer || NetMode == NM_ListenServer)
+    if (NetMode != NM_DedicatedServer && NetMode != NM_ListenServer)
     {
-        TArray<ACogDebugReplicator*> Replicators;
-        ACogDebugReplicator::GetRemoteReplicators(*World, Replicators);
+        return;
+    }
 
-        for (ACogDebugReplicator* Replicator : Replicators)
+    TArray<ACogDebugReplicator*> Replicators;
+    ACogDebugReplicator::GetRemoteReplicators(*World, Replicators);
+
+    for (ACogDebugReplicator* Replicator : Replicators)
+    {
+        if (Replicator == nullptr)
         {
-            if (Replicator != nullptr)
-            {
-                Replicator->ReplicatedShapes.Add(Shape);
-            }
+            continue;
         }
+
+        if (FCogDebugSettings::IsReplicatedDebugActiveForObject(WorldContextObject, Replicator->GetServerSelection(), Replicator->IsServerFilteringBySelection()) == false)
+        {
+            continue;
+        }
+            
+        Replicator->ReplicatedShapes.Add(Shape);
     }
 }
 

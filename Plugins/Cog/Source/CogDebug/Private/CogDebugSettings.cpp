@@ -1,10 +1,11 @@
 #include "CogDebugSettings.h"
 
 #include "CogCommonDebugFilteredActorInterface.h"
+#include "CogDebugReplicator.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 TWeakObjectPtr<AActor> FCogDebugSettings::Selection;
-bool FCogDebugSettings::FilterBySelection = true;
+bool FCogDebugSettings::bIsFilteringBySelection = true;
 bool FCogDebugSettings::Persistent = false;
 bool FCogDebugSettings::TextShadow = true;
 bool FCogDebugSettings::Fade2D = true;
@@ -48,7 +49,7 @@ TArray<FString> FCogDebugSettings::SecondaryBoneWildcards =
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugSettings::Reset()
 {
-    FilterBySelection = true;
+    bIsFilteringBySelection = true;
     Persistent = false;
     TextShadow = true;
     Fade2D = true;
@@ -68,7 +69,32 @@ void FCogDebugSettings::Reset()
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogDebugSettings::IsDebugActiveForObject(const UObject* WorldContextObject)
 {
-    if (FilterBySelection == false)
+    UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+    if (World == nullptr)
+    {
+        return true;
+    }
+
+    if (World->GetNetMode() == NM_DedicatedServer)
+    {
+        return true;
+    }
+
+    bool Result = IsDebugActiveForObject_Internal(WorldContextObject, Selection.Get(), bIsFilteringBySelection);
+
+    return Result;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogDebugSettings::IsReplicatedDebugActiveForObject(const UObject* WorldContextObject, const AActor* ServerSelection, bool IsServerFilteringBySelection)
+{
+    return IsDebugActiveForObject_Internal(WorldContextObject, ServerSelection, IsServerFilteringBySelection);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogDebugSettings::IsDebugActiveForObject_Internal(const UObject* WorldContextObject, const AActor* InSelection, bool InIsFilteringBySelection)
+{
+    if (InIsFilteringBySelection == false)
     {
         return true;
     }
@@ -78,7 +104,7 @@ bool FCogDebugSettings::IsDebugActiveForObject(const UObject* WorldContextObject
         return true;
     }
 
-    const AActor* SelectionPtr = Selection.Get();
+    const AActor* SelectionPtr = InSelection;
     if (SelectionPtr == nullptr)
     {
         return true;
@@ -116,9 +142,37 @@ AActor* FCogDebugSettings::GetSelection()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugSettings::SetSelection(AActor* Value)
+void FCogDebugSettings::SetSelection(UWorld* World, AActor* Value)
 {
     Selection = Value;
+
+    if (World != nullptr && World->GetNetMode() == NM_Client)
+    {
+        if (ACogDebugReplicator* Replicator = ACogDebugReplicator::GetLocalReplicator(*World))
+        {
+            Replicator->Server_SetSelection(Value);
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogDebugSettings::GetIsFilteringBySelection()
+{
+    return bIsFilteringBySelection;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogDebugSettings::SetIsFilteringBySelection(UWorld* World, bool Value)
+{
+    bIsFilteringBySelection = Value;
+
+    if (World != nullptr && World->GetNetMode() == NM_Client)
+    {
+        if (ACogDebugReplicator* Replicator = ACogDebugReplicator::GetLocalReplicator(*World))
+        {
+            Replicator->Server_SetIsFilteringBySelection(Value);
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

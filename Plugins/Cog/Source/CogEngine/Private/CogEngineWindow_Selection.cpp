@@ -86,9 +86,8 @@ void UCogEngineWindow_Selection::TryReapplySelection() const
         AActor* Actor = *It;
         if (GetNameSafe(Actor) == SelectionName)
         {
-            FCogDebugSettings::SetSelection(Actor);
+            SetGlobalSelection(Actor);
         }
-
     }
 }
 
@@ -158,7 +157,7 @@ void UCogEngineWindow_Selection::RenderTick(float DeltaTime)
 
     if (FCogDebugSettings::GetSelection() == nullptr)
     {
-        FCogDebugSettings::SetSelection(GetLocalPlayerPawn());
+        SetGlobalSelection(GetLocalPlayerPawn());
     }
 
     if (bSelectionModeActive)
@@ -254,7 +253,7 @@ bool UCogEngineWindow_Selection::DrawSelectionCombo()
             const FString ActorName = GetNameSafe(Actor);
             if (ImGui::Selectable(TCHAR_TO_ANSI(*ActorName), bIsSelected))
             {
-                FCogDebugSettings::SetSelection(Actor);
+                SetGlobalSelection(Actor);
                 SelectionChanged = true;
             }
 
@@ -294,7 +293,7 @@ void UCogEngineWindow_Selection::DrawActorContextMenu(AActor* Actor)
         if (ImGui::Button("Reset Selection", ImVec2(-1, 0)))
         {
             ImGui::CloseCurrentPopup();
-            FCogDebugSettings::SetSelection(GetLocalPlayerPawn());
+            SetGlobalSelection(GetLocalPlayerPawn());
         }
 
         if (ImGui::IsItemHovered())
@@ -399,7 +398,7 @@ void UCogEngineWindow_Selection::TickSelectionMode()
             {
                 if (HoveredActor != nullptr)
                 {
-                    FCogDebugSettings::SetSelection(HoveredActor);
+                    SetGlobalSelection(HoveredActor);
                 }
 
                 DeactivateSelectionMode();
@@ -590,7 +589,7 @@ void UCogEngineWindow_Selection::RenderMainMenuWidget(bool Draw, float& Width)
         ImGui::SameLine();
         if (ImGui::Button("X", ImVec2(ResetButtonWidth, 0)))
         {
-            FCogDebugSettings::SetSelection(nullptr);
+            SetGlobalSelection(nullptr);
             ImGui::CloseCurrentPopup();
         }
         if (ImGui::IsItemHovered())
@@ -600,4 +599,16 @@ void UCogEngineWindow_Selection::RenderMainMenuWidget(bool Draw, float& Width)
         ImGui::PopStyleColor(1);
         ImGui::PopStyleVar(1);
     }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindow_Selection::SetGlobalSelection(AActor* Value) const
+{
+    FCogDebugSettings::SetSelection(GetWorld(), Value);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+AActor* UCogEngineWindow_Selection::GetGlobalSelection(AActor* Value) const
+{
+    return FCogDebugSettings::GetSelection();
 }

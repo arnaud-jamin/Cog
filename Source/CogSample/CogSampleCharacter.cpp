@@ -66,7 +66,7 @@ ACogSampleCharacter::ACogSampleCharacter(const FObjectInitializer& ObjectInitial
 
     AbilitySystem = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystem"));
     AbilitySystem->SetIsReplicated(true);
-    AbilitySystem->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+    AbilitySystem->SetReplicationMode(EGameplayEffectReplicationMode::Full);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -108,6 +108,7 @@ void ACogSampleCharacter::BeginPlay()
 	}
 
     TryFinishInitialize();
+    RefreshServerAnimTickOption();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -639,6 +640,29 @@ void ACogSampleCharacter::OnScaleAttributeChanged(const FOnAttributeChangeData& 
 
     MARK_PROPERTY_DIRTY_FROM_NAME(ACogSampleCharacter, Scale, this);
     OnRep_Scale();
+
+    RefreshServerAnimTickOption();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSampleCharacter::RefreshServerAnimTickOption()
+{
+    const UCapsuleComponent* Capsule = GetCapsuleComponent();
+    if (Capsule == nullptr)
+    {
+        return;
+    }
+
+    USkeletalMeshComponent* SkeletalMesh = GetMesh();
+    if (SkeletalMesh == nullptr)
+    {
+        return;
+    }
+
+    const float ScaledHalfHeight = Capsule->GetScaledCapsuleHalfHeight();
+    const bool IsBigEnoughToSimulateBonesOnServer = ScaledHalfHeight > 200;
+    SkeletalMesh->VisibilityBasedAnimTickOption = IsBigEnoughToSimulateBonesOnServer ? EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones
+                                                                                     : EVisibilityBasedAnimTickOption::OnlyTickMontagesWhenNotRendered;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

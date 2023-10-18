@@ -9,10 +9,16 @@ public:
     //----------------------------------------------------------------------------------------------------------------------
     static bool IsDebugActiveForObject(const UObject* WorldContextObject);
     
+    static bool IsReplicatedDebugActiveForObject(const UObject* WorldContextObject, const AActor* ServerSelection, bool IsServerFilteringBySelection);
+
     static AActor* GetSelection();
     
-    static void SetSelection(AActor* Value);
+    static void SetSelection(UWorld* World, AActor* Value);
     
+    static bool GetIsFilteringBySelection();
+
+    static void SetIsFilteringBySelection(UWorld* World, bool Value);
+
     static bool GetDebugPersistent(bool bPersistent);
     
     static float GetDebugDuration(bool bPersistent);
@@ -36,11 +42,6 @@ public:
     static bool IsSecondarySkeletonBone(FName BoneName);
 
     static void Reset();
-
-    //----------------------------------------------------------------------------------------------------------------------
-    static TWeakObjectPtr<AActor> Selection;
-
-    static bool FilterBySelection;
 
     static bool Persistent;
 
@@ -71,4 +72,12 @@ public:
     static float TextSize;
 
     static TArray<FString> SecondaryBoneWildcards;
+
+private:
+
+    static bool IsDebugActiveForObject_Internal(const UObject* WorldContextObject, const AActor* InSelection, bool InIsFilteringBySelection);
+
+    static TWeakObjectPtr<AActor> Selection;
+
+    static bool bIsFilteringBySelection;
 };

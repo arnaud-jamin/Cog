@@ -42,13 +42,17 @@ protected:
 
     virtual void RenderMainMenuWidget(bool Draw, float& Width) override;
 
-    bool DrawSelectionCombo();
+    virtual bool DrawSelectionCombo();
 
-    void DrawActorContextMenu(AActor* Actor);
+    virtual void DrawActorContextMenu(AActor* Actor);
 
-    void ActivateSelectionMode();
+    virtual void ActivateSelectionMode();
 
-    void HackWaitInputRelease();
+    virtual void HackWaitInputRelease();
+
+    virtual void SetGlobalSelection(AActor* Value) const;
+
+    virtual AActor* GetGlobalSelection(AActor* Value) const;
 
 private:
 

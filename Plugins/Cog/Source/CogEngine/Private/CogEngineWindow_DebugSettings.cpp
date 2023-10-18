@@ -17,7 +17,7 @@ void UCogEngineWindow_DebugSettings::ResetConfig()
 {
     Super::ResetConfig();
 
-    FilterBySelection = true;
+    bIsFilteringBySelection = true;
     Persistent = false;
     TextShadow = true;
     Fade2D = true;
@@ -39,7 +39,6 @@ void UCogEngineWindow_DebugSettings::PostInitProperties()
 {
     Super::PostInitProperties();
 
-    FCogDebugSettings::FilterBySelection        = FilterBySelection;
     FCogDebugSettings::Persistent               = Persistent;
     FCogDebugSettings::TextShadow               = TextShadow;
     FCogDebugSettings::Fade2D                   = Fade2D;
@@ -54,6 +53,8 @@ void UCogEngineWindow_DebugSettings::PostInitProperties()
     FCogDebugSettings::GradientColorIntensity   = GradientColorIntensity;
     FCogDebugSettings::GradientColorSpeed       = GradientColorSpeed;
     FCogDebugSettings::TextSize                 = TextSize;
+
+    FCogDebugSettings::SetIsFilteringBySelection(GetWorld(), bIsFilteringBySelection);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -61,7 +62,6 @@ void UCogEngineWindow_DebugSettings::PreSaveConfig()
 {
     Super::PreSaveConfig();
 
-    FilterBySelection        = FCogDebugSettings::FilterBySelection;
     Persistent               = FCogDebugSettings::Persistent;
     TextShadow               = FCogDebugSettings::TextShadow;
     Fade2D                   = FCogDebugSettings::Fade2D;
@@ -76,6 +76,8 @@ void UCogEngineWindow_DebugSettings::PreSaveConfig()
     GradientColorIntensity   = FCogDebugSettings::GradientColorIntensity;
     GradientColorSpeed       = FCogDebugSettings::GradientColorSpeed;
     TextSize                 = FCogDebugSettings::TextSize;
+
+    bIsFilteringBySelection = FCogDebugSettings::GetIsFilteringBySelection();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -99,7 +101,11 @@ void UCogEngineWindow_DebugSettings::RenderContent()
         ImGui::EndMenuBar();
     }
 
-    ImGui::Checkbox("Filter by selection", &FCogDebugSettings::FilterBySelection);
+    if (ImGui::Checkbox("Filter by selection", &bIsFilteringBySelection))
+    {
+        FCogDebugSettings::SetIsFilteringBySelection(GetWorld(), bIsFilteringBySelection);
+    }
+
     ImGui::SameLine();
     FCogWindowWidgets::HelpMarker("If checked, only show the debug of the currently selected actor. Otherwise show the debug of all actors.");
 

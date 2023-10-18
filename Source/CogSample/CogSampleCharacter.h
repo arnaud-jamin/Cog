@@ -230,8 +230,10 @@ public:
     int32 ApplyRootMotion(const FCogSampleRootMotionParams& Params);
 
 private:
-    
     friend class ACogSamplePlayerController;
+
+    void RefreshServerAnimTickOption();
+
 
     UPROPERTY()
     AController* InitialController = nullptr;

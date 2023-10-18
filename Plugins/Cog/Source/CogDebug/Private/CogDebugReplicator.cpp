@@ -80,6 +80,8 @@ void ACogDebugReplicator::BeginPlay()
     if (OwnerPlayerController->IsLocalController())
     {
         Server_RequestAllCategoriesVerbosity();
+        Server_SetSelection(FCogDebugSettings::GetSelection());
+        Server_SetIsFilteringBySelection(FCogDebugSettings::GetIsFilteringBySelection());
     }
 }
 
@@ -104,7 +106,7 @@ void ACogDebugReplicator::TickActor(float DeltaTime, enum ELevelTick TickType, F
     {
         if (GetWorld()->GetNetMode() == NM_Client)
         {
-            for (FCogDebugShape ReplicatedShape : ReplicatedShapes)
+            for (const FCogDebugShape& ReplicatedShape : ReplicatedShapes)
             {
                 ReplicatedShape.Draw(GetWorld());
             }
@@ -191,6 +193,26 @@ void ACogDebugReplicator::Server_RequestAllCategoriesVerbosity_Implementation()
 
         Client_SendCategoriesVerbosity(CategoriesData);
     }
+
+#endif // !UE_BUILD_SHIPPING
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogDebugReplicator::Server_SetIsFilteringBySelection_Implementation(bool Value)
+{
+#if !UE_BUILD_SHIPPING
+
+    bIsServerFilteringBySelection = Value;
+
+#endif // !UE_BUILD_SHIPPING
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogDebugReplicator::Server_SetSelection_Implementation(AActor* Value)
+{
+#if !UE_BUILD_SHIPPING
+
+    ServerSelection = Value;
 
 #endif // !UE_BUILD_SHIPPING
 }
