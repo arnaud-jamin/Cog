@@ -242,6 +242,7 @@ You must have Unreal 5.1 or greater and Visual Studio to launch the sample
 The Cog repository has the following structure:
 - `CogSample` - A Sample that demonstrate various Cog functionalities. The project was saved in Unreal 5.1
 - `Plugins/CogAbility` - ImGui windows for the Gameplay Ability System (Abilities, Effects, Tags, ...)
+-  `Plugins/CogAI` - ImGui windows for AI (Behavior Tree, Blackboard)
 - `Plugins/CogInput` - ImGui windows for the Enhanced Input library (Input action, Gamepad)
 - `Plugins/Cog` - The main Cog plugin which contains the following modules
   - `CogEngine` - ImGui windows for the core unreal engine functionalities (Log, Stats, Time, Collisions, Skeleton, ...)
@@ -265,6 +266,7 @@ public class CogSample : ModuleRules
         PublicDependencyModuleNames.AddRange(new string[] 
         { 
             "CogCommon",  // The CogCommon is required on all target configuration
+            "AIModule",
             "Core",
             "CoreUObject", 
             "Engine", 
