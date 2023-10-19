@@ -65,6 +65,11 @@ public:
 
     bool CanGameplayCueBePredicted();
 
+    /* NOT REPLICATED - Is this effect context made for a local gameplay cue. Used to know if a remote gameplay cue
+    * created by the local player should be filtered when a local gameplay cue is played instead.
+    */
+    bool bGameplayCueIsPredicted = false;
+
     /* REPLICATED */
     UPROPERTY()
     TArray<FCogSampleGameplayEffectContextFloatValue> FloatValues;
@@ -90,6 +95,9 @@ class UCogSampleEffectContextLibrary : public UBlueprintFunctionLibrary
     GENERATED_BODY()
 
 public:
+
+    UFUNCTION(BlueprintPure)
+    static bool EffectContextGetGameplayCueIsPredicted(FGameplayEffectContextHandle EffectContext);
 
     UFUNCTION(BlueprintCallable)
     static void EffectContextSetFloatValue(FGameplayEffectContextHandle EffectContext, FName Name, float Value);

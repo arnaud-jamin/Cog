@@ -58,22 +58,22 @@ struct COGDEBUG_API FCogDebugShape
     static FCogDebugShape MakeFlatCapsule(const FVector2D& Start, const FVector2D& End, const float Radius, const float Z, const FColor& Color, const float Thickness, const bool bPersistent, const uint8 DepthPriority);
     static FCogDebugShape MakePolygon(const TArray<FVector>& Verts, const FColor& Color, const bool bPersistent, const uint8 DepthPriority);
 
-    void DrawPoint(UWorld* World);
-    void DrawSegment(UWorld* World);
-    void DrawBone(UWorld* World);
-    void DrawArrow(UWorld* World);
-    void DrawAxes(UWorld* World);
-    void DrawBox(UWorld* World);
-    void DrawSolidBox(UWorld* World);
-    void DrawCone(UWorld* World);
-    void DrawCylinder(UWorld* World);
-    void DrawCicle(UWorld* World);
-    void DrawCicleArc(UWorld* World);
-    void DrawCapsule(UWorld* World);
-    void DrawFlatCapsule(UWorld* World);
-    void DrawPolygon(UWorld* World);
+    void DrawPoint(UWorld* World) const;
+    void DrawSegment(UWorld* World) const;
+    void DrawBone(UWorld* World) const;
+    void DrawArrow(UWorld* World) const;
+    void DrawAxes(UWorld* World) const;
+    void DrawBox(UWorld* World) const;
+    void DrawSolidBox(UWorld* World) const;
+    void DrawCone(UWorld* World) const;
+    void DrawCylinder(UWorld* World) const;
+    void DrawCicle(UWorld* World) const;
+    void DrawCicleArc(UWorld* World) const;
+    void DrawCapsule(UWorld* World) const;
+    void DrawFlatCapsule(UWorld* World) const;
+    void DrawPolygon(UWorld* World) const;
 
-    void Draw(UWorld* World);
+    void Draw(UWorld* World) const;
 };
 
 FArchive& operator<<(FArchive& Ar, FCogDebugShape& Shape);

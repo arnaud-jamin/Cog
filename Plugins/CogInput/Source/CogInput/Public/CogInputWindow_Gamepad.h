@@ -64,6 +64,9 @@ private:
     FVector4f PressedColor = FVector4f(0.6f, 0.6f, 0.6f, 1.0f);
 
     UPROPERTY(Config)
+    FVector4f HoveredColor = FVector4f(0.3f, 0.3f, 0.3f, 1.0f);
+
+    UPROPERTY(Config)
     FVector4f InjectColor = FVector4f(1.0f, 0.5f, 0.0f, 0.5f);
 
     UPROPERTY(Config)

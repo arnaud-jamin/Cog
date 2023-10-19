@@ -22,9 +22,15 @@ protected:
 
     virtual void RenderContent() override;
 
-    virtual void RenderNode(UBehaviorTreeComponent* BehaviorTreeComponent, const UBTNode* Node, bool OpenAllChildren);
+    virtual void RenderNode(UBehaviorTreeComponent& BehaviorTreeComponent, UBTNode* Node, bool OpenAllChildren);
 
 private:
+
+    UPROPERTY(Config)
+    FVector4f ActiveColor = FVector4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+    UPROPERTY(Config)
+    FVector4f InactiveColor = FVector4f(1.0f, 1.0f, 1.0f, 0.2f);
 
     ImGuiTextFilter Filter;
 };

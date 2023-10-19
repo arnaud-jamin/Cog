@@ -8,6 +8,7 @@ public class CogSample : ModuleRules
 
 		PublicDependencyModuleNames.AddRange(new string[] 
         { 
+            "AIModule",
             "CogCommon",
             "Core",
             "CoreUObject", 

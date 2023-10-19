@@ -38,6 +38,7 @@ void UCogInputWindow_Gamepad::ResetConfig()
     ButtonColor = FVector4f(0.2f, 0.2f, 0.2f, 1.0f);
     BorderColor = FVector4f(0.03f, 0.03f, 0.03f, 1.0f);
     PressedColor = FVector4f(0.6f, 0.6f, 0.6f, 1.0f);
+    HoveredColor = FVector4f(0.3f, 0.3f, 0.3f, 1.0f);
     InjectColor = FVector4f(1.0f, 0.5f, 0.0f, 0.5f);
     Border = 0.02f;
 }
@@ -105,8 +106,7 @@ void UCogInputWindow_Gamepad::AddButton(const FKey& Key, const ImVec2& RelativeP
     const ImVec2& Size = RelativeSize * CanvasSize.x;
     const ImVec2 Position = (CanvasMin + CanvasSize * RelativePosition) - Alignment * Size;
 
-    ImU32 Color = ImGui::GetColorU32(ImLerp(FCogImguiHelper::ToImVec4(ButtonColor), FCogImguiHelper::ToImVec4(PressedColor), Value));
-
+    bool IsPressed = false;
     FCogInjectActionInfo* ActionInfo = Actions.Find(Key);
     if (ActionInfo != nullptr)
     {
@@ -114,7 +114,7 @@ void UCogInputWindow_Gamepad::AddButton(const FKey& Key, const ImVec2& RelativeP
         {
             if (Input->GetActionValue(ActionInfo->Action).Get<bool>())
             {
-                Color = FCogImguiHelper::ToImU32(PressedColor);
+                IsPressed = true;
             }
         }
     }
@@ -123,6 +123,16 @@ void UCogInputWindow_Gamepad::AddButton(const FKey& Key, const ImVec2& RelativeP
     if (ImGui::InvisibleButton("", Size))
     {
         OnButtonClicked(ActionInfo);
+    }
+
+    ImU32 Color = FCogImguiHelper::ToImU32(ButtonColor);
+    if (IsPressed)
+    {
+        Color = FCogImguiHelper::ToImU32(PressedColor);
+    }
+    else if (ImGui::IsItemHovered())
+    {
+        Color = FCogImguiHelper::ToImU32(HoveredColor);
     }
 
     InputContextMenu(Key, ActionInfo, nullptr);
@@ -143,8 +153,6 @@ void UCogInputWindow_Gamepad::AddButton(const FKey& Key, const ImVec2& RelativeP
 void UCogInputWindow_Gamepad::AddStick(const FKey& Key2D, const FKey& KeyBool, bool InvertY, float RelativeAmplitude, const ImVec2& RelativePosition, float RelativeRadius)
 {
     ImGui::PushID((void*)(&Key2D));
-
-    ImU32 Color = Input->GetKeyValue(KeyBool) > 0.0f ? FCogImguiHelper::ToImU32(PressedColor) : FCogImguiHelper::ToImU32(ButtonColor);
 
     FCogInjectActionInfo* ActionInfoBool = Actions.Find(KeyBool);
     FCogInjectActionInfo* ActionInfo2D = Actions.Find(Key2D);
@@ -167,6 +175,16 @@ void UCogInputWindow_Gamepad::AddStick(const FKey& Key2D, const FKey& KeyBool, b
     if (ImGui::InvisibleButton("", ButtonSize))
     {
         OnButtonClicked(ActionInfoBool);
+    }
+
+    ImU32 Color = FCogImguiHelper::ToImU32(ButtonColor);
+    if (Input->GetKeyValue(KeyBool) > 0.0f)
+    {
+        Color = FCogImguiHelper::ToImU32(PressedColor);
+    }
+    else if (ImGui::IsItemHovered())
+    {
+        Color = FCogImguiHelper::ToImU32(HoveredColor);
     }
 
     InputContextMenu(Key2D, ActionInfoBool, ActionInfo2D);
@@ -302,11 +320,12 @@ void UCogInputWindow_Gamepad::RenderContent()
         ImGui::Checkbox("Invert Left Stick Y", &bInvertLeftStickY);
         ImGui::Checkbox("Invert Right Stick Y", &bInvertRightStickY);
         ImGui::Separator();
-        ImGui::ColorEdit4("Background Color", (float*)&BackgroundColor, ImGuiColorEditFlags_NoInputs);
-        ImGui::ColorEdit4("Border Color", (float*)&BorderColor, ImGuiColorEditFlags_NoInputs);
-        ImGui::ColorEdit4("Button Color", (float*)&ButtonColor, ImGuiColorEditFlags_NoInputs);
-        ImGui::ColorEdit4("Pressed Color", (float*)&PressedColor, ImGuiColorEditFlags_NoInputs);
-        ImGui::ColorEdit4("Inject Color", (float*)&InjectColor, ImGuiColorEditFlags_NoInputs);
+        ImGui::ColorEdit4("Background Color", (float*)&BackgroundColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        ImGui::ColorEdit4("Border Color", (float*)&BorderColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        ImGui::ColorEdit4("Button Color", (float*)&ButtonColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        ImGui::ColorEdit4("Pressed Color", (float*)&PressedColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        ImGui::ColorEdit4("Hovered Color", (float*)&HoveredColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        ImGui::ColorEdit4("Inject Color", (float*)&InjectColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
         FCogWindowWidgets::SliderWithReset("Border", &Border, 0.0f, 0.1f, 0.02f, "%0.3f");
         ImGui::EndPopup();
     }

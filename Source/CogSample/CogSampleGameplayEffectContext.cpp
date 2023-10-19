@@ -250,3 +250,14 @@ void UCogSampleEffectContextLibrary::EffectContextGetAllFloatValues(FGameplayEff
         Entries = TypedEffectContext->FloatValues;
     }
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool UCogSampleEffectContextLibrary::EffectContextGetGameplayCueIsPredicted(FGameplayEffectContextHandle EffectContext)
+{
+    if (FCogSampleGameplayEffectContext* TypedEffectContext = FCogSampleGameplayEffectContext::ExtractEffectContext(EffectContext))
+    {
+        return TypedEffectContext->bGameplayCueIsPredicted;
+    }
+
+    return false;
+}

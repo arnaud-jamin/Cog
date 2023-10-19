@@ -85,6 +85,16 @@ public:
     UFUNCTION(Client, Reliable)
     void Client_SendCategoriesVerbosity(const TArray<FCogServerCategoryData>& Categories);
 
+    AActor* GetServerSelection() const { return ServerSelection.Get(); }
+    
+    UFUNCTION(Server, Reliable)
+    void Server_SetSelection(AActor* Value);
+
+    bool IsServerFilteringBySelection() const { return bIsServerFilteringBySelection; }
+    
+    UFUNCTION(Server, Reliable)
+    void Server_SetIsFilteringBySelection(bool Value);
+
 protected:
     friend FCogReplicatorNetPack;
 
@@ -92,8 +102,10 @@ protected:
 
     uint32 bHasAuthority : 1;
 
-private:
-
     UPROPERTY(Replicated)
     FCogReplicatorNetPack ReplicatedData;
+
+    TWeakObjectPtr<AActor> ServerSelection = nullptr;
+
+    bool bIsServerFilteringBySelection = true;
 };

@@ -22,7 +22,7 @@ FCogDebugShape FCogDebugShape::MakePoint(const FVector& Location, const float Si
 
 //--------------------------------------------------------------------------------------------------------------------------
 
-void FCogDebugShape::DrawPoint(UWorld* World)
+void FCogDebugShape::DrawPoint(UWorld* World) const
 {
 #if ENABLE_COG
 
@@ -60,7 +60,7 @@ FCogDebugShape FCogDebugShape::MakeSegment(const FVector& StartLocation, const F
 
 //--------------------------------------------------------------------------------------------------------------------------
 
-void FCogDebugShape::DrawSegment(UWorld* World)
+void FCogDebugShape::DrawSegment(UWorld* World) const
 {
 #if ENABLE_COG
 
@@ -100,7 +100,7 @@ FCogDebugShape FCogDebugShape::MakeArrow(const FVector& StartLocation, const FVe
 
 //--------------------------------------------------------------------------------------------------------------------------
 
-void FCogDebugShape::DrawArrow(UWorld* World)
+void FCogDebugShape::DrawArrow(UWorld* World) const
 {
 #if ENABLE_COG
 
@@ -141,7 +141,7 @@ FCogDebugShape FCogDebugShape::MakeAxes(const FVector& Location, const FRotator&
 
 //--------------------------------------------------------------------------------------------------------------------------
 
-void FCogDebugShape::DrawAxes(UWorld* World)
+void FCogDebugShape::DrawAxes(UWorld* World) const
 {
 #if ENABLE_COG
 
@@ -181,7 +181,7 @@ FCogDebugShape FCogDebugShape::MakeBox(const FVector& Center, const FRotator& Ro
 
 //--------------------------------------------------------------------------------------------------------------------------
 
-void FCogDebugShape::DrawBox(UWorld* World)
+void FCogDebugShape::DrawBox(UWorld* World) const
 {
 #if ENABLE_COG
 
@@ -220,7 +220,7 @@ FCogDebugShape FCogDebugShape::MakeSolidBox(const FVector& Center, const FRotato
 }
 
 
-void FCogDebugShape::DrawSolidBox(UWorld* World)
+void FCogDebugShape::DrawSolidBox(UWorld* World) const
 {
 #if ENABLE_COG
 
@@ -260,7 +260,7 @@ FCogDebugShape FCogDebugShape::MakeCone(const FVector& Location, const FVector& 
 
 //--------------------------------------------------------------------------------------------------------------------------
 
-void FCogDebugShape::DrawCone(UWorld* World)
+void FCogDebugShape::DrawCone(UWorld* World) const
 {
 #if ENABLE_COG
 
@@ -303,7 +303,7 @@ FCogDebugShape FCogDebugShape::MakeCylinder(const FVector& Center, const float R
 }
 //--------------------------------------------------------------------------------------------------------------------------
 
-void FCogDebugShape::DrawCylinder(UWorld* World)
+void FCogDebugShape::DrawCylinder(UWorld* World) const
 {
 #if ENABLE_COG
 
@@ -345,7 +345,7 @@ FCogDebugShape FCogDebugShape::MakeCircle(const FVector& Center, const FRotator&
 
 //--------------------------------------------------------------------------------------------------------------------------
 
-void FCogDebugShape::DrawCicle(UWorld* World)
+void FCogDebugShape::DrawCicle(UWorld* World) const
 {
 #if ENABLE_COG
 
@@ -387,7 +387,7 @@ FCogDebugShape FCogDebugShape::MakeCircleArc(const FVector& Center, const FRotat
 
 //--------------------------------------------------------------------------------------------------------------------------
 
-void FCogDebugShape::DrawCicleArc(UWorld* World)
+void FCogDebugShape::DrawCicleArc(UWorld* World) const
 {
 #if ENABLE_COG
 
@@ -430,7 +430,7 @@ FCogDebugShape FCogDebugShape::MakeCapsule(const FVector& Center, const FQuat& R
 
 //--------------------------------------------------------------------------------------------------------------------------
 
-void FCogDebugShape::DrawCapsule(UWorld* World)
+void FCogDebugShape::DrawCapsule(UWorld* World) const
 {
 #if ENABLE_COG
 
@@ -472,7 +472,7 @@ FCogDebugShape FCogDebugShape::MakeFlatCapsule(const FVector2D& Start, const FVe
 
 //--------------------------------------------------------------------------------------------------------------------------
 
-void FCogDebugShape::DrawFlatCapsule(UWorld* World)
+void FCogDebugShape::DrawFlatCapsule(UWorld* World) const
 {
 #if ENABLE_COG
 
@@ -514,7 +514,7 @@ FCogDebugShape FCogDebugShape::MakeBone(const FVector& BoneLocation, const FVect
 
 //--------------------------------------------------------------------------------------------------------------------------
 
-void FCogDebugShape::DrawBone(UWorld* World)
+void FCogDebugShape::DrawBone(UWorld* World) const
 {
 #if ENABLE_COG
 
@@ -560,7 +560,7 @@ FCogDebugShape FCogDebugShape::MakePolygon(const TArray<FVector>& Verts, const F
 
 //--------------------------------------------------------------------------------------------------------------------------
 
-void FCogDebugShape::DrawPolygon(UWorld* World)
+void FCogDebugShape::DrawPolygon(UWorld* World) const
 {
 #if ENABLE_COG
 
@@ -590,7 +590,7 @@ void FCogDebugShape::DrawPolygon(UWorld* World)
 
 //--------------------------------------------------------------------------------------------------------------------------
 
-void FCogDebugShape::Draw(UWorld* World)
+void FCogDebugShape::Draw(UWorld* World) const
 {
     switch (Type)
     {

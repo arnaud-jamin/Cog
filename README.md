@@ -4,7 +4,7 @@ Cog is a set of debug tools for Unreal Engine built on top of [Dear ImGui](https
 ![Cog](https://github.com/arnaud-jamin/Cog/assets/13844285/21659aea-2cd8-4ef6-b3b0-5795f5f3246b)
 
 - [Video](https://www.youtube.com/watch?v=ea5hz3cFcMM)
-- [Sample Executable](https://drive.google.com/file/d/1T7jQFoZ5rd6goBtDH-FCbjn6Kr1RzUCE/view?usp=sharing) (300 MB)
+- [Sample Executable (Windows)](https://drive.google.com/file/d/1T7jQFoZ5rd6goBtDH-FCbjn6Kr1RzUCE/view?usp=sharing) (300 MB)
 
 Cog provides:
 - ImGui windows to inspect and configure various Unreal systems (Core Engine, Enhanced Inputs, Gameplay Abilities, AI)
@@ -48,7 +48,7 @@ Displays the gameplay attributes of the selected actor.
 ### Behavior Tree
 Displays the behavior tree of the selected actor.
 
-![Behavior Tree](https://github.com/arnaud-jamin/Cog/assets/13844285/2e3ab30f-414a-497d-be08-605e1d299d23)
+![Behavior Tree](https://github.com/arnaud-jamin/Cog/assets/13844285/c799e85f-b641-4d6f-9476-54a5cbd73c65)
 
 ### Blackboard 
 Displays the blackboard of the selected actor.
@@ -111,14 +111,15 @@ Can be used to activate and deactivate log categories
 - The log categories are used to filter both the output log and the debug draw.
 
 ### Metric
-Gather various values sent by the selected actor and compte their rate per second. This is typically useful to compute the damage dealt or received per second.
+Gather various values sent by the selected actor and compte their rate per second. This is typically used to compute the damage dealt or received per second.
+
+![Metric](https://github.com/arnaud-jamin/Cog/assets/13844285/64d3cb7c-8731-4897-9ef9-b0868148ebe2)
 - The following code shows how to add a metric:
 ```cpp
 // Adding a metric
-FCogDebugMetric::AddMetric(this, "Damage Dealt", Params.MitigatedDamage, Params.UnmitigatedDamage, false);
+FCogDebugMetric::AddMetric(this, "Damage Dealt", MitigatedDamage, UnmitigatedDamage, false);
 ```
 
-![Metric](https://github.com/arnaud-jamin/Cog/assets/13844285/64d3cb7c-8731-4897-9ef9-b0868148ebe2)
 
 ### Net Emulation
 Used to configure the network emulation
@@ -242,6 +243,7 @@ You must have Unreal 5.1 or greater and Visual Studio to launch the sample
 The Cog repository has the following structure:
 - `CogSample` - A Sample that demonstrate various Cog functionalities. The project was saved in Unreal 5.1
 - `Plugins/CogAbility` - ImGui windows for the Gameplay Ability System (Abilities, Effects, Tags, ...)
+-  `Plugins/CogAI` - ImGui windows for AI (Behavior Tree, Blackboard)
 - `Plugins/CogInput` - ImGui windows for the Enhanced Input library (Input action, Gamepad)
 - `Plugins/Cog` - The main Cog plugin which contains the following modules
   - `CogEngine` - ImGui windows for the core unreal engine functionalities (Log, Stats, Time, Collisions, Skeleton, ...)
@@ -265,6 +267,7 @@ public class CogSample : ModuleRules
         PublicDependencyModuleNames.AddRange(new string[] 
         { 
             "CogCommon",  // The CogCommon is required on all target configuration
+            "AIModule",
             "Core",
             "CoreUObject", 
             "Engine", 

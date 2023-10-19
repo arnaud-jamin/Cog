@@ -2,6 +2,7 @@
 
 #include "Camera/CameraComponent.h"
 #include "CogCommon.h"
+#include "CogSampleAbilitySystemComponent.h"
 #include "CogSampleAttributeSet_Health.h"
 #include "CogSampleAttributeSet_Misc.h"
 #include "CogSampleCharacterMovementComponent.h"
@@ -64,9 +65,9 @@ ACogSampleCharacter::ACogSampleCharacter(const FObjectInitializer& ObjectInitial
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-    AbilitySystem = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystem"));
+    AbilitySystem = CreateDefaultSubobject<UCogSampleAbilitySystemComponent>(TEXT("AbilitySystem"));
     AbilitySystem->SetIsReplicated(true);
-    AbilitySystem->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+    AbilitySystem->SetReplicationMode(EGameplayEffectReplicationMode::Full);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -108,6 +109,7 @@ void ACogSampleCharacter::BeginPlay()
 	}
 
     TryFinishInitialize();
+    RefreshServerAnimTickOption();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -243,22 +245,31 @@ void ACogSampleCharacter::InitializeAbilitySystem()
             AbilitySystem->GiveAbility(Spec);
         }
 
-        int32 Index = 0;
-        for (FActiveAbilityInfo& AbilityInfo : ActiveAbilities)
+        for (int32 i = 0; i < ActiveAbilities.Num(); ++i)
         {
+            const FActiveAbilityInfo& AbilityInfo = ActiveAbilities[i];
             const FGameplayAbilitySpec Spec(AbilityInfo.Ability, 1, INDEX_NONE, this);
-            FGameplayAbilitySpecHandle Handle = AbilitySystem->GiveAbility(Spec);
+            const FGameplayAbilitySpecHandle Handle = AbilitySystem->GiveAbility(Spec);
             ActiveAbilityHandles.Add(Handle);
 
-            if (FGameplayAbilitySpec* AddedSpec = AbilitySystem->FindAbilitySpecFromHandle(Handle))
+            const FGameplayAbilitySpec* AddedSpec = AbilitySystem->FindAbilitySpecFromHandle(Handle);
+            if (AddedSpec == nullptr)
             {
-                if (UCogSampleGameplayAbility* Ab = Cast<UCogSampleGameplayAbility>(AddedSpec->GetPrimaryInstance()))
-                {
-                    Ab->SetCooldownTag(UCogSampleFunctionLibrary_Tag::ActiveAbilityCooldownTags[Index]);
-                }
+                continue;
             }
 
-            Index++;
+            UCogSampleGameplayAbility* Ability = Cast<UCogSampleGameplayAbility>(AddedSpec->GetPrimaryInstance());
+            if (Ability == nullptr)
+            {
+                continue;
+            }
+            
+            if (UCogSampleFunctionLibrary_Tag::ActiveAbilityCooldownTags.IsValidIndex(i) == false)
+            {
+                continue;
+            }
+            
+            Ability->SetCooldownTag(UCogSampleFunctionLibrary_Tag::ActiveAbilityCooldownTags[i]);
         }
 
         UpdateActiveAbilitySlots();
@@ -639,6 +650,29 @@ void ACogSampleCharacter::OnScaleAttributeChanged(const FOnAttributeChangeData& 
 
     MARK_PROPERTY_DIRTY_FROM_NAME(ACogSampleCharacter, Scale, this);
     OnRep_Scale();
+
+    RefreshServerAnimTickOption();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSampleCharacter::RefreshServerAnimTickOption()
+{
+    const UCapsuleComponent* Capsule = GetCapsuleComponent();
+    if (Capsule == nullptr)
+    {
+        return;
+    }
+
+    USkeletalMeshComponent* SkeletalMesh = GetMesh();
+    if (SkeletalMesh == nullptr)
+    {
+        return;
+    }
+
+    const float ScaledHalfHeight = Capsule->GetScaledCapsuleHalfHeight();
+    const bool IsBigEnoughToSimulateBonesOnServer = ScaledHalfHeight > 200;
+    SkeletalMesh->VisibilityBasedAnimTickOption = IsBigEnoughToSimulateBonesOnServer ? EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones
+                                                                                     : EVisibilityBasedAnimTickOption::OnlyTickMontagesWhenNotRendered;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -765,3 +799,24 @@ void ACogSampleCharacter::GetTargetCapsules(TArray<const UCapsuleComponent*>& Ca
     Capsules.Add(GetCapsuleComponent());
 }
 
+//--------------------------------------------------------------------------------------------------------------------------
+bool ACogSampleCharacter::GetMontage(FName MontageName, UAnimMontage*& Montage, bool bPrintWarning) const
+{
+    Montage = nullptr;
+
+    if (MontageTable == nullptr)
+    {
+        return false;
+    }
+
+    static FString ContextString(TEXT("GetMontage"));
+    FCogSampleMontageTableRow* Row = MontageTable->FindRow<FCogSampleMontageTableRow>(MontageName, ContextString, bPrintWarning);
+
+    if (Row == nullptr)
+    {
+        return false;
+    }
+
+    Montage = Row->Montage;
+    return Montage != nullptr;
+}

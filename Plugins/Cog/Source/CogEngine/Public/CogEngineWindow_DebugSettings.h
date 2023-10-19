@@ -28,7 +28,7 @@ protected:
 private:
 
     UPROPERTY(Config)
-    bool FilterBySelection = true;
+    bool bIsFilteringBySelection = true;
 
     UPROPERTY(Config)
     bool Persistent = false;

@@ -8,6 +8,7 @@
 #include "CogCommonDebugFilteredActorInterface.h"
 #include "CogSampleDamageEvent.h"
 #include "CogSampleDefines.h"
+#include "CogSampleDamageableInterface.h"
 #include "CogSampleTargetableInterface.h"
 #include "CogSampleTeamInterface.h"
 #include "GameFramework/Character.h"
@@ -16,9 +17,9 @@
 #include "InputActionValue.h"
 #include "CogSampleCharacter.generated.h"
 
-class UAbilitySystemComponent;
-class UCogAbilitySystemComponent;
 class UCameraComponent;
+class UCogAbilitySystemComponent;
+class UCogSampleAbilitySystemComponent;
 class UGameplayAbility;
 class UGameplayEffect;
 class UInputAction;
@@ -59,6 +60,19 @@ public:
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
+USTRUCT(BlueprintType)
+struct FCogSampleMontageTableRow : public FTableRowBase
+{
+    GENERATED_BODY()
+
+public:
+    FCogSampleMontageTableRow() {}
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly)
+    UAnimMontage* Montage = nullptr;
+};
+
+//--------------------------------------------------------------------------------------------------------------------------
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCogSampleCharacterEventDelegate, ACogSampleCharacter*, Character);
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -69,6 +83,7 @@ class ACogSampleCharacter : public ACharacter
     , public ICogCommonAllegianceActorInterface
     , public ICogSampleTeamInterface
     , public ICogSampleTargetableInterface
+    , public ICogSampleDamageableInterface
 {
 	GENERATED_BODY()
 
@@ -117,6 +132,14 @@ public:
     virtual FVector GetTargetLocation() const override;
 
     virtual void GetTargetCapsules(TArray<const UCapsuleComponent*>& Capsules) const override;
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // ICogSampleDamageableInterface overrides
+    //----------------------------------------------------------------------------------------------------------------------
+
+    virtual void HandleDamageReceived(const FCogSampleDamageEventParams& Params) override;
+
+    virtual void HandleDamageDealt(const FCogSampleDamageEventParams& Params) override;
 
     //----------------------------------------------------------------------------------------------------------------------
     // Team
@@ -182,16 +205,12 @@ public:
     UFUNCTION(BlueprintPure)
     bool IsInitialized() const { return bIsInitialized; }
 
-    void HandleDamageReceived(const FCogSampleDamageEventParams& Params);
-
-    void HandleDamageDealt(const FCogSampleDamageEventParams& Params);
-
     void OnKilled(AActor* InInstigator, AActor* InCauser, const FGameplayEffectSpec& InEffectSpec, float InMagnitude);
 
     void OnRevived(AActor* InInstigator, AActor* InCauser, const FGameplayEffectSpec& InEffectSpec, float InMagnitude);
 
     UPROPERTY(BlueprintReadOnly, Category = Ability, meta = (AllowPrivateAccess = "true"))
-    UAbilitySystemComponent* AbilitySystem = nullptr;
+    UCogSampleAbilitySystemComponent* AbilitySystem = nullptr;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Ability)
     TArray<TSubclassOf<UAttributeSet>> AttributeSets;
@@ -229,9 +248,20 @@ public:
     UFUNCTION(BlueprintCallable)
     int32 ApplyRootMotion(const FCogSampleRootMotionParams& Params);
 
+    //----------------------------------------------------------------------------------------------------------------------
+    // Montage
+    //----------------------------------------------------------------------------------------------------------------------
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation", meta = (RowType = "/Script/CogSample.FCogSampleMontageTableRow"))
+    UDataTable* MontageTable = nullptr;
+
+    UFUNCTION(BlueprintCallable, BlueprintPure=false)
+    bool GetMontage(FName MontageName, UAnimMontage*& Montage, bool bPrintWarning) const;
+
 private:
-    
     friend class ACogSamplePlayerController;
+
+    void RefreshServerAnimTickOption();
+
 
     UPROPERTY()
     AController* InitialController = nullptr;
@@ -271,8 +301,6 @@ private:
     void OnGameplayEffectAdded(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& GameplayEffectSpec, FActiveGameplayEffectHandle Handle);
 
     void OnGameplayEffectRemoved(const FActiveGameplayEffect& RemovedGameplayEffect);
-
-    void OnCooldownEffectUpdated(const FActiveGameplayEffect& GameplayEffect, bool bIsEffectRemoved);
 
     void OnGhostTagNewOrRemoved(const FGameplayTag InTag, int32 NewCount);
 
