@@ -1,26 +1,29 @@
 {
-	"FileVersion": 3,
-	"EngineAssociation": "{3A102A73-4E1B-A4EE-9D23-BC868A1B3015}",
-	"Category": "",
-	"Description": "",
-	"Modules": [
-		{
-			"Name": "CogSample",
-			"Type": "Runtime",
-			"LoadingPhase": "Default"
-		}
-	],
-	"Plugins": [
-		{
-			"Name": "GameplayAbilities",
-			"Enabled": true
-		},
-		{
-			"Name": "ModelingToolsEditorMode",
-			"Enabled": true,
-			"TargetAllowList": [
-				"Editor"
-			]
-		}
-	]
+    "FileVersion": 3,
+    "EngineAssociation": "5.1",
+    "Category": "",
+    "Description": "",
+    "Modules":
+    [
+        {
+            "Name": "CogSample",
+            "Type": "Runtime",
+            "LoadingPhase": "Default"
+        }
+    ],
+    "Plugins":
+    [
+        {
+            "Name": "GameplayAbilities",
+            "Enabled": true
+        },
+        {
+            "Name": "ModelingToolsEditorMode",
+            "Enabled": true,
+            "TargetAllowList":
+            [
+                "Editor"
+            ]
+        }
+    ]
 }
