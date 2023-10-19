@@ -5,10 +5,11 @@
 #include "imgui.h"
 #include "CogWindowManager.generated.h"
 
+class IConsoleObject;
+class SCogImguiWidget;
 class UCogWindow;
 class UCogWindow_Settings;
 class UWorld;
-class SCogImguiWidget;
 struct ImGuiSettingsHandler;
 struct ImGuiTextBuffer;
 
@@ -48,9 +49,9 @@ public:
 
     void ResetLayout();
 
-    void LoadLayout(int LayoutIndex);
+    void LoadLayout(int32 LayoutIndex);
 
-    void SaveLayout(int LayoutIndex);
+    void SaveLayout(int32 LayoutIndex);
 
     bool GetHideAllWindows() const { return bHideAllWindows; }
 
@@ -147,4 +148,6 @@ protected:
     bool bHideAllWindows = false;
 
     bool bRefreshDPIScale = false;
+
+    TArray<IConsoleObject*> ConsoleCommands;
 };

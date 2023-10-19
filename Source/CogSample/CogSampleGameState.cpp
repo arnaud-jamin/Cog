@@ -25,13 +25,14 @@
 #include "CogEngineDataAsset.h"
 #include "CogEngineModule.h"
 #include "CogEngineWindow_Collisions.h"
+#include "CogEngineWindow_CommandBindings.h"
 #include "CogEngineWindow_DebugSettings.h"
 #include "CogEngineWindow_ImGui.h"
 #include "CogEngineWindow_Inspector.h"
 #include "CogEngineWindow_LogCategories.h"
+#include "CogEngineWindow_Metrics.h"
 #include "CogEngineWindow_NetEmulation.h"
 #include "CogEngineWindow_OutputLog.h"
-#include "CogEngineWindow_Metrics.h"
 #include "CogEngineWindow_Plots.h"
 #include "CogEngineWindow_Scalability.h"
 #include "CogEngineWindow_Selection.h"
@@ -43,6 +44,7 @@
 #include "CogInputDataAsset.h"
 #include "CogInputWindow_Actions.h"
 #include "CogInputWindow_Gamepad.h"
+#include "CogSampleLogCategories.h"
 #include "CogWindowManager.h"
 
 #include "GameFramework/GameUserSettings.h"
@@ -94,6 +96,7 @@ void ACogSampleGameState::EndPlay(const EEndPlayReason::Type EndPlayReason)
     Super::EndPlay(EndPlayReason);
 
 #if ENABLE_COG
+    
     if (CogWindowManager != nullptr)
     {
         CogWindowManager->Shutdown();
@@ -123,9 +126,6 @@ void ACogSampleGameState::Tick(float DeltaSeconds)
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleGameState::InitializeCog()
 {
-    FCogImguiModule::Get().SetToggleInputKey(FCogImGuiKeyInfo(EKeys::Tab));
-    RegisterCommand(TEXT("Cog.ToggleInput"), TEXT(""), FConsoleCommandWithArgsDelegate::CreateUObject(this, &ACogSampleGameState::CogToggleInput));
-
     CogWindowManager = NewObject<UCogWindowManager>(this);
     CogWindowManagerRef = CogWindowManager;
 
@@ -136,6 +136,8 @@ void ACogSampleGameState::InitializeCog()
 
     UCogEngineWindow_Collisions* CollisionsWindow = CogWindowManager->CreateWindow<UCogEngineWindow_Collisions>("Engine.Collision");
     CollisionsWindow->SetAsset(EngineAsset);
+
+    CogWindowManager->CreateWindow<UCogEngineWindow_CommandBindings>("Engine.Command Bindings");
 
     CogWindowManager->CreateWindow<UCogEngineWindow_DebugSettings>("Engine.Debug Settings");
 
@@ -150,9 +152,6 @@ void ACogSampleGameState::InitializeCog()
         }
     });
 
-    
-
-
     CogWindowManager->CreateWindow<UCogEngineWindow_LogCategories>("Engine.Log Categories");
 
     CogWindowManager->CreateWindow<UCogEngineWindow_NetEmulation>("Engine.Net Emulation");
@@ -163,7 +162,7 @@ void ACogSampleGameState::InitializeCog()
 
     CogWindowManager->CreateWindow<UCogEngineWindow_Plots>("Engine.Plots");
 
-    UCogEngineWindow_Selection* SelectionWindow = CogWindowManager->CreateWindow<UCogEngineWindow_Selection>("Engine.Selection");
+    SelectionWindow = CogWindowManager->CreateWindow<UCogEngineWindow_Selection>("Engine.Selection");
     SelectionWindow->SetActorClasses({ ACharacter::StaticClass(), AActor::StaticClass(), AGameModeBase::StaticClass(), AGameStateBase::StaticClass() });
     SelectionWindow->SetTraceType(UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Pawn));
 
@@ -223,25 +222,8 @@ void ACogSampleGameState::InitializeCog()
     //---------------------------------------
     // Main Menu Widget
     //---------------------------------------
-    CogWindowManager->AddMainMenuWidget(SelectionWindow);
+    CogWindowManager->AddMainMenuWidget(SelectionWindow.Get());
     CogWindowManager->AddMainMenuWidget(StatsWindow);
 }
-
-//--------------------------------------------------------------------------------------------------------------------------
-void ACogSampleGameState::RegisterCommand(const TCHAR* Name, const TCHAR* Help, const FConsoleCommandWithArgsDelegate& Command)
-{
-    IConsoleManager& ConsoleManager = IConsoleManager::Get();
-    if (!ConsoleManager.FindConsoleObject(Name))
-    {
-        ConsoleManager.RegisterConsoleCommand(Name, Help, Command, ECVF_Cheat);
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void ACogSampleGameState::CogToggleInput(const TArray<FString>& Args)
-{
-    FCogImguiModule::Get().ToggleEnableInput();
-}
-
 
 #endif //ENABLE_COG

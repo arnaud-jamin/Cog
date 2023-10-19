@@ -121,17 +121,6 @@ void SCogImguiWidget::TickFocus()
 {
     FCogImguiModule& Module = FCogImguiModule::Get();
 
-    if (UWorld* World = GameViewport->GetWorld())
-    {
-        if (APlayerController* Controller = FCogImguiInputHelper::GetFirstLocalPlayerController(*World))
-        {
-            if (FCogImguiInputHelper::WasKeyInfoJustPressed(*Controller, Module.GetToggleInputKey()))
-            {
-                Module.ToggleEnableInput();
-            }
-        }
-    }
-
     const bool bShouldEnableInput = Module.GetEnableInput();
     if (bEnableInput != bShouldEnableInput)
     {
@@ -264,18 +253,19 @@ FVector2D SCogImguiWidget::ComputeDesiredSize(float Scale) const
 //--------------------------------------------------------------------------------------------------------------------------
 ULocalPlayer* SCogImguiWidget::GetLocalPlayer() const
 {
-    if (GameViewport.IsValid())
-    {
-        if (UWorld* World = GameViewport->GetWorld())
-        {
-            if (ULocalPlayer* LocalPlayer = World->GetFirstLocalPlayerFromController())
-            {
-                return World->GetFirstLocalPlayerFromController();
-            }
-        }
+    if (GameViewport.IsValid() == false)
+    {  
+        return nullptr;
     }
-
-    return nullptr;
+     
+    UWorld* World = GameViewport->GetWorld();
+    if (World == nullptr)
+    {
+        return nullptr;
+    }
+    
+    ULocalPlayer* LocalPlayer = World->GetFirstLocalPlayerFromController();
+    return LocalPlayer;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -358,7 +348,7 @@ FReply SCogImguiWidget::OnKeyChar(const FGeometry& MyGeometry, const FCharacterE
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiWidget::OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent)
 {
-    if (FCogImguiInputHelper::IsKeyEventHandled(KeyEvent) == false)
+    if (FCogImguiInputHelper::IsKeyEventHandled(GameViewport->GetWorld(), KeyEvent) == false)
     {
         return FReply::Unhandled();
     }
@@ -377,7 +367,7 @@ FReply SCogImguiWidget::OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& 
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiWidget::OnKeyUp(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent)
 {
-    if (FCogImguiInputHelper::IsKeyEventHandled(KeyEvent) == false)
+    if (FCogImguiInputHelper::IsKeyEventHandled(GameViewport->GetWorld(), KeyEvent) == false)
     {
         return FReply::Unhandled();
     }

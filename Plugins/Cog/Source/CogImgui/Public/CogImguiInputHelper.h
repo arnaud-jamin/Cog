@@ -5,6 +5,7 @@
 #include "imgui.h"
 
 struct FCogImGuiKeyInfo;
+struct FKeyBind;
 
 class COGIMGUI_API FCogImguiInputHelper
 {
@@ -12,7 +13,7 @@ public:
 
     static APlayerController* GetFirstLocalPlayerController(UWorld& World);
 
-    static bool IsKeyEventHandled(const FKeyEvent& KeyEvent);
+    static bool IsKeyEventHandled(UWorld* World, const FKeyEvent& KeyEvent);
 
     static bool WasKeyInfoJustPressed(APlayerController& PlayerController, const FCogImGuiKeyInfo& KeyInfo);
 
@@ -20,9 +21,17 @@ public:
 
     static bool IsKeyEventMatchingKeyInfo(const FKeyEvent& KeyEvent, const FCogImGuiKeyInfo& InputChord);
 
+    static bool IsKeyEventMatchingKeyBind(const FKeyEvent& KeyEvent, const FKeyBind& KeyBind);
+
+    static ECheckBoxState MakeCheckBoxState(uint8 RequireValue, uint8 IgnoreValue);
+
+    static void KeyBindToKeyInfo(const FKeyBind& KeyBind, FCogImGuiKeyInfo& KeyInfo);
+
+    static void KeyInfoToKeyBind(const FCogImGuiKeyInfo& KeyInfo, FKeyBind& KeyBind);
+
     static bool IsConsoleEvent(const FKeyEvent& KeyEvent);
 
-    static bool IsImGuiToggleInputEvent(const FKeyEvent& KeyEvent);
+    static bool IsKeyBoundToCommand(UWorld* World, const FKeyEvent& KeyEvent);
 
     static bool IsStopPlaySessionEvent(const FKeyEvent& KeyEvent);
 

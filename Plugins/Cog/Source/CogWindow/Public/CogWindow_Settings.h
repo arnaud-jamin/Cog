@@ -5,6 +5,7 @@
 #include "CogImGuiKeyInfo.h"
 #include "CogWindow_Settings.generated.h"
 
+
 UCLASS(Config = Cog)
 class COGWINDOW_API UCogWindow_Settings : public UCogWindow
 {
@@ -22,6 +23,4 @@ protected:
 
 private:
 
-    UPROPERTY(Config)
-    FCogImGuiKeyInfo ToggleInputKey; 
 };

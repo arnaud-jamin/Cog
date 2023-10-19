@@ -6,6 +6,7 @@
 #include "CogSampleGameState.generated.h"
 
 class UCogWindowManager;
+class UCogEngineWindow_Selection;
 
 UCLASS()
 class ACogSampleGameState : public AGameStateBase
@@ -32,11 +33,12 @@ private:
 
     void InitializeCog();
 
-    void RegisterCommand(const TCHAR* Name, const TCHAR* Help, const FConsoleCommandWithArgsDelegate& Command);
+    void RegisterCommands();
 
-    void CogToggleInput(const TArray<FString>& Args);
+    void UnregisterCommands();
 
     TObjectPtr<UCogWindowManager> CogWindowManager = nullptr;
+    TObjectPtr<UCogEngineWindow_Selection> SelectionWindow = nullptr;
 
 #endif //ENABLE_COG
 };

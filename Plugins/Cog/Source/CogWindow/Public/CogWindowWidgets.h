@@ -6,6 +6,7 @@
 
 class UEnum;
 class FEnumProperty;
+struct FCogImGuiKeyInfo;
 
 class COGWINDOW_API FCogWindowWidgets
 {
@@ -50,6 +51,18 @@ public:
     static bool ComboboxEnum(const char* Label, UObject* Object, const char* FieldName, uint8* PointerToEnumValue);
     
     static bool ComboboxEnum(const char* Label, const FEnumProperty* EnumProperty, uint8* PointerToEnumValue);
+
+    static bool CheckBoxState(const char* Label, ECheckBoxState& State);
+
+    static bool InputKey(const char* Label, FCogImGuiKeyInfo& KeyInfo);
+
+    static bool InputKey(FCogImGuiKeyInfo& KeyInfo);
+
+    static bool KeyBind(FKeyBind& KeyBind);
+
+    static bool ButtonWithTooltip(const char* Text, const char* Tooltip);
+
+    static bool DeleteArrayItemButton();
 
 };
 

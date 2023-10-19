@@ -7,13 +7,15 @@ public class CogEngine : ModuleRules
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		
 		PublicIncludePaths.AddRange(
-			new string[] {
+			new string[] 
+			{
 			}
 			);
 				
 		
 		PrivateIncludePaths.AddRange(
-			new string[] {
+			new string[] 
+			{
 			}
 			);
 			
@@ -21,11 +23,6 @@ public class CogEngine : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core",
-                "CogCommon",
-                "CogImgui",
-                "CogDebug",
-                "CogWindow",
             }
             );
 			
@@ -33,11 +30,17 @@ public class CogEngine : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"CoreUObject",
+				"CogCommon",
+                "CogDebug",
+                "CogImgui",
+                "CogWindow",
+				"Core",
+                "CoreUObject",
 				"Engine",
+                "InputCore",
+                "NetCore",
 				"Slate",
 				"SlateCore",
-                "NetCore",
             }
 			);
 		

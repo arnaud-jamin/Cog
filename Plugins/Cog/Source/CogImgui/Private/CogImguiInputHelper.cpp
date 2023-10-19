@@ -31,29 +31,59 @@ APlayerController* FCogImguiInputHelper::GetFirstLocalPlayerController(UWorld& W
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogImguiInputHelper::IsKeyEventHandled(const FKeyEvent& KeyEvent)
+bool FCogImguiInputHelper::IsKeyEventHandled(UWorld* World, const FKeyEvent& KeyEvent)
 {
+    //------------------------------------------------------------------------------------------------
+    // Do not handle the input if imgui input is disabled
+    //------------------------------------------------------------------------------------------------
     if (FCogImguiModule::Get().GetEnableInput() == false)
     {
         return false;
     }
 
+    //------------------------------------------------------------------------------------------------
+    // We want the user to control the character with its gamepad even when imgui has the input.
+    //------------------------------------------------------------------------------------------------
     if (KeyEvent.GetKey().IsGamepadKey())
     {
         return false;
     }
     
+    //------------------------------------------------------------------------------------------------
+    // We want the user to be able to open the console command when imgui has the input.
+    //------------------------------------------------------------------------------------------------
     if (IsConsoleEvent(KeyEvent))
     {
         return false;
     }
 
+    //------------------------------------------------------------------------------------------------
+    // We want the user to be able to stop its session by pressing Esc, even when imgui has the input
+    //------------------------------------------------------------------------------------------------
     if (IsStopPlaySessionEvent(KeyEvent))
     {
         return false;
     }
 
-    if (IsImGuiToggleInputEvent(KeyEvent))
+    //------------------------------------------------------------------------------------------------
+    // If we receive a key modifier, we want to let others systems know about it. 
+    // Otherwise, the console command bindings that are bound to something like CTRL+Key 
+    // won't work, even if we let the KeyEvent pass with 'IsKeyBoundToCommand' below. 
+    // It seems the command binings system needs to know about the modifier key press event itself, 
+    // and not the Key+Modifier event.
+    // We update ImGui modifier keys in SCogImguiWidget::TickKeyModifiers().
+    //------------------------------------------------------------------------------------------------
+    if (KeyEvent.GetKey().IsModifierKey())
+    {
+        return false;
+    }
+
+    //------------------------------------------------------------------------------------------------
+    // We want the user to be able to use command bingings, even when imgui has the input. 
+    // We actually use a console command to toggle the input from the game to imgui, and other
+    // windows command such as LoadLayout.
+    //------------------------------------------------------------------------------------------------
+    if (IsKeyBoundToCommand(World, KeyEvent))
     {
         return false;
     }
@@ -81,6 +111,73 @@ bool FCogImguiInputHelper::IsKeyEventMatchingKeyInfo(const FKeyEvent& KeyEvent, 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+#define BREAK_CHECKBOX_STATE(CheckBoxState, RequireValue, IgnoreValue)  \
+{                                                                       \
+    if (CheckBoxState == ECheckBoxState::Checked)                       \
+    {                                                                   \
+        RequireValue = true;                                            \
+        IgnoreValue = false;                                            \
+    }                                                                   \
+    else if (CheckBoxState == ECheckBoxState::Unchecked)                \
+    {                                                                   \
+        RequireValue = false;                                           \
+        IgnoreValue = true;                                             \
+    }                                                                   \
+    else if (CheckBoxState == ECheckBoxState::Undetermined)             \
+    {                                                                   \
+        RequireValue = false;                                           \
+        IgnoreValue = false;                                            \
+    }                                                                   \
+}                                                                       \
+
+
+//--------------------------------------------------------------------------------------------------------------------------
+ECheckBoxState FCogImguiInputHelper::MakeCheckBoxState(uint8 RequireValue, uint8 IgnoreValue)
+{
+    if (RequireValue)
+    {
+        return ECheckBoxState::Checked;
+    }
+
+    if (IgnoreValue)
+    {
+        return ECheckBoxState::Unchecked;
+    }
+
+    return ECheckBoxState::Undetermined;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogImguiInputHelper::KeyBindToKeyInfo(const FKeyBind& KeyBind, FCogImGuiKeyInfo& KeyInfo)
+{
+    KeyInfo.Key = KeyBind.Key;
+    KeyInfo.Shift = MakeCheckBoxState(KeyBind.Shift, KeyBind.bIgnoreShift);
+    KeyInfo.Ctrl = MakeCheckBoxState(KeyBind.Control, KeyBind.bIgnoreCtrl);
+    KeyInfo.Alt = MakeCheckBoxState(KeyBind.Alt, KeyBind.bIgnoreAlt);
+    KeyInfo.Alt = MakeCheckBoxState(KeyBind.Cmd, KeyBind.bIgnoreCmd);
+}
+
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogImguiInputHelper::KeyInfoToKeyBind(const FCogImGuiKeyInfo& KeyInfo, FKeyBind& KeyBind)
+{
+    KeyBind.Key = KeyInfo.Key;
+    BREAK_CHECKBOX_STATE(KeyInfo.Shift, KeyBind.Shift, KeyBind.bIgnoreShift);
+    BREAK_CHECKBOX_STATE(KeyInfo.Ctrl, KeyBind.Control, KeyBind.bIgnoreCtrl);
+    BREAK_CHECKBOX_STATE(KeyInfo.Alt, KeyBind.Alt, KeyBind.bIgnoreAlt);
+    BREAK_CHECKBOX_STATE(KeyInfo.Cmd, KeyBind.Cmd, KeyBind.bIgnoreCmd);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogImguiInputHelper::IsKeyEventMatchingKeyBind(const FKeyEvent& KeyEvent, const FKeyBind& KeyBind)
+{
+    FCogImGuiKeyInfo KeyInfo;
+    KeyBindToKeyInfo(KeyBind, KeyInfo);
+    const bool Result = IsKeyEventMatchingKeyInfo(KeyEvent, KeyInfo);
+    return Result;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 bool FCogImguiInputHelper::WasKeyInfoJustPressed(APlayerController& PlayerController, const FCogImGuiKeyInfo& KeyInfo)
 {
     if (PlayerController.WasInputKeyJustPressed(KeyInfo.Key))
@@ -98,6 +195,38 @@ bool FCogImguiInputHelper::WasKeyInfoJustPressed(APlayerController& PlayerContro
 
     return false;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogImguiInputHelper::IsKeyBoundToCommand(UWorld* World, const FKeyEvent& KeyEvent)
+{
+    if (World == nullptr)
+    {
+        return false;
+    }
+
+    APlayerController* Controller = GetFirstLocalPlayerController(*World);
+    if (Controller == nullptr)
+    {
+        return false;
+    }
+    
+    UPlayerInput* PlayerInput = Controller->PlayerInput;
+    if (PlayerInput == nullptr)
+    {
+        return false;
+    }
+
+    for (const FKeyBind& KeyBind : PlayerInput->DebugExecBindings)
+    {
+        if (IsKeyEventMatchingKeyBind(KeyEvent, KeyBind))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogImguiInputHelper::IsConsoleEvent(const FKeyEvent& KeyEvent)
@@ -125,13 +254,6 @@ bool FCogImguiInputHelper::IsStopPlaySessionEvent(const FKeyEvent& KeyEvent)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogImguiInputHelper::IsImGuiToggleInputEvent(const FKeyEvent& KeyEvent)
-{
-    const bool Result = IsKeyEventMatchingKeyInfo(KeyEvent, FCogImguiModule::Get().GetToggleInputKey());
-    return Result;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 ImGuiKey FCogImguiInputHelper::KeyEventToImGuiKey(const FKeyEvent& KeyEvent)
 {
     if (KeyMap.IsEmpty())
@@ -150,11 +272,11 @@ ImGuiKey FCogImguiInputHelper::KeyEventToImGuiKey(const FKeyEvent& KeyEvent)
 //--------------------------------------------------------------------------------------------------------------------------
 uint32 FCogImguiInputHelper::MouseButtonToImGuiMouseButton(const FKey& MouseButton)
 {
-    if (MouseButton == EKeys::LeftMouseButton) { return 0; }
-    if (MouseButton == EKeys::RightMouseButton) { return 1; }
-    if (MouseButton == EKeys::MiddleMouseButton) { return 2; }
-    if (MouseButton == EKeys::ThumbMouseButton) { return 3; }
-    if (MouseButton == EKeys::ThumbMouseButton2) { return 4; }
+    if (MouseButton == EKeys::LeftMouseButton)      { return 0; }
+    if (MouseButton == EKeys::RightMouseButton)     { return 1; }
+    if (MouseButton == EKeys::MiddleMouseButton)    { return 2; }
+    if (MouseButton == EKeys::ThumbMouseButton)     { return 3; }
+    if (MouseButton == EKeys::ThumbMouseButton2)    { return 4; }
 
     return -1;
 }

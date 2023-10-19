@@ -5,6 +5,8 @@
 #include "CogWindow.h"
 #include "CogEngineWindow_Selection.generated.h"
 
+class IConsoleObject;
+
 UCLASS(Config = Cog)
 class COGENGINE_API UCogEngineWindow_Selection : public UCogWindow
 {
@@ -24,9 +26,15 @@ public:
 
     void SetTraceType(ETraceTypeQuery Value) { TraceType = Value; }
 
-    void TryReapplySelection() const;
+    virtual void ActivateSelectionMode();
+
+    virtual void DeactivateSelectionMode();
+
+    virtual void ToggleSelectionMode();
 
 protected:
+
+    virtual void TryReapplySelection() const;
 
     virtual void ResetConfig() override;
 
@@ -46,8 +54,6 @@ protected:
 
     virtual void DrawActorContextMenu(AActor* Actor);
 
-    virtual void ActivateSelectionMode();
-
     virtual void HackWaitInputRelease();
 
     virtual void SetGlobalSelection(AActor* Value) const;
@@ -58,18 +64,21 @@ private:
 
     TSubclassOf<AActor> GetSelectedActorClass() const;
 
+    FString GetActorName(const AActor* Actor) const;
+
+    FString GetActorName(const AActor& Actor) const;
+
     void TickSelectionMode();
 
-    void ToggleSelectionMode();
-
-    void DeactivateSelectionMode();
-
-    void DrawActorFrame(const AActor* Actor);
+    void DrawActorFrame(const AActor& Actor);
 
     bool ComputeBoundingBoxScreenPosition(const APlayerController* PlayerController, const FVector& Origin, const FVector& Extent, FVector2D& Min, FVector2D& Max);
 
     UPROPERTY(Config)
     bool bReapplySelection = true;
+
+    UPROPERTY(Config)
+    bool bDisplayActorLabel = true;
 
     UPROPERTY(Config)
     FString SelectionName;
@@ -88,4 +97,6 @@ private:
     TArray<TSubclassOf<AActor>> ActorClasses;
 
     ETraceTypeQuery TraceType = TraceTypeQuery1;
+
+    TArray<IConsoleObject*> ConsoleCommands;
 };

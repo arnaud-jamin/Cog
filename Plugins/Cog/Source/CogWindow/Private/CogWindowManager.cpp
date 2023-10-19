@@ -3,10 +3,11 @@
 #include "CogDebugDrawImGui.h"
 #include "CogImguiModule.h"
 #include "CogImguiWidget.h"
-#include "CogWindow_Spacing.h"
 #include "CogWindow_Settings.h"
+#include "CogWindow_Spacing.h"
 #include "CogWindowWidgets.h"
 #include "Engine/Engine.h"
+#include "HAL/IConsoleManager.h"
 #include "imgui_internal.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -36,6 +37,25 @@ void UCogWindowManager::InitializeInternal()
     SpaceWindows.Add(CreateWindow<UCogWindow_Spacing>("Spacing 4", false));
 
     SettingsWindow = CreateWindow<UCogWindow_Settings>("Window.Settings", false);
+
+    ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
+        TEXT("Cog.ToggleInput"), 
+        TEXT("Toggle the input focus between the Game and ImGui"),
+        FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& Args) { FCogImguiModule::Get().ToggleEnableInput(); }), 
+        ECVF_Cheat));
+
+    ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
+        TEXT("Cog.LoadLayout"), 
+        TEXT("Load the layout. Cog.LoadLayout <Index>"),
+        FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { if (Args.Num() > 0) { LoadLayout(FCString::Atoi(*Args[0])); }}), 
+        ECVF_Cheat));
+
+    ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
+        TEXT("Cog.SaveLayout"), 
+        TEXT("Save the layout. Cog.SaveLayout <Index>"),
+        FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { if (Args.Num() > 0) { SaveLayout(FCString::Atoi(*Args[0])); }}), 
+        ECVF_Cheat));
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -45,6 +65,11 @@ void UCogWindowManager::Shutdown()
     {
         Window->PreSaveConfig();
         Window->SaveConfig();
+    }
+
+    for (IConsoleObject* ConsoleCommand : ConsoleCommands)
+    {
+        IConsoleManager::Get().UnregisterConsoleObject(ConsoleCommand);
     }
 
     SaveConfig();
@@ -190,7 +215,7 @@ void UCogWindowManager::CloseAllWindows()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::LoadLayout(int LayoutIndex)
+void UCogWindowManager::LoadLayout(int32 LayoutIndex)
 {
     for (UCogWindow* Window : Windows)
     {
@@ -201,7 +226,7 @@ void UCogWindowManager::LoadLayout(int LayoutIndex)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::SaveLayout(int LayoutIndex)
+void UCogWindowManager::SaveLayout(int32 LayoutIndex)
 {
     FString Filename = *FCogImguiHelper::GetIniFilePath(FString::Printf(TEXT("imgui_layout_%d"), LayoutIndex));
     ImGui::SaveIniSettingsToDisk(TCHAR_TO_ANSI(*Filename));

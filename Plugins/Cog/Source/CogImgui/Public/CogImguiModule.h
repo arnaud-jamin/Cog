@@ -35,10 +35,6 @@ public:
     
     void ToggleEnableInput() { bEnabledInput = !bEnabledInput; }
     
-    const FCogImGuiKeyInfo& GetToggleInputKey() const { return ToggleInputKey; }
-
-    void SetToggleInputKey(const FCogImGuiKeyInfo& Value) { ToggleInputKey = Value; }
-
 private:
 
     void Initialize();
@@ -47,5 +43,4 @@ private:
     ImFontAtlas DefaultFontAtlas;
     bool bEnabledInput = true;
     bool bIsInitialized = false;
-    FCogImGuiKeyInfo ToggleInputKey;
 };

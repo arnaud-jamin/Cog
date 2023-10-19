@@ -1,12 +1,14 @@
 #include "CogEngineWindow_Selection.h"
 
 #include "CogDebugDraw.h"
+#include "CogDebugSettings.h"
 #include "CogEngineReplicator.h"
 #include "CogImguiModule.h"
 #include "CogWindowManager.h"
 #include "CogWindowWidgets.h"
 #include "EngineUtils.h"
 #include "GameFramework/Character.h"
+#include "HAL/IConsoleManager.h"
 #include "imgui.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -26,13 +28,23 @@ UCogEngineWindow_Selection::UCogEngineWindow_Selection()
 {
     bHasMenu = true;
     ActorClasses = { AActor::StaticClass(), ACharacter::StaticClass() };
-}
 
+    ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
+        TEXT("Cog.ToggleSelectionMode"),
+        TEXT("Toggle the actor selection mode"),
+        FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { ToggleSelectionMode(); }),
+        ECVF_Cheat));
+}
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogEngineWindow_Selection::ResetConfig()
 {
     Super::ResetConfig();
+
+    for (IConsoleObject* ConsoleCommand : ConsoleCommands)
+    {
+        IConsoleManager::Get().UnregisterConsoleObject(ConsoleCommand);
+    }
 
     SelectedClassIndex = 0;
     SelectionName = FString();
@@ -169,7 +181,7 @@ void UCogEngineWindow_Selection::RenderTick(float DeltaTime)
     {
         if (Actor != GetLocalPlayerPawn())
         {
-            DrawActorFrame(Actor);
+            DrawActorFrame(*Actor);
         }
     }
 }
@@ -250,8 +262,7 @@ bool UCogEngineWindow_Selection::DrawSelectionCombo()
             ImGui::PushStyleColor(ImGuiCol_Text, Actor == LocalPlayerPawn ? IM_COL32(255, 255, 0, 255) : IM_COL32(255, 255, 255, 255));
 
             bool bIsSelected = Actor == FCogDebugSettings::GetSelection();
-            const FString ActorName = GetNameSafe(Actor);
-            if (ImGui::Selectable(TCHAR_TO_ANSI(*ActorName), bIsSelected))
+            if (ImGui::Selectable(TCHAR_TO_ANSI(*GetActorName(*Actor)), bIsSelected))
             {
                 SetGlobalSelection(Actor);
                 SelectionChanged = true;
@@ -266,7 +277,7 @@ bool UCogEngineWindow_Selection::DrawSelectionCombo()
             //------------------------
             if (ImGui::IsItemHovered())
             {
-                DrawActorFrame(Actor);
+                DrawActorFrame(*Actor);
             }
 
             if (bIsSelected)
@@ -279,6 +290,31 @@ bool UCogEngineWindow_Selection::DrawSelectionCombo()
     ImGui::EndChild();
 
     return SelectionChanged;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FString UCogEngineWindow_Selection::GetActorName(const AActor* Actor) const
+{
+    if (Actor == nullptr)
+    {
+        return FString("none");
+    }
+
+    return GetActorName(*Actor);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FString UCogEngineWindow_Selection::GetActorName(const AActor& Actor) const
+{
+#if WITH_EDITOR
+
+    return bDisplayActorLabel ? Actor.GetActorLabel() : Actor.GetName();
+
+#else //WITH_EDITOR
+
+    return Actor.GetName();
+
+#endif //WITH_EDITOR
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -333,6 +369,7 @@ void UCogEngineWindow_Selection::DrawActorContextMenu(AActor* Actor)
         ImGui::Separator();
 
         ImGui::Checkbox("Save selection", &bReapplySelection);
+        ImGui::Checkbox("Display Actor Label", &bDisplayActorLabel);
 
         ImGui::EndPopup();
     }
@@ -387,7 +424,7 @@ void UCogEngineWindow_Selection::TickSelectionMode()
 
     if (HoveredActor != nullptr)
     {
-        DrawActorFrame(HoveredActor);
+        DrawActorFrame(*HoveredActor);
     }
 
     if (bSelectionModeActive)
@@ -412,7 +449,7 @@ void UCogEngineWindow_Selection::TickSelectionMode()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Selection::DrawActorFrame(const AActor* Actor)
+void UCogEngineWindow_Selection::DrawActorFrame(const AActor& Actor)
 {
     APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
     if (PlayerController == nullptr)
@@ -427,14 +464,14 @@ void UCogEngineWindow_Selection::DrawActorFrame(const AActor* Actor)
     bool PrimitiveFound = false;
     FBox Bounds(ForceInit);
     
-    if (const UPrimitiveComponent* PrimitiveComponent = Cast<UPrimitiveComponent>(Actor->GetRootComponent()))
+    if (const UPrimitiveComponent* PrimitiveComponent = Cast<UPrimitiveComponent>(Actor.GetRootComponent()))
     {
         PrimitiveFound = true;
         Bounds += PrimitiveComponent->Bounds.GetBox();
     }
     else
     {
-        Actor->ForEachComponent<UPrimitiveComponent>(true, [&](const UPrimitiveComponent* InPrimComp)
+        Actor.ForEachComponent<UPrimitiveComponent>(true, [&](const UPrimitiveComponent* InPrimComp)
             {
                 if (InPrimComp->IsRegistered() && InPrimComp->IsCollisionEnabled())
                 {
@@ -450,16 +487,16 @@ void UCogEngineWindow_Selection::DrawActorFrame(const AActor* Actor)
     }
     else
     {
-        BoxOrigin = Actor->GetActorLocation();
+        BoxOrigin = Actor.GetActorLocation();
         BoxExtent = FVector(50.f, 50.f, 50.f);
     }
 
     FVector2D ScreenPosMin, ScreenPosMax;
     if (ComputeBoundingBoxScreenPosition(PlayerController, BoxOrigin, BoxExtent, ScreenPosMin, ScreenPosMax))
     {
-        const ImU32 Color = (Actor == GetSelection()) ? IM_COL32(255, 255, 255, 255) : IM_COL32(255, 255, 255, 128);
+        const ImU32 Color = (&Actor == GetSelection()) ? IM_COL32(255, 255, 255, 255) : IM_COL32(255, 255, 255, 128);
         DrawList->AddRect(FCogImguiHelper::ToImVec2(ScreenPosMin), FCogImguiHelper::ToImVec2(ScreenPosMax), Color, 0.0f, 0, 1.0f);
-        FCogWindowWidgets::AddTextWithShadow(DrawList, FCogImguiHelper::ToImVec2(ScreenPosMin + FVector2D(0, -14.0f)), Color, TCHAR_TO_ANSI(*Actor->GetName()));
+        FCogWindowWidgets::AddTextWithShadow(DrawList, FCogImguiHelper::ToImVec2(ScreenPosMin + FVector2D(0, -14.0f)), Color, TCHAR_TO_ANSI(*GetActorName(Actor)));
     }
 }
 
@@ -563,7 +600,7 @@ void UCogEngineWindow_Selection::RenderMainMenuWidget(bool Draw, float& Width)
         ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
         ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(0, 0, 0, 0));
         ImGui::SameLine();
-        FString CurrentSelectionName = GetNameSafe(GlobalSelection);
+        FString CurrentSelectionName = GetActorName(GlobalSelection);
 
         if (ImGui::Button(TCHAR_TO_ANSI(*CurrentSelectionName), ImVec2(SelectionButtonWidth, 0)))
         {

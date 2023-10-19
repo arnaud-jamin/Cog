@@ -1,9 +1,12 @@
 #include "CogWindowWidgets.h"
 
 #include "CogImguiHelper.h"
-#include "Kismet/KismetMathLibrary.h"
+#include "CogImGuiKeyInfo.h"
+#include "CogImguiInputHelper.h"
 #include "imgui.h"
 #include "imgui_internal.h"
+#include "InputCoreTypes.h"
+#include "Kismet/KismetMathLibrary.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogWindowWidgets::BeginTableTooltip()
@@ -283,4 +286,193 @@ bool FCogWindowWidgets::ComboboxEnum(const char* Label, UEnum* Enum, int64 Curre
     }
 
     return HasChanged;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::CheckBoxState(const char* Label, ECheckBoxState& State)
+{
+    const char* TooltipText = nullptr;
+    ImVec4 ButtonColor = ImGui::GetStyleColorVec4(ImGuiCol_Button);
+    ImVec4 TextColor = ImGui::GetStyleColorVec4(ImGuiCol_Text);
+
+    switch (State)
+    {
+        case ECheckBoxState::Checked:
+        {
+            TooltipText = "Checked";
+            break;
+        }
+
+        case ECheckBoxState::Unchecked:
+        {
+            ButtonColor.w = 0.5f;
+            TextColor.w = 0.5f;
+            TooltipText = "Unchecked";
+            break;
+        }
+
+        case ECheckBoxState::Undetermined:
+        {
+            ButtonColor.w = 0.1f;
+            TextColor.w = 0.1f;
+            TooltipText = "Undetermined";
+            break;
+        }
+    }
+
+    ImGui::PushStyleColor(ImGuiCol_Text,            TextColor);
+    ImGui::PushStyleColor(ImGuiCol_Button,          ImVec4(ButtonColor.x, ButtonColor.y, ButtonColor.z, ButtonColor.w * 0.6f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered,   ImVec4(ButtonColor.x, ButtonColor.y, ButtonColor.z, ButtonColor.w * 0.8f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive,    ImVec4(ButtonColor.x, ButtonColor.y, ButtonColor.z, ButtonColor.w * 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_Border,          ImVec4(1.0f, 1.0f, 1.0f, 0.1f));
+
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
+
+    const bool Pressed = ImGui::Button(Label);
+
+    if (State == ECheckBoxState::Unchecked)
+    {
+        ImVec2 Pos = ImGui::GetItemRectMin();
+        ImVec2 Size = ImGui::GetItemRectSize();
+
+        ImGui::GetWindowDrawList()->AddLine(ImVec2(Pos.x, Pos.y + Size.y * 0.5f), ImVec2(Pos.x + Size.x, Pos.y + Size.y * 0.5f), IM_COL32(255, 255, 255, 255), 0.0f);
+    }
+
+    ImGui::PopStyleVar();
+
+    ImGui::PopStyleColor(5);
+
+    if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
+    {
+        ImGui::SetTooltip(TooltipText);
+    }
+
+    if (Pressed)
+    {
+        switch (State)
+        {
+            case ECheckBoxState::Checked:       State = ECheckBoxState::Unchecked; break;
+            case ECheckBoxState::Unchecked:     State = ECheckBoxState::Undetermined; break;
+            case ECheckBoxState::Undetermined:  State = ECheckBoxState::Checked; break;
+        }
+    }
+
+    return Pressed;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::InputKey(const char* Label, FCogImGuiKeyInfo& KeyInfo)
+{
+    ImGui::PushID(Label);
+   
+    ImGui::AlignTextToFramePadding();
+    ImGui::TextUnformatted(Label);
+
+    const bool HasChanged = InputKey(KeyInfo);
+
+    ImGui::PopID();
+
+    return HasChanged;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::InputKey(FCogImGuiKeyInfo& KeyInfo)
+{
+    static TArray<FKey> AllKeys;
+    if (AllKeys.IsEmpty())
+    {
+        EKeys::GetAllKeys(AllKeys);
+    }
+    
+    bool HasKeyChanged = false;
+
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 6);
+    if (ImGui::BeginCombo("##Key", TCHAR_TO_ANSI(*KeyInfo.Key.ToString()), ImGuiComboFlags_HeightLarge))
+    {
+        for (int32 i = 0; i < AllKeys.Num(); ++i)
+        {
+            const FKey Key = AllKeys[i];
+            if (Key.IsDigital() == false || Key.IsDeprecated() || Key.IsBindableToActions() == false || Key.IsMouseButton() || Key.IsTouch() || Key.IsGamepadKey())
+            {
+                continue;
+            }
+
+            bool IsSelected = KeyInfo.Key == Key;
+            if (ImGui::Selectable(TCHAR_TO_ANSI(*Key.ToString()), IsSelected))
+            {
+                KeyInfo.Key = Key;
+                HasKeyChanged = true;
+            }
+        }
+        ImGui::EndCombo();
+    }
+
+    ImGui::SameLine();
+    HasKeyChanged |= CheckBoxState("Ctrl", KeyInfo.Ctrl);
+
+    ImGui::SameLine();
+    HasKeyChanged |= CheckBoxState("Shift", KeyInfo.Shift);
+
+    ImGui::SameLine();
+    HasKeyChanged |= CheckBoxState("Alt", KeyInfo.Alt);
+
+    ImGui::SameLine();
+    HasKeyChanged |= CheckBoxState("Cmd", KeyInfo.Cmd);
+
+    return HasKeyChanged;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::KeyBind(FKeyBind& KeyBind)
+{
+    static char Buffer[256] = "";
+
+    const char* Str = TCHAR_TO_ANSI(*KeyBind.Command);
+    ImStrncpy(Buffer, Str, IM_ARRAYSIZE(Buffer));
+
+    bool HasChanged = false;
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 15);
+    if (ImGui::InputText("##Command", Buffer, IM_ARRAYSIZE(Buffer)))
+    {
+        KeyBind.Command = FString(Buffer);
+        HasChanged = true;
+    }
+
+    FCogImGuiKeyInfo KeyInfo;
+    FCogImguiInputHelper::KeyBindToKeyInfo(KeyBind, KeyInfo);
+
+    ImGui::SameLine();
+    if (InputKey(KeyInfo))
+    {
+        HasChanged = true;
+        FCogImguiInputHelper::KeyInfoToKeyBind(KeyInfo, KeyBind);
+    }
+
+    return HasChanged;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::ButtonWithTooltip(const char* Text, const char* Tooltip)
+{
+    bool IsPressed = ImGui::Button(Text);
+
+    if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
+    {
+        ImGui::SetTooltip(Tooltip);
+    }
+
+    return IsPressed;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::DeleteArrayItemButton()
+{
+    bool IsPressed = ImGui::Button("x");
+
+    if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
+    {
+        ImGui::SetTooltip("Delete Item");
+    }
+
+    return IsPressed;
 }

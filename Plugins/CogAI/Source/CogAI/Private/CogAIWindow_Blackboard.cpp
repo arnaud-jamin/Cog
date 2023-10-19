@@ -100,7 +100,7 @@ void UCogAIWindow_Blackboard::RenderContent()
     {
         Keys.Sort([](const FBlackboardEntry& Key1, const FBlackboardEntry& Key2)
         {
-            return Key1.EntryName.Compare(Key1.EntryName) < 0;
+            return Key1.EntryName.Compare(Key2.EntryName) < 0;
         });
     }
 
