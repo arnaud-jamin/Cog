@@ -74,6 +74,16 @@ Used to inspect collisions by performing a collision query with the selected cha
 - The displayed collision channels can be configured in a Data Asset.
 - It can be used to better understand what object collisions are blocking a raycast.
 
+### Command Bindings
+Used to configure the command bindings. 
+        
+![Command Bindings](https://github.com/arnaud-jamin/Cog/assets/13844285/47179de9-ee28-427f-951f-5773b66cdeb2)
+- Bindings are used to trigger console commands from a keyboard shortcuts, which are saved in `Saved/Config/WindowEditor/Input.ini` (in editor).
+- Can be used to register the shortcuts Cog console commands:
+  - `Cog.ToggleInput`
+  - `Cog.LoadLayout <LayoutIndex>`
+  - `Cog.ToggleSelectionMode`
+
 ### Debug Settings
 Used to tweak how the debug display is drawn.
 
