@@ -42,4 +42,7 @@ public:
     virtual void HandleDamageReceived(const FCogSampleDamageEventParams& Params) {}
 
     virtual void HandleDamageDealt(const FCogSampleDamageEventParams& Params) {}
+
+    virtual bool IsDead() const { return false; }
+
 };

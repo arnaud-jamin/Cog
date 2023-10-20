@@ -316,3 +316,28 @@ bool UCogSampleFunctionLibrary_Gameplay::IsActorMatchingTags(const AActor* Actor
     return Result;
 }
 
+//--------------------------------------------------------------------------------------------------------------------------
+AActor* UCogSampleFunctionLibrary_Gameplay::GetActorInstigator(AActor* Actor) 
+{
+    if (Actor == nullptr)
+    {
+        return nullptr;
+    }
+
+    AActor* Instigator = Actor->GetInstigator();
+    if (Instigator != nullptr)
+    {
+        return Instigator;
+    }
+
+    //-------------------------------------------------
+    // The game state is the default Instigator
+    //-------------------------------------------------
+    UWorld* World = Actor->GetWorld();
+    if (World != nullptr)
+    {
+        return World->GetGameState();
+    }
+
+    return nullptr;
+}

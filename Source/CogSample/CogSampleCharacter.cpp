@@ -536,8 +536,16 @@ void ACogSampleCharacter::HandleDamageDealt(const FCogSampleDamageEventParams& P
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+bool ACogSampleCharacter::IsDead() const
+{
+    return bIsDead;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleCharacter::OnKilled(AActor* InInstigator, AActor* InCauser, const FGameplayEffectSpec& InEffectSpec, float InMagnitude)
 {
+    bIsDead = true;
+
     if (AbilitySystem != nullptr)
     {
         FGameplayEventData Payload;
@@ -558,6 +566,8 @@ void ACogSampleCharacter::OnKilled(AActor* InInstigator, AActor* InCauser, const
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleCharacter::OnRevived(AActor* InInstigator, AActor* InCauser, const FGameplayEffectSpec& InEffectSpec, float InMagnitude)
 {
+    bIsDead = false;
+
     if (AbilitySystem != nullptr)
     {
         FGameplayEventData Payload;

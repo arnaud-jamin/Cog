@@ -32,6 +32,9 @@ class UCogSampleFunctionLibrary_Team : public UBlueprintFunctionLibrary
 public:
 
     UFUNCTION(BlueprintPure)
+    static int32 GetTeamSafe(const AActor* Actor);
+
+    UFUNCTION(BlueprintPure)
     static ECogSampleAllegiance GetTeamsAllegiance(int32 Team1, int32 Team2);
 
     UFUNCTION(BlueprintPure)
@@ -39,6 +42,12 @@ public:
 
     UFUNCTION(BlueprintPure)
     static bool MatchAllegiance(const AActor* Actor1, const AActor* Actor2, UPARAM(meta = (Bitmask, BitmaskEnum = "/Script/CogSample.ECogSampleAllegianceFilter")) int32 AllegianceFilter);
+
+    UFUNCTION(BlueprintPure)
+    bool MatchAllegianceFromTeams(int32 Team1, int32 Team2, UPARAM(meta = (Bitmask, BitmaskEnum = "/Script/CogSample.ECogSampleAllegianceFilter")) int32 AllegianceFilter);
+
+    UFUNCTION(BlueprintPure)
+    static bool MatchAllegianceBetweenTeamAndActor(int32 Team, const AActor* Actor, UPARAM(meta = (Bitmask, BitmaskEnum = "/Script/CogSample.ECogSampleAllegianceFilter")) int32 AllegianceFilter);
 
     UFUNCTION(BlueprintPure)
     static bool MatchAllegianceFilter(ECogSampleAllegiance Allegiance, UPARAM(meta = (Bitmask, BitmaskEnum = "/Script/CogSample.ECogSampleAllegianceFilter")) int32 AllegianceFilter);

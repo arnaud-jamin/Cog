@@ -3,6 +3,24 @@
 #include "CogSampleTeamInterface.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
+int32 UCogSampleFunctionLibrary_Team::GetTeamSafe(const AActor* Actor)
+{
+    if (Actor == nullptr)
+    {
+        return 0;
+    }
+
+    const ICogSampleTeamInterface* TeamActor = Cast<ICogSampleTeamInterface>(Actor);
+    if (TeamActor == nullptr)
+    {
+        return 0;
+    }
+
+    const int32 Team = TeamActor->GetTeam();
+    return Team;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 ECogSampleAllegiance UCogSampleFunctionLibrary_Team::GetTeamsAllegiance(int32 Team1, int32 Team2)
 {
     if (Team1 == 0 || Team2 == 0)
@@ -21,18 +39,9 @@ ECogSampleAllegiance UCogSampleFunctionLibrary_Team::GetTeamsAllegiance(int32 Te
 //--------------------------------------------------------------------------------------------------------------------------
 ECogSampleAllegiance UCogSampleFunctionLibrary_Team::GetActorsAllegiance(const AActor* Actor1, const AActor* Actor2)
 {
-    const ICogSampleTeamInterface* TeamActor1 = Cast<ICogSampleTeamInterface>(Actor1);
-    const ICogSampleTeamInterface* TeamActor2 = Cast<ICogSampleTeamInterface>(Actor2);
-
-    if (TeamActor1 == nullptr || TeamActor2 == nullptr)
-    {
-        return ECogSampleAllegiance::Neutral;
-    }
-
-    const int32 Team1 = TeamActor1->GetTeam();
-    const int32 Team2 = TeamActor2->GetTeam();
+    const int32 Team1 = GetTeamSafe(Actor1);
+    const int32 Team2 = GetTeamSafe(Actor2);
     const ECogSampleAllegiance Allegiance = GetTeamsAllegiance(Team1, Team2);
-
     return Allegiance;
 }
 
@@ -40,6 +49,23 @@ ECogSampleAllegiance UCogSampleFunctionLibrary_Team::GetActorsAllegiance(const A
 bool UCogSampleFunctionLibrary_Team::MatchAllegiance(const AActor* Actor1, const AActor* Actor2, int32 AllegianceFilter)
 {
     const ECogSampleAllegiance Allegiance = GetActorsAllegiance(Actor1, Actor2);
+    const bool Result = MatchAllegianceFilter(Allegiance, AllegianceFilter);
+    return Result;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool UCogSampleFunctionLibrary_Team::MatchAllegianceFromTeams(int32 Team1, int32 Team2, int32 AllegianceFilter)
+{
+    const ECogSampleAllegiance Allegiance = GetTeamsAllegiance(Team1, Team2);
+    const bool Result = MatchAllegianceFilter(Allegiance, AllegianceFilter);
+    return Result;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool UCogSampleFunctionLibrary_Team::MatchAllegianceBetweenTeamAndActor(int32 Team, const AActor* Actor, int32 AllegianceFilter)
+{
+    const int32 ActorTeam = GetTeamSafe(Actor);
+    const ECogSampleAllegiance Allegiance = GetTeamsAllegiance(Team, ActorTeam);
     const bool Result = MatchAllegianceFilter(Allegiance, AllegianceFilter);
     return Result;
 }

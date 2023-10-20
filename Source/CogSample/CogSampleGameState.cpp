@@ -2,6 +2,7 @@
 
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetRegistry/IAssetRegistry.h"
+#include "CogSampleAbilitySystemComponent.h"
 #include "CogSampleFunctionLibrary_Tag.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/GameMode.h"
@@ -78,12 +79,18 @@ ACogSampleGameState::ACogSampleGameState(const FObjectInitializer & ObjectInitia
     PrimaryActorTick.bCanEverTick = true;
     PrimaryActorTick.SetTickFunctionEnable(true);
     PrimaryActorTick.bStartWithTickEnabled = true;
+
+    AbilitySystemComponent = CreateDefaultSubobject<UCogSampleAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+    AbilitySystemComponent->SetIsReplicated(true);
+    AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleGameState::BeginPlay()
 {
     Super::BeginPlay();
+
+    AbilitySystemComponent->InitAbilityActorInfo(this, this);
 
 #if ENABLE_COG
     InitializeCog();

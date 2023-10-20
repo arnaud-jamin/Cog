@@ -26,13 +26,6 @@ void UCogWindow_Settings::RenderContent()
     {
         GetOwner()->bRefreshDPIScale = true;
     }
-
-    ImGui::Checkbox("Compact Mode", &GetOwner()->bCompactMode);
-
-    ImGui::Checkbox("Show Windows In Main Menu", &GetOwner()->bShowWindowsInMainMenu);
-    
-    ImGui::Checkbox("Show Window Help", &GetOwner()->bShowHelp);
-
     if (ImGui::IsItemHovered())
     {
         ImGui::BeginTooltip();
@@ -40,6 +33,12 @@ void UCogWindow_Settings::RenderContent()
         ImGui::TextUnformatted("Reset DPi Scale  [Middle Mouse]");
         ImGui::EndTooltip();
     }
+
+    ImGui::Checkbox("Compact Mode", &GetOwner()->bCompactMode);
+
+    ImGui::Checkbox("Show Windows In Main Menu", &GetOwner()->bShowWindowsInMainMenu);
+    
+    ImGui::Checkbox("Show Window Help", &GetOwner()->bShowHelp);
 
     ImGui::Separator();
 

@@ -141,6 +141,8 @@ public:
 
     virtual void HandleDamageDealt(const FCogSampleDamageEventParams& Params) override;
 
+    virtual bool IsDead() const override;
+
     //----------------------------------------------------------------------------------------------------------------------
     // Team
     //----------------------------------------------------------------------------------------------------------------------
@@ -333,6 +335,8 @@ private:
     bool bIsInitialized = false;
 
     bool bIsInGhostMode = false;
+
+    bool bIsDead = false;
 
     //----------------------------------------------------------------------------------------------------------------------
     // Root Motion 

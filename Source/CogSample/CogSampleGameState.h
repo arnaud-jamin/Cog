@@ -7,6 +7,7 @@
 
 class UCogWindowManager;
 class UCogEngineWindow_Selection;
+class UCogSampleAbilitySystemComponent;
 
 UCLASS()
 class ACogSampleGameState : public AGameStateBase
@@ -23,11 +24,18 @@ class ACogSampleGameState : public AGameStateBase
 
 private:
 
-    //--------------------------------------------------------------
+    //---------------------------------------------------------------------------------
     // To make sure it doesn't get garbage collected.
-    //--------------------------------------------------------------
+    //---------------------------------------------------------------------------------
     UPROPERTY()
     TObjectPtr<UObject> CogWindowManagerRef = nullptr;
+
+    //---------------------------------------------------------------------------------
+    // The game state has an AbilitySystemComponent to serve as the default instigator 
+    // for effects that are not applied by characters.
+    //---------------------------------------------------------------------------------
+    UPROPERTY()
+    UCogSampleAbilitySystemComponent* AbilitySystemComponent = nullptr;
 
 #if ENABLE_COG
 

@@ -64,6 +64,9 @@ public:
     UFUNCTION(BlueprintPure)
     static void FindCapsulePointDistance(const FVector2D& CapsulePoint1, const FVector2D& CapsulePoint2, const float CapsuleRadius, const FVector2D& Point, FVector2D& Projection, float& Time, float& Distance);
 
+    UFUNCTION(BlueprintPure)
+    static AActor* GetActorInstigator(AActor* Actor);
+
     static void AdjustAttributeForMaxChange(UAbilitySystemComponent* AbilityComponent, FGameplayAttributeData& AffectedAttribute, float OldValue, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty);
 
     static FCollisionObjectQueryParams ConfigureCollisionObjectParams(const TArray<TEnumAsByte<EObjectTypeQuery>>& ObjectTypes);
@@ -83,6 +86,4 @@ public:
     static bool IsActorMatchingTags(const AActor* Actor, const FGameplayTagContainer& RequiredTags, const FGameplayTagContainer& IgnoredTags);
 
     static bool MatchCooldownTag(const FGameplayTagContainer& TagContainer);
-
-
 };

@@ -119,7 +119,11 @@ void ACogEngineReplicator::Server_Spawn_Implementation(const FCogEngineSpawnEntr
 
         FActorSpawnParameters Params;
         Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-        GetWorld()->SpawnActor(SpawnEntry.Class, &Transform, Params);
+        AActor* SpawnerActor = GetWorld()->SpawnActor(SpawnEntry.Class, &Transform, Params);
+        if (APawn* SpawnedPawn = Cast<APawn>(SpawnerActor))
+        {
+            SpawnedPawn->SpawnDefaultController();
+        }
     }
 
 #endif // !UE_BUILD_SHIPPING
