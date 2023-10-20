@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
+COGAI_API DECLARE_LOG_CATEGORY_EXTERN(LogCogAI, Warning, All);
+
 class COGAI_API FCogAIModule : public IModuleInterface
 {
 public:

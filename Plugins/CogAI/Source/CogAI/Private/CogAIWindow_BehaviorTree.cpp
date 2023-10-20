@@ -7,6 +7,8 @@
 #include "BehaviorTree/Tasks/BTTask_BlueprintBase.h"
 #include "BehaviorTree/Tasks/BTTask_Wait.h"
 #include "BrainComponent.h"
+#include "CogAIModule.h"
+#include "CogDebugDraw.h"
 #include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
 #include "GameFramework/Pawn.h"
@@ -27,10 +29,98 @@ UCogAIWindow_BehaviorTree::UCogAIWindow_BehaviorTree()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void UCogAIWindow_BehaviorTree::GameTick(float DeltaTime)
+{
+    Super::GameTick(DeltaTime);
+
+#if ENABLE_COG
+
+    const AActor* Selection = GetSelection();
+    if (Selection == nullptr)
+    {
+        return;
+    }
+
+    const APawn* Pawn = Cast<APawn>(Selection);
+    if (Pawn == nullptr)
+    {
+        return;
+    }
+
+    const AAIController* AIController = Cast<AAIController>(Pawn->Controller);
+    if (AIController == nullptr)
+    {
+        return;
+    }
+
+    const UPathFollowingComponent* PathFollowing = AIController->GetPathFollowingComponent();
+    if (PathFollowing == nullptr)
+    {
+        return;
+    }
+
+    const FNavigationPath* CurrentPath = PathFollowing->GetPath().Get();
+    if (CurrentPath == nullptr)
+    {
+        return;
+    }
+
+    FVector LastLocation;
+    for (int32 i = 0; i < CurrentPath->GetPathPoints().Num(); i++)
+    {
+        const FVector& Location = CurrentPath->GetPathPoints()[i].Location;
+
+        if (i > 0)
+        {
+            FCogDebugDraw::Arrow(LogCogAI, this, LastLocation, Location, FColor::White, false, 0);
+            FCogDebugDraw::Point(LogCogAI, this, LastLocation, 10.0f, FColor::White, false, 0);
+            FCogDebugDraw::Point(LogCogAI, this, Location, 10.0f, FColor::White, false, 0);
+        }
+
+        LastLocation = Location;
+    }
+    
+    //TArray<FString> Tokens;
+    //TArray<EPathFollowingDebugTokens::Type> Flags;
+    //PathFollowing->GetDebugStringTokens(Tokens, Flags);
+
+    //for (int32 Idx = 0; Idx < Tokens.Num(); Idx++)
+    //{
+    //    switch (Flags[Idx])
+    //    {
+    //    case EPathFollowingDebugTokens::Description:
+    //        DataPack.PathFollowingInfo += Tokens[Idx];
+    //        break;
+
+    //    case EPathFollowingDebugTokens::ParamName:
+    //        DataPack.PathFollowingInfo += TEXT(", {yellow}");
+    //        DataPack.PathFollowingInfo += Tokens[Idx];
+    //        DataPack.PathFollowingInfo += TEXT(":");
+    //        break;
+
+    //    case EPathFollowingDebugTokens::PassedValue:
+    //        DataPack.PathFollowingInfo += TEXT("{yellow}");
+    //        DataPack.PathFollowingInfo += Tokens[Idx];
+    //        break;
+
+    //    case EPathFollowingDebugTokens::FailedValue:
+    //        DataPack.PathFollowingInfo += TEXT("{orange}");
+    //        DataPack.PathFollowingInfo += Tokens[Idx];
+    //        break;
+
+    //    default:
+    //        break;
+    //    }
+    //}
+
+#endif //ENABLE_COG
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void UCogAIWindow_BehaviorTree::RenderContent()
 {
     Super::RenderContent();
-
 
     if (ImGui::BeginMenuBar())
     {

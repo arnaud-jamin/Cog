@@ -4,13 +4,13 @@
 #include "CogSampleDefines.h"
 
 #if ENABLE_COG
+#include "CogAIModule.h"
 #include "CogDebugLog.h"
 #endif //ENABLE_COG
 
 DEFINE_LOG_CATEGORY(LogCogAlways);
 
 DEFINE_LOG_CATEGORY(LogCogAbility);
-DEFINE_LOG_CATEGORY(LogCogAI);
 DEFINE_LOG_CATEGORY(LogCogBaseAimRotation);
 DEFINE_LOG_CATEGORY(LogCogCollision);
 DEFINE_LOG_CATEGORY(LogCogControlRotation);
@@ -26,6 +26,7 @@ namespace CogSampleLog
     void RegisterAllLogCategories()
     {
 #if ENABLE_COG
+        
         FCogDebugLog::AddLogCategory(LogCogAlways, "Always", "Debug Category that is always active", false);
 
         FCogDebugLog::AddLogCategory(LogCogAbility, "Ability", "Log and debug draw of gameplay abilities");
@@ -41,6 +42,7 @@ namespace CogSampleLog
         FCogDebugLog::AddLogCategory(LogCogSkeleton, "Skeleton", "Debug Draw a Character Skeleton");
         FCogDebugLog::AddLogCategory(LogCogTargetAcquisition, "Target Acquisition", "Debug Draw the target acquisition debug draw");
         FCogDebugLog::AddLogCategory(LogGameplayEffects, "Gameplay Effects", "Unreal Gameplay Effect Log");
+
 #endif //ENABLE_COG
     }
 }

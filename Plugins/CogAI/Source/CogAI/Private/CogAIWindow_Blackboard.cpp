@@ -104,7 +104,6 @@ void UCogAIWindow_Blackboard::RenderContent()
         });
     }
 
-
     if (ImGui::BeginTable("Blackboard", 3, ImGuiTableFlags_SizingFixedFit 
                                          | ImGuiTableFlags_Resizable 
                                          | ImGuiTableFlags_NoBordersInBodyUntilResize 

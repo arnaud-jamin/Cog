@@ -2,6 +2,8 @@
 
 #define LOCTEXT_NAMESPACE "FCogAIModule"
 
+DEFINE_LOG_CATEGORY(LogCogAI);
+
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAIModule::StartupModule()
 {

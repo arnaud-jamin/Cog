@@ -18,7 +18,9 @@ public:
 
 protected:
 
-    void RenderHelp();
+    virtual void GameTick(float DeltaTime) override;
+
+    virtual void RenderHelp() override;
 
     virtual void RenderContent() override;
 
