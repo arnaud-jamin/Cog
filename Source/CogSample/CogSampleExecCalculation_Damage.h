@@ -30,6 +30,7 @@ public:
     UFUNCTION(BlueprintCallable)
     static void ExecuteDamageGameplayCue(
         UCogSampleAbilitySystemComponent* TargetAbilitySystem,
+        const FGameplayEffectSpec& EffectSpec,
         const FHitResult& HitResult,
         float HealthDamage,
         const FGameplayEffectContextHandle& EffectContext,

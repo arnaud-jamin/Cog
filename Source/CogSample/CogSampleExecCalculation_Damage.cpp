@@ -122,17 +122,26 @@ void UCogSampleExecCalculation_Damage::Execute_Implementation(const FGameplayEff
         }
     }
 
-    UCogSampleFunctionLibrary_Damage::ExecuteDamageGameplayCue(TargetAbilitySystem, HitResult, MitigatedDamage, EffectContext, false);
+    UCogSampleFunctionLibrary_Damage::ExecuteDamageGameplayCue(TargetAbilitySystem, EffectSpec, HitResult, MitigatedDamage, EffectContext, false);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSampleFunctionLibrary_Damage::ExecuteDamageGameplayCue(
     UCogSampleAbilitySystemComponent* TargetAbilitySystem,
+    const FGameplayEffectSpec& EffectSpec,
     const FHitResult& HitResult,
     float Damage,
     const FGameplayEffectContextHandle& EffectContext,
     bool IsPredicted)
 {
+    //-----------------------------------------------------------------------------------------------------
+    // We check for >= 1 instead of >= 0 because we can use damage values between 0 and 1.
+    //-----------------------------------------------------------------------------------------------------
+    if (Damage == 0.0f)
+    {
+        return;
+    }
+
     ensure(TargetAbilitySystem);
     if (TargetAbilitySystem == nullptr)
     {
@@ -154,27 +163,27 @@ void UCogSampleFunctionLibrary_Damage::ExecuteDamageGameplayCue(
 
     TypedContext->bGameplayCueIsPredicted = IsPredicted;
 
-    //-----------------------------------------------------------------------------------------------------
-    // We check for >= 1 instead of >= 0 because we can use damage values between 0 and 1.
-    //-----------------------------------------------------------------------------------------------------
-    if (Damage > 0.0f)
-    {
-        FGameplayCueParameters GameplayCueParameters;
-        GameplayCueParameters.RawMagnitude = Damage;
-        GameplayCueParameters.EffectContext = EffectContext;
-        GameplayCueParameters.Instigator = TypedContext->GetInstigator();
-        GameplayCueParameters.EffectCauser = TypedContext->GetEffectCauser();
-        GameplayCueParameters.PhysicalMaterial = HitResult.PhysMaterial;
-        GameplayCueParameters.Location = HitResult.Location;
-        GameplayCueParameters.Normal = HitResult.ImpactNormal;
+    FGameplayCueParameters GameplayCueParameters;
+    GameplayCueParameters.RawMagnitude = Damage;
+    GameplayCueParameters.EffectContext = EffectContext;
+    GameplayCueParameters.Instigator = TypedContext->GetInstigator();
+    GameplayCueParameters.EffectCauser = TypedContext->GetEffectCauser();
+    GameplayCueParameters.PhysicalMaterial = HitResult.PhysMaterial;
+    GameplayCueParameters.Location = HitResult.Location;
+    GameplayCueParameters.Normal = HitResult.ImpactNormal;
 
-        if (IsPredicted)
-        {
-            TargetAbilitySystem->ExecuteGameplayCueLocal(Tag_GameplayCue_DamageReceived, GameplayCueParameters);
-        }
-        else
-        {
-            TargetAbilitySystem->ExecuteGameplayCue(Tag_GameplayCue_DamageReceived, GameplayCueParameters);
-        }
+    TArray<FGameplayTag> Tags;
+    SpecAssetTags.GetGameplayTagArray(Tags);
+    
+    FGameplayTag* FoundTag = Tags.FindByPredicate([](const FGameplayTag& Tag) { return Tag.MatchesTag(Tag_GameplayCue_DamageReceived); });
+    FGameplayTag DamageTag = FoundTag != nullptr ? *FoundTag : Tag_GameplayCue_DamageReceived;
+
+    if (IsPredicted)
+    {
+        TargetAbilitySystem->ExecuteGameplayCueLocal(DamageTag, GameplayCueParameters);
+    }
+    else
+    {
+        TargetAbilitySystem->ExecuteGameplayCue(DamageTag, GameplayCueParameters);
     }
 }
