@@ -2,6 +2,7 @@
 
 #include "CogDebugDrawImGui.h"
 #include "CogImguiModule.h"
+#include "CogImguiInputHelper.h"
 #include "CogImguiWidget.h"
 #include "CogWindow_Settings.h"
 #include "CogWindow_Spacing.h"
@@ -13,6 +14,20 @@
 //--------------------------------------------------------------------------------------------------------------------------
 UCogWindowManager::UCogWindowManager()
 {
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogWindowManager::PostInitProperties()
+{
+    Super::PostInitProperties();
+
+    if (bRegisterDefaultCommands)
+    {
+        if (RegisterDefaultCommands())
+        {
+            bRegisterDefaultCommands = false;
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -515,4 +530,83 @@ void UCogWindowManager::ResetAllWindowsConfig()
     {
         Window->ResetConfig();
     }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool UCogWindowManager::RegisterDefaultCommands()
+{
+    UWorld* World = GetWorld();
+    if (World == nullptr)
+    {
+        return false;
+    }
+
+    APlayerController* PlayerController = FCogImguiInputHelper::GetFirstLocalPlayerController(*World);
+    if (PlayerController == nullptr)
+    {
+        return false;
+    }
+
+    UPlayerInput* PlayerInput = PlayerController->PlayerInput;
+    if (PlayerInput == nullptr)
+    {
+        return false;
+    }
+
+    AddCommand(PlayerInput, "Cog.ToggleInput", EKeys::Tab);
+    AddCommand(PlayerInput, "Cog.LoadLayout 1", EKeys::F1);
+    AddCommand(PlayerInput, "Cog.LoadLayout 2", EKeys::F2);
+    AddCommand(PlayerInput, "Cog.LoadLayout 3", EKeys::F3);
+    AddCommand(PlayerInput, "Cog.LoadLayout 4", EKeys::F4);
+    AddCommand(PlayerInput, "Cog.ToggleSelectionMode", EKeys::F5);
+
+    SortCommands(PlayerInput);
+    PlayerInput->SaveConfig();
+
+    return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogWindowManager::AddCommand(UPlayerInput* PlayerInput, const FString& Command, const FKey& Key)
+{
+    //---------------------------------------------------
+    // Reassign conflicting commands
+    //---------------------------------------------------
+    for (FKeyBind& KeyBind : PlayerInput->DebugExecBindings)
+    {
+        if (KeyBind.Key == Key && KeyBind.Command != Command)
+        {
+            KeyBind.Control = true;
+            KeyBind.bIgnoreCtrl = false;
+        }
+    }
+
+    //---------------------------------------------------
+    // Find or add desired command
+    //---------------------------------------------------
+    FKeyBind* ExistingKeyBind = PlayerInput->DebugExecBindings.FindByPredicate([Command](const FKeyBind& KeyBind) { return KeyBind.Command == Command; });
+    if (ExistingKeyBind == nullptr)
+    {
+        ExistingKeyBind = &PlayerInput->DebugExecBindings.AddDefaulted_GetRef();
+    }
+
+    //---------------------------------------------------
+    // Assign the key to the command
+    //---------------------------------------------------
+    FKeyBind CogKeyBind;
+    CogKeyBind.Command = Command;
+    CogKeyBind.Control = false;
+    CogKeyBind.bIgnoreCtrl = true;
+    CogKeyBind.Key = Key;
+
+    *ExistingKeyBind = CogKeyBind;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogWindowManager::SortCommands(UPlayerInput* PlayerInput)
+{
+    PlayerInput->DebugExecBindings.Sort([](const FKeyBind& Key1, const FKeyBind& Key2)
+    {
+        return Key1.Command.Compare(Key2.Command) < 0;
+    });
 }

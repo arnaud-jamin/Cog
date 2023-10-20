@@ -5,6 +5,7 @@
 #include "GameFramework/GameUserSettings.h"
 #include "GameFramework/InputSettings.h"
 #include "GameFramework/PlayerController.h"
+#include "GameFramework/PlayerInput.h"
 #include "imgui_internal.h"
 #include "InputCoreTypes.h"
 
@@ -226,7 +227,6 @@ bool FCogImguiInputHelper::IsKeyBoundToCommand(UWorld* World, const FKeyEvent& K
 
     return false;
 }
-
 
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogImguiInputHelper::IsConsoleEvent(const FKeyEvent& KeyEvent)

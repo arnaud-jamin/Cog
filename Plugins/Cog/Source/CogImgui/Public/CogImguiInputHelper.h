@@ -4,6 +4,7 @@
 #include "CogImguiInputHelper.h"
 #include "imgui.h"
 
+class UPlayerInput;
 struct FCogImGuiKeyInfo;
 struct FKeyBind;
 

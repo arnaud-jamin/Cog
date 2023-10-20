@@ -172,6 +172,8 @@ void UCogSampleFunctionLibrary_Damage::ExecuteDamageGameplayCue(
     GameplayCueParameters.Location = HitResult.Location;
     GameplayCueParameters.Normal = HitResult.ImpactNormal;
 
+    FGameplayTagContainer SpecAssetTags;
+    EffectSpec.GetAllAssetTags(SpecAssetTags);
     TArray<FGameplayTag> Tags;
     SpecAssetTags.GetGameplayTagArray(Tags);
     

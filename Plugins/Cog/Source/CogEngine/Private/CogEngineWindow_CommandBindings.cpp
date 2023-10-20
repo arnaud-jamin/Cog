@@ -1,5 +1,6 @@
 #include "CogEngineWindow_CommandBindings.h"
 
+#include "CogWindowManager.h"
 #include "CogWindowWidgets.h"
 #include "GameFramework/PlayerInput.h"
 #include "imgui.h"
@@ -16,20 +17,6 @@ void UCogEngineWindow_CommandBindings::RenderHelp()
 //--------------------------------------------------------------------------------------------------------------------------
 UCogEngineWindow_CommandBindings::UCogEngineWindow_CommandBindings()
 {
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_CommandBindings::PostInitProperties()
-{
-    Super::PostInitProperties();
-
-    if (bRegisterDefaultCommands)
-    {
-        if (RegisterDefaultCommands())
-        {
-            bRegisterDefaultCommands = false;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -61,7 +48,7 @@ void UCogEngineWindow_CommandBindings::RenderContent()
     ImGui::SameLine();
     if (FCogWindowWidgets::ButtonWithTooltip("Sort", "Sort the array"))
     {
-        Sort(PlayerInput);
+        UCogWindowManager::SortCommands(PlayerInput);
         PlayerInput->SaveConfig();
     }
 
@@ -77,7 +64,7 @@ void UCogEngineWindow_CommandBindings::RenderContent()
             "[F5]   Cog.ToggleSelectionMode\n"
     ))
     {
-        RegisterDefaultCommands();
+        Owner->RegisterDefaultCommands();
     }
 
     for (FKeyBind& KeyBind : PlayerInput->DebugExecBindings)
@@ -104,69 +91,4 @@ void UCogEngineWindow_CommandBindings::RenderContent()
         PlayerInput->DebugExecBindings.RemoveAt(IndexToRemove);
         PlayerInput->SaveConfig();
     }
-}
-
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_CommandBindings::Sort(UPlayerInput* PlayerInput)
-{
-    PlayerInput->DebugExecBindings.Sort([](const FKeyBind& Key1, const FKeyBind& Key2)
-    {
-        return Key1.Command.Compare(Key2.Command) < 0;
-    });
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_CommandBindings::RegisterDefaultCommands()
-{
-    APlayerController* PlayerController = GetLocalPlayerController();
-    if (PlayerController == nullptr)
-    {
-        return false;
-    }
-
-    UPlayerInput* PlayerInput = PlayerController->PlayerInput;
-    if (PlayerInput == nullptr)
-    {
-        return false;
-    }
-
-    AddCogCommand(PlayerInput, "Cog.ToggleInput", EKeys::Tab);
-    AddCogCommand(PlayerInput, "Cog.LoadLayout 1", EKeys::F1);
-    AddCogCommand(PlayerInput, "Cog.LoadLayout 2", EKeys::F2);
-    AddCogCommand(PlayerInput, "Cog.LoadLayout 3", EKeys::F3);
-    AddCogCommand(PlayerInput, "Cog.LoadLayout 4", EKeys::F4);
-    AddCogCommand(PlayerInput, "Cog.ToggleSelectionMode", EKeys::F5);
-
-    Sort(PlayerInput);
-    PlayerInput->SaveConfig();
-
-    return true;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_CommandBindings::AddCogCommand(UPlayerInput* PlayerInput, const FString& Command, const FKey& Key)
-{
-    for (FKeyBind& KeyBind : PlayerInput->DebugExecBindings)
-    {
-        if (KeyBind.Key == Key && KeyBind.Command != Command)
-        {
-            KeyBind.Control = true;
-            KeyBind.bIgnoreCtrl = false;
-        }
-    }
-
-    FKeyBind* ExistingKeyBind = PlayerInput->DebugExecBindings.FindByPredicate([Command](const FKeyBind& KeyBind){ return KeyBind.Command == Command; });
-    if (ExistingKeyBind == nullptr)
-    {
-        ExistingKeyBind = &PlayerInput->DebugExecBindings.AddDefaulted_GetRef();
-    }
-
-    FKeyBind CogKeyBind;
-    CogKeyBind.Command = Command;
-    CogKeyBind.Control = false;
-    CogKeyBind.bIgnoreCtrl = true;
-    CogKeyBind.Key = Key;
-
-    *ExistingKeyBind = CogKeyBind;
 }

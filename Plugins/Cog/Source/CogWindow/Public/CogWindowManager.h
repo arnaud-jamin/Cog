@@ -21,13 +21,15 @@ class COGWINDOW_API UCogWindowManager : public UObject
 public:
     UCogWindowManager();
 
-    void Shutdown();
+    virtual void PostInitProperties() override;
 
-    void SortMainMenu();
+    virtual void Shutdown();
 
-    void Render(float DeltaTime);
+    virtual void SortMainMenu();
 
-    void Tick(float DeltaTime);
+    virtual void Render(float DeltaTime);
+
+    virtual void Tick(float DeltaTime);
 
     template<class T>
     T* CreateWindow(const FString& Name, bool AddToMainMenu = true)
@@ -39,41 +41,47 @@ public:
         return Window;
     }
 
-    void AddWindow(UCogWindow* Window, bool AddToMainMenu = true);
+    virtual void AddWindow(UCogWindow* Window, bool AddToMainMenu = true);
 
-    void AddMainMenuWidget(UCogWindow* Window);
+    virtual void AddMainMenuWidget(UCogWindow* Window);
 
-    UCogWindow* FindWindowByID(ImGuiID ID);
+    virtual UCogWindow* FindWindowByID(ImGuiID ID);
 
-    void CloseAllWindows();
+    virtual void CloseAllWindows();
 
-    void ResetLayout();
+    virtual void ResetLayout();
 
-    void LoadLayout(int32 LayoutIndex);
+    virtual void LoadLayout(int32 LayoutIndex);
 
-    void SaveLayout(int32 LayoutIndex);
+    virtual void SaveLayout(int32 LayoutIndex);
 
-    bool GetHideAllWindows() const { return bHideAllWindows; }
+    virtual bool GetHideAllWindows() const { return bHideAllWindows; }
 
-    void SetHideAllWindows(bool Value);
+    virtual void SetHideAllWindows(bool Value);
 
-    float GetDPIScale() const { return DPIScale; }
+    virtual float GetDPIScale() const { return DPIScale; }
 
-    void SetDPIScale(float Value);
+    virtual void SetDPIScale(float Value);
     
-    bool GetCompactMode() const { return bCompactMode; }
+    virtual bool GetCompactMode() const { return bCompactMode; }
 
-    void SetCompactMode(bool Value) { bCompactMode = Value; }
+    virtual void SetCompactMode(bool Value) { bCompactMode = Value; }
 
-    bool GetShowHelp() const { return bShowHelp; }
+    virtual bool GetShowHelp() const { return bShowHelp; }
 
-    void SetShowHelp(bool Value) { bShowHelp = Value; }
+    virtual void SetShowHelp(bool Value) { bShowHelp = Value; }
 
-    bool GetPreviewWindowsInMenu() const { return bShowWindowsInMainMenu; }
+    virtual bool GetPreviewWindowsInMenu() const { return bShowWindowsInMainMenu; }
 
-    void SetPreviewWindowsInMenu(bool Value) { bShowWindowsInMainMenu = Value; }
+    virtual void SetPreviewWindowsInMenu(bool Value) { bShowWindowsInMainMenu = Value; }
 
-    void ResetAllWindowsConfig();
+    virtual void ResetAllWindowsConfig();
+
+    virtual bool RegisterDefaultCommands();
+
+    static void AddCommand(UPlayerInput* PlayerInput, const FString& Command, const FKey& Key);
+
+    static void SortCommands(UPlayerInput* PlayerInput);
 
 protected:
 
@@ -86,17 +94,17 @@ protected:
         TArray<FMenu> SubMenus;
     };
 
-    void InitializeInternal();
+    virtual void InitializeInternal();
 
-    void RefreshDPIScale();
+    virtual void RefreshDPIScale();
 
-    void RenderMainMenu();
+    virtual void RenderMainMenu();
     
-    FMenu* AddMenu(const FString& Name);
+    virtual FMenu* AddMenu(const FString& Name);
 
-    void RenderOptionMenu(FMenu& Menu);
+    virtual void RenderOptionMenu(FMenu& Menu);
 
-    void RenderMenuItem(UCogWindow& Window, const char* MenuItemName);
+    virtual void RenderMenuItem(UCogWindow& Window, const char* MenuItemName);
 
     static void SettingsHandler_ClearAll(ImGuiContext* ctx, ImGuiSettingsHandler*);
 
@@ -136,6 +144,9 @@ protected:
 
     UPROPERTY(Config)
     bool bShowWindowsInMainMenu = true;
+
+    UPROPERTY(Config)
+    bool bRegisterDefaultCommands = true;
 
     TSharedPtr<SCogImguiWidget> ImGuiWidget = nullptr;
 

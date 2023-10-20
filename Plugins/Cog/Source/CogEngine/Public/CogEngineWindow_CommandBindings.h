@@ -18,20 +18,10 @@ public:
 
 protected:
 
-    virtual void PostInitProperties() override;
-
     virtual void RenderHelp() override;
 
     virtual void RenderContent() override;
 
-    virtual bool RegisterDefaultCommands();
-
 private:
-    
-    UPROPERTY(Config)
-    bool bRegisterDefaultCommands = true;
 
-    void Sort(UPlayerInput* PlayerInput);
-
-    void AddCogCommand(UPlayerInput* PlayerInput, const FString& Command, const FKey& Key);
 };
