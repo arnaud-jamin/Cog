@@ -62,9 +62,9 @@ Used to apply cheats to the selected actor.
 ![Cheats](https://github.com/arnaud-jamin/Cog/assets/13844285/b7b89635-7924-49b7-98c0-311199947dfc)
 - The cheats are gameplay effects configured in a data asset.
 - Key modifiers can be used to change which actor should be affected by the cheat:
-  - [CTRL] apply the cheat to the controlled actor
-  - [ALT] apply the cheat to the allies of the selected actor
-  - [SHIFT] apply the cheat to the enemies of the selected actor
+  - `[CTRL]` Apply the cheat to the controlled actor
+  - `[ALT]` Apply the cheat to the allies of the selected actor
+  - `[SHIFT]` Apply the cheat to the enemies of the selected actor
 
 ### Collisions
 Used to inspect collisions by performing a collision query with the selected channels. 
