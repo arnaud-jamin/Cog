@@ -58,8 +58,6 @@ protected:
 
     virtual void SetGlobalSelection(AActor* Value) const;
 
-    virtual AActor* GetGlobalSelection(AActor* Value) const;
-
 private:
 
     TSubclassOf<AActor> GetSelectedActorClass() const;

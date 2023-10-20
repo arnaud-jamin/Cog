@@ -407,17 +407,27 @@ void UCogEngineWindow_Selection::TickSelectionMode()
     FVector WorldOrigin, WorldDirection;
     if (UGameplayStatics::DeprojectScreenToWorld(PlayerController, FCogImguiHelper::ToVector2D(ImGui::GetMousePos()), WorldOrigin, WorldDirection))
     {
+        //--------------------------------------------------------------------------------------------------------
+        // Prioritize another actor than the selected actor unless we only touch the selected actor.
+        //--------------------------------------------------------------------------------------------------------
         TArray<AActor*> IgnoreList;
+        IgnoreList.Add(FCogDebugSettings::GetSelection());
 
         FHitResult HitResult;
-        if (UKismetSystemLibrary::LineTraceSingle(GetWorld(), WorldOrigin, WorldOrigin + WorldDirection * 10000, TraceType, false, IgnoreList, EDrawDebugTrace::None, HitResult, true))
+        for (int i = 0; i < 2; ++i)
         {
-            if (HitResult.GetActor() != nullptr)
+            if (UKismetSystemLibrary::LineTraceSingle(GetWorld(), WorldOrigin, WorldOrigin + WorldDirection * 10000, TraceType, false, IgnoreList, EDrawDebugTrace::None, HitResult, true))
             {
                 if (SelectedActorClass == nullptr || HitResult.GetActor()->GetClass()->IsChildOf(SelectedActorClass))
                 {
                     HoveredActor = HitResult.GetActor();
+                    break;
                 }
+
+                //------------------------------------------------
+                // The second time we accept the selected actor
+                //------------------------------------------------
+                IgnoreList.Empty();
             }
         }
     }
@@ -467,6 +477,7 @@ void UCogEngineWindow_Selection::DrawActorFrame(const AActor& Actor)
     if (const UPrimitiveComponent* PrimitiveComponent = Cast<UPrimitiveComponent>(Actor.GetRootComponent()))
     {
         PrimitiveFound = true;
+    
         Bounds += PrimitiveComponent->Bounds.GetBox();
     }
     else
@@ -642,10 +653,4 @@ void UCogEngineWindow_Selection::RenderMainMenuWidget(bool Draw, float& Width)
 void UCogEngineWindow_Selection::SetGlobalSelection(AActor* Value) const
 {
     FCogDebugSettings::SetSelection(GetWorld(), Value);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-AActor* UCogEngineWindow_Selection::GetGlobalSelection(AActor* Value) const
-{
-    return FCogDebugSettings::GetSelection();
 }
