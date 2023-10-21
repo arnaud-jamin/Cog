@@ -54,5 +54,5 @@ private:
     ImGuiTextFilter Filter;
 
     UPROPERTY()
-    TWeakObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
+    TObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
 };

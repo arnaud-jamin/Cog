@@ -31,5 +31,5 @@ protected:
 private:
 
     UPROPERTY()
-    TWeakObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
+    TObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
 };

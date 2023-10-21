@@ -76,7 +76,7 @@ private:
     float RepeatPeriod = 0.5f;
 
     UPROPERTY()
-    TWeakObjectPtr<const UCogInputDataAsset> Asset;
+    TObjectPtr<const UCogInputDataAsset> Asset;
 
     TMap<FKey, FCogInjectActionInfo> Actions;
     

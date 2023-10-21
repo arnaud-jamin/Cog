@@ -39,7 +39,7 @@ private:
     float RepeatTime = 0.0f;
 
     UPROPERTY()
-    TWeakObjectPtr<const UCogInputDataAsset> Asset = nullptr;
+    TObjectPtr<const UCogInputDataAsset> Asset = nullptr;
 
     TArray<FCogInjectActionInfo> Actions;
 };

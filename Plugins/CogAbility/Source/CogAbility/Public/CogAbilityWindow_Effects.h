@@ -55,5 +55,5 @@ protected:
     ImVec4 GetEffectModifierColor(const FModifierSpec& ModSpec, const FGameplayModifierInfo& ModInfo, float BaseValue) const;
 
     UPROPERTY()
-    TWeakObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
+    TObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
 };

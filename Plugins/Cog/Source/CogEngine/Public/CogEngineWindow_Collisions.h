@@ -60,5 +60,5 @@ private:
     bool ShowQuery = false;
 
     UPROPERTY()
-    TWeakObjectPtr<const UCogEngineDataAsset> Asset = nullptr;
+    TObjectPtr<const UCogEngineDataAsset> Asset = nullptr;
 };

@@ -29,5 +29,5 @@ protected:
     virtual void DrawPool(const UAbilitySystemComponent* AbilitySystemComponent, const FCogAbilityPool& Pool);
 
     UPROPERTY()
-    TWeakObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
+    TObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
 };

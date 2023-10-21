@@ -66,5 +66,5 @@ private:
     TArray<FGameplayAbilitySpecHandle> OpenedAbilities;
 
     UPROPERTY()
-    TWeakObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
+    TObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
 };

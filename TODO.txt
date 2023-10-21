@@ -7,6 +7,7 @@
 - CogEngine: More stats in the stats window
 - CogEngine: Overlay mode of stats.
 - CogEngine: Stat main menu widget could have a tooltip on each stat with a control to change set the emulation (FPS, Ping, Packetloss)
+- CogEngine: Add screen settings (fullscreen, borderless, window and resolution)
 
 - CogInput: Add multiple IMC on the input data asset. Maybe propose a current imc
 
