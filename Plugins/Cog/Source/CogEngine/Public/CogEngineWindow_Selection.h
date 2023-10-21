@@ -14,6 +14,8 @@ class COGENGINE_API UCogEngineWindow_Selection : public UCogWindow
 
 public:
 
+    static FString ToggleSelectionModeCommand;
+
     UCogEngineWindow_Selection();
 
     bool GetIsSelecting() const { return bSelectionModeActive; }
@@ -58,7 +60,7 @@ protected:
 
     virtual void SetGlobalSelection(AActor* Value) const;
 
-private:
+    virtual void RenderPickButtonTooltip();
 
     TSubclassOf<AActor> GetSelectedActorClass() const;
 

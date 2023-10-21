@@ -4,6 +4,7 @@
 #include "CogDebugSettings.h"
 #include "CogEngineReplicator.h"
 #include "CogImguiModule.h"
+#include "CogImguiInputHelper.h"
 #include "CogWindowManager.h"
 #include "CogWindowWidgets.h"
 #include "EngineUtils.h"
@@ -11,6 +12,8 @@
 #include "HAL/IConsoleManager.h"
 #include "imgui.h"
 #include "Kismet/GameplayStatics.h"
+
+FString UCogEngineWindow_Selection::ToggleSelectionModeCommand = TEXT("Cog.ToggleSelectionMode");
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogEngineWindow_Selection::RenderHelp()
@@ -30,7 +33,7 @@ UCogEngineWindow_Selection::UCogEngineWindow_Selection()
     ActorClasses = { AActor::StaticClass(), ACharacter::StaticClass() };
 
     ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
-        TEXT("Cog.ToggleSelectionMode"),
+        *ToggleSelectionModeCommand,
         TEXT("Toggle the actor selection mode"),
         FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { ToggleSelectionMode(); }),
         ECVF_Cheat));
@@ -198,6 +201,7 @@ void UCogEngineWindow_Selection::RenderContent()
             ActivateSelectionMode();
             HackWaitInputRelease();
         }
+        RenderPickButtonTooltip();
 
         ImGui::EndMenuBar();
     }
@@ -592,10 +596,7 @@ void UCogEngineWindow_Selection::RenderMainMenuWidget(bool Draw, float& Width)
             ActivateSelectionMode();
             HackWaitInputRelease();
         }
-        if (ImGui::IsItemHovered())
-        {
-            ImGui::SetTooltip("Enter picking mode to select an actor on screen.");
-        }
+        RenderPickButtonTooltip();
 
         ImGui::PopStyleColor(1);
         ImGui::PopStyleVar(2);
@@ -653,4 +654,14 @@ void UCogEngineWindow_Selection::RenderMainMenuWidget(bool Draw, float& Width)
 void UCogEngineWindow_Selection::SetGlobalSelection(AActor* Value) const
 {
     FCogDebugSettings::SetSelection(GetWorld(), Value);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindow_Selection::RenderPickButtonTooltip()
+{
+    if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
+    {
+        const FString Shortcut = FCogImguiInputHelper::CommandToString(*GetWorld(), ToggleSelectionModeCommand);
+        ImGui::SetTooltip("Enter picking mode to pick an actor on screen. %s", TCHAR_TO_ANSI(*Shortcut));
+    }
 }

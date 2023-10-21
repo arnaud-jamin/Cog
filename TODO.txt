@@ -14,6 +14,4 @@
 
 - CogSample: Add a custom window in sample (changing the character faction)
 - CogSample: Create more abilities
-- CogSample: Add area of effects in the level
 
-- CogPackage: in package mode the Gameplay Cues are not visible.

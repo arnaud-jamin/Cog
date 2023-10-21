@@ -11,6 +11,11 @@
 #include "HAL/IConsoleManager.h"
 #include "imgui_internal.h"
 
+FString UCogWindowManager::ToggleInputCommand   = TEXT("Cog.ToggleInput");
+FString UCogWindowManager::LoadLayoutCommand    = TEXT("Cog.LoadLayout");
+FString UCogWindowManager::SaveLayoutCommand    = TEXT("Cog.SaveLayout");
+FString UCogWindowManager::ResetLayoutCommand   = TEXT("Cog.ResetLayout");
+
 //--------------------------------------------------------------------------------------------------------------------------
 UCogWindowManager::UCogWindowManager()
 {
@@ -54,19 +59,25 @@ void UCogWindowManager::InitializeInternal()
     SettingsWindow = CreateWindow<UCogWindow_Settings>("Window.Settings", false);
 
     ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
-        TEXT("Cog.ToggleInput"), 
+        *ToggleInputCommand,
         TEXT("Toggle the input focus between the Game and ImGui"),
         FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& Args) { FCogImguiModule::Get().ToggleEnableInput(); }), 
         ECVF_Cheat));
 
     ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
-        TEXT("Cog.LoadLayout"), 
+        *ResetLayoutCommand,
+        TEXT("Reset the layout."),
+        FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { if (Args.Num() > 0) { ResetLayout(); }}),
+        ECVF_Cheat));
+
+    ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
+        *LoadLayoutCommand,
         TEXT("Load the layout. Cog.LoadLayout <Index>"),
         FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { if (Args.Num() > 0) { LoadLayout(FCString::Atoi(*Args[0])); }}), 
         ECVF_Cheat));
 
     ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
-        TEXT("Cog.SaveLayout"), 
+        *SaveLayoutCommand, 
         TEXT("Save the layout. Cog.SaveLayout <Index>"),
         FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { if (Args.Num() > 0) { SaveLayout(FCString::Atoi(*Args[0])); }}), 
         ECVF_Cheat));
@@ -295,6 +306,8 @@ UCogWindowManager::FMenu* UCogWindowManager::AddMenu(const FString& Name)
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::RenderMainMenu()
 {
+    const UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*GetWorld());
+
     if (ImGui::BeginMainMenuBar())
     {
         for (UCogWindowManager::FMenu& Menu : MainMenu.SubMenus)
@@ -304,6 +317,13 @@ void UCogWindowManager::RenderMainMenu()
 
         if (ImGui::BeginMenu("Window"))
         {
+            if (ImGui::MenuItem("Toggle Input", TCHAR_TO_ANSI(*FCogImguiInputHelper::CommandToString(PlayerInput, ToggleInputCommand))))
+            {
+                FCogImguiModule::Get().ToggleEnableInput();
+            }
+            ImGui::Separator();
+
+
             if (ImGui::MenuItem("Close All Windows"))
             {
                 CloseAllWindows();
@@ -318,10 +338,7 @@ void UCogWindowManager::RenderMainMenu()
             {
                 for (int32 i = 1; i <= 4; ++i)
                 {
-                    if (ImGui::MenuItem(TCHAR_TO_ANSI(*FString::Printf(TEXT("Load Layout %d"), i))))
-                    {
-                        LoadLayout(i);
-                    }
+                    RenderLoadLayoutMenuItem(PlayerInput, i);
                 }
 
                 ImGui::EndMenu();
@@ -331,10 +348,7 @@ void UCogWindowManager::RenderMainMenu()
             {
                 for (int32 i = 1; i <= 4; ++i)
                 {
-                    if (ImGui::MenuItem(TCHAR_TO_ANSI(*FString::Printf(TEXT("Save Layout %d"), i))))
-                    {
-                        SaveLayout(i);
-                    }
+                    RenderSaveLayoutMenuItem(PlayerInput, i);
                 }
 
                 ImGui::EndMenu();
@@ -387,6 +401,28 @@ void UCogWindowManager::RenderMainMenu()
         }
 
         ImGui::EndMainMenuBar();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogWindowManager::RenderLoadLayoutMenuItem(const UPlayerInput* PlayerInput, int LayoutIndex)
+{
+    FString Command = FString::Printf(TEXT("%s %d"), *LoadLayoutCommand, LayoutIndex);
+    FString Shortcut = FCogImguiInputHelper::CommandToString(PlayerInput, Command);
+    if (ImGui::MenuItem(TCHAR_TO_ANSI(*FString::Printf(TEXT("Load Layout %d"), LayoutIndex)), TCHAR_TO_ANSI(*Shortcut)))
+    {
+        LoadLayout(LayoutIndex);
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogWindowManager::RenderSaveLayoutMenuItem(const UPlayerInput* PlayerInput, int LayoutIndex)
+{
+    FString Command = FString::Printf(TEXT("%s %d"), *SaveLayoutCommand, LayoutIndex);
+    FString Shortcut = FCogImguiInputHelper::CommandToString(PlayerInput, Command);
+    if (ImGui::MenuItem(TCHAR_TO_ANSI(*FString::Printf(TEXT("Save Layout %d"), LayoutIndex)), TCHAR_TO_ANSI(*Shortcut)))
+    {
+        SaveLayout(LayoutIndex);
     }
 }
 
@@ -535,23 +571,12 @@ void UCogWindowManager::ResetAllWindowsConfig()
 //--------------------------------------------------------------------------------------------------------------------------
 bool UCogWindowManager::RegisterDefaultCommands()
 {
-    UWorld* World = GetWorld();
-    if (World == nullptr)
+    if (GetWorld() == nullptr)
     {
         return false;
     }
 
-    APlayerController* PlayerController = FCogImguiInputHelper::GetFirstLocalPlayerController(*World);
-    if (PlayerController == nullptr)
-    {
-        return false;
-    }
-
-    UPlayerInput* PlayerInput = PlayerController->PlayerInput;
-    if (PlayerInput == nullptr)
-    {
-        return false;
-    }
+    UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*GetWorld());
 
     AddCommand(PlayerInput, "Cog.ToggleInput", EKeys::Tab);
     AddCommand(PlayerInput, "Cog.LoadLayout 1", EKeys::F1);

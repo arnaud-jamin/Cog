@@ -12,7 +12,9 @@ class COGIMGUI_API FCogImguiInputHelper
 {
 public:
 
-    static APlayerController* GetFirstLocalPlayerController(UWorld& World);
+    static APlayerController* GetFirstLocalPlayerController(const UWorld& World);
+
+    static UPlayerInput* GetPlayerInput(const UWorld& World);
 
     static bool IsKeyEventHandled(UWorld* World, const FKeyEvent& KeyEvent);
 
@@ -41,6 +43,12 @@ public:
     static uint32 MouseButtonToImGuiMouseButton(const FKey& MouseButton);
 
     static EMouseCursor::Type ToSlateMouseCursor(ImGuiMouseCursor MouseCursor);
+
+    static FString CommandToString(const UWorld& World, const FString& Command);
+
+    static FString CommandToString(const UPlayerInput* PlayerInput, const FString& Command);
+
+    static FString KeyBindToString(const FKeyBind& KeyBind);
 
     template<typename T, std::enable_if_t<(sizeof(T) <= sizeof(ImWchar)), T>* = nullptr>
     static ImWchar CastInputChar(T Char)

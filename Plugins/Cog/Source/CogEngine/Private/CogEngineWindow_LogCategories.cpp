@@ -49,21 +49,38 @@ void UCogEngineWindow_LogCategories::RenderContent()
     {
         if (ImGui::BeginMenu("Options"))
         {
+            if (ImGui::MenuItem("Deactivate All"))
+            {
+                FCogDebugLog::DeactivateAllLogCateories(*World);
+            }
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
+            {
+                ImGui::SetTooltip("Deactivate all log categories. If connected to a server, also deactivate all its log categories.");
+            }
+
+            ImGui::Separator();
+
             ImGui::Checkbox("Show detailed verbosity", &bShowAllVerbosity);
-            ImGui::SameLine();
-            FCogWindowWidgets::HelpMarker("Show the verbosity level of each log category.");
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
+            {
+                ImGui::SetTooltip("Show the verbosity level of each log category.");
+            }
 
             ImGui::EndMenu();
         }
 
-        if (ImGui::MenuItem("Reset"))
+        bool bIsFilteringBySelection = FCogDebugSettings::GetIsFilteringBySelection();
+        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
+        FCogWindowWidgets::PushStyleCompact();
+        if (ImGui::Checkbox("Filter", &bIsFilteringBySelection))
         {
-            FCogDebugLog::DeactivateAllLogCateories(*World);
+            FCogDebugSettings::SetIsFilteringBySelection(GetWorld(), bIsFilteringBySelection);
         }
+        FCogWindowWidgets::PopStyleCompact();
 
-        if (ImGui::IsItemHovered())
+        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
         {
-            ImGui::SetTooltip("Deactivate all the log categories");
+            ImGui::SetTooltip("If checked, only show the debug of the currently selected actor. Otherwise show the debug of all actors.");
         }
 
         if (ImGui::MenuItem("Flush"))
@@ -73,7 +90,7 @@ void UCogEngineWindow_LogCategories::RenderContent()
             GEngine->ClearOnScreenDebugMessages();
         }
 
-        if (ImGui::IsItemHovered())
+        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
         {
             ImGui::SetTooltip("Clear all the debug drawn on screen");
         }

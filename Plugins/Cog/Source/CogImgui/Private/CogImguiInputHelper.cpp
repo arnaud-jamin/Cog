@@ -17,7 +17,7 @@
 TMap<FKey, ImGuiKey> FCogImguiInputHelper::KeyMap;
 
 //--------------------------------------------------------------------------------------------------------------------------
-APlayerController* FCogImguiInputHelper::GetFirstLocalPlayerController(UWorld& World)
+APlayerController* FCogImguiInputHelper::GetFirstLocalPlayerController(const UWorld& World)
 {
     for (FConstPlayerControllerIterator Iterator = World.GetPlayerControllerIterator(); Iterator; ++Iterator)
     {
@@ -29,6 +29,19 @@ APlayerController* FCogImguiInputHelper::GetFirstLocalPlayerController(UWorld& W
     }
 
     return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+UPlayerInput* FCogImguiInputHelper::GetPlayerInput(const UWorld& World)
+{
+    APlayerController* PlayerController = GetFirstLocalPlayerController(World);
+    if (PlayerController == nullptr)
+    {
+        return nullptr;
+    }
+
+    UPlayerInput* PlayerInput = PlayerController->PlayerInput;
+    return PlayerInput;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -205,13 +218,7 @@ bool FCogImguiInputHelper::IsKeyBoundToCommand(UWorld* World, const FKeyEvent& K
         return false;
     }
 
-    APlayerController* Controller = GetFirstLocalPlayerController(*World);
-    if (Controller == nullptr)
-    {
-        return false;
-    }
-    
-    UPlayerInput* PlayerInput = Controller->PlayerInput;
+    const UPlayerInput* PlayerInput = GetPlayerInput(*World);
     if (PlayerInput == nullptr)
     {
         return false;
@@ -440,4 +447,68 @@ void FCogImguiInputHelper::InitializeKeyMap()
     //KeyMap.Add(EKeys::LeftParantheses,   ImGuiKey_None;
     //KeyMap.Add(EKeys::RightParantheses,  ImGuiKey_None;
     //KeyMap.Add(EKeys::Quote,             ImGuiKey_None;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FString FCogImguiInputHelper::CommandToString(const UWorld& World, const FString& Command)
+{
+    const UPlayerInput* PlayerInput = GetPlayerInput(World);
+    if (PlayerInput == nullptr)
+    {
+        return FString();
+    }
+
+    const FKeyBind* Result = PlayerInput->DebugExecBindings.FindByPredicate([&](const FKeyBind& KeyBind) { return KeyBind.Command == Command; });
+    if (Result == nullptr)
+    {
+        return FString();
+    }
+
+    return KeyBindToString(*Result);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FString FCogImguiInputHelper::CommandToString(const UPlayerInput* PlayerInput, const FString& Command)
+{
+    if (PlayerInput == nullptr)
+    {
+        return FString();
+    }
+
+    const FKeyBind* Result = PlayerInput->DebugExecBindings.FindByPredicate([&](const FKeyBind& KeyBind) { return KeyBind.Command == Command; });
+    if (Result == nullptr)
+    {
+        return FString();
+    }
+
+    return KeyBindToString(*Result);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FString FCogImguiInputHelper::KeyBindToString(const FKeyBind& KeyBind)
+{
+    FString Result;
+    if (KeyBind.Alt)
+    {
+        Result = Result.Append("Alt ");
+    }
+
+    if (KeyBind.Shift)
+    {
+        Result = Result.Append("Shift ");
+    }
+
+    if (KeyBind.Control)
+    {
+        Result = Result.Append("Ctrl ");
+    }
+
+    if (KeyBind.Cmd)
+    {
+        Result = Result.Append("Cmd ");
+    }
+
+    Result = Result.Printf(TEXT("[%s]"), *KeyBind.Key.ToString());
+
+    return Result;
 }

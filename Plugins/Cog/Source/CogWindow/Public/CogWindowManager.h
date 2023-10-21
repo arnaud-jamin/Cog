@@ -9,6 +9,7 @@ class IConsoleObject;
 class SCogImguiWidget;
 class UCogWindow;
 class UCogWindow_Settings;
+class UPlayerInput;
 class UWorld;
 struct ImGuiSettingsHandler;
 struct ImGuiTextBuffer;
@@ -19,6 +20,12 @@ class COGWINDOW_API UCogWindowManager : public UObject
     GENERATED_BODY()
 
 public:
+
+    static FString ToggleInputCommand;
+    static FString LoadLayoutCommand;
+    static FString SaveLayoutCommand;
+    static FString ResetLayoutCommand;
+
     UCogWindowManager();
 
     virtual void PostInitProperties() override;
@@ -105,6 +112,10 @@ protected:
     virtual void RenderOptionMenu(FMenu& Menu);
 
     virtual void RenderMenuItem(UCogWindow& Window, const char* MenuItemName);
+
+    virtual void RenderLoadLayoutMenuItem(const UPlayerInput* PlayerInput, int LayoutIndex);
+
+    virtual void RenderSaveLayoutMenuItem(const UPlayerInput* PlayerInput, int LayoutIndex);
 
     static void SettingsHandler_ClearAll(ImGuiContext* ctx, ImGuiSettingsHandler*);
 
