@@ -33,7 +33,7 @@ Displays the gameplay abilities of the selected actor.
 Displays the state of Input Action.
 
 ![Actions](https://github.com/arnaud-jamin/Cog/assets/13844285/6323e78b-2ee4-43e2-bec6-19aa15716d2c)
-- Can be used to inject inputs to help debugging.
+- Can be used to inject inputs to help debugging, as loosing window focus when breaking in the code doesn't affect the state of injected inputs unlike real inputs.
 - The display input action are read from a Input Mapping Context defined in a Data Asset.
 
 ### Attributes
@@ -54,7 +54,6 @@ Displays the behavior tree of the selected actor.
 Displays the blackboard of the selected actor.
 
 ![Blackboard](https://github.com/arnaud-jamin/Cog/assets/13844285/649d46d5-386c-4990-9f45-e4eb95a6b81a)
-
 
 ### Cheats
 Used to apply cheats to the selected actor.
@@ -121,7 +120,7 @@ Can be used to activate and deactivate log categories
 - The log categories are used to filter both the output log and the debug draw.
 
 ### Metric
-Gather various values sent by the selected actor and compte their rate per second. This is typically used to compute the damage dealt or received per second.
+Gather various values sent by the selected actor and compute their rate per second. This is typically used to compute the damage dealt or received per second.
 
 ![Metric](https://github.com/arnaud-jamin/Cog/assets/13844285/64d3cb7c-8731-4897-9ef9-b0868148ebe2)
 - The following code shows how to add a metric:
