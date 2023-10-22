@@ -415,6 +415,7 @@ class ACogSamplePlayerController
 
 - In Unreal Editor create and configure the following Data Assets:
   - CogAbilityDataAsset
+  - CogAIDataAsset
   - CogEngineDataAsset
   - CogInputDataAsset
   
