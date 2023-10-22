@@ -38,7 +38,7 @@ void UCogWindowManager::PostInitProperties()
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::InitializeInternal()
 {
-    ImGuiWidget = FCogImguiModule::Get().CreateImGuiViewport(GEngine->GameViewport, [this](float DeltaTime) { Render(DeltaTime); });
+    ImGuiWidget = FCogImguiModule::Get().CreateImGuiWidget(GEngine->GameViewport, [this](float DeltaTime) { Render(DeltaTime); });
 
     ImGuiSettingsHandler IniHandler;
     IniHandler.TypeName = "Cog";
@@ -97,6 +97,8 @@ void UCogWindowManager::Shutdown()
     {
         IConsoleManager::Get().UnregisterConsoleObject(ConsoleCommand);
     }
+
+    FCogImguiModule::Get().DestroyImGuiWidget(ImGuiWidget);
 
     SaveConfig();
 }

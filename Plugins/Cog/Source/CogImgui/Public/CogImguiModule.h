@@ -23,7 +23,9 @@ public:
 	virtual void ShutdownModule() override;
 
     //----------------------------------------------------------------------------------------------------------------------
-    TSharedPtr<SCogImguiWidget> CreateImGuiViewport(UGameViewportClient* GameViewport,  FCogImguiRenderFunction Render, ImFontAtlas* FontAtlas = nullptr);
+    TSharedPtr<SCogImguiWidget> CreateImGuiWidget(UGameViewportClient* GameViewport,  FCogImguiRenderFunction Render, ImFontAtlas* FontAtlas = nullptr);
+
+    void DestroyImGuiWidget(TSharedPtr<SCogImguiWidget> ImGuiWidget);
 
     FCogImguiTextureManager& GetTextureManager() { return TextureManager; }
     

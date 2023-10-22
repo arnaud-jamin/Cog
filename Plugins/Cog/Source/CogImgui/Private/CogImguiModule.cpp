@@ -37,7 +37,7 @@ void FCogImguiModule::Initialize()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-TSharedPtr<SCogImguiWidget> FCogImguiModule::CreateImGuiViewport(UGameViewportClient* GameViewport, FCogImguiRenderFunction Render, ImFontAtlas* FontAtlas /*= nullptr*/)
+TSharedPtr<SCogImguiWidget> FCogImguiModule::CreateImGuiWidget(UGameViewportClient* GameViewport, FCogImguiRenderFunction Render, ImFontAtlas* FontAtlas /*= nullptr*/)
 {
     if (bIsInitialized == false)
     {
@@ -70,6 +70,24 @@ TSharedPtr<SCogImguiWidget> FCogImguiModule::CreateImGuiViewport(UGameViewportCl
     GameViewport->AddViewportWidgetContent(ScaleWidget.ToSharedRef(), Cog_ZOrder);
 
     return ImguiWidget;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogImguiModule::DestroyImGuiWidget(TSharedPtr<SCogImguiWidget> ImGuiWidget)
+{
+    UGameViewportClient* Viewport = ImGuiWidget->GetGameViewport().Get();
+    if (Viewport == nullptr)
+    {
+        return;
+    }
+
+    TSharedPtr<SWidget> ParentWidget = ImGuiWidget->GetParentWidget();
+    if (ParentWidget.IsValid() == false)
+    {
+        return;
+    }
+
+    Viewport->RemoveViewportWidgetContent(ParentWidget.ToSharedRef());
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
