@@ -379,6 +379,20 @@ void ACogSampleGameState::Tick(float DeltaSeconds)
 }
 ```
 
+- In your PlayerController class, spawn the Cog Replicators. The Replicator are used to communicate between the client and the server, for example to apply cheats, spawn actors, etc.
+```cpp
+void ACogSamplePlayerController::BeginPlay()
+{
+    Super::BeginPlay();
+
+#if ENABLE_COG
+    // Spawn the Replicator of each plugin
+    ACogDebugReplicator::Spawn(this);
+    ACogAbilityReplicator::Spawn(this);
+    ACogEngineReplicator::Spawn(this);
+#endif //ENABLE_COG
+}
+```
 
 - Implement Cog Interfaces on your desired actor classes:
 ```cpp
@@ -404,6 +418,10 @@ class ACogSamplePlayerController
   - CogEngineDataAsset
   - CogInputDataAsset
   
-  
- 
+![Data Assets](https://github.com/arnaud-jamin/Cog/assets/13844285/88384138-2ba7-43cf-a275-82f40503338e)
+
+![Data Assets](https://github.com/arnaud-jamin/Cog/assets/13844285/cbda8065-c921-41a6-b06e-4302d8c72989)
+
+![Data Assets](https://github.com/arnaud-jamin/Cog/assets/13844285/1f4f3255-4104-4dfc-ab9e-fd34335c0289)
+
 
