@@ -2,6 +2,8 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
+#include "CogAbilityDataAsset.h"
+#include "CogWindowHelper.h"
 #include "Components/SceneComponent.h"
 #include "EngineUtils.h"
 #include "GameplayEffect.h"
@@ -52,6 +54,8 @@ ACogAbilityReplicator::ACogAbilityReplicator(const FObjectInitializer& ObjectIni
     bReplicates = true;
     bOnlyRelevantToOwner = true;
 
+    AbilityAsset = FCogWindowHelper::GetFirstAssetByClass<UCogAbilityDataAsset>();
+
 #endif // !UE_BUILD_SHIPPING
 }
 
@@ -74,6 +78,18 @@ void ACogAbilityReplicator::BeginPlay()
     Super::BeginPlay();
 
     OwnerPlayerController = Cast<APlayerController>(GetOwner());
+    
+    OnAnyActorSpawnedHandle = GetWorld()->AddOnActorSpawnedHandler(FOnActorSpawned::FDelegate::CreateUObject(this, &ACogAbilityReplicator::OnAnyActorSpawned));
+
+    ApplyAllTweaksOnAllActors();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogAbilityReplicator::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    GetWorld()->RemoveOnActorSpawnedHandler(OnAnyActorSpawnedHandle);
+
+    Super::EndPlay(EndPlayReason);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -216,59 +232,76 @@ void ACogAbilityReplicator::Server_ResetAllTweaks_Implementation()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::SetTweakValue(const UCogAbilityDataAsset* TweaksAsset, int32 TweakIndex, int32 TweakCategoryIndex, float Value)
+void ACogAbilityReplicator::OnAnyActorSpawned(AActor* Actor)
 {
-    Server_SetTweakValue(TweaksAsset, TweakIndex, TweakCategoryIndex, Value);
+    if (AbilityAsset->ActorRootClass != nullptr && Actor->GetClass()->IsChildOf(AbilityAsset->ActorRootClass) == false)
+    {
+        return;
+    }
+
+    int32 TweakCategoryIndex = FindTweakCategoryFromActor(Actor);
+    if (TweakCategoryIndex == INDEX_NONE)
+    {
+        return;
+    }
+
+    ApplyAllTweaksOnActor(TweakCategoryIndex, Actor);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::Server_SetTweakValue_Implementation(const UCogAbilityDataAsset* TweaksAsset, int32 TweakIndex, int32 TweakCategoryIndex, float Value)
+void ACogAbilityReplicator::SetTweakValue(int32 TweakIndex, int32 TweakCategoryIndex, float Value)
 {
-    if (TweaksAsset == nullptr)
+    Server_SetTweakValue(TweakIndex, TweakCategoryIndex, Value);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogAbilityReplicator::Server_SetTweakValue_Implementation(int32 TweakIndex, int32 TweakCategoryIndex, float Value)
+{
+    if (AbilityAsset == nullptr)
     {
         return;
     }
 
-    if (TweaksAsset->Tweaks.IsValidIndex(TweakIndex) == false)
+    if (AbilityAsset->Tweaks.IsValidIndex(TweakIndex) == false)
     {
         return;
     }
 
-    if (TweaksAsset->TweaksCategories.IsValidIndex(TweakCategoryIndex) == false)
+    if (AbilityAsset->TweaksCategories.IsValidIndex(TweakCategoryIndex) == false)
     {
         return;
     }
 
-    SetTweakCurrentValue(TweaksAsset, TweakIndex, TweakCategoryIndex, Value);
+    SetTweakCurrentValue(TweakIndex, TweakCategoryIndex, Value);
 
-    const FCogAbilityTweak& Tweak = TweaksAsset->Tweaks[TweakIndex];
+    const FCogAbilityTweak& Tweak = AbilityAsset->Tweaks[TweakIndex];
 
     TArray<AActor*> Actors;
-    GetActorsFromTweakCategory(TweaksAsset, TweakCategoryIndex, Actors);
+    FindActorsFromTweakCategory(TweakCategoryIndex, Actors);
     for (AActor* Actor : Actors)
     {
-        ApplyTweakOnActor(Actor, Tweak, Value, TweaksAsset->SetByCallerMagnitudeTag);
+        ApplyTweakOnActor(Actor, Tweak, Value, AbilityAsset->SetByCallerMagnitudeTag);
     }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::ApplyAllTweaksOnActor(const UCogAbilityDataAsset* TweaksAsset, int32 TweakCategoryIndex, AActor* Actor)
+void ACogAbilityReplicator::ApplyAllTweaksOnActor(int32 TweakCategoryIndex, AActor* Actor)
 {
-    if (TweaksAsset == nullptr)
+    if (AbilityAsset == nullptr)
     {
         return;
     }
 
-    if (TweaksAsset->TweaksCategories.IsValidIndex(TweakCategoryIndex) == false)
+    if (AbilityAsset->TweaksCategories.IsValidIndex(TweakCategoryIndex) == false)
     {
         return;
     }
 
     int32 TweakIndex = 0;
-    for (const FCogAbilityTweak& Tweak : TweaksAsset->Tweaks)
+    for (const FCogAbilityTweak& Tweak : AbilityAsset->Tweaks)
     {
-        const float Value = GetTweakCurrentValue(TweaksAsset, TweakIndex, TweakCategoryIndex);
-        ApplyTweakOnActor(Actor, Tweak, Value, TweaksAsset->SetByCallerMagnitudeTag);
+        const float Value = GetTweakCurrentValue(TweakIndex, TweakCategoryIndex);
+        ApplyTweakOnActor(Actor, Tweak, Value, AbilityAsset->SetByCallerMagnitudeTag);
         TweakIndex++;
     }
 }
@@ -297,9 +330,9 @@ void ACogAbilityReplicator::ApplyTweakOnActor(AActor* Actor, const FCogAbilityTw
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-float ACogAbilityReplicator::GetTweakCurrentValue(const UCogAbilityDataAsset* TweaksAsset, int32 TweakIndex, int32 TweakCategoryIndex)
+float ACogAbilityReplicator::GetTweakCurrentValue(int32 TweakIndex, int32 TweakCategoryIndex)
 {
-    float* Value = GetTweakCurrentValuePtr(TweaksAsset, TweakIndex, TweakCategoryIndex);
+    float* Value = GetTweakCurrentValuePtr(TweakIndex, TweakCategoryIndex);
     if (Value == nullptr)
     {
         return 0.0f; 
@@ -309,11 +342,16 @@ float ACogAbilityReplicator::GetTweakCurrentValue(const UCogAbilityDataAsset* Tw
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-float* ACogAbilityReplicator::GetTweakCurrentValuePtr(const UCogAbilityDataAsset* TweaksAsset, int32 TweakIndex, int32 TweakCategoryIndex)
+float* ACogAbilityReplicator::GetTweakCurrentValuePtr(int32 TweakIndex, int32 TweakCategoryIndex)
 {
-    TweakCurrentValues.SetNum(TweaksAsset->Tweaks.Num() * TweaksAsset->TweaksCategories.Num());
+    if (AbilityAsset == nullptr)
+    {
+        return nullptr;
+    }
 
-    const int32 Index = TweakIndex + (TweakCategoryIndex * TweaksAsset->Tweaks.Num());
+    TweakCurrentValues.SetNum(AbilityAsset->Tweaks.Num() * AbilityAsset->TweaksCategories.Num());
+
+    const int32 Index = TweakIndex + (TweakCategoryIndex * AbilityAsset->Tweaks.Num());
 
     if (TweakCurrentValues.IsValidIndex(Index) == false)
     {
@@ -324,16 +362,16 @@ float* ACogAbilityReplicator::GetTweakCurrentValuePtr(const UCogAbilityDataAsset
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::SetTweakCurrentValue(const UCogAbilityDataAsset* TweaksAsset, int32 TweakIndex, int32 TweakCategoryIndex, float Value)
+void ACogAbilityReplicator::SetTweakCurrentValue(int32 TweakIndex, int32 TweakCategoryIndex, float Value)
 {
-    if (TweaksAsset == nullptr)
+    if (AbilityAsset == nullptr)
     {
         return;
     }
 
-    TweakCurrentValues.SetNum(TweaksAsset->Tweaks.Num() * TweaksAsset->TweaksCategories.Num());
+    TweakCurrentValues.SetNum(AbilityAsset->Tweaks.Num() * AbilityAsset->TweaksCategories.Num());
 
-    const int32 Index = TweakIndex + (TweakCategoryIndex * TweaksAsset->Tweaks.Num());
+    const int32 Index = TweakIndex + (TweakCategoryIndex * AbilityAsset->Tweaks.Num());
     if (TweakCurrentValues.IsValidIndex(TweakIndex) == false)
     {
         return;
@@ -344,20 +382,20 @@ void ACogAbilityReplicator::SetTweakCurrentValue(const UCogAbilityDataAsset* Twe
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::SetTweakProfile(const UCogAbilityDataAsset* TweaksAsset, int32 ProfileIndex)
+void ACogAbilityReplicator::SetTweakProfile(int32 ProfileIndex)
 {
-    Server_SetTweakProfile(TweaksAsset, ProfileIndex);
+    Server_SetTweakProfile(ProfileIndex);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::Server_SetTweakProfile_Implementation(const UCogAbilityDataAsset* TweaksAsset, int32 ProfileIndex)
+void ACogAbilityReplicator::Server_SetTweakProfile_Implementation(int32 ProfileIndex)
 {
-    if (TweaksAsset == nullptr)
+    if (AbilityAsset == nullptr)
     {
         return;
     }
 
-    if (TweaksAsset->TweakProfiles.IsValidIndex(ProfileIndex) == false)
+    if (AbilityAsset->TweakProfiles.IsValidIndex(ProfileIndex) == false)
     {
         ProfileIndex = INDEX_NONE;
     }
@@ -367,48 +405,59 @@ void ACogAbilityReplicator::Server_SetTweakProfile_Implementation(const UCogAbil
 
     ResetAllTweaks();
 
-    if (TweaksAsset->TweakProfiles.IsValidIndex(TweakProfileIndex))
+    if (AbilityAsset->TweakProfiles.IsValidIndex(TweakProfileIndex))
     {
-        const FCogAbilityTweakProfile& TweakProfile = TweaksAsset->TweakProfiles[TweakProfileIndex];
+        const FCogAbilityTweakProfile& TweakProfile = AbilityAsset->TweakProfiles[TweakProfileIndex];
 
         for (const FCogAbilityTweakProfileValue& ProfileTweak : TweakProfile.Tweaks)
         {
-            const int32 TweakIndex = TweaksAsset->Tweaks.IndexOfByPredicate([ProfileTweak](const FCogAbilityTweak& Tweak) { return ProfileTweak.Effect == Tweak.Effect; });
-            const int32 TweakCategoryIndex = TweaksAsset->TweaksCategories.IndexOfByPredicate([ProfileTweak](const FCogAbilityTweakCategory& TweakCategory) { return ProfileTweak.CategoryId == TweakCategory.Id; });
+            const int32 TweakIndex = AbilityAsset->Tweaks.IndexOfByPredicate([ProfileTweak](const FCogAbilityTweak& Tweak) { return ProfileTweak.Effect == Tweak.Effect; });
+            const int32 TweakCategoryIndex = AbilityAsset->TweaksCategories.IndexOfByPredicate([ProfileTweak](const FCogAbilityTweakCategory& TweakCategory) { return ProfileTweak.CategoryId == TweakCategory.Id; });
 
             if (TweakIndex != INDEX_NONE && TweakCategoryIndex != INDEX_NONE)
             {
-                SetTweakCurrentValue(TweaksAsset, TweakIndex, TweakCategoryIndex, ProfileTweak.Value);
+                SetTweakCurrentValue(TweakIndex, TweakCategoryIndex, ProfileTweak.Value);
             }
         }
     }
 
-    for (int32 TweakCategoryIndex = 0; TweakCategoryIndex < TweaksAsset->TweaksCategories.Num(); ++TweakCategoryIndex)
+    ApplyAllTweaksOnAllActors();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogAbilityReplicator::ApplyAllTweaksOnAllActors()
+{
+    if (AbilityAsset == nullptr)
+    {
+        return;
+    }
+
+    for (int32 TweakCategoryIndex = 0; TweakCategoryIndex < AbilityAsset->TweaksCategories.Num(); ++TweakCategoryIndex)
     {
         TArray<AActor*> Actors;
-        GetActorsFromTweakCategory(TweaksAsset, TweakCategoryIndex,  Actors);
+        FindActorsFromTweakCategory(TweakCategoryIndex,  Actors);
         
         for (AActor* Actor : Actors)
         {
-            ApplyAllTweaksOnActor(TweaksAsset, TweakCategoryIndex, Actor);
+            ApplyAllTweaksOnActor(TweakCategoryIndex, Actor);
         }
     }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::GetActorsFromTweakCategory(const UCogAbilityDataAsset* TweaksAsset, int32 TweakCategoryIndex, TArray<AActor*>& Actors)
+void ACogAbilityReplicator::FindActorsFromTweakCategory(int32 TweakCategoryIndex, TArray<AActor*>& Actors)
 {
-    if (TweaksAsset == nullptr)
+    if (AbilityAsset == nullptr)
     {
         return;
     }
     
-    if (TweaksAsset->TweaksCategories.IsValidIndex(TweakCategoryIndex) == false)
+    if (AbilityAsset->TweaksCategories.IsValidIndex(TweakCategoryIndex) == false)
     {
         return;
     }
     
-    const FCogAbilityTweakCategory& TweakCategory = TweaksAsset->TweaksCategories[TweakCategoryIndex];
+    const FCogAbilityTweakCategory& TweakCategory = AbilityAsset->TweaksCategories[TweakCategoryIndex];
 
     for (TActorIterator<AActor> It(GetWorld(), TweakCategory.ActorClass); It; ++It)
     {
@@ -423,4 +472,49 @@ void ACogAbilityReplicator::GetActorsFromTweakCategory(const UCogAbilityDataAsse
             }
         }
     }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+int32 ACogAbilityReplicator::FindTweakCategoryFromActor(AActor* Actor)
+{
+    UAbilitySystemComponent* AbilitySystem = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Actor, true);
+    if (AbilitySystem == nullptr)
+    {
+        return INDEX_NONE;
+    }
+
+    for (int32 i = 0; i < AbilityAsset->TweaksCategories.Num(); ++i)
+    {
+        const FCogAbilityTweakCategory& TweakCategory = AbilityAsset->TweaksCategories[i];
+
+        if (IsActorMatchingTweakCategory(Actor, AbilitySystem, TweakCategory))
+        {
+            return i;
+        }
+    }
+
+    return INDEX_NONE;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool ACogAbilityReplicator::IsActorMatchingTweakCategory(const AActor* Actor, const UAbilitySystemComponent* ActorAbilitySystem, const FCogAbilityTweakCategory& TweakCategory)
+{
+    if (Actor->GetClass()->IsChildOf(TweakCategory.ActorClass) == false)
+    {
+        return false;
+    }
+
+    const bool bHasRequiredTags = ActorAbilitySystem->HasAllMatchingGameplayTags(TweakCategory.RequiredTags);
+    if (bHasRequiredTags == false)
+    {
+        return false;
+    }
+
+    const bool bHasIgnoredTags = ActorAbilitySystem->HasAnyMatchingGameplayTags(TweakCategory.IgnoredTags);
+    if (bHasIgnoredTags)
+    {
+        return false;
+    }
+
+    return true;
 }

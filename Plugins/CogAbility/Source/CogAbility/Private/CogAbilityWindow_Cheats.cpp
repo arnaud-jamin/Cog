@@ -6,6 +6,7 @@
 #include "CogCommonAllegianceActorInterface.h"
 #include "CogDebugDraw.h"
 #include "CogImguiHelper.h"
+#include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
 #include "EngineUtils.h"
 #include "GameFramework/Character.h"
@@ -30,6 +31,8 @@ void UCogAbilityWindow_Cheats::RenderHelp()
 UCogAbilityWindow_Cheats::UCogAbilityWindow_Cheats()
 {
     bHasMenu = true;
+
+    SetAsset(FCogWindowHelper::GetFirstAssetByClass<UCogAbilityDataAsset>());
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

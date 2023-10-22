@@ -16,10 +16,6 @@ public:
 
     UCogAbilityWindow_Tweaks();
 
-    const UCogAbilityDataAsset* GetAsset() const { return Asset.Get(); }
-
-    void SetAsset(const UCogAbilityDataAsset* Value) { Asset = Value; }
-
 protected:
 
     virtual void RenderHelp() override;

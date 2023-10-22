@@ -42,7 +42,10 @@ private:
     void Initialize();
 
     FCogImguiTextureManager TextureManager;
+
     ImFontAtlas DefaultFontAtlas;
+
     bool bEnabledInput = true;
+
     bool bIsInitialized = false;
 };

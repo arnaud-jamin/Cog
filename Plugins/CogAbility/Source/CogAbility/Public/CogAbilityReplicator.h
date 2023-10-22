@@ -9,6 +9,7 @@ class UAbilitySystemComponent;
 class UCogAbilityDataAsset;
 struct FCogAbilityCheat;
 struct FCogAbilityTweak;
+struct FCogAbilityTweakCategory;
 struct FGameplayTag;
 
 UCLASS(NotBlueprintable, NotBlueprintType, notplaceable, noteditinlinenew, hidedropdown, Transient, Config = Cog)
@@ -26,6 +27,8 @@ public:
 
     virtual void BeginPlay() override;
 
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
     APlayerController* GetPlayerController() const { return OwnerPlayerController.Get(); }
 
     void ApplyCheat(AActor* CheatInstigator, const TArray<AActor*>& Targets, const FCogAbilityCheat& Cheat);
@@ -38,17 +41,20 @@ public:
 
     void ResetAllTweaks();
 
-    void SetTweakValue(const UCogAbilityDataAsset* TweaksAsset, int32 TweakIndex, int32 CategoryIndex, float Value);
+    void SetTweakValue(int32 TweakIndex, int32 CategoryIndex, float Value);
 
-    void SetTweakProfile(const UCogAbilityDataAsset* TweaksAsset, int32 ProfileIndex);
+    void SetTweakProfile(int32 ProfileIndex);
 
     int32 GetTweakProfileIndex() const { return TweakProfileIndex; }
 
-    float GetTweakCurrentValue(const UCogAbilityDataAsset* TweaksAsset, int32 TweakIndex, int32 CategoryIndex);
+    float GetTweakCurrentValue(int32 TweakIndex, int32 CategoryIndex);
 
-    float* GetTweakCurrentValuePtr(const UCogAbilityDataAsset* TweaksAsset, int32 TweakIndex, int32 CategoryIndex);
+    float* GetTweakCurrentValuePtr(int32 TweakIndex, int32 CategoryIndex);
 
 private:
+
+    UFUNCTION()
+    void OnAnyActorSpawned(AActor* Actor);
 
     UFUNCTION(Reliable, Server)
     void Server_ApplyCheat(const AActor* CheatInstigator, const TArray<AActor*>& TargetActors, const FCogAbilityCheat& Cheat) const;
@@ -63,17 +69,24 @@ private:
     void Server_ResetAllTweaks();
 
     UFUNCTION(Reliable, Server)
-    void Server_SetTweakValue(const UCogAbilityDataAsset* TweaksAsset, int32 TweakIndex, int32 TweakCategoryIndex, float Value);
+    void Server_SetTweakValue(int32 TweakIndex, int32 TweakCategoryIndex, float Value);
 
     UFUNCTION(Reliable, Server)
-    void Server_SetTweakProfile(const UCogAbilityDataAsset* TweaksAsset, int32 ProfileIndex);
+    void Server_SetTweakProfile(int32 ProfileIndex);
 
-    void SetTweakCurrentValue(const UCogAbilityDataAsset* TweaksAsset, int32 TweakIndex, int32 CategoryIndex, float Value);
+    void SetTweakCurrentValue(int32 TweakIndex, int32 CategoryIndex, float Value);
+
+    void ApplyAllTweaksOnAllActors();
+
     void ApplyTweakOnActor(AActor* Actor, const FCogAbilityTweak& Tweak, float Value, const FGameplayTag& SetByCallerMagnitudeTag);
-    void ApplyAllTweaksOnActor(const UCogAbilityDataAsset* TweaksAsset, int32 TweakCategoryIndex, AActor* Actor);
-    void GetActorsFromTweakCategory(const UCogAbilityDataAsset* TweaksAsset, int32 CategoryIndex, TArray<AActor*>& Actors);
 
-    TObjectPtr<APlayerController> OwnerPlayerController;
+    void ApplyAllTweaksOnActor(int32 TweakCategoryIndex, AActor* Actor);
+
+    void FindActorsFromTweakCategory(int32 CategoryIndex, TArray<AActor*>& Actors);
+
+    int32 FindTweakCategoryFromActor(AActor* Actor);
+
+    static bool IsActorMatchingTweakCategory(const AActor* Actor, const UAbilitySystemComponent* ActorAbilitySystem, const FCogAbilityTweakCategory& TweakCategory);
 
     UPROPERTY(Replicated)
     int32 TweakProfileIndex = INDEX_NONE;
@@ -83,4 +96,11 @@ private:
 
     UPROPERTY(Config)
     TArray<FString> AppliedCheatsOnLocalPawn;
+
+    TObjectPtr<APlayerController> OwnerPlayerController;
+
+    FDelegateHandle OnAnyActorSpawnedHandle;
+
+    UPROPERTY()
+    TObjectPtr<const UCogAbilityDataAsset> AbilityAsset = nullptr;
 };

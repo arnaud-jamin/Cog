@@ -4,6 +4,7 @@
 #include "CogDebugSettings.h"
 #include "CogEngineDataAsset.h"
 #include "CogImGuiHelper.h"
+#include "CogWindowHelper.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/PrimitiveComponent.h"
@@ -26,6 +27,8 @@ void UCogEngineWindow_Collisions::RenderHelp()
 UCogEngineWindow_Collisions::UCogEngineWindow_Collisions()
 {
     bHasMenu = true;
+
+    SetAsset(FCogWindowHelper::GetFirstAssetByClass<UCogEngineDataAsset>());
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

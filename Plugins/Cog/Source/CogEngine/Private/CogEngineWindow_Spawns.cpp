@@ -3,7 +3,15 @@
 #include "CogEngineDataAsset.h"
 #include "CogEngineReplicator.h"
 #include "CogImguiHelper.h"
+#include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
+
+
+//--------------------------------------------------------------------------------------------------------------------------
+UCogEngineWindow_Spawns::UCogEngineWindow_Spawns()
+{
+    Asset = FCogWindowHelper::GetFirstAssetByClass<UCogEngineDataAsset>();
+}
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogEngineWindow_Spawns::RenderHelp()

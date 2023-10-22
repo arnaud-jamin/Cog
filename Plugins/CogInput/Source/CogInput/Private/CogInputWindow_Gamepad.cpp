@@ -2,6 +2,7 @@
 
 #include "CogImguiHelper.h"
 #include "CogInputDataAsset.h"
+#include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
 #include "Engine/LocalPlayer.h"
 #include "EnhancedInputSubsystems.h"
@@ -11,6 +12,7 @@
 //--------------------------------------------------------------------------------------------------------------------------
 UCogInputWindow_Gamepad::UCogInputWindow_Gamepad()
 {
+    Asset = FCogWindowHelper::GetFirstAssetByClass<UCogInputDataAsset>();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

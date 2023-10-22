@@ -1,7 +1,5 @@
 #include "CogSampleGameState.h"
 
-#include "AssetRegistry/AssetRegistryModule.h"
-#include "AssetRegistry/IAssetRegistry.h"
 #include "CogSampleAbilitySystemComponent.h"
 #include "CogSampleFunctionLibrary_Tag.h"
 #include "GameFramework/Character.h"
@@ -51,25 +49,6 @@
 #include "GameFramework/GameUserSettings.h"
 
 #endif //ENABLE_COG
-
-
-//--------------------------------------------------------------------------------------------------------------------------
-template<typename T>
-T* GetFirstAssetByClass()
-{
-    IAssetRegistry& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry")).Get();
-
-    TArray<FAssetData> Assets;
-    AssetRegistry.GetAssetsByClass(T::StaticClass()->GetClassPathName(), Assets, true);
-    if (Assets.Num() == 0)
-    {
-        return nullptr;
-    }
-
-    UObject* Asset = Assets[0].GetAsset();
-    T* CastedAsset = Cast<T>(Asset);
-    return CastedAsset;
-}
 
 //--------------------------------------------------------------------------------------------------------------------------
 ACogSampleGameState::ACogSampleGameState(const FObjectInitializer & ObjectInitializer)
@@ -139,10 +118,7 @@ void ACogSampleGameState::InitializeCog()
     //---------------------------------------
     // Engine
     //---------------------------------------
-    const UCogEngineDataAsset* EngineAsset = GetFirstAssetByClass<UCogEngineDataAsset>();
-
-    UCogEngineWindow_Collisions* CollisionsWindow = CogWindowManager->CreateWindow<UCogEngineWindow_Collisions>("Engine.Collision");
-    CollisionsWindow->SetAsset(EngineAsset);
+    CogWindowManager->CreateWindow<UCogEngineWindow_Collisions>("Engine.Collision");
 
     CogWindowManager->CreateWindow<UCogEngineWindow_CommandBindings>("Engine.Command Bindings");
 
@@ -177,8 +153,7 @@ void ACogSampleGameState::InitializeCog()
 
     CogWindowManager->CreateWindow<UCogEngineWindow_Skeleton>("Engine.Skeleton");
 
-    UCogEngineWindow_Spawns* SpawnWindow = CogWindowManager->CreateWindow<UCogEngineWindow_Spawns>("Engine.Spawns");
-    SpawnWindow->SetAsset(EngineAsset);
+    CogWindowManager->CreateWindow<UCogEngineWindow_Spawns>("Engine.Spawns");
 
     UCogEngineWindow_Stats* StatsWindow = CogWindowManager->CreateWindow<UCogEngineWindow_Stats>("Engine.Stats");
 
@@ -187,44 +162,33 @@ void ACogSampleGameState::InitializeCog()
     //---------------------------------------
     // Abilities
     //---------------------------------------
-    const UCogAbilityDataAsset* AbilityAsset = GetFirstAssetByClass<UCogAbilityDataAsset>();
+    CogWindowManager->CreateWindow<UCogAbilityWindow_Abilities>("Gameplay.Abilities");
 
-    UCogAbilityWindow_Abilities* AbilitiesWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Abilities>("Gameplay.Abilities");
-    AbilitiesWindow->SetAsset(AbilityAsset);
+    CogWindowManager->CreateWindow<UCogAbilityWindow_Attributes>("Gameplay.Attributes");
 
-    UCogAbilityWindow_Attributes* AttributesWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Attributes>("Gameplay.Attributes");
-    AttributesWindow->SetAsset(AbilityAsset);
+    CogWindowManager->CreateWindow<UCogAbilityWindow_Cheats>("Gameplay.Cheats");
 
-    UCogAbilityWindow_Cheats* CheatsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Cheats>("Gameplay.Cheats");
-    CheatsWindow->SetAsset(AbilityAsset);
+    CogWindowManager->CreateWindow<UCogAbilityWindow_Effects>("Gameplay.Effects");
 
-    UCogAbilityWindow_Effects* EffectsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Effects>("Gameplay.Effects");
-    EffectsWindow->SetAsset(AbilityAsset);
-
-    UCogAbilityWindow_Pools* PoolsWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Pools>("Gameplay.Pools");
-    PoolsWindow->SetAsset(AbilityAsset);
+    CogWindowManager->CreateWindow<UCogAbilityWindow_Pools>("Gameplay.Pools");
 
     CogWindowManager->CreateWindow<UCogAbilityWindow_Tags>("Gameplay.Tags");
 
-    UCogAbilityWindow_Tweaks* TweaksWindow = CogWindowManager->CreateWindow<UCogAbilityWindow_Tweaks>("Gameplay.Tweaks");
-    TweaksWindow->SetAsset(AbilityAsset);
+    CogWindowManager->CreateWindow<UCogAbilityWindow_Tweaks>("Gameplay.Tweaks");
 
     //---------------------------------------
     // AI
     //---------------------------------------
     CogWindowManager->CreateWindow<UCogAIWindow_BehaviorTree>("AI.Behavior Tree");
+
     CogWindowManager->CreateWindow<UCogAIWindow_Blackboard>("AI.Blackboard");
 
     //---------------------------------------
     // Input
     //---------------------------------------
-    const UCogInputDataAsset* InputAsset = GetFirstAssetByClass<UCogInputDataAsset>();
+    CogWindowManager->CreateWindow<UCogInputWindow_Actions>("Input.Actions");
 
-    UCogInputWindow_Actions* ActionsWindow = CogWindowManager->CreateWindow<UCogInputWindow_Actions>("Input.Actions");
-    ActionsWindow->SetAsset(InputAsset);
-
-    UCogInputWindow_Gamepad* GamepadWindow = CogWindowManager->CreateWindow<UCogInputWindow_Gamepad>("Input.Gamepad");
-    GamepadWindow->SetAsset(InputAsset);
+    CogWindowManager->CreateWindow<UCogInputWindow_Gamepad>("Input.Gamepad");
 
     //---------------------------------------
     // Main Menu Widget

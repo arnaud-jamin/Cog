@@ -15,17 +15,15 @@ public:
 
     UCogEngineWindow_Collisions();
 
-    const UCogEngineDataAsset* GetAsset() const { return Asset.Get(); }
-
-    void SetAsset(const UCogEngineDataAsset* Value);
-
-private:
+protected:
 
     virtual void ResetConfig() override;
 
     virtual void RenderHelp() override;
 
     virtual void RenderContent() override;
+
+    virtual void SetAsset(const UCogEngineDataAsset* Value);
 
     struct FChannel
     {

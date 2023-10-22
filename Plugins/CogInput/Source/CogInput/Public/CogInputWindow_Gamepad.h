@@ -18,10 +18,6 @@ public:
 
     UCogInputWindow_Gamepad();
 
-    const UCogInputDataAsset* GetAsset() const { return Asset.Get(); }
-
-    void SetAsset(const UCogInputDataAsset* Value) { Asset = Value; }
-
 protected:
 
     virtual void ResetConfig() override;

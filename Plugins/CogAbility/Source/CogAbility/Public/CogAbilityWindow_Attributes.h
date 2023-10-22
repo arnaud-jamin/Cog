@@ -19,10 +19,6 @@ public:
 
     UCogAbilityWindow_Attributes();
 
-    const UCogAbilityDataAsset* GetAsset() const { return Asset.Get(); }
-
-    void SetAsset(const UCogAbilityDataAsset* Value) { Asset = Value; }
-
 protected:
 
     virtual void ResetConfig() override;

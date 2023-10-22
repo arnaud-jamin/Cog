@@ -15,9 +15,7 @@ class COGENGINE_API UCogEngineWindow_Spawns : public UCogWindow
 
 public:
 
-    const UCogEngineDataAsset* GetAsset() const { return Asset.Get(); }
-
-    void SetAsset(const UCogEngineDataAsset* Value) { Asset = Value; }
+    UCogEngineWindow_Spawns();
 
 protected:
 

@@ -4,8 +4,15 @@
 #include "AbilitySystemGlobals.h"
 #include "CogAbilityDataAsset.h"
 #include "CogImguiHelper.h"
+#include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
 #include "imgui_internal.h"
+
+//--------------------------------------------------------------------------------------------------------------------------
+UCogAbilityWindow_Pools::UCogAbilityWindow_Pools()
+{
+    Asset = FCogWindowHelper::GetFirstAssetByClass<UCogAbilityDataAsset>();
+}
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogAbilityWindow_Pools::RenderHelp()

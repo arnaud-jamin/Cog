@@ -192,6 +192,9 @@ public:
     UPROPERTY(Category = "Tweaks", EditAnywhere)
     FGameplayTag SetByCallerMagnitudeTag;
 
+    UPROPERTY(Category = "Tweaks", EditAnywhere)
+    TSubclassOf<AActor> ActorRootClass;
+
     UPROPERTY(Category = "Tweaks", EditAnywhere, meta = (TitleProperty = "Name"))
     TArray<FCogAbilityTweak> Tweaks;
 

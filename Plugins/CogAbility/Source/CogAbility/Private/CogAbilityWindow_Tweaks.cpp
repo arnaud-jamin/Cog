@@ -4,12 +4,15 @@
 #include "CogAbilityDataAsset.h"
 #include "CogAbilityReplicator.h"
 #include "CogImguiHelper.h"
+#include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCogAbilityWindow_Tweaks::UCogAbilityWindow_Tweaks()
 {
     bHasMenu = true;
+
+    Asset = FCogWindowHelper::GetFirstAssetByClass<UCogAbilityDataAsset>();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -62,7 +65,7 @@ void UCogAbilityWindow_Tweaks::RenderContent()
             bool IsSelected = CurrentTweakProfileIndex == INDEX_NONE;
             if (ImGui::Selectable("None", IsSelected))
             {
-                Replicator->SetTweakProfile(Asset.Get(), INDEX_NONE);
+                Replicator->SetTweakProfile(INDEX_NONE);
             }
         }
 
@@ -73,7 +76,7 @@ void UCogAbilityWindow_Tweaks::RenderContent()
 
             if (ImGui::Selectable(TCHAR_TO_ANSI(*TweakProfile.Name.ToString()), IsSelected))
             {
-                Replicator->SetTweakProfile(Asset.Get(), TweakProfileIndex);
+                Replicator->SetTweakProfile(TweakProfileIndex);
             }
         }
         ImGui::EndCombo();
@@ -128,7 +131,7 @@ void UCogAbilityWindow_Tweaks::DrawTweak(ACogAbilityReplicator* Replicator, int3
         return;
     }
 
-    float* Value = Replicator->GetTweakCurrentValuePtr(Asset.Get(), TweakIndex, TweakCategoryIndex);
+    float* Value = Replicator->GetTweakCurrentValuePtr(TweakIndex, TweakCategoryIndex);
     if (Value == nullptr)
     {
         return;
@@ -156,6 +159,6 @@ void UCogAbilityWindow_Tweaks::DrawTweak(ACogAbilityReplicator* Replicator, int3
 
     if (bUpdateValue)
     {
-        Replicator->SetTweakValue(Asset.Get(), TweakIndex, TweakCategoryIndex, *Value);
+        Replicator->SetTweakValue(TweakIndex, TweakCategoryIndex, *Value);
     }
 }

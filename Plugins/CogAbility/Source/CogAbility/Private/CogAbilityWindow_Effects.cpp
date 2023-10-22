@@ -6,6 +6,7 @@
 #include "CogAbilityDataAsset.h"
 #include "CogAbilityHelper.h"
 #include "CogImguiHelper.h"
+#include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
 #include "EngineUtils.h"
 #include "GameFramework/Character.h"
@@ -23,6 +24,8 @@ void UCogAbilityWindow_Effects::RenderHelp()
 UCogAbilityWindow_Effects::UCogAbilityWindow_Effects()
 {
     bHasMenu = false;
+
+    Asset = FCogWindowHelper::GetFirstAssetByClass<UCogAbilityDataAsset>();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -17,10 +17,6 @@ public:
 
     UCogInputWindow_Actions();
 
-    const UCogInputDataAsset* GetAsset() const { return Asset.Get(); }
-
-    void SetAsset(const UCogInputDataAsset* Value) { Asset = Value; }
-
 protected:
 
     void RenderHelp();

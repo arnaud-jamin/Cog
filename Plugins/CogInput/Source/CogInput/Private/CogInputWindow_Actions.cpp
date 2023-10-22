@@ -1,6 +1,7 @@
 #include "CogInputWindow_Actions.h"
 
 #include "CogInputDataAsset.h"
+#include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
 #include "Engine/LocalPlayer.h"
 #include "EnhancedInputSubsystems.h"
@@ -23,6 +24,8 @@ void UCogInputWindow_Actions::RenderHelp()
 UCogInputWindow_Actions::UCogInputWindow_Actions()
 {
     bHasMenu = true;
+
+    Asset = FCogWindowHelper::GetFirstAssetByClass<UCogInputDataAsset>();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

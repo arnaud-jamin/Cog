@@ -16,9 +16,7 @@ class COGABILITY_API UCogAbilityWindow_Pools : public UCogWindow
 
 public:
     
-    const UCogAbilityDataAsset* GetAsset() const { return Asset.Get(); }
-
-    void SetAsset(const UCogAbilityDataAsset* Value) { Asset  = Value; }
+    UCogAbilityWindow_Pools();
 
 protected:
 
