@@ -21,6 +21,12 @@ void UCogInputWindow_Actions::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void UCogInputWindow_Actions::ResetConfig()
+{
+    RepeatPeriod = 0.5f;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 UCogInputWindow_Actions::UCogInputWindow_Actions()
 {
     bHasMenu = true;
@@ -36,12 +42,6 @@ void UCogInputWindow_Actions::RenderContent()
     if (Asset == nullptr)
     {
         ImGui::Text("No Actions Asset");
-        return;
-    }
-
-    if (Asset->MappingContext == nullptr)
-    {
-        ImGui::Text("No MappingContext");
         return;
     }
 
@@ -80,14 +80,22 @@ void UCogInputWindow_Actions::RenderContent()
 
     if (Actions.Num() == 0)
     {
-        for (const FEnhancedActionKeyMapping& Mapping : Asset->MappingContext->GetMappings())
+        for (TObjectPtr<const UInputMappingContext> MappingContext : Asset->MappingContexts)
         {
-            if (Mapping.Action != nullptr && Actions.ContainsByPredicate([&Mapping](const FCogInjectActionInfo& ActionInfo) { return Mapping.Action == ActionInfo.Action; }) == false)
+            for (const FEnhancedActionKeyMapping& Mapping : MappingContext->GetMappings())
             {
-                FCogInjectActionInfo& ActionInfo = Actions.AddDefaulted_GetRef();
-                ActionInfo.Action = Mapping.Action;
+                if (Mapping.Action != nullptr && Actions.ContainsByPredicate([&Mapping](const FCogInjectActionInfo& ActionInfo) { return Mapping.Action == ActionInfo.Action; }) == false)
+                {
+                    FCogInjectActionInfo& ActionInfo = Actions.AddDefaulted_GetRef();
+                    ActionInfo.Action = Mapping.Action;
+                }
             }
         }
+
+        Actions.Sort([](const FCogInjectActionInfo& Lhs, const FCogInjectActionInfo& Rhs)
+        {
+            return GetNameSafe(Lhs.Action).Compare(GetNameSafe(Rhs.Action)) < 0;
+        });
     }
 
     if (ImGui::BeginTable("Actions", 3, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize))

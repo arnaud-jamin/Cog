@@ -288,7 +288,7 @@ void UCogEngineWindow_OutputLog::RenderContent()
         ImGui::EndChild();
     }
 
-    if (ImGui::BeginPopupContextItem())
+    if (ImGui::BeginPopupContextItem("OutputLog"))
     {
         if (ImGui::MenuItem("Clear"))
         {

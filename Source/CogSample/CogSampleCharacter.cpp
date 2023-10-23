@@ -393,9 +393,26 @@ void ACogSampleCharacter::OnAbilityInputStarted(const FInputActionValue& Value, 
     {
         return;
     }
-    
+
     Spec->InputPressed = true;
-    AbilitySystem->TryActivateAbility(Handle);
+
+    //-----------------------------------------------------
+    // Replicate button press if ability is already active
+    //-----------------------------------------------------
+    if (Spec->IsActive())
+    {
+        const UGameplayAbility* AbilityToActivate = Spec->GetPrimaryInstance();
+        if (AbilityToActivate->bReplicateInputDirectly && AbilitySystem->IsOwnerActorAuthoritative() == false)
+        {
+            AbilitySystem->ServerSetInputPressed(Spec->Handle);
+        }
+        AbilitySystem->AbilitySpecInputPressed(*Spec);
+        AbilitySystem->InvokeReplicatedEvent(EAbilityGenericReplicatedEvent::InputPressed, Spec->Handle, Spec->ActivationInfo.GetActivationPredictionKey());
+    }
+    else
+    {
+        AbilitySystem->TryActivateAbility(Handle);
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

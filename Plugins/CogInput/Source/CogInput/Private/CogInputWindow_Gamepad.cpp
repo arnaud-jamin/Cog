@@ -62,7 +62,7 @@ void UCogInputWindow_Gamepad::InputContextMenu(const FKey& Key, FCogInjectAction
 
         if (ActionInfoButton != nullptr && ActionInfoButton->Action != nullptr && ActionInfoButton->Action->ValueType == EInputActionValueType::Axis1D)
         {
-            FCogWindowWidgets::SliderWithReset("X", &ActionInfo2D->X, -1.0f, 1.0f, 0.0f, "%0.2f");
+            FCogWindowWidgets::SliderWithReset("X", &ActionInfoButton->X, -1.0f, 1.0f, 0.0f, "%0.2f");
         }
 
         if (ActionInfo2D != nullptr)
@@ -236,7 +236,11 @@ void UCogInputWindow_Gamepad::RenderContent()
         return;
     }
 
-    if (Asset != nullptr && Asset->MappingContext != nullptr)
+    if (Asset == nullptr)
+    {
+        ImGui::Text("No Input Asset");
+    }
+    else
     {
         if (Actions.Num() == 0)
         {
@@ -267,20 +271,20 @@ void UCogInputWindow_Gamepad::RenderContent()
             Actions.FindOrAdd(EKeys:: Gamepad_DPad_Right);
             Actions.FindOrAdd(EKeys:: Gamepad_DPad_Left);
 
-            for (const FEnhancedActionKeyMapping& Mapping : Asset->MappingContext->GetMappings())
+            for (TObjectPtr<const UInputMappingContext> MappingContext : Asset->MappingContexts)
             {
-                if (Mapping.Action != nullptr)
+                for (const FEnhancedActionKeyMapping& Mapping : MappingContext->GetMappings())
                 {
-                    FCogInjectActionInfo& ActionInfo = Actions.FindOrAdd(Mapping.Key);
-                    ActionInfo.Action = Mapping.Action;
+                    if (Mapping.Action != nullptr)
+                    {
+                        FCogInjectActionInfo& ActionInfo = Actions.FindOrAdd(Mapping.Key);
+                        ActionInfo.Action = Mapping.Action;
+                    }
                 }
             }
         }
     }
-    else
-    {
-        ImGui::Text("No Action Asset");
-    }
+
 
     const float AspectRatio = 0.55f;
     const float StickAmplitude = 0.04f;
@@ -311,7 +315,7 @@ void UCogInputWindow_Gamepad::RenderContent()
 
     DrawList = ImGui::GetWindowDrawList();
     ImGui::Dummy(bShowAsOverlay ? CanvasMax - CanvasMin : ContentSize);
-    if (ImGui::BeginPopupContextItem())
+    if (ImGui::BeginPopupContextItem("Gamepad"))
     {
         if (ImGui::Button("Close", ImVec2(-1.0f, 0)))
         {

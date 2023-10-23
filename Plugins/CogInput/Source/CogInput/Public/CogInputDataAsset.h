@@ -15,5 +15,5 @@ public:
     UCogInputDataAsset() {}
 
     UPROPERTY(EditAnywhere)
-    TObjectPtr<const UInputMappingContext> MappingContext;
+    TArray<TObjectPtr<const UInputMappingContext>> MappingContexts;
 };
