@@ -77,13 +77,14 @@ void ACogSampleCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 
     FDoRepLifetimeParams Params;
     Params.bIsPushBased = true;
-    Params.Condition = COND_OwnerOnly;
 
-    DOREPLIFETIME_WITH_PARAMS_FAST(ACogSampleCharacter, ActiveAbilityHandles, Params);
-    DOREPLIFETIME_WITH_PARAMS_FAST(ACogSampleCharacter, Team, Params);
-    
     Params.Condition = COND_None;
+    DOREPLIFETIME_WITH_PARAMS_FAST(ACogSampleCharacter, Team, Params);
+    DOREPLIFETIME_WITH_PARAMS_FAST(ACogSampleCharacter, ProgressionLevel, Params);
     DOREPLIFETIME_WITH_PARAMS_FAST(ACogSampleCharacter, Scale, Params);
+
+    Params.Condition = COND_OwnerOnly;
+    DOREPLIFETIME_WITH_PARAMS_FAST(ACogSampleCharacter, ActiveAbilityHandles, Params);
 }
 
 
@@ -709,10 +710,15 @@ void ACogSampleCharacter::OnRep_Scale()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogSampleCharacter::SetTeamID(int32 Value)
+void ACogSampleCharacter::SetTeam(int32 Value)
 {
-    Team = Value;
-    MARK_PROPERTY_DIRTY_FROM_NAME(ACogSampleCharacter, Team, this);
+    COMPARE_ASSIGN_AND_MARK_PROPERTY_DIRTY(ACogSampleCharacter, Team, Value, this);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSampleCharacter::SetProgressionLevel(int32 Value)
+{
+    COMPARE_ASSIGN_AND_MARK_PROPERTY_DIRTY(ACogSampleCharacter, ProgressionLevel, Value, this);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

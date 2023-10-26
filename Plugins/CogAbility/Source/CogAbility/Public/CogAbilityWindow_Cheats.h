@@ -23,17 +23,19 @@ public:
 
 protected:
 
+    virtual void GameTick(float DeltaTime);
+
     virtual void ResetConfig() override;
 
     virtual void RenderHelp() override;
 
     virtual void RenderContent() override;
 
-private:
-    
-    bool AddCheat(AActor* ControlledActor, AActor* TargetActor, const FCogAbilityCheat& CheatEffect, bool IsPersistent);
+    virtual void TryReapplyCheats();
 
-    void RequestCheat(AActor* ControlledActor, AActor* TargetActor, const FCogAbilityCheat& CheatEffect);
+    virtual bool AddCheat(AActor* ControlledActor, AActor* TargetActor, const FCogAbilityCheat& CheatEffect, bool IsPersistent);
+
+    virtual void RequestCheat(AActor* ControlledActor, AActor* TargetActor, const FCogAbilityCheat& CheatEffect);
 
     UPROPERTY(Config)
     bool bReapplyCheatsBetweenPlays = true;
@@ -46,4 +48,6 @@ private:
 
     UPROPERTY()
     TObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
+
+    bool bHasReappliedCheats = false;
 };

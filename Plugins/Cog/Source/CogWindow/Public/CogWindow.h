@@ -31,7 +31,10 @@ public:
     virtual void GameTick(float DeltaTime);
 
     /**  */
-    virtual void RenderMainMenuWidget(bool Draw, float& Width) {}
+    virtual float GetMainMenuWidgetWidth(int32 SubWidgetIndex, float MaxWidth) { return -1.0f; }
+
+    /**  */
+    virtual void RenderMainMenuWidget(int32 SubWidgetIndex, float Width) {}
 
     ImGuiID GetID() const { return ID; }
 

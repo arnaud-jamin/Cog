@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
 #include "CogSampleFunctionLibrary_Team.generated.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -32,7 +33,10 @@ class UCogSampleFunctionLibrary_Team : public UBlueprintFunctionLibrary
 public:
 
     UFUNCTION(BlueprintPure)
-    static int32 GetTeamSafe(const AActor* Actor);
+    static int32 GetTeam(const AActor* Actor);
+
+    UFUNCTION(BlueprintCallable)
+    static void SetTeam(AActor* Actor, int32 Value);
 
     UFUNCTION(BlueprintPure)
     static ECogSampleAllegiance GetTeamsAllegiance(int32 Team1, int32 Team2);

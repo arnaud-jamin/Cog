@@ -6,9 +6,17 @@
 
 - CogEngine: More stats in the stats window
 - CogEngine: Overlay mode of stats.
-- CogEngine: Stat main menu widget could have a tooltip on each stat with a control to change set the emulation (FPS, Ping, Packetloss)
+- CogEngine: Add more info in stats tooltip (details, curves, ...)
 - CogEngine: Add screen settings (fullscreen, borderless, window and resolution)
+- CogEngine: make a better widget for CheckBoxState for input shortcuts
 
 - CogSample: Add a custom window in sample (changing the character faction)
 - CogSample: Create more abilities
+- CogSample: Push Model
+- CogSample: Add timescale game tweak 
+- CogSample: Add cooldown reduction 
+- CogSample: Add more debug for area (change color on tick, duration ...)
 
+- CogDebug: Check KismetExecutionMessage for warnings. As an exemple it is used by GEngine::GetWorldFromContextObject.
+
+- CogInput: Add gamepad stick drag to set their values

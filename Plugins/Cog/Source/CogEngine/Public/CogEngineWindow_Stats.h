@@ -23,5 +23,10 @@ protected:
 
     virtual void RenderContent() override;
 
-    virtual void RenderMainMenuWidget(bool Draw, float& Width) override;
+    virtual float GetMainMenuWidgetWidth(int32 SubWidgetIndex, float MaxWidth) override;
+
+    virtual void RenderMainMenuWidget(int32 SubWidgetIndex, float Width) override;
+    void RenderMainMenuWidgetPacketLoss(float Width);
+    void RenderMainMenuWidgetPing(float Width);
+    void RenderMainMenuWidgetFramerate(float Width);
 };

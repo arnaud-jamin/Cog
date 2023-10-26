@@ -5,6 +5,7 @@
 #include "CogSampleCharacter.h"
 #include "CogSampleLogCategories.h"
 #include "CogSampleTargetAcquisition.h"
+#include "GameFramework/PlayerState.h"
 #include "Net/UnrealNetwork.h"
 
 #if ENABLE_COG
@@ -171,7 +172,7 @@ void ACogSamplePlayerController::TickTargeting(float DeltaSeconds)
 #if ENABLE_COG
     if (Target != nullptr && PossessedCharacter != nullptr)
     {
-        FCogDebugDraw::Segment(LogCogTargetAcquisition, PossessedCharacter.Get(), PossessedCharacter->GetActorLocation(), Target->GetActorLocation(), FColor::White, false);
+        FCogDebugDraw::Segment(LogCogTargetAcquisition, this, PossessedCharacter->GetActorLocation(), Target->GetActorLocation(), FColor::White, false);
     }
 #endif //ENABLE_COG
 }

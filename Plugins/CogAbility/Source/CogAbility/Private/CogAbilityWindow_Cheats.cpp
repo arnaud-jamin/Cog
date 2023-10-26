@@ -48,6 +48,24 @@ void UCogAbilityWindow_Cheats::ResetConfig()
 void UCogAbilityWindow_Cheats::SetAsset(const UCogAbilityDataAsset* Value) 
 {
     Asset = Value;
+}
+
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogAbilityWindow_Cheats::GameTick(float DeltaTime)
+{
+    Super::GameTick(DeltaTime);
+
+    TryReapplyCheats();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogAbilityWindow_Cheats::TryReapplyCheats()
+{
+    if (bHasReappliedCheats)
+    {
+        return;
+    }
 
     if (bReapplyCheatsBetweenPlays == false)
     {
@@ -78,7 +96,7 @@ void UCogAbilityWindow_Cheats::SetAsset(const UCogAbilityDataAsset* Value)
         return;
     }
 
-    TArray<AActor*> Targets{ LocalPawn };
+    TArray<AActor*> Targets { LocalPawn };
 
     for (const FString& AppliedCheatName : AppliedCheats)
     {
@@ -88,6 +106,8 @@ void UCogAbilityWindow_Cheats::SetAsset(const UCogAbilityDataAsset* Value)
             Replicator->ApplyCheat(LocalPawn, Targets, *Cheat);
         }
     }
+
+    bHasReappliedCheats = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

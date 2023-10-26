@@ -19,6 +19,7 @@ public class CogSample : ModuleRules
             "GameplayTags",
             "InputCore", 
             "NetCore",
+            "Niagara",
         });
 
         if (Target.Configuration != UnrealTargetConfiguration.Shipping && Target.Type != TargetRules.TargetType.Server)

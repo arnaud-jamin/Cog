@@ -12,6 +12,8 @@ DECLARE_LOG_CATEGORY_EXTERN(LogCogControlRotation, Warning, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogCogInput, Warning, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogCogPosition, Warning, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogCogPossession, Warning, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogCogPredictedActor, Warning, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogCogProjectile, Warning, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogCogRotation, Warning, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogCogSkeleton, Warning, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogCogTargetAcquisition, Warning, All);

@@ -50,7 +50,9 @@ protected:
 
     virtual void RenderContent() override;
 
-    virtual void RenderMainMenuWidget(bool Draw, float& Width) override;
+    virtual float GetMainMenuWidgetWidth(int32 SubWidgetIndex, float MaxWidth) override;
+
+    virtual void RenderMainMenuWidget(int32 SubWidgetIndex, float Width) override;
 
     virtual bool DrawSelectionCombo();
 

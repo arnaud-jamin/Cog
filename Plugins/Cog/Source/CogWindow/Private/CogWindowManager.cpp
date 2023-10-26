@@ -384,20 +384,54 @@ void UCogWindowManager::RenderMainMenu()
 
         for (UCogWindow* Window : MainMenuWidgets)
         {
-            float Width = 0.0f;
-            Window->RenderMainMenuWidget(false, Width);
+            TArray<float> SubWidgetsWidths;
+            float SimCursorX = CursorX;
+            for (int32 SubWidgetIndex = 0; ; ++SubWidgetIndex)
+            {
+                const float MaxWidth = SimCursorX - MinCursorX;
+                float SubWidgetWidth = Window->GetMainMenuWidgetWidth(SubWidgetIndex, MaxWidth);
+                if (SubWidgetWidth == -1)
+                {
+                    break;
+                }
 
-            //-------------------------------------------
-            // Stop drawing if there is not enough room
-            //-------------------------------------------
-            if (CursorX - Width < MinCursorX)
+                SimCursorX -= SubWidgetWidth;
+                SubWidgetsWidths.Add(SubWidgetWidth);
+            }
+
+            bool Stop = false;
+            for (int32 SubWidgetIndex = SubWidgetsWidths.Num() - 1; SubWidgetIndex >= 0; SubWidgetIndex--)
+            {
+                const float SubWidgetWidth = SubWidgetsWidths[SubWidgetIndex];
+                const float MaxWidth = CursorX - MinCursorX;
+
+                //-------------------------------------------
+                // Bypass this subwidget if its width is 0
+                //-------------------------------------------
+                if (SubWidgetWidth == 0)
+                {
+                    continue;
+                }
+
+                //-------------------------------------------
+                // Stop drawing if there is not enough room
+                //-------------------------------------------
+                if (SubWidgetWidth > MaxWidth)
+                {
+                    Stop = true;
+                    break;
+                }
+
+                CursorX -= SubWidgetWidth;
+                ImGui::SetCursorPosX(CursorX);
+                
+                Window->RenderMainMenuWidget(SubWidgetIndex, SubWidgetWidth);
+            }
+
+            if (Stop)
             {
                 break;
             }
-
-            CursorX -= Width;
-            ImGui::SetCursorPosX(CursorX);
-            Window->RenderMainMenuWidget(true, Width);
 
             CursorX -= ImGui::GetStyle().ItemSpacing.x;
         }

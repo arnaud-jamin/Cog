@@ -558,40 +558,32 @@ bool UCogEngineWindow_Selection::ComputeBoundingBoxScreenPosition(const APlayerC
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Selection::RenderMainMenuWidget(bool Draw, float& Width)
+float UCogEngineWindow_Selection::GetMainMenuWidgetWidth(int32 SubWidgetIndex, float MaxWidth)
 {
-    const float PickButtonWidth = FCogWindowWidgets::GetFontWidth() * 6;
-    const float SelectionButtonWidth = FCogWindowWidgets::GetFontWidth() * 30;
-    const float ResetButtonWidth = FCogWindowWidgets::GetFontWidth() * 3;
-    Width = PickButtonWidth + SelectionButtonWidth + ResetButtonWidth;
-
-    if (Draw == false)
+    switch (SubWidgetIndex)
     {
-        return;
+        case 0: return FCogWindowWidgets::GetFontWidth() * 6;
+        case 1: return FMath::Min(FMath::Max(MaxWidth, FCogWindowWidgets::GetFontWidth() * 10), FCogWindowWidgets::GetFontWidth() * 30);
+        case 2: return FCogWindowWidgets::GetFontWidth() * 3;
     }
 
-    if (ImGui::BeginPopup("SelectionPopup"))
-    {
-        ImGui::BeginChild("Popup", ImVec2(Width, FCogWindowWidgets::GetFontWidth() * 40), false);
+    return -1.0f;
+}
 
-        if (DrawSelectionCombo())
-        {
-            ImGui::CloseCurrentPopup();
-        }
 
-        ImGui::EndChild();
-        ImGui::EndPopup();
-    }
-
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindow_Selection::RenderMainMenuWidget(int32 SubWidgetIndex, float Width)
+{
     //-----------------------------------
     // Pick Button
     //-----------------------------------
+    if (SubWidgetIndex == 0)
     {
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
         ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
         ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(0, 0, 0, 0));
 
-        if (ImGui::Button("Pick", ImVec2(PickButtonWidth, 0)))
+        if (ImGui::Button("Pick", ImVec2(Width, 0)))
         {
             ActivateSelectionMode();
             HackWaitInputRelease();
@@ -601,52 +593,67 @@ void UCogEngineWindow_Selection::RenderMainMenuWidget(bool Draw, float& Width)
         ImGui::PopStyleColor(1);
         ImGui::PopStyleVar(2);
     }
-
-    AActor* GlobalSelection = FCogDebugSettings::GetSelection();
-
-    //-----------------------------------
-    // Selection
-    //-----------------------------------
+    else if (SubWidgetIndex == 1)
     {
-        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
-        ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
-        ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(0, 0, 0, 0));
-        ImGui::SameLine();
-        FString CurrentSelectionName = GetActorName(GlobalSelection);
+        if (ImGui::BeginPopup("SelectionPopup"))
+        {
+            ImGui::BeginChild("Popup", ImVec2(Width, FCogWindowWidgets::GetFontWidth() * 40), false);
 
-        if (ImGui::Button(TCHAR_TO_ANSI(*CurrentSelectionName), ImVec2(SelectionButtonWidth, 0)))
-        {
-            ImGui::OpenPopup("SelectionPopup");
-        }
-        if (ImGui::IsItemHovered())
-        {
-            ImGui::SetTooltip("Current Selection: %s", TCHAR_TO_ANSI(*CurrentSelectionName));
+            if (DrawSelectionCombo())
+            {
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::EndChild();
+            ImGui::EndPopup();
         }
 
-        ImGui::PopStyleColor(1);
-        ImGui::PopStyleVar(2);
+        AActor* GlobalSelection = FCogDebugSettings::GetSelection();
 
-        DrawActorContextMenu(GlobalSelection);
+        //-----------------------------------
+        // Selection
+        //-----------------------------------
+        {
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
+            ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
+            ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(0, 0, 0, 0));
+            FString CurrentSelectionName = GetActorName(GlobalSelection);
+
+            if (ImGui::Button(TCHAR_TO_ANSI(*CurrentSelectionName), ImVec2(Width, 0.0f)))
+            {
+                ImGui::OpenPopup("SelectionPopup");
+            }
+            if (ImGui::IsItemHovered())
+            {
+                ImGui::SetTooltip("Current Selection: %s", TCHAR_TO_ANSI(*CurrentSelectionName));
+            }
+
+            ImGui::PopStyleColor(1);
+            ImGui::PopStyleVar(2);
+
+            DrawActorContextMenu(GlobalSelection);
+        }
     }
-
-    //-----------------------------------
-    // Reset Button
-    //-----------------------------------
+    else if (SubWidgetIndex == 2)
     {
-        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
-        ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(0, 0, 0, 0));
-        ImGui::SameLine();
-        if (ImGui::Button("X", ImVec2(ResetButtonWidth, 0)))
+        //-----------------------------------
+        // Reset Button
+        //-----------------------------------
         {
-            SetGlobalSelection(nullptr);
-            ImGui::CloseCurrentPopup();
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
+            ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(0, 0, 0, 0));
+            if (ImGui::Button("X", ImVec2(Width, 0)))
+            {
+                SetGlobalSelection(nullptr);
+                ImGui::CloseCurrentPopup();
+            }
+            if (ImGui::IsItemHovered())
+            {
+                ImGui::SetTooltip("Reset the selection to the controlled actor.");
+            }
+            ImGui::PopStyleColor(1);
+            ImGui::PopStyleVar(1);
         }
-        if (ImGui::IsItemHovered())
-        {
-            ImGui::SetTooltip("Reset the selection to the controlled actor.");
-        }
-        ImGui::PopStyleColor(1);
-        ImGui::PopStyleVar(1);
     }
 }
 

@@ -476,3 +476,97 @@ bool FCogWindowWidgets::DeleteArrayItemButton()
 
     return IsPressed;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::MultiChoiceButton(const char* Label, bool IsSelected, const ImVec2& Size)
+{
+    if (IsSelected)
+    {
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
+    }
+    else
+    {
+        ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(128, 128, 128, 50));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, IM_COL32(128, 128, 128, 100));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, IM_COL32(128, 128, 128, 150));
+    }
+
+    const bool IsPressed = ImGui::Button(Label, Size);
+
+    if (IsSelected)
+    {
+        ImGui::PopStyleVar();
+    }
+    else
+    {
+        ImGui::PopStyleColor(3);
+    }
+
+    return IsPressed;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::MultiChoiceButtonsInt(TArray<int32>& Values, int32& Value, const ImVec2& Size)
+{
+    ImGuiStyle& Style = ImGui::GetStyle();
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(Style.WindowPadding.x * 0.40f, (float)(int)(Style.WindowPadding.y * 0.60f)));
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(Style.FramePadding.x * 0.40f, (float)(int)(Style.FramePadding.y * 0.60f)));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(Style.ItemSpacing.x * 0.30f, (float)(int)(Style.ItemSpacing.y * 0.60f)));
+    ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(255, 255, 255, 180));
+
+    bool IsPressed = false;
+    for (int32 i = 0; i < Values.Num(); ++i)
+    {
+        int32 ButtonValue = Values[i];
+
+        const char* Text = TCHAR_TO_ANSI(*FString::Printf(TEXT("%d"), ButtonValue));
+        if (MultiChoiceButton(Text, ButtonValue == Value, Size))
+        {
+            IsPressed = true;
+            Value = ButtonValue;
+        }
+
+        if (i < Values.Num() - 1)
+        {
+            ImGui::SameLine();
+        }
+    }
+
+    ImGui::PopStyleColor(1);
+    ImGui::PopStyleVar(3);
+
+    return IsPressed;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::MultiChoiceButtonsFloat(TArray<float>& Values, float& Value, const ImVec2& Size)
+{
+    ImGuiStyle& Style = ImGui::GetStyle();
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(Style.WindowPadding.x * 0.40f, (float)(int)(Style.WindowPadding.y * 0.60f)));
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(Style.FramePadding.x * 0.40f, (float)(int)(Style.FramePadding.y * 0.60f)));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(Style.ItemSpacing.x * 0.30f, (float)(int)(Style.ItemSpacing.y * 0.60f)));
+    ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(255, 255, 255, 180));
+
+    bool IsPressed = false;
+    for (int32 i = 0; i < Values.Num(); ++i)
+    {
+        float ButtonValue = Values[i];
+
+        const char* Text = TCHAR_TO_ANSI(*FString::Printf(TEXT("%g"), ButtonValue).Replace(TEXT("0."), TEXT(".")));
+        if (MultiChoiceButton(Text, ButtonValue == Value, Size))
+        {
+            IsPressed = true;
+            Value = ButtonValue;
+        }
+
+        if (i < Values.Num() - 1)
+        {
+            ImGui::SameLine();
+        }
+    }
+
+    ImGui::PopStyleColor(1);
+    ImGui::PopStyleVar(3);
+
+    return IsPressed;
+}

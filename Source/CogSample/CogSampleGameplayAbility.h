@@ -4,6 +4,8 @@
 #include "Abilities/GameplayAbility.h"
 #include "CogSampleGameplayAbility.generated.h"
 
+class UCogSampleSpawnPredictionComponent;
+
 UCLASS()
 class UCogSampleGameplayAbility : public UGameplayAbility
 {
@@ -17,7 +19,9 @@ public:
     // UGameplayAbility overrides
     //----------------------------------------------------------------------------------------------------------------------
     virtual void PreActivate(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData) override;
+    
     virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+    
     virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -58,6 +62,16 @@ public:
 
     UFUNCTION(BlueprintPure)
     int32 GetIntValueAtAbilityLevel(const FScalableFloat& ScalableFloat) const;
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Predicated Actors
+    //----------------------------------------------------------------------------------------------------------------------
+
+    UFUNCTION(BlueprintCallable)
+    void SetupSpawnPrediction(AActor* PredictedSpawn, int32 InstanceIndex);
+
+    UFUNCTION(BlueprintCallable)
+    void SetupSpawnPredictionComponent(UCogSampleSpawnPredictionComponent* SpawnPrediction, int32 InstanceIndex);
 
 private:
 

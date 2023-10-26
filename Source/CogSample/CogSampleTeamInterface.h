@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 #include "CogSampleTeamInterface.generated.h"
 
-//--------------------------------------------------------------------------------------------------------------------------
 UINTERFACE(MinimalAPI, Blueprintable)
 class UCogSampleTeamInterface : public UInterface
 {
@@ -17,4 +16,7 @@ class ICogSampleTeamInterface
 public:
 
     virtual int32 GetTeam() const { return 0; }
+
+    virtual void SetTeam(int32) { }
 };
+

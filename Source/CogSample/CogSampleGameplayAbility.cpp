@@ -5,9 +5,8 @@
 #include "CogSampleFunctionLibrary_Tag.h"
 #include "CogSampleGameplayEffectContext.h"
 #include "CogSampleLogCategories.h"
-
-
-
+#include "CogSamplePlayerController.h"
+#include "CogSampleSpawnPredictionComponent.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCogSampleGameplayAbility::UCogSampleGameplayAbility()
@@ -235,4 +234,49 @@ void UCogSampleGameplayAbility::GetCooldownInfos(float& TimeRemaining, float& Co
     //-------------------------------------------------------------------------------------
     FGameplayAbilitySpecHandle Handle;
     GetCooldownTimeRemainingAndDuration(Handle, CurrentActorInfo, TimeRemaining, CooldownDuration);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleGameplayAbility::SetupSpawnPrediction(AActor* Actor, int32 InstanceIndex)
+{
+    if (Actor == nullptr)
+    {
+        return;
+    }
+
+    UCogSampleSpawnPredictionComponent* SpawnPrediction = Actor->FindComponentByClass<UCogSampleSpawnPredictionComponent>();
+    if (SpawnPrediction == nullptr)
+    {
+        return;
+    }
+
+    SetupSpawnPredictionComponent(SpawnPrediction, InstanceIndex);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleGameplayAbility::SetupSpawnPredictionComponent(UCogSampleSpawnPredictionComponent* SpawnPrediction, int32 InstanceIndex)
+{
+    if (SpawnPrediction == nullptr)
+    {
+        return;
+    }
+
+    SpawnPrediction->SetCreator(CurrentActorInfo->AvatarActor.Get());
+
+    FCogSampleSpawnPredictionKey PredictedActorKey = FCogSampleSpawnPredictionKey::MakeFromAbility(*this, InstanceIndex);
+    SpawnPrediction->SetSpawnPredictionKey(PredictedActorKey);
+
+    if (GetCurrentActorInfo()->IsNetAuthority())
+    {
+        SpawnPrediction->SetRole(ECogSampleSpawnPredictionRole::Server);
+    }
+    else
+    {
+        SpawnPrediction->SetRole(ECogSampleSpawnPredictionRole::Predicted);
+
+        if (ACogSamplePlayerController* PlayerController = Cast<ACogSamplePlayerController>(GetCurrentActorInfo()->PlayerController))
+        {
+            PlayerController->SpawnPredictions.Add(SpawnPrediction);
+        }
+    }
 }

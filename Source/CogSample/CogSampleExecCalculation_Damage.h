@@ -21,7 +21,7 @@ public:
 };
 
 UCLASS(meta = (ScriptName = "CogSampleFunctionLibrary_Damage"))
-class COGSAMPLE_API UCogSampleFunctionLibrary_Damage : public UBlueprintFunctionLibrary
+class UCogSampleFunctionLibrary_Damage : public UBlueprintFunctionLibrary
 {
     GENERATED_BODY()
 

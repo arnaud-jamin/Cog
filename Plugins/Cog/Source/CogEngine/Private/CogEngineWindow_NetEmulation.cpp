@@ -1,6 +1,7 @@
 #include "CogEngineWindow_NetEmulation.h"
 
 #include "CogEngineWindow_Stats.h"
+#include "CogWindowWidgets.h"
 #include "Engine/Engine.h"
 #include "Engine/NetDriver.h"
 #include "Engine/NetConnection.h"
@@ -111,7 +112,7 @@ void UCogEngineWindow_NetEmulation::DrawControls()
 
     //-------------------------------------------------------------------------------------------
     FCogWindowWidgets::SetNextItemToShortWidth();
-    if (ImGui::DragInt("Lag Min", &Settings.PktLagMin, 1.0f, 0, INT_MAX, "%d ms"))
+    if (ImGui::DragInt("Lag Min", &Settings.PktLagMin, 5.0f, 0, INT_MAX, "%d ms"))
     {
         SelectedNetDriver->NetDriver->SetPacketSimulationSettings(Settings);
     }
@@ -123,7 +124,7 @@ void UCogEngineWindow_NetEmulation::DrawControls()
 
     //-------------------------------------------------------------------------------------------
     FCogWindowWidgets::SetNextItemToShortWidth();
-    if (ImGui::DragInt("Lag Max", &Settings.PktLagMax, 1.0f, 0, INT_MAX, "%d ms"))
+    if (ImGui::DragInt("Lag Max", &Settings.PktLagMax, 5.0f, 0, INT_MAX, "%d ms"))
     {
         SelectedNetDriver->NetDriver->SetPacketSimulationSettings(Settings);
     }
@@ -184,7 +185,7 @@ void UCogEngineWindow_NetEmulation::DrawControls()
 
     //-------------------------------------------------------------------------------------------
     FCogWindowWidgets::SetNextItemToShortWidth();
-    if (ImGui::DragInt("Incoming Lag Min", &Settings.PktIncomingLagMin, 1.0f, 0, INT_MAX, "%d ms"))
+    if (ImGui::DragInt("Incoming Lag Min", &Settings.PktIncomingLagMin, 5.0f, 0, INT_MAX, "%d ms"))
     {
         SelectedNetDriver->NetDriver->SetPacketSimulationSettings(Settings);
     }
@@ -196,7 +197,7 @@ void UCogEngineWindow_NetEmulation::DrawControls()
 
     //-------------------------------------------------------------------------------------------
     FCogWindowWidgets::SetNextItemToShortWidth();
-    if (ImGui::DragInt("Incoming Lag Max", &Settings.PktIncomingLagMax, 1.0f, 0, INT_MAX, "%d ms"))
+    if (ImGui::DragInt("Incoming Lag Max", &Settings.PktIncomingLagMax, 5.0f, 0, INT_MAX, "%d ms"))
     {
         SelectedNetDriver->NetDriver->SetPacketSimulationSettings(Settings);
     }

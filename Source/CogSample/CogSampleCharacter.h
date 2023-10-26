@@ -1,16 +1,16 @@
 #pragma once
 
-#include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
 #include "ActiveGameplayEffectHandle.h"
 #include "AttributeSet.h"
 #include "CogCommonAllegianceActorInterface.h"
 #include "CogCommonDebugFilteredActorInterface.h"
-#include "CogSampleDamageEvent.h"
-#include "CogSampleDefines.h"
 #include "CogSampleDamageableInterface.h"
+#include "CogSampleDefines.h"
+#include "CogSampleProgressionLevelInterface.h"
 #include "CogSampleTargetableInterface.h"
 #include "CogSampleTeamInterface.h"
+#include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "GameplayAbilitySpecHandle.h"
 #include "GameplayTagContainer.h"
@@ -82,6 +82,7 @@ class ACogSampleCharacter : public ACharacter
     , public ICogCommonDebugFilteredActorInterface
     , public ICogCommonAllegianceActorInterface
     , public ICogSampleTeamInterface
+    , public ICogSampleProgressionLevelInterface
     , public ICogSampleTargetableInterface
     , public ICogSampleDamageableInterface
 {
@@ -151,10 +152,16 @@ public:
     virtual int32 GetTeam() const override { return Team; }
 
     UFUNCTION(BlueprintCallable)
-    void SetTeamID(int32 Value);
+    virtual void SetTeam(int32 Value) override;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Team, Replicated, meta = (AllowPrivateAccess = "true"))
-    int32 Team = 0;
+    //----------------------------------------------------------------------------------------------------------------------
+    // Level
+    //----------------------------------------------------------------------------------------------------------------------
+
+    virtual int32 GetProgressionLevel() const override { return ProgressionLevel; }
+
+    UFUNCTION(BlueprintCallable)
+    virtual void SetProgressionLevel(int32 Value) override;
 
     //----------------------------------------------------------------------------------------------------------------------
     // Camera
@@ -163,10 +170,10 @@ public:
 
     UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess))
 	USpringArmComponent* CameraBoom;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess))
 	UCameraComponent* FollowCamera;
 	
     //----------------------------------------------------------------------------------------------------------------------
@@ -179,26 +186,26 @@ public:
     FVector GetMoveInputInWorldSpace() const { return MoveInputInWorldSpace; }
 
 	/** MappingContext */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess))
 	UInputMappingContext* DefaultMappingContext;
 
     /** MappingContext */
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess))
     UInputMappingContext* GhostMappingContext;
 
 	/** Move Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess))
 	UInputAction* MoveAction;
 
     /** Move Input Action */
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess))
     UInputAction* MoveZAction;
 
 	/** Look Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess))
 	UInputAction* LookAction;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess))
     TArray<UInputAction*> ItemActions;
 
     //----------------------------------------------------------------------------------------------------------------------
@@ -211,7 +218,7 @@ public:
 
     void OnRevived(AActor* InInstigator, AActor* InCauser, const FGameplayEffectSpec& InEffectSpec, float InMagnitude);
 
-    UPROPERTY(BlueprintReadOnly, Category = Ability, meta = (AllowPrivateAccess = "true"))
+    UPROPERTY(BlueprintReadOnly, Category = Ability, meta = (AllowPrivateAccess))
     UCogSampleAbilitySystemComponent* AbilitySystem = nullptr;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Ability)
@@ -259,11 +266,16 @@ public:
     UFUNCTION(BlueprintCallable, BlueprintPure=false)
     bool GetMontage(FName MontageName, UAnimMontage*& Montage, bool bPrintWarning) const;
 
-private:
+protected:
     friend class ACogSamplePlayerController;
 
     void RefreshServerAnimTickOption();
 
+    UPROPERTY(EditAnywhere, Category = Team, Replicated, meta = (AllowPrivateAccess))
+    int32 Team = 0;
+
+    UPROPERTY(EditAnywhere, Category = Level, Replicated, meta = (AllowPrivateAccess))
+    int32 ProgressionLevel = 0;
 
     UPROPERTY()
     AController* InitialController = nullptr;

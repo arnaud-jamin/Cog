@@ -2,15 +2,18 @@
 
 #include "CoreMinimal.h"
 #include "CogSampleDefines.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
 #include "CogSampleFunctionLibrary_Gameplay.generated.h"
 
 class UAbilitySystemComponent;
 class UGameplayAbility;
+class UGameplayEffect;
 struct FGameplayAbilitySpecHandle;
 struct FGameplayAttribute;
 struct FGameplayAttributeData;
 struct FGameplayCueNotify_SpawnResult;
 struct FGameplayCueParameters;
+struct FGameplayEffectSpecHandle;
 struct FGameplayTagContainer;
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -65,7 +68,25 @@ public:
     static void FindCapsulePointDistance(const FVector2D& CapsulePoint1, const FVector2D& CapsulePoint2, const float CapsuleRadius, const FVector2D& Point, FVector2D& Projection, float& Time, float& Distance);
 
     UFUNCTION(BlueprintPure)
-    static AActor* GetActorInstigator(AActor* Actor);
+    static AActor* GetInstigator(const AActor* Actor);
+
+    UFUNCTION(BlueprintPure)
+    static int32 GetProgressionLevel(const AActor* Actor);
+    
+    UFUNCTION(BlueprintCallable)
+    static void SetProgressionLevel(AActor* Actor, int32 Value);
+
+    UFUNCTION(BlueprintPure)
+    static AActor* GetCreator(const AActor* Actor);
+    
+    UFUNCTION(BlueprintCallable)
+    static void SetCreator(AActor* Actor, AActor* Value);
+
+    UFUNCTION(BlueprintCallable)
+    static bool IsAlive(const AActor* Actor);
+
+    UFUNCTION(BlueprintCallable)
+    static bool IsDead(const AActor* Actor);
 
     static void AdjustAttributeForMaxChange(UAbilitySystemComponent* AbilityComponent, FGameplayAttributeData& AffectedAttribute, float OldValue, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty);
 
@@ -85,5 +106,5 @@ public:
 
     static bool IsActorMatchingTags(const AActor* Actor, const FGameplayTagContainer& RequiredTags, const FGameplayTagContainer& IgnoredTags);
 
-    static bool MatchCooldownTag(const FGameplayTagContainer& TagContainer);
+    static void MakeOutgoingSpecs(const AActor* Actor, const TArray<TSubclassOf<UGameplayEffect>>& Effects, const TArray<FGameplayEffectSpecHandle>& BakedEffects, TMap<TSubclassOf<UGameplayEffect>, FGameplayEffectSpecHandle>& Result);
 };

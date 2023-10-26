@@ -21,8 +21,6 @@ protected:
 
     virtual void RenderContent() override;
 
-    virtual void DrawTimeButton(ACogEngineReplicator* Replicator, float Value);
-
     TArray<float> TimingScales;
 
 private:

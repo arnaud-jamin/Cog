@@ -6,8 +6,9 @@
 #include "GameFramework/PlayerController.h"
 #include "CogSamplePlayerController.generated.h"
 
-class UCogSampleTargetAcquisition;
 class ACogSampleCharacter;
+class UCogSampleSpawnPredictionComponent;
+class UCogSampleTargetAcquisition;
 
 //--------------------------------------------------------------------------------------------------------------------------
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FCogSampleTargetChangedEventDelegate, ACogSamplePlayerController*, Controller, AActor*, NewTarget, AActor*, OldTarget);
@@ -53,9 +54,14 @@ public:
 
     AActor* GetTarget() const { return Target.Get(); }
 
-
     UPROPERTY(BlueprintAssignable)
     FCogSampleTargetChangedEventDelegate OnTargetChanged;
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Spawn Predictions
+    //----------------------------------------------------------------------------------------------------------------------
+    UPROPERTY()
+    TArray<UCogSampleSpawnPredictionComponent*> SpawnPredictions;
 
 private:
 

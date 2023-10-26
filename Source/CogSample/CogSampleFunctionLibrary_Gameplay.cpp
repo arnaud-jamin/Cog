@@ -3,10 +3,14 @@
 #include "Abilities/GameplayAbility.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
+#include "CogSampleDamageableInterface.h"
 #include "CogSampleGameplayEffectContext.h"
+#include "CogSampleProgressionLevelInterface.h"
+#include "CogSampleSpawnableInterface.h"
 #include "CogSampleTargetableInterface.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/GameStateBase.h"
 #include "GameplayCueNotifyTypes.h"
 #include "GameplayEffectTypes.h"
 #include "GameplayTagContainer.h"
@@ -317,7 +321,7 @@ bool UCogSampleFunctionLibrary_Gameplay::IsActorMatchingTags(const AActor* Actor
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-AActor* UCogSampleFunctionLibrary_Gameplay::GetActorInstigator(AActor* Actor) 
+AActor* UCogSampleFunctionLibrary_Gameplay::GetInstigator(const AActor* Actor) 
 {
     if (Actor == nullptr)
     {
@@ -340,4 +344,149 @@ AActor* UCogSampleFunctionLibrary_Gameplay::GetActorInstigator(AActor* Actor)
     }
 
     return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+int32 UCogSampleFunctionLibrary_Gameplay::GetProgressionLevel(const AActor* Actor)
+{
+    if (Actor == nullptr)
+    {
+        return 0;
+    }
+
+    const ICogSampleProgressionLevelInterface* LevelActor = Cast<ICogSampleProgressionLevelInterface>(Actor);
+    if (LevelActor == nullptr)
+    {
+        return 0;
+    }
+
+    const int32 Value = LevelActor->GetProgressionLevel();
+    return Value;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleFunctionLibrary_Gameplay::SetProgressionLevel(AActor* Actor, int32 Value)
+{
+    if (Actor == nullptr)
+    {
+        return;
+    }
+
+    ICogSampleProgressionLevelInterface* LevelActor = Cast<ICogSampleProgressionLevelInterface>(Actor);
+    if (LevelActor == nullptr)
+    {
+        return;
+    }
+
+    LevelActor->SetProgressionLevel(Value);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+AActor* UCogSampleFunctionLibrary_Gameplay::GetCreator(const AActor* Actor)
+{
+    if (Actor == nullptr)
+    {
+        return 0;
+    }
+
+    const ICogSampleSpawnableInterface* Spawnable = Cast<ICogSampleSpawnableInterface>(Actor);
+    if (Spawnable == nullptr)
+    {
+        return 0;
+    }
+
+    AActor* Value = Spawnable->GetCreator();
+    return Value;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleFunctionLibrary_Gameplay::SetCreator(AActor* Actor, AActor* Value)
+{
+    if (Actor == nullptr)
+    {
+        return;
+    }
+
+    ICogSampleSpawnableInterface* Spawnable = Cast<ICogSampleSpawnableInterface>(Actor);
+    if (Spawnable == nullptr)
+    {
+        return;
+    }
+
+    Spawnable->SetCreator(Value);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool UCogSampleFunctionLibrary_Gameplay::IsAlive(const AActor* Actor)
+{
+    if (Actor == nullptr)
+    {
+        return false;
+    }
+
+    const ICogSampleDamageableInterface* Damageable = Cast<ICogSampleDamageableInterface>(Actor);
+    if (Damageable == nullptr)
+    {
+        return true;
+    }
+
+    if (Damageable->IsDead() == false)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool UCogSampleFunctionLibrary_Gameplay::IsDead(const AActor* Actor)
+{
+    return IsAlive(Actor) == false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleFunctionLibrary_Gameplay::MakeOutgoingSpecs(
+    const AActor* Actor,
+    const TArray<TSubclassOf<UGameplayEffect>>& Effects,
+    const TArray<FGameplayEffectSpecHandle>& BakedEffects,
+    TMap<TSubclassOf<UGameplayEffect>, FGameplayEffectSpecHandle>& Results)
+{
+    const AActor* Instigator = UCogSampleFunctionLibrary_Gameplay::GetInstigator(Actor);
+    if (Instigator == nullptr)
+    {
+        return;
+    }
+
+    const UAbilitySystemComponent* AbilitySystem = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Instigator);
+    if (AbilitySystem == nullptr)
+    {
+        return;
+    }
+
+    const int32 Level = UCogSampleFunctionLibrary_Gameplay::GetProgressionLevel(Actor);
+
+    FGameplayEffectContextHandle EffectContextHandle = AbilitySystem->MakeEffectContext();
+
+    for (const TSubclassOf<UGameplayEffect>& EffectClass : Effects)
+    {
+        if (Results.Contains(EffectClass))
+        {
+            continue;
+        }
+
+        const FGameplayEffectSpecHandle* BakedEffectSpecHandle = BakedEffects.FindByPredicate([EffectClass](const FGameplayEffectSpecHandle& Handle)
+        {
+            return Handle.Data->Def.GetClass() == EffectClass;
+        });
+
+        if (BakedEffectSpecHandle != nullptr)
+        {
+            Results.Add(EffectClass, *BakedEffectSpecHandle);
+        }
+        else
+        {
+            FGameplayEffectSpecHandle EffectSpecHandle = AbilitySystem->MakeOutgoingSpec(EffectClass, Level, EffectContextHandle);
+            Results.Add(EffectClass, EffectSpecHandle);
+        }
+    }
 }

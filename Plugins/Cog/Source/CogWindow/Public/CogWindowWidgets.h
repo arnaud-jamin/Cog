@@ -20,6 +20,12 @@ public:
 
     static void ToggleButton(bool* Value, const char* TextTrue, const char* TextFalse, const ImVec4& TrueColor, const ImVec4& FalseColor, const ImVec2& Size = ImVec2(0, 0));
 
+    static bool MultiChoiceButton(const char* Label, bool IsSelected, const ImVec2& Size = ImVec2(0, 0));
+
+    static bool MultiChoiceButtonsInt(TArray<int32>& Values, int32& Value, const ImVec2& Size = ImVec2(0, 0));
+
+    static bool MultiChoiceButtonsFloat(TArray<float>& Values, float& Value, const ImVec2& Size = ImVec2(0, 0));
+
     static void SliderWithReset(const char* Name, float* Value, float Min, float Max, const float& ResetValue, const char* Format);
 
     static void HelpMarker(const char* Text);
