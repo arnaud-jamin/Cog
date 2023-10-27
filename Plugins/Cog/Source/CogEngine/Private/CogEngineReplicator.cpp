@@ -130,6 +130,26 @@ void ACogEngineReplicator::Server_Spawn_Implementation(const FCogEngineSpawnEntr
 #endif // !UE_BUILD_SHIPPING
 }
 
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogEngineReplicator::SetTimeDilation(float Value)
+{
+#if !UE_BUILD_SHIPPING
+
+    //-------------------------------------
+    // Set local time dilation right away
+    //-------------------------------------
+    TimeDilation = Value;
+    OnRep_TimeDilation();
+
+    //-------------------------------------
+    // Update server time dilation
+    //-------------------------------------
+    Server_SetTimeDilation(Value);
+
+#endif // !UE_BUILD_SHIPPING
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogEngineReplicator::Server_SetTimeDilation_Implementation(float Value)
 {

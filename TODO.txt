@@ -9,6 +9,7 @@
 - CogEngine: Add more info in stats tooltip (details, curves, ...)
 - CogEngine: Add screen settings (fullscreen, borderless, window and resolution)
 - CogEngine: make a better widget for CheckBoxState for input shortcuts
+- CogEngine: save active log categories
 
 - CogSample: Add a custom window in sample (changing the character faction)
 - CogSample: Create more abilities

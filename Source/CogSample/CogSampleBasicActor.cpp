@@ -1,8 +1,8 @@
 #include "CogSampleBasicActor.h"
 
+#include "GameFramework/GameStateBase.h"
 #include "Net/Core/PushModel/PushModel.h"
 #include "Net/UnrealNetwork.h"
-
 
 //--------------------------------------------------------------------------------------------------------------------------
 ACogSampleBasicActor::ACogSampleBasicActor(const FObjectInitializer& ObjectInitializer)
@@ -20,6 +20,21 @@ void ACogSampleBasicActor::GetLifetimeReplicatedProps(TArray< FLifetimeProperty 
     DOREPLIFETIME_WITH_PARAMS_FAST(ACogSampleBasicActor, Team, Params);
     DOREPLIFETIME_WITH_PARAMS_FAST(ACogSampleBasicActor, ProgressionLevel, Params);
     DOREPLIFETIME_WITH_PARAMS_FAST(ACogSampleBasicActor, Creator, Params);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSampleBasicActor::BeginPlay()
+{
+    //-----------------------------------------------------
+    // Set default creator before Super::BeginPlay()
+    // so component can access it inside they BeginPlay()
+    //-----------------------------------------------------
+    if (Creator == nullptr)
+    {
+        Creator = GetWorld()->GetGameState();
+    }
+
+    Super::BeginPlay();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

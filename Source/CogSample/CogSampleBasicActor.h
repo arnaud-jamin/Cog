@@ -19,6 +19,8 @@ class ACogSampleBasicActor : public AActor
 public:
 
     ACogSampleBasicActor(const FObjectInitializer& ObjectInitializer);
+
+    virtual void BeginPlay();
     
     UFUNCTION(BlueprintPure)
     virtual int32 GetTeam() const override { return Team; }

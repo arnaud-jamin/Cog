@@ -96,7 +96,7 @@ void ACogDebugReplicator::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 
     DOREPLIFETIME_WITH_PARAMS_FAST(ACogDebugReplicator, ReplicatedData, Params);
 }
-
+ 
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogDebugReplicator::TickActor(float DeltaTime, enum ELevelTick TickType, FActorTickFunction& ThisTickFunction)
 {

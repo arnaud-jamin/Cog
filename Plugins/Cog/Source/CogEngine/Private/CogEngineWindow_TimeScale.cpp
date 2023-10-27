@@ -50,7 +50,7 @@ void FCogEngineWindow_TimeScale::RenderContent()
     float Value = Replicator->GetTimeDilation();
     if (FCogWindowWidgets::MultiChoiceButtonsFloat(TimingScales, Value, ImVec2(3.5f * FCogWindowWidgets::GetFontWidth(), 0)))
     {
-        Replicator->Server_SetTimeDilation(Value);
+        Replicator->SetTimeDilation(Value);
     }
 
 }

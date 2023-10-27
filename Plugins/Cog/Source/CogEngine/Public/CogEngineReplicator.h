@@ -39,8 +39,7 @@ public:
 
     float GetTimeDilation() const { return TimeDilation; }
 
-    UFUNCTION(Server, Reliable)
-    void Server_SetTimeDilation(float Value);
+    void SetTimeDilation(float Value);
 
     UFUNCTION(Server, Reliable)
     void Server_Possess(APawn* Pawn);
@@ -49,6 +48,9 @@ public:
     void Server_ResetPossession();
 
 protected:
+
+    UFUNCTION(Server, Reliable)
+    void Server_SetTimeDilation(float Value);
 
     UFUNCTION()
     void OnRep_TimeDilation();
