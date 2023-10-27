@@ -1,6 +1,7 @@
 #include "CogDebugDrawBlueprint.h"
 
 #include "CogDebugDraw.h"
+#include "CogDebugLogCategory.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogDebugDrawBlueprint::DebugDrawString(const UObject* WorldContextObject, FCogLogCategory LogCategory, const FString& Text, const FVector Location, const FLinearColor Color, bool Persistent)

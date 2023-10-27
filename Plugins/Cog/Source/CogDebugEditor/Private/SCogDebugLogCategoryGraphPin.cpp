@@ -1,5 +1,6 @@
 #include "SCogDebugLogCategoryGraphPin.h"
 
+#include "CogDebugLogCategory.h"
 #include "ScopedTransaction.h"
 #include "SCogDebugLogCategoryWidget.h"
 #include "UObject/CoreRedirects.h"

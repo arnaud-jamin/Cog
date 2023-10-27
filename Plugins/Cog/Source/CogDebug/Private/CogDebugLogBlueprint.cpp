@@ -2,6 +2,7 @@
 
 #include "CogCommon.h"
 #include "CogDebugLog.h"
+#include "CogDebugLogCategory.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogDebugLogBlueprint::Log(const UObject* WorldContextObject, FCogLogCategory LogCategory, ECogLogVerbosity Verbosity, const FString& Text)

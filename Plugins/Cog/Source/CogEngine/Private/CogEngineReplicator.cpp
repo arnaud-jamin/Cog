@@ -2,6 +2,7 @@
 
 #include "CogCommon.h"
 #include "CogCommonPossessorInterface.h"
+#include "CogEngineDataAsset.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/WorldSettings.h"
 #include "EngineUtils.h"

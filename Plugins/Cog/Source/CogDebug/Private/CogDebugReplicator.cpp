@@ -1,6 +1,7 @@
 #include "CogDebugReplicator.h"
 
 #include "CogDebugDraw.h"
+#include "CogDebugLog.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/WorldSettings.h"

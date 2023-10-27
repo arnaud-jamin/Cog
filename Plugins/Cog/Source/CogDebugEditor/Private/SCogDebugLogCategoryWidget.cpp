@@ -1,5 +1,6 @@
 #include "SCogDebugLogCategoryWidget.h"
 
+#include "CogDebugLog.h"
 #include "Misc/TextFilter.h"
 #include "SlateOptMacros.h"
 #include "UObject/UnrealType.h"

@@ -1,6 +1,7 @@
 #include "CogDebugDrawHelper.h"
 
 #include "Components/LineBatchComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 namespace 
 {
