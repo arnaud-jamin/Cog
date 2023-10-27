@@ -2,19 +2,18 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
-#include "CogAbilityWindow_Tweaks.generated.h"
 
 class ACogAbilityReplicator;
 class UCogAbilityDataAsset;
 
-UCLASS()
-class COGABILITY_API UCogAbilityWindow_Tweaks : public UCogWindow
+//--------------------------------------------------------------------------------------------------------------------------
+class COGABILITY_API FCogAbilityWindow_Tweaks : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 public:
 
-    UCogAbilityWindow_Tweaks();
+    virtual void Initialize() override;
 
 protected:
 
@@ -26,6 +25,5 @@ protected:
 
 private:
 
-    UPROPERTY()
     TObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
 };

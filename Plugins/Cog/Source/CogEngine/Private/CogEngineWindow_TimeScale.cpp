@@ -6,17 +6,10 @@
 #include "Engine/World.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_TimeScale::RenderHelp()
+void FCogEngineWindow_TimeScale::Initialize()
 {
-    ImGui::Text(
-        "This window can be used to change the game global time scale. "
-        "If changed on a client the time scale is also modified on the game server. "
-    );
-}
+    Super::Initialize();
 
-//--------------------------------------------------------------------------------------------------------------------------
-UCogEngineWindow_TimeScale::UCogEngineWindow_TimeScale()
-{
     TimingScales.Add(0.00f);
     TimingScales.Add(0.01f);
     TimingScales.Add(0.10f);
@@ -28,7 +21,16 @@ UCogEngineWindow_TimeScale::UCogEngineWindow_TimeScale()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_TimeScale::RenderContent()
+void FCogEngineWindow_TimeScale::RenderHelp()
+{
+    ImGui::Text(
+        "This window can be used to change the game global time scale. "
+        "If changed on a client the time scale is also modified on the game server. "
+    );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_TimeScale::RenderContent()
 {
     Super::RenderContent();
 

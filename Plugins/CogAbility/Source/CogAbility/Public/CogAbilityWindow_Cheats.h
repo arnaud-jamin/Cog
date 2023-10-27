@@ -2,24 +2,21 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
+#include "CogWindowConfig.h"
 #include "CogAbilityWindow_Cheats.generated.h"
 
 class AActor;
 class UCogAbilityDataAsset;
 struct FCogAbilityCheat;
 
-UCLASS(Config = Cog)
-class COGABILITY_API UCogAbilityWindow_Cheats : public UCogWindow
+//--------------------------------------------------------------------------------------------------------------------------
+class COGABILITY_API FCogAbilityWindow_Cheats : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 public:
 
-    UCogAbilityWindow_Cheats();
-
-    const UCogAbilityDataAsset* GetAsset() const { return Asset.Get(); }
-
-    void SetAsset(const UCogAbilityDataAsset* Value);
+    virtual void Initialize() override;
 
 protected:
 
@@ -37,6 +34,21 @@ protected:
 
     virtual void RequestCheat(AActor* ControlledActor, AActor* TargetActor, const FCogAbilityCheat& CheatEffect);
 
+    TObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
+
+    TObjectPtr<UCogAbilityConfig_Cheats> Config = nullptr;
+
+    bool bHasReappliedCheats = false;
+};
+
+//--------------------------------------------------------------------------------------------------------------------------
+UCLASS(Config = Cog)
+class UCogAbilityConfig_Cheats : public UCogWindowConfig
+{
+    GENERATED_BODY()
+
+public:
+
     UPROPERTY(Config)
     bool bReapplyCheatsBetweenPlays = true;
 
@@ -46,8 +58,11 @@ protected:
     UPROPERTY(Config)
     TArray<FString> AppliedCheats;
 
-    UPROPERTY()
-    TObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
+    virtual void Reset() override
+    {
+        Super::Reset();
 
-    bool bHasReappliedCheats = false;
+        bReapplyCheatsBetweenPlays = true;
+        bReapplyCheatsBetweenLaunches = true;
+    }
 };

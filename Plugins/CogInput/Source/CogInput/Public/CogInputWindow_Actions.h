@@ -1,21 +1,23 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogWindow.h"
 #include "CogInjectActionInfo.h"
+#include "CogWindow.h"
+#include "CogWindowConfig.h"
 #include "CogInputWindow_Actions.generated.h"
 
 class UInputAction;
+class UCogInputConfig_Actions;
 class UCogInputDataAsset;
 
-UCLASS(Config = Cog)
-class COGINPUT_API UCogInputWindow_Actions : public UCogWindow
+//--------------------------------------------------------------------------------------------------------------------------
+class COGINPUT_API FCogInputWindow_Actions : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 public:
 
-    UCogInputWindow_Actions();
+    virtual void Initialize() override;
 
 protected:
 
@@ -31,13 +33,30 @@ protected:
 
 private:
 
+    float RepeatTime = 0.0f;
+
+    TObjectPtr<const UCogInputDataAsset> Asset = nullptr;
+
+    TObjectPtr<UCogInputConfig_Actions> Config = nullptr;
+
+    TArray<FCogInjectActionInfo> Actions;
+};
+
+//--------------------------------------------------------------------------------------------------------------------------
+UCLASS(Config = Cog)
+class UCogInputConfig_Actions : public UCogWindowConfig
+{
+    GENERATED_BODY()
+
+public:
+
     UPROPERTY(Config)
     float RepeatPeriod = 0.5f;
 
-    float RepeatTime = 0.0f;
+    virtual void Reset() override
+    {
+        Super::Reset();
 
-    UPROPERTY()
-    TObjectPtr<const UCogInputDataAsset> Asset = nullptr;
-
-    TArray<FCogInjectActionInfo> Actions;
+        RepeatPeriod = 0.5f;
+    }
 };

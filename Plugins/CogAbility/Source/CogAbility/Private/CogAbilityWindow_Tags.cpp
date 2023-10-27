@@ -6,19 +6,21 @@
 #include "CogWindowWidgets.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Tags::RenderHelp()
+void FCogAbilityWindow_Tags::Initialize()
+{
+    Super::Initialize();
+
+    bHasMenu = false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_Tags::RenderHelp()
 {
     ImGui::Text("This window displays gameplay tags of the selected actor. ");
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogAbilityWindow_Tags::UCogAbilityWindow_Tags()
-{
-    bHasMenu = false;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Tags::RenderContent()
+void FCogAbilityWindow_Tags::RenderContent()
 {
     Super::RenderContent();
 
@@ -36,7 +38,7 @@ void UCogAbilityWindow_Tags::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Tags::DrawTag(const UAbilitySystemComponent& AbilitySystemComponent, const FGameplayTag& Tag)
+void FCogAbilityWindow_Tags::DrawTag(const UAbilitySystemComponent& AbilitySystemComponent, const FGameplayTag& Tag)
 {
     if (ImGui::BeginTable("Tag", 2, ImGuiTableFlags_Borders))
     {
@@ -94,7 +96,7 @@ void UCogAbilityWindow_Tags::DrawTag(const UAbilitySystemComponent& AbilitySyste
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Tags::DrawTagContainer(const FString& TagContainerName, const UAbilitySystemComponent& AbilitySystemComponent, FGameplayTagContainer& TagContainer)
+void FCogAbilityWindow_Tags::DrawTagContainer(const FString& TagContainerName, const UAbilitySystemComponent& AbilitySystemComponent, FGameplayTagContainer& TagContainer)
 {
     if (ImGui::BeginTable(TCHAR_TO_ANSI(*TagContainerName), 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuterH | ImGuiTableFlags_BordersOuterV))
     {

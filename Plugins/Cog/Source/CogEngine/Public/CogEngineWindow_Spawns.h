@@ -2,20 +2,18 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
-#include "CogEngineWindow_Spawns.generated.h"
 
 class UCogEngineDataAsset;
 struct FCogEngineSpawnGroup;
 struct FCogEngineSpawnEntry;
 
-UCLASS()
-class COGENGINE_API UCogEngineWindow_Spawns : public UCogWindow
+class COGENGINE_API FCogEngineWindow_Spawns : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 public:
 
-    UCogEngineWindow_Spawns();
+    virtual void Initialize() override;
 
 protected:
 
@@ -29,6 +27,5 @@ protected:
 
 private:
 
-    UPROPERTY()
     TObjectPtr<const UCogEngineDataAsset> Asset = nullptr;
 };

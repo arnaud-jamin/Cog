@@ -2,17 +2,17 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
-#include "CogEngineWindow_ImGui.generated.h"
 
-UCLASS()
-class COGENGINE_API UCogEngineWindow_ImGui : public UCogWindow
+class COGENGINE_API FCogEngineWindow_ImGui : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 public:
-    UCogEngineWindow_ImGui();
+
+protected:
 
     virtual void RenderTick(float DeltaTime) override;
+
     virtual void RenderContent() override;
 
 private:

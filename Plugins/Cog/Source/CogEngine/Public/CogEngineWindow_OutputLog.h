@@ -2,35 +2,36 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
+#include "CogWindowConfig.h"
 #include "imgui.h"
 #include "Misc/OutputDevice.h"
 #include "CogEngineWindow_OutputLog.generated.h"
 
-class UCogEngineWindow_OutputLog;
+class FCogEngineWindow_OutputLog;
+class UCogEngineConfig_OutputLog;
 
 //--------------------------------------------------------------------------------------------------------------------------
-class UCogLogOutputDevice : public FOutputDevice
+class FCogLogOutputDevice : public FOutputDevice
 {
 public:
-    friend class UCogEngineWindow_OutputLog;
+    friend class FCogEngineWindow_OutputLog;
 
-    UCogLogOutputDevice();
-    ~UCogLogOutputDevice();
+    FCogLogOutputDevice();
+    ~FCogLogOutputDevice();
 
     virtual void Serialize(const TCHAR* Message, ELogVerbosity::Type Verbosity, const FName& Category) override;
 
-    UCogEngineWindow_OutputLog* OutputLog = nullptr;
+    FCogEngineWindow_OutputLog* OutputLog = nullptr;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCLASS(Config = Cog)
-class COGENGINE_API UCogEngineWindow_OutputLog : public UCogWindow
+class COGENGINE_API FCogEngineWindow_OutputLog : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 public:
 
-    UCogEngineWindow_OutputLog();
+    virtual void Initialize() override;
 
     void AddLog(const TCHAR* Message, ELogVerbosity::Type Verbosity, const FName& Category);
 
@@ -57,6 +58,25 @@ private:
 
     void DrawRow(const char* BufferStart, const FLineInfo& Info, bool IsTableShown);
 
+    ImGuiTextBuffer TextBuffer;
+
+    ImGuiTextFilter Filter;
+
+    TArray<FLineInfo> LineInfos;
+
+    FCogLogOutputDevice OutputDevice;
+
+    TObjectPtr<UCogEngineConfig_OutputLog> Config = nullptr;
+};
+
+//--------------------------------------------------------------------------------------------------------------------------
+UCLASS(Config = Cog)
+class UCogEngineConfig_OutputLog : public UCogWindowConfig
+{
+    GENERATED_BODY()
+
+public:
+
     UPROPERTY(Config)
     bool AutoScroll = true;
 
@@ -71,15 +91,19 @@ private:
 
     UPROPERTY(Config)
     bool ShowAsTable = false;
-    
+
     UPROPERTY(Config)
     int32 VerbosityFilter = ELogVerbosity::VeryVerbose;
 
-    ImGuiTextBuffer TextBuffer;
+    virtual void Reset() override
+    {
+        Super::Reset();
 
-    ImGuiTextFilter Filter;
-
-    TArray<FLineInfo> LineInfos;
-
-    UCogLogOutputDevice OutputDevice;
+        AutoScroll = true;
+        ShowFrame = true;
+        ShowCategory = true;
+        ShowVerbosity = false;
+        ShowAsTable = false;
+        VerbosityFilter = ELogVerbosity::VeryVerbose;
+    }
 };

@@ -8,43 +8,44 @@
 char ImGuiTextBuffer::EmptyString[1] = { 0 };
 
 //--------------------------------------------------------------------------------------------------------------------------
-// FCogWindow_Log
+// UCogEngineWindow_OutputLog
 //--------------------------------------------------------------------------------------------------------------------------
-UCogEngineWindow_OutputLog::UCogEngineWindow_OutputLog()
-{
+void FCogEngineWindow_OutputLog::Initialize()
+{    
+    Super::Initialize();
+
     bHasMenu = true;
     OutputDevice.OutputLog = this;
+
+    Config = GetConfig<UCogEngineConfig_OutputLog>();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_OutputLog::RenderHelp()
+void FCogEngineWindow_OutputLog::RenderHelp()
 {
     ImGui::Text(
     "This window output the log based on each log categories verbosity. "
     "The verbosity of each log category can be configured in the 'Log Categories' window. "
     );
 }
+
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_OutputLog::ResetConfig()
+void FCogEngineWindow_OutputLog::ResetConfig()
 {
     Super::ResetConfig();
 
-    AutoScroll = true;
-    ShowFrame = true;
-    ShowCategory = true;
-    ShowVerbosity = false;
-    ShowAsTable = false;
+    Config->Reset();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_OutputLog::Clear()
+void FCogEngineWindow_OutputLog::Clear()
 {
     TextBuffer.clear();
     LineInfos.Empty();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_OutputLog::AddLog(const TCHAR* Message, ELogVerbosity::Type Verbosity, const class FName& Category)
+void FCogEngineWindow_OutputLog::AddLog(const TCHAR* Message, ELogVerbosity::Type Verbosity, const class FName& Category)
 {
     static TAnsiStringBuilder<512> Format;
 
@@ -68,7 +69,7 @@ void UCogEngineWindow_OutputLog::AddLog(const TCHAR* Message, ELogVerbosity::Typ
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_OutputLog::DrawRow(const char* BufferStart, const FLineInfo& LineInfo, bool IsTableShown)
+void FCogEngineWindow_OutputLog::DrawRow(const char* BufferStart, const FLineInfo& LineInfo, bool IsTableShown)
 {
     ImU32 Color;
     switch (LineInfo.Verbosity)
@@ -84,19 +85,19 @@ void UCogEngineWindow_OutputLog::DrawRow(const char* BufferStart, const FLineInf
     {
         ImGui::TableNextRow();
 
-        if (ShowFrame)
+        if (Config->ShowFrame)
         {
             ImGui::TableNextColumn();
             ImGui::Text("%3d", LineInfo.Frame);
         }
 
-        if (ShowCategory)
+        if (Config->ShowCategory)
         {
             ImGui::TableNextColumn();
             ImGui::Text("%s", TCHAR_TO_ANSI(*LineInfo.Category.ToString()));
         }
 
-        if (ShowVerbosity)
+        if (Config->ShowVerbosity)
         {
             ImGui::TableNextColumn();
             ImGui::Text("%s", TCHAR_TO_ANSI(ToString(LineInfo.Verbosity)));
@@ -109,19 +110,19 @@ void UCogEngineWindow_OutputLog::DrawRow(const char* BufferStart, const FLineInf
     }
     else
     {
-        if (ShowFrame)
+        if (Config->ShowFrame)
         {
             ImGui::Text("[%3d] ", LineInfo.Frame);
             ImGui::SameLine();
         }
 
-        if (ShowCategory)
+        if (Config->ShowCategory)
         {
             ImGui::Text("%s: ", TCHAR_TO_ANSI(*LineInfo.Category.ToString()));
             ImGui::SameLine();
         }
 
-        if (ShowVerbosity)
+        if (Config->ShowVerbosity)
         {
             ImGui::Text("%s: ", TCHAR_TO_ANSI(ToString(LineInfo.Verbosity)));
             ImGui::SameLine();
@@ -136,7 +137,7 @@ void UCogEngineWindow_OutputLog::DrawRow(const char* BufferStart, const FLineInf
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_OutputLog::RenderContent()
+void FCogEngineWindow_OutputLog::RenderContent()
 {
     Super::RenderContent();
 
@@ -153,11 +154,11 @@ void UCogEngineWindow_OutputLog::RenderContent()
             }
             ImGui::Separator();
 
-            ImGui::Checkbox("Auto Scroll", &AutoScroll);
-            ImGui::Checkbox("Show Frame", &ShowFrame);
-            ImGui::Checkbox("Show Category", &ShowCategory);
-            ImGui::Checkbox("Show Verbosity", &ShowVerbosity);
-            ImGui::Checkbox("Show As Table", &ShowAsTable);
+            ImGui::Checkbox("Auto Scroll", &Config->AutoScroll);
+            ImGui::Checkbox("Show Frame", &Config->ShowFrame);
+            ImGui::Checkbox("Show Category", &Config->ShowCategory);
+            ImGui::Checkbox("Show Verbosity", &Config->ShowVerbosity);
+            ImGui::Checkbox("Show As Table", &Config->ShowAsTable);
 
             ImGui::EndMenu();
         }
@@ -172,16 +173,16 @@ void UCogEngineWindow_OutputLog::RenderContent()
         ImGui::SameLine();
 
         ImGui::SetNextItemWidth(ImGui::GetFontSize() * 9);
-        if (ImGui::BeginCombo("##Verbosity", FCogDebugHelper::VerbosityToString((ELogVerbosity::Type)VerbosityFilter)))
+        if (ImGui::BeginCombo("##Verbosity", FCogDebugHelper::VerbosityToString((ELogVerbosity::Type)Config->VerbosityFilter)))
         {
             for (int32 i = (int32)ELogVerbosity::Error; i <= (int32)ELogVerbosity::VeryVerbose; ++i)
             {
-                bool IsSelected = i == VerbosityFilter;
+                bool IsSelected = i == Config->VerbosityFilter;
                 ELogVerbosity::Type Verbosity = (ELogVerbosity::Type)i;
 
                 if (ImGui::Selectable(FCogDebugHelper::VerbosityToString(Verbosity), IsSelected))
                 {
-                    VerbosityFilter = i;
+                    Config->VerbosityFilter = i;
                 }
             }
             ImGui::EndCombo();
@@ -193,27 +194,27 @@ void UCogEngineWindow_OutputLog::RenderContent()
     }
 
     int32 ColumnCount = 1;
-    ColumnCount += (int32)ShowFrame;
-    ColumnCount += (int32)ShowCategory;
-    ColumnCount += (int32)ShowVerbosity;
+    ColumnCount += (int32)Config->ShowFrame;
+    ColumnCount += (int32)Config->ShowCategory;
+    ColumnCount += (int32)Config->ShowVerbosity;
 
     bool IsTableShown = false;
-    if (ShowAsTable)
+    if (Config->ShowAsTable)
     {
         if (ImGui::BeginTable("LogTable", ColumnCount, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_ScrollX))
         {
             IsTableShown = true;
-            if (ShowFrame)
+            if (Config->ShowFrame)
             {
                 ImGui::TableSetupColumn("Frame", ImGuiTableColumnFlags_WidthFixed, FCogWindowWidgets::GetFontWidth() * 4);
             }
 
-            if (ShowCategory)
+            if (Config->ShowCategory)
             {
                 ImGui::TableSetupColumn("Category", ImGuiTableColumnFlags_WidthFixed, FCogWindowWidgets::GetFontWidth() * 10);
             }
 
-            if (ShowVerbosity)
+            if (Config->ShowVerbosity)
             {
                 ImGui::TableSetupColumn("Verbosity", ImGuiTableColumnFlags_WidthFixed, FCogWindowWidgets::GetFontWidth() * 10);
             }
@@ -242,13 +243,13 @@ void UCogEngineWindow_OutputLog::RenderContent()
             }
         }
     }
-    else if (VerbosityFilter != ELogVerbosity::VeryVerbose)
+    else if (Config->VerbosityFilter != ELogVerbosity::VeryVerbose)
     {
         for (int32 LineIndex = 0; LineIndex < LineInfos.Num(); LineIndex++)
         {
             const FLineInfo& LineInfo = LineInfos[LineIndex];
 
-            if (LineInfo.Verbosity <= (ELogVerbosity::Type)VerbosityFilter)
+            if (LineInfo.Verbosity <= (ELogVerbosity::Type)Config->VerbosityFilter)
             {
                 const char* LineStart = BufferStart + LineInfo.Start;
                 const char* LineEnd = BufferStart + LineInfo.End;
@@ -274,7 +275,7 @@ void UCogEngineWindow_OutputLog::RenderContent()
         Clipper.End();
     }
 
-    if (AutoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
+    if (Config->AutoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
     {
         ImGui::SetScrollHereY(1.0f);
     }
@@ -302,13 +303,13 @@ void UCogEngineWindow_OutputLog::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 // FCogLogOutputDevice
 //--------------------------------------------------------------------------------------------------------------------------
-UCogLogOutputDevice::UCogLogOutputDevice()
+FCogLogOutputDevice::FCogLogOutputDevice()
 {
     GLog->AddOutputDevice(this);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogLogOutputDevice::~UCogLogOutputDevice()
+FCogLogOutputDevice::~FCogLogOutputDevice()
 {
     if (GLog != nullptr)
     {
@@ -317,7 +318,7 @@ UCogLogOutputDevice::~UCogLogOutputDevice()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogLogOutputDevice::Serialize(const TCHAR* Message, ELogVerbosity::Type Verbosity, const class FName& Category)
+void FCogLogOutputDevice::Serialize(const TCHAR* Message, ELogVerbosity::Type Verbosity, const class FName& Category)
 {
     if (OutputLog != nullptr)
     {

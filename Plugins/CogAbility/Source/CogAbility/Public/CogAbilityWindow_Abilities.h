@@ -3,24 +3,22 @@
 #include "CoreMinimal.h"
 #include "CogWindow.h"
 #include "GameplayAbilitySpecHandle.h"
-#include "CogAbilityWindow_Abilities.generated.h"
 
 class UAbilitySystemComponent;
 class UGameplayAbility;
 class UCogAbilityDataAsset;
 struct FGameplayAbilitySpec;
 
-UCLASS()
-class COGABILITY_API UCogAbilityWindow_Abilities : public UCogWindow
+class COGABILITY_API FCogAbilityWindow_Abilities : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 public:
 
-    UCogAbilityWindow_Abilities();
+    virtual void Initialize() override;
 
 protected:
-
+    
     virtual void RenderHelp() override;
 
     virtual void RenderTick(float DetlaTime) override;
@@ -61,6 +59,5 @@ private:
 
     TArray<FGameplayAbilitySpecHandle> OpenedAbilities;
 
-    UPROPERTY()
     TObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
 };

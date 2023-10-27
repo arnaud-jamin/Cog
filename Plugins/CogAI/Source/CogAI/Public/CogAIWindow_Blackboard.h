@@ -2,27 +2,50 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
+#include "CogWindowConfig.h"
 #include "CogAIWindow_Blackboard.generated.h"
 
-UCLASS(Config = Cog)
-class COGAI_API UCogAIWindow_Blackboard : public UCogWindow
+class UCogAIConfig_Blackboard;
+
+//--------------------------------------------------------------------------------------------------------------------------
+class COGAI_API FCogAIWindow_Blackboard : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 public:
 
-    UCogAIWindow_Blackboard();
+    virtual void Initialize() override;
 
 protected:
 
-    void RenderHelp();
+    virtual void ResetConfig() override;
+
+    virtual void RenderHelp() override;
 
     virtual void RenderContent() override;
 
 private:
 
+    ImGuiTextFilter Filter;
+
+    TObjectPtr<UCogAIConfig_Blackboard> Config;
+};
+
+//--------------------------------------------------------------------------------------------------------------------------
+UCLASS(Config = Cog)
+class UCogAIConfig_Blackboard : public UCogWindowConfig
+{
+    GENERATED_BODY()
+
+public:
+
     UPROPERTY(Config)
     bool bSortByName = true;
 
-    ImGuiTextFilter Filter;
+    virtual void Reset() override
+    {
+        Super::Reset();
+
+        bSortByName = true;
+    }
 };

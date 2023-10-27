@@ -8,7 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Plots::RenderHelp()
+void FCogEngineWindow_Plots::RenderHelp()
 {
     ImGui::Text(
         "This window plots values overtime. When applicable, only the values of the selected actor are displayed."
@@ -16,14 +16,14 @@ void UCogEngineWindow_Plots::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Plots::RenderTick(float DeltaTime)
+void FCogEngineWindow_Plots::RenderTick(float DeltaTime)
 {
     Super::RenderTick(DeltaTime);
     FCogDebugPlot::IsVisible = GetIsVisible();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Plots::RenderContent()
+void FCogEngineWindow_Plots::RenderContent()
 {
     Super::RenderContent();
 

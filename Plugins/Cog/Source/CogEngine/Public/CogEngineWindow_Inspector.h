@@ -2,19 +2,21 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
+#include "CogWindowConfig.h"
 #include "imgui.h"
 #include "CogEngineWindow_Inspector.generated.h"
 
+class UCogEngineConfig_Inspector;
 using FCogEngineInspectorApplyFunction = TFunction<void(UObject*)>;
 
-UCLASS(Config = Cog)
-class COGENGINE_API UCogEngineWindow_Inspector : public UCogWindow
+//--------------------------------------------------------------------------------------------------------------------------
+class COGENGINE_API FCogEngineWindow_Inspector : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 public:
     
-    UCogEngineWindow_Inspector();
+    virtual void Initialize() override;
 
     virtual UObject* GetInspectedObject() const { return InspectedObject.Get(); }
 
@@ -23,24 +25,6 @@ public:
     virtual void AddFavorite(UObject* Object);
 
     virtual void AddFavorite(UObject* Object, FCogEngineInspectorApplyFunction ApplyFunction);
-
-    UPROPERTY(Config)
-    bool bSyncWithSelection = true;
-
-    UPROPERTY(Config)
-    bool bShowDisplayName = true;
-
-    UPROPERTY(Config)
-    bool bShowRowBackground = true;
-
-    UPROPERTY(Config)
-    bool bShowBorders = false;
-
-    UPROPERTY(Config)
-    bool bShowCategories = true;
-
-    UPROPERTY(Config)
-    bool bSortByName = true;
 
 protected:
 
@@ -120,4 +104,45 @@ protected:
     TArray<TWeakObjectPtr<UObject>> History;
 
     int32 HistoryIndex = INDEX_NONE;
+
+    TWeakObjectPtr<UCogEngineConfig_Inspector> Config = nullptr;
+};
+
+//--------------------------------------------------------------------------------------------------------------------------
+UCLASS(Config = Cog)
+class UCogEngineConfig_Inspector : public UCogWindowConfig
+{
+    GENERATED_BODY()
+
+public:
+
+    UPROPERTY(Config)
+    bool bSyncWithSelection = true;
+
+    UPROPERTY(Config)
+    bool bShowDisplayName = true;
+
+    UPROPERTY(Config)
+    bool bShowRowBackground = true;
+
+    UPROPERTY(Config)
+    bool bShowBorders = false;
+
+    UPROPERTY(Config)
+    bool bShowCategories = true;
+
+    UPROPERTY(Config)
+    bool bSortByName = true;
+
+    virtual void Reset() override
+    {
+        Super::Reset();
+
+        bSyncWithSelection = true;
+        bShowDisplayName = true;
+        bShowRowBackground = true;
+        bShowBorders = false;
+        bShowCategories = true;
+        bSortByName = true;
+    }
 };

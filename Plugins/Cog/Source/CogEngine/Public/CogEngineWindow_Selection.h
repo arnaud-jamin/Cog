@@ -3,20 +3,24 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "CogWindow.h"
+#include "CogWindowConfig.h"
 #include "CogEngineWindow_Selection.generated.h"
 
 class IConsoleObject;
+class UCogEngineConfig_Selection;
 
-UCLASS(Config = Cog)
-class COGENGINE_API UCogEngineWindow_Selection : public UCogWindow
+//--------------------------------------------------------------------------------------------------------------------------
+class COGENGINE_API FCogEngineWindow_Selection : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 public:
 
     static FString ToggleSelectionModeCommand;
 
-    UCogEngineWindow_Selection();
+    virtual void Initialize() override;
+
+    virtual void Shutdown() override;
 
     bool GetIsSelecting() const { return bSelectionModeActive; }
 
@@ -41,8 +45,6 @@ protected:
     virtual void ResetConfig() override;
 
     virtual void PreSaveConfig() override;
-
-    virtual void PostInitProperties() override;
 
     virtual void RenderHelp() override;
 
@@ -76,18 +78,6 @@ protected:
 
     bool ComputeBoundingBoxScreenPosition(const APlayerController* PlayerController, const FVector& Origin, const FVector& Extent, FVector2D& Min, FVector2D& Max);
 
-    UPROPERTY(Config)
-    bool bReapplySelection = true;
-
-    UPROPERTY(Config)
-    bool bDisplayActorLabel = true;
-
-    UPROPERTY(Config)
-    FString SelectionName;
-
-    UPROPERTY(Config)
-    int32 SelectedClassIndex = 0;
-
     FVector LastSelectedActorLocation = FVector::ZeroVector;
 
     bool bSelectionModeActive = false;
@@ -101,4 +91,37 @@ protected:
     ETraceTypeQuery TraceType = TraceTypeQuery1;
 
     TArray<IConsoleObject*> ConsoleCommands;
+
+    TObjectPtr<UCogEngineConfig_Selection> Config;
+};
+
+//--------------------------------------------------------------------------------------------------------------------------
+UCLASS(Config = Cog)
+class UCogEngineConfig_Selection : public UCogWindowConfig
+{
+    GENERATED_BODY()
+
+public:
+
+    UPROPERTY(Config)
+    bool bReapplySelection = true;
+
+    UPROPERTY(Config)
+    bool bDisplayActorLabel = true;
+
+    UPROPERTY(Config)
+    FString SelectionName;
+
+    UPROPERTY(Config)
+    int32 SelectedClassIndex = 0;
+
+    virtual void Reset() override
+    {
+        Super::Reset();
+
+        bReapplySelection = true;
+        bDisplayActorLabel = true;
+        SelectionName;
+        SelectedClassIndex = 0;
+    }
 };

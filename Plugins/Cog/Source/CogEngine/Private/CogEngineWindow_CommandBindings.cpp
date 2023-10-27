@@ -6,7 +6,7 @@
 #include "imgui.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_CommandBindings::RenderHelp()
+void FCogEngineWindow_CommandBindings::RenderHelp()
 {
     ImGui::Text(
         "This window can be used to configure the command bindings. "
@@ -15,12 +15,7 @@ void UCogEngineWindow_CommandBindings::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogEngineWindow_CommandBindings::UCogEngineWindow_CommandBindings()
-{
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_CommandBindings::RenderContent()
+void FCogEngineWindow_CommandBindings::RenderContent()
 {
     Super::RenderContent();
 
@@ -64,7 +59,7 @@ void UCogEngineWindow_CommandBindings::RenderContent()
             "[F5]   Cog.ToggleSelectionMode\n"
     ))
     {
-        Owner->RegisterDefaultCommands();
+        GetOwner()->RegisterDefaultCommands();
     }
 
     for (FKeyBind& KeyBind : PlayerInput->DebugExecBindings)

@@ -2,12 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
-#include "CogEngineWindow_Scalability.generated.h"
 
-UCLASS()
-class COGENGINE_API UCogEngineWindow_Scalability : public UCogWindow
+class COGENGINE_API FCogEngineWindow_Scalability : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 public:
 

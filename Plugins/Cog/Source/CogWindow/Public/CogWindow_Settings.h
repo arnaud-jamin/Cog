@@ -3,21 +3,16 @@
 #include "CoreMinimal.h"
 #include "CogWindow.h"
 #include "CogImGuiKeyInfo.h"
-#include "CogWindow_Settings.generated.h"
 
-
-UCLASS(Config = Cog)
-class COGWINDOW_API UCogWindow_Settings : public UCogWindow
+class COGWINDOW_API FCogWindow_Settings : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 public:
     
-    UCogWindow_Settings();
+    virtual void Initialize() override;
 
 protected: 
-
-    virtual void PostInitProperties() override;
 
     virtual void RenderContent() override;
 

@@ -67,6 +67,8 @@ public:
 
     TWeakObjectPtr<UGameViewportClient> GetGameViewport() const { return GameViewport; }
 
+    void DestroyImGuiContext();
+
 protected:
 
     FVector2D TransformScreenPointToImGui(const FGeometry& MyGeometry, const FVector2D& Point) const;

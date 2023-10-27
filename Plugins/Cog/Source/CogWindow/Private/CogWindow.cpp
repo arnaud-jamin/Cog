@@ -8,7 +8,7 @@
 #include "imgui_internal.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindow::SetFullName(const FString& InFullName)
+void FCogWindow::SetFullName(const FString& InFullName)
 {
     FullName = InFullName;
 
@@ -29,7 +29,7 @@ void UCogWindow::SetFullName(const FString& InFullName)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogWindow::CheckEditorVisibility()
+bool FCogWindow::CheckEditorVisibility()
 {
     const UWorld* World = GetWorld();
     if (World == nullptr)
@@ -51,7 +51,7 @@ bool UCogWindow::CheckEditorVisibility()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindow::Render(float DeltaTime)
+void FCogWindow::Render(float DeltaTime)
 {
     ImGuiWindowFlags WindowFlags = 0;
     PreRender(WindowFlags);
@@ -65,7 +65,7 @@ void UCogWindow::Render(float DeltaTime)
 
     if (ImGui::Begin(TCHAR_TO_ANSI(*WindowTitle), &bIsVisible, WindowFlags))
     {
-        if (Owner->GetShowHelp())
+        if (GetOwner()->GetShowHelp())
         {
             if (ImGui::IsItemHovered())
             {
@@ -107,24 +107,24 @@ void UCogWindow::Render(float DeltaTime)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindow::RenderHelp()
+void FCogWindow::RenderHelp()
 {
     ImGui::Text("No help available.");
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindow::RenderTick(float DeltaTime)
+void FCogWindow::RenderTick(float DeltaTime)
 {
     SetSelection(FCogDebugSettings::GetSelection());
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindow::GameTick(float DeltaTime)
+void FCogWindow::GameTick(float DeltaTime)
 {
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindow::SetSelection(AActor* NewSelection)
+void FCogWindow::SetSelection(AActor* NewSelection)
 {
     if (CurrentSelection == NewSelection)
     {
@@ -138,7 +138,7 @@ void UCogWindow::SetSelection(AActor* NewSelection)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-APawn* UCogWindow::GetLocalPlayerPawn()
+APawn* FCogWindow::GetLocalPlayerPawn()
 {
     APlayerController* LocalPlayerController = GetLocalPlayerController();
     
@@ -153,7 +153,7 @@ APawn* UCogWindow::GetLocalPlayerPawn()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-APlayerController* UCogWindow::GetLocalPlayerController()
+APlayerController* FCogWindow::GetLocalPlayerController()
 {
     ULocalPlayer* LocalPlayer = GetLocalPlayer();
     if (LocalPlayer == nullptr)
@@ -165,7 +165,7 @@ APlayerController* UCogWindow::GetLocalPlayerController()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ULocalPlayer* UCogWindow::GetLocalPlayer()
+ULocalPlayer* FCogWindow::GetLocalPlayer()
 {
     const UWorld* World = GetWorld();
     if (World == nullptr)
@@ -175,3 +175,22 @@ ULocalPlayer* UCogWindow::GetLocalPlayer()
 
     return World->GetFirstLocalPlayerFromController();
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+UCogWindowConfig* FCogWindow::GetConfig(const TSubclassOf<UCogWindowConfig> ConfigClass)
+{
+    return GetOwner()->GetConfig(ConfigClass);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+const UObject* FCogWindow::GetAsset(const TSubclassOf<UObject> AssetClass)
+{
+    return GetOwner()->GetAsset(AssetClass);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+UWorld* FCogWindow::GetWorld() const
+{
+    return Owner->GetWorld();
+}
+

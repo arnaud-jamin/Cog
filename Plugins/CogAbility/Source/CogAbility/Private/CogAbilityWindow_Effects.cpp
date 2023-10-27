@@ -12,7 +12,17 @@
 #include "GameFramework/Character.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Effects::RenderHelp()
+void FCogAbilityWindow_Effects::Initialize()
+{
+    Super::Initialize();
+
+    bHasMenu = false;
+
+    Asset = GetAsset<UCogAbilityDataAsset>();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_Effects::RenderHelp()
 {
     ImGui::Text(
         "This window displays the gameplay effects of the selected actor. "
@@ -21,15 +31,7 @@ void UCogAbilityWindow_Effects::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogAbilityWindow_Effects::UCogAbilityWindow_Effects()
-{
-    bHasMenu = false;
-
-    Asset = FCogWindowHelper::GetFirstAssetByClass<UCogAbilityDataAsset>();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Effects::RenderContent()
+void FCogAbilityWindow_Effects::RenderContent()
 {
     Super::RenderContent();
 
@@ -37,7 +39,7 @@ void UCogAbilityWindow_Effects::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Effects::RenderEffectsTable()
+void FCogAbilityWindow_Effects::RenderEffectsTable()
 {
     UAbilitySystemComponent* AbilitySystemComponent = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetSelection(), true);
     if (AbilitySystemComponent == nullptr)
@@ -65,7 +67,7 @@ void UCogAbilityWindow_Effects::RenderEffectsTable()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Effects::RenderEffectRow(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffectHandle& ActiveHandle, int32 Index, int32& Selected)
+void FCogAbilityWindow_Effects::RenderEffectRow(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffectHandle& ActiveHandle, int32 Index, int32& Selected)
 {
     ImGui::PushID(Index);
 
@@ -146,7 +148,7 @@ void UCogAbilityWindow_Effects::RenderEffectRow(const UAbilitySystemComponent& A
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Effects::RenderEffectInfo(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffect& ActiveEffect, const UGameplayEffect& Effect)
+void FCogAbilityWindow_Effects::RenderEffectInfo(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffect& ActiveEffect, const UGameplayEffect& Effect)
 {
     if (ImGui::BeginTable("Effect", 2, ImGuiTableFlags_Borders))
     {
@@ -265,7 +267,7 @@ void UCogAbilityWindow_Effects::RenderEffectInfo(const UAbilitySystemComponent& 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Effects::RenderTagContainer(const FGameplayTagContainer& Container)
+void FCogAbilityWindow_Effects::RenderTagContainer(const FGameplayTagContainer& Container)
 {
     TArray<FGameplayTag> GameplayTags;
     Container.GetGameplayTagArray(GameplayTags);
@@ -276,14 +278,14 @@ void UCogAbilityWindow_Effects::RenderTagContainer(const FGameplayTagContainer& 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FString UCogAbilityWindow_Effects::GetEffectName(const UGameplayEffect& Effect)
+FString FCogAbilityWindow_Effects::GetEffectName(const UGameplayEffect& Effect)
 {
     FString Str = FCogAbilityHelper::CleanupName(Effect.GetName());
     return Str;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Effects::RenderRemainingTime(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffect& ActiveEffect)
+void FCogAbilityWindow_Effects::RenderRemainingTime(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffect& ActiveEffect)
 {
     const float StartTime = ActiveEffect.StartWorldTime;
     const float Duration = ActiveEffect.GetDuration();
@@ -301,7 +303,7 @@ void UCogAbilityWindow_Effects::RenderRemainingTime(const UAbilitySystemComponen
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Effects::RenderStacks(const FActiveGameplayEffect& ActiveEffect, const UGameplayEffect& Effect)
+void FCogAbilityWindow_Effects::RenderStacks(const FActiveGameplayEffect& ActiveEffect, const UGameplayEffect& Effect)
 {
     const int32 CurrentStackCount = ActiveEffect.Spec.StackCount;
     if (Effect.StackLimitCount <= 0)
@@ -319,7 +321,7 @@ void UCogAbilityWindow_Effects::RenderStacks(const FActiveGameplayEffect& Active
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Effects::RenderPrediction(const FActiveGameplayEffect& ActiveEffect, bool Short)
+void FCogAbilityWindow_Effects::RenderPrediction(const FActiveGameplayEffect& ActiveEffect, bool Short)
 {
     FString PredictionString;
     if (ActiveEffect.PredictionKey.IsValidKey())
@@ -342,13 +344,13 @@ void UCogAbilityWindow_Effects::RenderPrediction(const FActiveGameplayEffect& Ac
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ImVec4 UCogAbilityWindow_Effects::GetEffectColor(const UGameplayEffect& Effect) const
+ImVec4 FCogAbilityWindow_Effects::GetEffectColor(const UGameplayEffect& Effect) const
 {
     return FCogAbilityHelper::GetEffectColor(Asset.Get(), Effect);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ImVec4 UCogAbilityWindow_Effects::GetEffectModifierColor(const FModifierSpec& ModSpec, const FGameplayModifierInfo& ModInfo, float BaseValue) const
+ImVec4 FCogAbilityWindow_Effects::GetEffectModifierColor(const FModifierSpec& ModSpec, const FGameplayModifierInfo& ModInfo, float BaseValue) const
 {
     const float ModValue = ModSpec.GetEvaluatedMagnitude();
     return FCogAbilityHelper::GetEffectModifierColor(Asset.Get(), ModSpec.GetEvaluatedMagnitude(), ModInfo.ModifierOp, BaseValue);

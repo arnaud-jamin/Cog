@@ -10,7 +10,7 @@
 
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Scalability::RenderHelp()
+void FCogEngineWindow_Scalability::RenderHelp()
 {
     ImGui::Text(
         "This window can be used to configure the rendering quality."
@@ -18,7 +18,7 @@ void UCogEngineWindow_Scalability::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Scalability::RenderContent()
+void FCogEngineWindow_Scalability::RenderContent()
 {
     Super::RenderContent();
 

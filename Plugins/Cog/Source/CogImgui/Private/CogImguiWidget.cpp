@@ -47,8 +47,23 @@ END_SLATE_FUNCTION_BUILD_OPTIMIZATION
 //--------------------------------------------------------------------------------------------------------------------------
 SCogImguiWidget::~SCogImguiWidget()
 {
-    ImPlot::DestroyContext(ImPlotContext);
-    ImGui::DestroyContext(ImGuiContext);
+    DestroyImGuiContext();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void SCogImguiWidget::DestroyImGuiContext()
+{
+    if (ImPlotContext != nullptr)
+    {
+        ImPlot::DestroyContext(ImPlotContext);
+        ImPlotContext = nullptr;
+    }
+
+    if (ImGuiContext != nullptr)
+    {
+        ImGui::DestroyContext(ImGuiContext);
+        ImGuiContext = nullptr;
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

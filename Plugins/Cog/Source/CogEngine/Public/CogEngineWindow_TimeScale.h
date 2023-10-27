@@ -2,18 +2,14 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
-#include "CogEngineWindow_TimeScale.generated.h"
 
-class ACogEngineReplicator;
-
-UCLASS()
-class COGENGINE_API UCogEngineWindow_TimeScale : public UCogWindow
+class COGENGINE_API FCogEngineWindow_TimeScale : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 public:
     
-    UCogEngineWindow_TimeScale();
+    void Initialize();
 
 protected:
 

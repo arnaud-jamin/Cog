@@ -13,10 +13,29 @@
 #include "imgui.h"
 #include "Kismet/GameplayStatics.h"
 
-FString UCogEngineWindow_Selection::ToggleSelectionModeCommand = TEXT("Cog.ToggleSelectionMode");
+FString FCogEngineWindow_Selection::ToggleSelectionModeCommand = TEXT("Cog.ToggleSelectionMode");
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Selection::RenderHelp()
+void FCogEngineWindow_Selection::Initialize()
+{
+    Super::Initialize();
+
+    bHasMenu = true;
+    ActorClasses = { AActor::StaticClass(), ACharacter::StaticClass() };
+
+    Config = GetConfig<UCogEngineConfig_Selection>();
+
+    ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
+        *ToggleSelectionModeCommand,
+        TEXT("Toggle the actor selection mode"),
+        FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { ToggleSelectionMode(); }),
+        ECVF_Cheat));
+
+    TryReapplySelection();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_Selection::RenderHelp()
 {
     ImGui::Text(
         "This window can be used to select an actor either by picking an actor in the world, "
@@ -27,51 +46,32 @@ void UCogEngineWindow_Selection::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogEngineWindow_Selection::UCogEngineWindow_Selection()
+void FCogEngineWindow_Selection::Shutdown()
 {
-    bHasMenu = true;
-    ActorClasses = { AActor::StaticClass(), ACharacter::StaticClass() };
-
-    ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
-        *ToggleSelectionModeCommand,
-        TEXT("Toggle the actor selection mode"),
-        FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { ToggleSelectionMode(); }),
-        ECVF_Cheat));
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Selection::ResetConfig()
-{
-    Super::ResetConfig();
-
     for (IConsoleObject* ConsoleCommand : ConsoleCommands)
     {
         IConsoleManager::Get().UnregisterConsoleObject(ConsoleCommand);
     }
-
-    SelectedClassIndex = 0;
-    SelectionName = FString();
-    bReapplySelection = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Selection::PreSaveConfig()
+void FCogEngineWindow_Selection::ResetConfig()
+{
+    Super::ResetConfig();
+
+    Config->Reset();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_Selection::PreSaveConfig()
 {
     Super::PreSaveConfig();
 
-    SelectionName = GetNameSafe(GetSelection());
+    Config->SelectionName = GetNameSafe(GetSelection());
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Selection::PostInitProperties()
-{
-    Super::PostInitProperties();
-    
-    TryReapplySelection();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Selection::TryReapplySelection() const
+void FCogEngineWindow_Selection::TryReapplySelection() const
 {
     UWorld* World = GetWorld();
     if (World == nullptr)
@@ -79,12 +79,12 @@ void UCogEngineWindow_Selection::TryReapplySelection() const
         return;
     }
 
-    if (bReapplySelection == false)
+    if (Config->bReapplySelection == false)
     {
         return;
     }
 
-    if (SelectionName.IsEmpty())
+    if (Config->SelectionName.IsEmpty())
     {
         return;
     }
@@ -99,7 +99,7 @@ void UCogEngineWindow_Selection::TryReapplySelection() const
     for (TActorIterator<AActor> It(World, SelectedClass); It; ++It)
     {
         AActor* Actor = *It;
-        if (GetNameSafe(Actor) == SelectionName)
+        if (GetNameSafe(Actor) == Config->SelectionName)
         {
             SetGlobalSelection(Actor);
         }
@@ -107,19 +107,19 @@ void UCogEngineWindow_Selection::TryReapplySelection() const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-TSubclassOf<AActor> UCogEngineWindow_Selection::GetSelectedActorClass() const
+TSubclassOf<AActor> FCogEngineWindow_Selection::GetSelectedActorClass() const
 {
     TSubclassOf<AActor> SelectedClass = AActor::StaticClass();
-    if (ActorClasses.IsValidIndex(SelectedClassIndex))
+    if (ActorClasses.IsValidIndex(Config->SelectedClassIndex))
     {
-        SelectedClass = ActorClasses[SelectedClassIndex];
+        SelectedClass = ActorClasses[Config->SelectedClassIndex];
     }
 
     return SelectedClass;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Selection::ToggleSelectionMode()
+void FCogEngineWindow_Selection::ToggleSelectionMode()
 {
     if (bSelectionModeActive)
     {
@@ -132,7 +132,7 @@ void UCogEngineWindow_Selection::ToggleSelectionMode()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Selection::ActivateSelectionMode()
+void FCogEngineWindow_Selection::ActivateSelectionMode()
 {
     bSelectionModeActive = true;
     bImGuiHadInputBeforeEnteringSelectionMode = FCogImguiModule::Get().GetEnableInput();
@@ -142,13 +142,13 @@ void UCogEngineWindow_Selection::ActivateSelectionMode()
 
 //--------------------------------------------------------------------------------------------------------------------------
 
-void UCogEngineWindow_Selection::HackWaitInputRelease()
+void FCogEngineWindow_Selection::HackWaitInputRelease()
 {
     WaitInputReleased = 1;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Selection::DeactivateSelectionMode()
+void FCogEngineWindow_Selection::DeactivateSelectionMode()
 {
     bSelectionModeActive = false;
 
@@ -166,7 +166,7 @@ void UCogEngineWindow_Selection::DeactivateSelectionMode()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Selection::RenderTick(float DeltaTime)
+void FCogEngineWindow_Selection::RenderTick(float DeltaTime)
 {
     Super::RenderTick(DeltaTime);
 
@@ -190,7 +190,7 @@ void UCogEngineWindow_Selection::RenderTick(float DeltaTime)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Selection::RenderContent()
+void FCogEngineWindow_Selection::RenderContent()
 {
     Super::RenderContent();
 
@@ -210,7 +210,7 @@ void UCogEngineWindow_Selection::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Selection::DrawSelectionCombo()
+bool FCogEngineWindow_Selection::DrawSelectionCombo()
 {
     bool SelectionChanged = false;
 
@@ -230,7 +230,7 @@ bool UCogEngineWindow_Selection::DrawSelectionCombo()
             TSubclassOf<AActor> SubClass = ActorClasses[i];
             if (ImGui::Selectable(TCHAR_TO_ANSI(*GetNameSafe(SubClass)), false))
             {
-                SelectedClassIndex = i;
+                Config->SelectedClassIndex = i;
                 SelectedClass = SubClass;
             }
         }
@@ -297,7 +297,7 @@ bool UCogEngineWindow_Selection::DrawSelectionCombo()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FString UCogEngineWindow_Selection::GetActorName(const AActor* Actor) const
+FString FCogEngineWindow_Selection::GetActorName(const AActor* Actor) const
 {
     if (Actor == nullptr)
     {
@@ -308,11 +308,11 @@ FString UCogEngineWindow_Selection::GetActorName(const AActor* Actor) const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FString UCogEngineWindow_Selection::GetActorName(const AActor& Actor) const
+FString FCogEngineWindow_Selection::GetActorName(const AActor& Actor) const
 {
 #if WITH_EDITOR
 
-    return bDisplayActorLabel ? Actor.GetActorLabel() : Actor.GetName();
+    return Config->bDisplayActorLabel ? Actor.GetActorLabel() : Actor.GetName();
 
 #else //WITH_EDITOR
 
@@ -322,7 +322,7 @@ FString UCogEngineWindow_Selection::GetActorName(const AActor& Actor) const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Selection::DrawActorContextMenu(AActor* Actor)
+void FCogEngineWindow_Selection::DrawActorContextMenu(AActor* Actor)
 {
     //------------------------
     // ContextMenu
@@ -372,15 +372,15 @@ void UCogEngineWindow_Selection::DrawActorContextMenu(AActor* Actor)
 
         ImGui::Separator();
 
-        ImGui::Checkbox("Save selection", &bReapplySelection);
-        ImGui::Checkbox("Display Actor Label", &bDisplayActorLabel);
+        ImGui::Checkbox("Save selection", &Config->bReapplySelection);
+        ImGui::Checkbox("Display Actor Label", &Config->bDisplayActorLabel);
 
         ImGui::EndPopup();
     }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Selection::TickSelectionMode()
+void FCogEngineWindow_Selection::TickSelectionMode()
 {
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
     {
@@ -463,7 +463,7 @@ void UCogEngineWindow_Selection::TickSelectionMode()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Selection::DrawActorFrame(const AActor& Actor)
+void FCogEngineWindow_Selection::DrawActorFrame(const AActor& Actor)
 {
     APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
     if (PlayerController == nullptr)
@@ -516,7 +516,7 @@ void UCogEngineWindow_Selection::DrawActorFrame(const AActor& Actor)
 }
 
 //-----------------------------------------------------------------------------------------
-bool UCogEngineWindow_Selection::ComputeBoundingBoxScreenPosition(const APlayerController* PlayerController, const FVector& Origin, const FVector& Extent, FVector2D& Min, FVector2D& Max)
+bool FCogEngineWindow_Selection::ComputeBoundingBoxScreenPosition(const APlayerController* PlayerController, const FVector& Origin, const FVector& Extent, FVector2D& Min, FVector2D& Max)
 {
     FVector Corners[8];
     Corners[0].Set(-Extent.X, -Extent.Y, -Extent.Z); // - - - 
@@ -558,7 +558,7 @@ bool UCogEngineWindow_Selection::ComputeBoundingBoxScreenPosition(const APlayerC
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-float UCogEngineWindow_Selection::GetMainMenuWidgetWidth(int32 SubWidgetIndex, float MaxWidth)
+float FCogEngineWindow_Selection::GetMainMenuWidgetWidth(int32 SubWidgetIndex, float MaxWidth)
 {
     switch (SubWidgetIndex)
     {
@@ -572,7 +572,7 @@ float UCogEngineWindow_Selection::GetMainMenuWidgetWidth(int32 SubWidgetIndex, f
 
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Selection::RenderMainMenuWidget(int32 SubWidgetIndex, float Width)
+void FCogEngineWindow_Selection::RenderMainMenuWidget(int32 SubWidgetIndex, float Width)
 {
     //-----------------------------------
     // Pick Button
@@ -658,13 +658,13 @@ void UCogEngineWindow_Selection::RenderMainMenuWidget(int32 SubWidgetIndex, floa
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Selection::SetGlobalSelection(AActor* Value) const
+void FCogEngineWindow_Selection::SetGlobalSelection(AActor* Value) const
 {
     FCogDebugSettings::SetSelection(GetWorld(), Value);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Selection::RenderPickButtonTooltip()
+void FCogEngineWindow_Selection::RenderPickButtonTooltip()
 {
     if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
     {

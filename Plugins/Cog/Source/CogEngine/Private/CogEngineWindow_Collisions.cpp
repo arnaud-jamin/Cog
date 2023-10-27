@@ -13,8 +13,21 @@
 #include "imgui.h"
 #include "Kismet/GameplayStatics.h"
 
+
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Collisions::RenderHelp()
+void FCogEngineWindow_Collisions::Initialize()
+{
+    Super::Initialize();
+
+    bHasMenu = true;
+
+    SetAsset(GetAsset<UCogEngineDataAsset>());
+
+    Config = GetConfig<UCogEngineConfig_Collisions>();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_Collisions::RenderHelp()
 {
     ImGui::Text("This window is used to inspect collisions by performing a collision query with the selected channels. "
         "The query can be configured in the options. "
@@ -24,30 +37,15 @@ void UCogEngineWindow_Collisions::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogEngineWindow_Collisions::UCogEngineWindow_Collisions()
-{
-    bHasMenu = true;
-
-    SetAsset(FCogWindowHelper::GetFirstAssetByClass<UCogEngineDataAsset>());
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Collisions::ResetConfig() 
+void FCogEngineWindow_Collisions::ResetConfig() 
 {
     Super::ResetConfig();
 
-    ObjectTypesToQuery = 0;
-    ProfileIndex = 0;
-    QueryType = 0;
-    QueryDistance = 5000.0f;
-    QueryThickness = 0.0f;
-    UseComplexCollisions = false;
-    ShowActorsNames = false;
-    ShowQuery = false;
+    Config->Reset();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Collisions::RenderContent()
+void FCogEngineWindow_Collisions::RenderContent()
 {
     Super::RenderContent();
 
@@ -77,7 +75,7 @@ void UCogEngineWindow_Collisions::RenderContent()
             //-------------------------------------------------
             // Query Mode
             //-------------------------------------------------
-            ImGui::Combo("Query", &QueryType,
+            ImGui::Combo("Query", &Config->QueryType,
                 "Sphere\0"
                 "Raycast Crosshair\0"
                 "Raycast Cursor\0"
@@ -87,30 +85,30 @@ void UCogEngineWindow_Collisions::RenderContent()
             //-------------------------------------------------
             // Query Distance
             //-------------------------------------------------
-            ImGui::SliderFloat("Distance", &QueryDistance, 0.0f, 20000.0f, "%0.f");
+            ImGui::SliderFloat("Distance", &Config->QueryDistance, 0.0f, 20000.0f, "%0.f");
 
             //-------------------------------------------------
             // Query Thickness
             //-------------------------------------------------
-            if (QueryType == 1 || QueryType == 2)
+            if (Config->QueryType == 1 || Config->QueryType == 2)
             {
-                ImGui::SliderFloat("Thickness", &QueryThickness, 0.0f, 1000.0f, "%0.f");
+                ImGui::SliderFloat("Thickness", &Config->QueryThickness, 0.0f, 1000.0f, "%0.f");
             }
 
             //-------------------------------------------------
             // Query Use Complex Collisions
             //-------------------------------------------------
-            ImGui::Checkbox("Use Complex Collisions", &UseComplexCollisions);
+            ImGui::Checkbox("Use Complex Collisions", &Config->UseComplexCollisions);
 
             //-------------------------------------------------
             // Show Names
             //-------------------------------------------------
-            ImGui::Checkbox("Show Actors Names", &ShowActorsNames);
+            ImGui::Checkbox("Show Actors Names", &Config->ShowActorsNames);
 
             //-------------------------------------------------
             // Show Query
             //-------------------------------------------------
-            ImGui::Checkbox("Show Query", &ShowQuery);
+            ImGui::Checkbox("Show Query", &Config->ShowQuery);
 
             ImGui::EndMenu();
         }
@@ -121,7 +119,7 @@ void UCogEngineWindow_Collisions::RenderContent()
     //-------------------------------------------------
     // Profile
     //-------------------------------------------------
-    const FCollisionResponseTemplate* SelectedProfile = CollisionProfile->GetProfileByIndex(ProfileIndex);
+    const FCollisionResponseTemplate* SelectedProfile = CollisionProfile->GetProfileByIndex(Config->ProfileIndex);
     FName SelectedProfileName = SelectedProfile != nullptr ? SelectedProfile->Name : FName("Custom");
 
     if (ImGui::BeginCombo("Profile", TCHAR_TO_ANSI(*SelectedProfileName.ToString()), ImGuiComboFlags_HeightLargest))
@@ -131,9 +129,9 @@ void UCogEngineWindow_Collisions::RenderContent()
             const FCollisionResponseTemplate* Profile = CollisionProfile->GetProfileByIndex(i);
             if (ImGui::Selectable(TCHAR_TO_ANSI(*Profile->Name.ToString()), false))
             {
-                ProfileIndex = i;
-                ObjectTypesToQuery = 0;
-                SelectedProfile = CollisionProfile->GetProfileByIndex(ProfileIndex);
+                Config->ProfileIndex = i;
+                Config->ObjectTypesToQuery = 0;
+                SelectedProfile = CollisionProfile->GetProfileByIndex(Config->ProfileIndex);
                 
                 if (Profile->CollisionEnabled != ECollisionEnabled::NoCollision)
                 {
@@ -142,7 +140,7 @@ void UCogEngineWindow_Collisions::RenderContent()
                         ECollisionResponse Response = Profile->ResponseToChannels.GetResponse((ECollisionChannel)j);
                         if (Response != ECR_Ignore)
                         {
-                            ObjectTypesToQuery |= ECC_TO_BITFIELD(j);
+                            Config->ObjectTypesToQuery |= ECC_TO_BITFIELD(j);
                         }
                     }
                 }
@@ -169,19 +167,19 @@ void UCogEngineWindow_Collisions::RenderContent()
         ImGui::ColorEdit4("Color", (float*)&Color.Value, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
         ImGui::SameLine();
 
-        bool IsCollisionActive = (ObjectTypesToQuery & ECC_TO_BITFIELD(ChannelIndex)) > 0;
+        bool IsCollisionActive = (Config->ObjectTypesToQuery & ECC_TO_BITFIELD(ChannelIndex)) > 0;
         const FName ChannelName = CollisionProfile->ReturnChannelNameFromContainerIndex(ChannelIndex);
         if (ImGui::Checkbox(TCHAR_TO_ANSI(*ChannelName.ToString()), &IsCollisionActive))
         {
             if (IsCollisionActive)
             {
-                ObjectTypesToQuery |= ECC_TO_BITFIELD(ChannelIndex);
-                ProfileIndex = INDEX_NONE;
+                Config->ObjectTypesToQuery |= ECC_TO_BITFIELD(ChannelIndex);
+                Config->ProfileIndex = INDEX_NONE;
             }
             else
             {
-                ObjectTypesToQuery &= ~ECC_TO_BITFIELD(ChannelIndex);
-                ProfileIndex = INDEX_NONE;
+                Config->ObjectTypesToQuery &= ~ECC_TO_BITFIELD(ChannelIndex);
+                Config->ProfileIndex = INDEX_NONE;
             }
         }
 
@@ -191,7 +189,7 @@ void UCogEngineWindow_Collisions::RenderContent()
     //-------------------------------------------------
     // Perform Query
     //-------------------------------------------------
-    if (ObjectTypesToQuery == 0)
+    if (Config->ObjectTypesToQuery == 0)
     {
         return;
     }
@@ -200,7 +198,7 @@ void UCogEngineWindow_Collisions::RenderContent()
     FVector QueryEnd;
     float QueryRadius = 0.0f;
 
-    switch (QueryType)
+    switch (Config->QueryType)
     {
         case 0:
         {
@@ -210,7 +208,7 @@ void UCogEngineWindow_Collisions::RenderContent()
                 Location = Pawn->GetActorLocation();
             }
 
-            QueryRadius = QueryDistance;
+            QueryRadius = Config->QueryDistance;
             QueryStart = Location;
             QueryEnd = QueryStart;
             break;
@@ -222,8 +220,8 @@ void UCogEngineWindow_Collisions::RenderContent()
             FRotator Rotation;
             PlayerController->GetPlayerViewPoint(Location, Rotation);
             QueryStart = Location;
-            QueryEnd = QueryStart + Rotation.Vector() * QueryDistance;
-            QueryRadius = QueryThickness;
+            QueryEnd = QueryStart + Rotation.Vector() * Config->QueryDistance;
+            QueryRadius = Config->QueryThickness;
             break;
         }
 
@@ -231,17 +229,17 @@ void UCogEngineWindow_Collisions::RenderContent()
         {
             FVector Direction;
             UGameplayStatics::DeprojectScreenToWorld(PlayerController, FCogImguiHelper::ToVector2D(ImGui::GetMousePos()), QueryStart, Direction);
-            QueryEnd = QueryStart + Direction * QueryDistance;
-            QueryRadius = QueryThickness;
+            QueryEnd = QueryStart + Direction * Config->QueryDistance;
+            QueryRadius = Config->QueryThickness;
             break;
         }
     }
 
     static const FName TraceTag(TEXT("FCogWindow_Collision"));
-    FCollisionQueryParams QueryParams(TraceTag, SCENE_QUERY_STAT_ONLY(CogHitDetection), UseComplexCollisions);
+    FCollisionQueryParams QueryParams(TraceTag, SCENE_QUERY_STAT_ONLY(CogHitDetection), Config->UseComplexCollisions);
 
     FCollisionObjectQueryParams QueryObjectParams;
-    QueryObjectParams.ObjectTypesToQuery = ObjectTypesToQuery;
+    QueryObjectParams.ObjectTypesToQuery = Config->ObjectTypesToQuery;
 
     FCollisionShape QueryShape;
     QueryShape.SetSphere(QueryRadius);
@@ -257,7 +255,7 @@ void UCogEngineWindow_Collisions::RenderContent()
         QueryShape,
         QueryParams);
 
-    if (ShowQuery)
+    if (Config->ShowQuery)
     {
         FCogDebugDrawHelper::DrawCapsuleCastMulti(World, QueryStart, QueryEnd, FQuat::Identity, 0.0f, QueryRadius, EDrawDebugTrace::ForOneFrame, false, QueryHits, FLinearColor::White, FLinearColor::Red, FCogDebugSettings::GetDebugDuration(true));
     }
@@ -283,7 +281,7 @@ void UCogEngineWindow_Collisions::RenderContent()
         //-------------------------------------------------------
         // Draw Name
         //-------------------------------------------------------
-        if (ShowActorsNames)
+        if (Config->ShowActorsNames)
         {
             const AActor* Actor = HitResult.GetActor();
             if (Actor != nullptr)
@@ -386,7 +384,7 @@ void UCogEngineWindow_Collisions::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Collisions::SetAsset(const UCogEngineDataAsset* Value)
+void FCogEngineWindow_Collisions::SetAsset(const UCogEngineDataAsset* Value)
 {
     Asset = Value;
 

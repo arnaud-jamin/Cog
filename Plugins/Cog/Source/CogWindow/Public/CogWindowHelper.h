@@ -8,20 +8,26 @@ class COGWINDOW_API FCogWindowHelper
 {
 public:
 
+    //----------------------------------------------------------------------------------------------------------------------
     template<typename T>
-    static T* GetFirstAssetByClass()
+    static const T* GetFirstAssetByClass()
+    {
+        return Cast<T>(GetFirstAssetByClass(T::StaticClass()));
+    }
+
+    //----------------------------------------------------------------------------------------------------------------------
+    static const UObject* GetFirstAssetByClass(const TSubclassOf<UObject> AssetClass)
     {
         IAssetRegistry& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry")).Get();
 
         TArray<FAssetData> Assets;
-        AssetRegistry.GetAssetsByClass(T::StaticClass()->GetClassPathName(), Assets, true);
+        AssetRegistry.GetAssetsByClass(AssetClass->GetClassPathName(), Assets, true);
         if (Assets.Num() == 0)
         {
             return nullptr;
         }
 
         UObject* Asset = Assets[0].GetAsset();
-        T* CastedAsset = Cast<T>(Asset);
-        return CastedAsset;
+        return Asset;
     }
 };

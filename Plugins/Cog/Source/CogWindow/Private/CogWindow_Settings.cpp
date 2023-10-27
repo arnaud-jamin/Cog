@@ -6,19 +6,15 @@
 #include "InputCoreTypes.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogWindow_Settings::UCogWindow_Settings()
+void FCogWindow_Settings::Initialize()
 {
+    Super::Initialize();
+
     bHasMenu = false;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindow_Settings::PostInitProperties() 
-{
-    Super::PostInitProperties();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogWindow_Settings::RenderContent()
+void FCogWindow_Settings::RenderContent()
 {
     FCogWindowWidgets::SetNextItemToShortWidth();
     ImGui::SliderFloat("DPI Scale", &GetOwner()->DPIScale, 0.5f, 2.0f, "%.1f");

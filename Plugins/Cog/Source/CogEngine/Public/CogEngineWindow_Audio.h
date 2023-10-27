@@ -2,12 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
-#include "CogEngineWindow_Audio.generated.h"
 
-UCLASS()
-class COGENGINE_API UCogEngineWindow_Audio : public UCogWindow
+class COGENGINE_API FCogEngineWindow_Audio : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 public:
 

@@ -2,12 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
-#include "CogEngineWindow_Stats.generated.h"
 
-UCLASS()
-class COGENGINE_API UCogEngineWindow_Stats : public UCogWindow
+class COGENGINE_API FCogEngineWindow_Stats : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 public:
 
@@ -26,7 +24,10 @@ protected:
     virtual float GetMainMenuWidgetWidth(int32 SubWidgetIndex, float MaxWidth) override;
 
     virtual void RenderMainMenuWidget(int32 SubWidgetIndex, float Width) override;
-    void RenderMainMenuWidgetPacketLoss(float Width);
-    void RenderMainMenuWidgetPing(float Width);
-    void RenderMainMenuWidgetFramerate(float Width);
+
+    virtual void RenderMainMenuWidgetPacketLoss(float Width);
+
+    virtual void RenderMainMenuWidgetPing(float Width);
+
+    virtual void RenderMainMenuWidgetFramerate(float Width);
 };

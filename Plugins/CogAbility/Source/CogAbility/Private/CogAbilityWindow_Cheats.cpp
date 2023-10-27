@@ -14,7 +14,18 @@
 #include "imgui_internal.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Cheats::RenderHelp()
+void FCogAbilityWindow_Cheats::Initialize()
+{
+    Super::Initialize();
+
+    bHasMenu = true;
+
+    Asset = GetAsset<UCogAbilityDataAsset>();
+    Config = GetConfig<UCogAbilityConfig_Cheats>();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_Cheats::RenderHelp()
 {
     ImGui::Text(
         "This window can be used to apply cheats to the selected actor (by default). "
@@ -28,31 +39,15 @@ void UCogAbilityWindow_Cheats::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogAbilityWindow_Cheats::UCogAbilityWindow_Cheats()
-{
-    bHasMenu = true;
-
-    SetAsset(FCogWindowHelper::GetFirstAssetByClass<UCogAbilityDataAsset>());
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Cheats::ResetConfig()
+void FCogAbilityWindow_Cheats::ResetConfig()
 {
     Super::ResetConfig();
 
-    bReapplyCheatsBetweenPlays = true;
-    bReapplyCheatsBetweenLaunches = true;
+    Config->Reset();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Cheats::SetAsset(const UCogAbilityDataAsset* Value) 
-{
-    Asset = Value;
-}
-
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Cheats::GameTick(float DeltaTime)
+void FCogAbilityWindow_Cheats::GameTick(float DeltaTime)
 {
     Super::GameTick(DeltaTime);
 
@@ -60,20 +55,25 @@ void UCogAbilityWindow_Cheats::GameTick(float DeltaTime)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Cheats::TryReapplyCheats()
+void FCogAbilityWindow_Cheats::TryReapplyCheats()
 {
+    if (Config == nullptr)
+    {
+        return;
+    }
+    
     if (bHasReappliedCheats)
     {
         return;
     }
 
-    if (bReapplyCheatsBetweenPlays == false)
+    if (Config->bReapplyCheatsBetweenPlays == false)
     {
         return;
     }
 
     static int32 IsFirstLaunch = true;
-    if (IsFirstLaunch && bReapplyCheatsBetweenLaunches == false)
+    if (IsFirstLaunch && Config->bReapplyCheatsBetweenLaunches == false)
     {
         return;
     }
@@ -98,7 +98,7 @@ void UCogAbilityWindow_Cheats::TryReapplyCheats()
 
     TArray<AActor*> Targets { LocalPawn };
 
-    for (const FString& AppliedCheatName : AppliedCheats)
+    for (const FString& AppliedCheatName : Config->AppliedCheats)
     {
         if (const FCogAbilityCheat* Cheat = Asset->PersistentEffects.FindByPredicate(
             [AppliedCheatName](const FCogAbilityCheat& Cheat) { return Cheat.Name == AppliedCheatName; }))
@@ -111,14 +111,20 @@ void UCogAbilityWindow_Cheats::TryReapplyCheats()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Cheats::RenderContent()
+void FCogAbilityWindow_Cheats::RenderContent()
 {
     Super::RenderContent();
+
+    if (Config == nullptr)
+    {
+        ImGui::Text("Invalid Config");
+        return;
+    }
 
     AActor* SelectedActor = GetSelection();
     if (SelectedActor == nullptr)
     {
-        ImGui::Text("Invlid Selection");
+        ImGui::Text("Invalid Selection");
         return;
     }
 
@@ -132,15 +138,15 @@ void UCogAbilityWindow_Cheats::RenderContent()
     {
         if (ImGui::BeginMenu("Options"))
         {
-            ImGui::Checkbox("Reapply Cheats Between Plays", &bReapplyCheatsBetweenPlays);
+            ImGui::Checkbox("Reapply Cheats Between Plays", &Config->bReapplyCheatsBetweenPlays);
 
-            if (bReapplyCheatsBetweenPlays == false)
+            if (Config->bReapplyCheatsBetweenPlays == false)
             {
                 ImGui::BeginDisabled();
             }
-            ImGui::Checkbox("Reapply Cheats Between Launches", &bReapplyCheatsBetweenLaunches);
+            ImGui::Checkbox("Reapply Cheats Between Launches", &Config->bReapplyCheatsBetweenLaunches);
 
-            if (bReapplyCheatsBetweenPlays == false)
+            if (Config->bReapplyCheatsBetweenPlays == false)
             {
                 ImGui::EndDisabled();
             }
@@ -177,13 +183,13 @@ void UCogAbilityWindow_Cheats::RenderContent()
         //----------------------------------------------------------------
         if (bHasChanged && SelectedActor == ControlledActor)
         {
-            AppliedCheats.Empty();
+            Config->AppliedCheats.Empty();
 
             for (const FCogAbilityCheat& CheatEffect : Asset->PersistentEffects)
             {
                 if (ACogAbilityReplicator::IsCheatActive(SelectedActor, CheatEffect))
                 {
-                    AppliedCheats.Add(CheatEffect.Name);
+                    Config->AppliedCheats.Add(CheatEffect.Name);
                 }
             }
         }
@@ -203,7 +209,7 @@ void UCogAbilityWindow_Cheats::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogAbilityWindow_Cheats::AddCheat(AActor* ControlledActor, AActor* SelectedActor, const FCogAbilityCheat& Cheat, bool IsPersistent)
+bool FCogAbilityWindow_Cheats::AddCheat(AActor* ControlledActor, AActor* SelectedActor, const FCogAbilityCheat& Cheat, bool IsPersistent)
 {
     if (Cheat.Effect == nullptr)
     {
@@ -268,7 +274,7 @@ bool UCogAbilityWindow_Cheats::AddCheat(AActor* ControlledActor, AActor* Selecte
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Cheats::RequestCheat(AActor* ControlledActor, AActor* SelectedActor, const FCogAbilityCheat& Cheat)
+void FCogAbilityWindow_Cheats::RequestCheat(AActor* ControlledActor, AActor* SelectedActor, const FCogAbilityCheat& Cheat)
 {
     const bool IsShiftDown = (ImGui::GetCurrentContext()->IO.KeyMods & ImGuiMod_Shift) != 0;
     const bool IsAltDown = (ImGui::GetCurrentContext()->IO.KeyMods & ImGuiMod_Alt) != 0;

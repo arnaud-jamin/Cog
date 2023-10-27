@@ -6,15 +6,16 @@
 #include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
 
-
 //--------------------------------------------------------------------------------------------------------------------------
-UCogEngineWindow_Spawns::UCogEngineWindow_Spawns()
+void FCogEngineWindow_Spawns::Initialize()
 {
-    Asset = FCogWindowHelper::GetFirstAssetByClass<UCogEngineDataAsset>();
+    Super::Initialize();
+
+    Asset = GetAsset<UCogEngineDataAsset>();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Spawns::RenderHelp()
+void FCogEngineWindow_Spawns::RenderHelp()
 {
     ImGui::Text(
         "This window can be used to spawn new actors in the world. "
@@ -24,7 +25,7 @@ void UCogEngineWindow_Spawns::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Spawns::RenderContent()
+void FCogEngineWindow_Spawns::RenderContent()
 {
     Super::RenderContent();
 
@@ -40,7 +41,7 @@ void UCogEngineWindow_Spawns::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Spawns::RenderSpawnGroup(const FCogEngineSpawnGroup& SpawnGroup)
+void FCogEngineWindow_Spawns::RenderSpawnGroup(const FCogEngineSpawnGroup& SpawnGroup)
 {
     int32 GroupIndex = 0;
 
@@ -84,7 +85,7 @@ void UCogEngineWindow_Spawns::RenderSpawnGroup(const FCogEngineSpawnGroup& Spawn
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Spawns::RenderSpawnAsset(const FCogEngineSpawnEntry& SpawnEntry, bool IsLastSelected)
+bool FCogEngineWindow_Spawns::RenderSpawnAsset(const FCogEngineSpawnEntry& SpawnEntry, bool IsLastSelected)
 {
     bool IsPressed = false;
 

@@ -3,20 +3,19 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "CogWindow.h"
-#include "CogAbilityWindow_Pools.generated.h"
 
 class UCogAbilityDataAsset;
 class UAbilitySystemComponent;
 struct FCogAbilityPool;
 
-UCLASS()
-class COGABILITY_API UCogAbilityWindow_Pools : public UCogWindow
+//--------------------------------------------------------------------------------------------------------------------------
+class COGABILITY_API FCogAbilityWindow_Pools : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 public:
-    
-    UCogAbilityWindow_Pools();
+
+    virtual void Initialize() override;
 
 protected:
 
@@ -26,6 +25,5 @@ protected:
 
     virtual void DrawPool(const UAbilitySystemComponent* AbilitySystemComponent, const FCogAbilityPool& Pool);
 
-    UPROPERTY()
     TObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
 };

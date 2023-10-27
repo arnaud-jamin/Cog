@@ -1,18 +1,22 @@
 #include "CogEngineWindow_Skeleton.h"
 
 #include "CogDebugSettings.h"
+#include "CogWindowWidgets.h"
 #include "Components/LineBatchComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/SkeletalMesh.h"
+#include "imgui_internal.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogEngineWindow_Skeleton::UCogEngineWindow_Skeleton()
+void FCogEngineWindow_Skeleton::Initialize()
 {
+    Super::Initialize();
+
     bHasMenu = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Skeleton::RenderHelp()
+void FCogEngineWindow_Skeleton::RenderHelp()
 {
     ImGui::Text(
         "This window display the bone hierarchy and the skeleton debug draw of the selected actor if it has a Skeletal Mesh. "
@@ -23,13 +27,13 @@ void UCogEngineWindow_Skeleton::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Skeleton::OnSelectionChanged(AActor* OldSelection, AActor* NewSelection)
+void FCogEngineWindow_Skeleton::OnSelectionChanged(AActor* OldSelection, AActor* NewSelection)
 {
     RefreshSkeleton();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Skeleton::RenderTick(float DeltaTime)
+void FCogEngineWindow_Skeleton::RenderTick(float DeltaTime)
 {
     Super::RenderTick(DeltaTime);
 
@@ -43,7 +47,7 @@ void UCogEngineWindow_Skeleton::RenderTick(float DeltaTime)
 
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Skeleton::RefreshSkeleton()
+void FCogEngineWindow_Skeleton::RefreshSkeleton()
 {
     CurrentSkeleton = nullptr;
     BonesInfos.Empty();
@@ -88,7 +92,7 @@ void UCogEngineWindow_Skeleton::RefreshSkeleton()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Skeleton::RenderContent()
+void FCogEngineWindow_Skeleton::RenderContent()
 {
     Super::RenderContent();
 
@@ -120,7 +124,7 @@ void UCogEngineWindow_Skeleton::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Skeleton::RenderBoneEntry(int32 BoneIndex, bool OpenAllChildren)
+void FCogEngineWindow_Skeleton::RenderBoneEntry(int32 BoneIndex, bool OpenAllChildren)
 {
     if (BonesInfos.IsValidIndex(BoneIndex) == false)
     {
@@ -257,7 +261,7 @@ void UCogEngineWindow_Skeleton::RenderBoneEntry(int32 BoneIndex, bool OpenAllChi
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Skeleton::SetChildrenVisibility(int32 BoneIndex, bool IsVisible)
+void FCogEngineWindow_Skeleton::SetChildrenVisibility(int32 BoneIndex, bool IsVisible)
 {
     if (BonesInfos.IsValidIndex(BoneIndex) == false)
     {
@@ -274,7 +278,7 @@ void UCogEngineWindow_Skeleton::SetChildrenVisibility(int32 BoneIndex, bool IsVi
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Skeleton::DrawSkeleton()
+void FCogEngineWindow_Skeleton::DrawSkeleton()
 {
     if (CurrentSkeleton == nullptr || CurrentSkeleton->GetWorld() == nullptr)
     {

@@ -2,20 +2,13 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
-#include "CogEngineWindow_CommandBindings.generated.h"
 
-class UPlayerInput;
-struct FKeyBind;
-
-UCLASS(Config = Cog)
-class COGENGINE_API UCogEngineWindow_CommandBindings : public UCogWindow
+class COGENGINE_API FCogEngineWindow_CommandBindings : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 public:
     
-    UCogEngineWindow_CommandBindings();
-
 protected:
 
     virtual void RenderHelp() override;

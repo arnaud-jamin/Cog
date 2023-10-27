@@ -12,7 +12,17 @@
 #include "imgui_internal.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Abilities::RenderHelp()
+void FCogAbilityWindow_Abilities::Initialize()
+{
+    Super::Initialize();
+
+    bHasMenu = true;
+
+    Asset = GetAsset<UCogAbilityDataAsset>();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_Abilities::RenderHelp()
 {
     ImGui::Text(
     "This window displays the gameplay abilities of the selected actor. "
@@ -23,15 +33,7 @@ void UCogAbilityWindow_Abilities::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogAbilityWindow_Abilities::UCogAbilityWindow_Abilities()
-{
-    bHasMenu = true;
-
-    Asset = FCogWindowHelper::GetFirstAssetByClass<UCogAbilityDataAsset>();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Abilities::RenderTick(float DetlaTime)
+void FCogAbilityWindow_Abilities::RenderTick(float DetlaTime)
 {
     Super::RenderTick(DetlaTime);
 
@@ -39,7 +41,7 @@ void UCogAbilityWindow_Abilities::RenderTick(float DetlaTime)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Abilities::RenderOpenAbilities()
+void FCogAbilityWindow_Abilities::RenderOpenAbilities()
 {
     AActor* Selection = GetSelection();
     if (Selection == nullptr)
@@ -84,7 +86,7 @@ void UCogAbilityWindow_Abilities::RenderOpenAbilities()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Abilities::RenderContent()
+void FCogAbilityWindow_Abilities::RenderContent()
 {
     Super::RenderContent();
 
@@ -106,7 +108,7 @@ void UCogAbilityWindow_Abilities::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Abilities::RenderAbiltiesMenu(AActor* Selection)
+void FCogAbilityWindow_Abilities::RenderAbiltiesMenu(AActor* Selection)
 {
     if (ImGui::BeginMenuBar())
     {
@@ -140,7 +142,7 @@ void UCogAbilityWindow_Abilities::RenderAbiltiesMenu(AActor* Selection)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Abilities::RenderAbilitiesTable(UAbilitySystemComponent& AbilitySystemComponent)
+void FCogAbilityWindow_Abilities::RenderAbilitiesTable(UAbilitySystemComponent& AbilitySystemComponent)
 {
     TArray<FGameplayAbilitySpec>& Abilities = AbilitySystemComponent.GetActivatableAbilities();
 
@@ -253,7 +255,7 @@ void UCogAbilityWindow_Abilities::RenderAbilitiesTable(UAbilitySystemComponent& 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Abilities::RenderAbilityCooldown(const UAbilitySystemComponent& AbilitySystemComponent, UGameplayAbility& Ability)
+void FCogAbilityWindow_Abilities::RenderAbilityCooldown(const UAbilitySystemComponent& AbilitySystemComponent, UGameplayAbility& Ability)
 {
     FGameplayAbilitySpec* Spec = Ability.GetCurrentAbilitySpec();
 
@@ -275,7 +277,7 @@ void UCogAbilityWindow_Abilities::RenderAbilityCooldown(const UAbilitySystemComp
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Abilities::RenderAbilityContextMenu(UAbilitySystemComponent& AbilitySystemComponent, FGameplayAbilitySpec& Spec, int Index)
+void FCogAbilityWindow_Abilities::RenderAbilityContextMenu(UAbilitySystemComponent& AbilitySystemComponent, FGameplayAbilitySpec& Spec, int Index)
 {
     if (ImGui::BeginPopupContextItem())
     {
@@ -303,19 +305,19 @@ void UCogAbilityWindow_Abilities::RenderAbilityContextMenu(UAbilitySystemCompone
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Abilities::OpenAbility(const FGameplayAbilitySpecHandle& Handle)
+void FCogAbilityWindow_Abilities::OpenAbility(const FGameplayAbilitySpecHandle& Handle)
 {
     OpenedAbilities.AddUnique(Handle);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Abilities::CloseAbility(const FGameplayAbilitySpecHandle& Handle)
+void FCogAbilityWindow_Abilities::CloseAbility(const FGameplayAbilitySpecHandle& Handle)
 {
     OpenedAbilities.Remove(Handle);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FString UCogAbilityWindow_Abilities::GetAbilityName(const UGameplayAbility* Ability)
+FString FCogAbilityWindow_Abilities::GetAbilityName(const UGameplayAbility* Ability)
 {
     if (Ability == nullptr)
     {
@@ -327,7 +329,7 @@ FString UCogAbilityWindow_Abilities::GetAbilityName(const UGameplayAbility* Abil
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Abilities::RenderAbilityInfo(const UAbilitySystemComponent& AbilitySystemComponent, FGameplayAbilitySpec& Spec)
+void FCogAbilityWindow_Abilities::RenderAbilityInfo(const UAbilitySystemComponent& AbilitySystemComponent, FGameplayAbilitySpec& Spec)
 {
     UGameplayAbility* Ability = Spec.GetPrimaryInstance();
     if (Ability == nullptr)
@@ -438,7 +440,7 @@ void UCogAbilityWindow_Abilities::RenderAbilityInfo(const UAbilitySystemComponen
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Abilities::GameTick(float DeltaTime)
+void FCogAbilityWindow_Abilities::GameTick(float DeltaTime)
 {
     if (AbilityHandleToActivate.IsValid())
     {
@@ -461,7 +463,7 @@ void UCogAbilityWindow_Abilities::GameTick(float DeltaTime)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Abilities::ProcessAbilityActivation(const FGameplayAbilitySpecHandle& Handle)
+void FCogAbilityWindow_Abilities::ProcessAbilityActivation(const FGameplayAbilitySpecHandle& Handle)
 {
     AActor* Selection = GetSelection();
     if (Selection == nullptr)
@@ -492,14 +494,14 @@ void UCogAbilityWindow_Abilities::ProcessAbilityActivation(const FGameplayAbilit
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Abilities::ActivateAbility(UAbilitySystemComponent& AbilitySystemComponent, FGameplayAbilitySpec& Spec)
+void FCogAbilityWindow_Abilities::ActivateAbility(UAbilitySystemComponent& AbilitySystemComponent, FGameplayAbilitySpec& Spec)
 {
     Spec.InputPressed = true;
     AbilitySystemComponent.TryActivateAbility(Spec.Handle);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Abilities::DeactivateAbility(UAbilitySystemComponent& AbilitySystemComponent, FGameplayAbilitySpec& Spec)
+void FCogAbilityWindow_Abilities::DeactivateAbility(UAbilitySystemComponent& AbilitySystemComponent, FGameplayAbilitySpec& Spec)
 {
     Spec.InputPressed = false;
     AbilitySystemComponent.CancelAbilityHandle(Spec.Handle);

@@ -10,7 +10,18 @@
 #include "InputMappingContext.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogInputWindow_Actions::RenderHelp()
+void FCogInputWindow_Actions::Initialize()
+{
+    Super::Initialize();
+
+    bHasMenu = true;
+
+    Asset = GetAsset<UCogInputDataAsset>();
+    Config = GetConfig<UCogInputConfig_Actions>();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogInputWindow_Actions::RenderHelp()
 {
     ImGui::Text(
         "This window displays the current state of each Input Action. "
@@ -21,21 +32,15 @@ void UCogInputWindow_Actions::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogInputWindow_Actions::ResetConfig()
+void FCogInputWindow_Actions::ResetConfig()
 {
-    RepeatPeriod = 0.5f;
+    Super::ResetConfig();
+
+    Config->Reset();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogInputWindow_Actions::UCogInputWindow_Actions()
-{
-    bHasMenu = true;
-
-    Asset = FCogWindowHelper::GetFirstAssetByClass<UCogInputDataAsset>();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogInputWindow_Actions::RenderContent()
+void FCogInputWindow_Actions::RenderContent()
 {
     Super::RenderContent();
 
@@ -63,7 +68,7 @@ void UCogInputWindow_Actions::RenderContent()
     {
         if (ImGui::BeginMenu("Options"))
         {
-            ImGui::SliderFloat("##Repeat", &RepeatPeriod, 0.1f, 10.0f, "Repeat: %0.1fs");
+            ImGui::SliderFloat("##Repeat", &Config->RepeatPeriod, 0.1f, 10.0f, "Repeat: %0.1fs");
             ImGui::EndMenu();
         }
 
@@ -173,7 +178,7 @@ void UCogInputWindow_Actions::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogInputWindow_Actions::RenderTick(float DeltaSeconds)
+void FCogInputWindow_Actions::RenderTick(float DeltaSeconds)
 {
     Super::RenderTick(DeltaSeconds);
 
@@ -198,7 +203,7 @@ void UCogInputWindow_Actions::RenderTick(float DeltaSeconds)
     float WorldTime = GetWorld()->GetTimeSeconds();
     if (RepeatTime < WorldTime)
     {
-        RepeatTime = WorldTime + RepeatPeriod;
+        RepeatTime = WorldTime + Config->RepeatPeriod;
         IsTimeToRepeat = true;
     }
 
@@ -209,7 +214,7 @@ void UCogInputWindow_Actions::RenderTick(float DeltaSeconds)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogInputWindow_Actions::DrawAxis(const char* Format, const char* ActionName, float CurrentValue, float* InjectValue)
+void FCogInputWindow_Actions::DrawAxis(const char* Format, const char* ActionName, float CurrentValue, float* InjectValue)
 {
     ImGui::PushID(Format);
     ImGui::TableNextRow();

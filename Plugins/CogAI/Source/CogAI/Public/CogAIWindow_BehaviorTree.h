@@ -2,19 +2,21 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
+#include "CogWindowConfig.h"
 #include "CogAIWindow_BehaviorTree.generated.h"
 
 class UBehaviorTreeComponent;
 class UBTNode;
+class UCogAIConfig_BehaviorTree;
 
-UCLASS(Config = Cog)
-class COGAI_API UCogAIWindow_BehaviorTree : public UCogWindow
+//--------------------------------------------------------------------------------------------------------------------------
+class COGAI_API FCogAIWindow_BehaviorTree : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 public:
 
-    UCogAIWindow_BehaviorTree();
+    virtual void Initialize() override;
 
 protected:
 
@@ -28,11 +30,30 @@ protected:
 
 private:
 
+    ImGuiTextFilter Filter;
+
+    TObjectPtr<UCogAIConfig_BehaviorTree> Config = nullptr;
+};
+
+//--------------------------------------------------------------------------------------------------------------------------
+UCLASS(Config = Cog)
+class UCogAIConfig_BehaviorTree : public UCogWindowConfig
+{
+    GENERATED_BODY()
+
+public:
+
     UPROPERTY(Config)
     FVector4f ActiveColor = FVector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
     UPROPERTY(Config)
     FVector4f InactiveColor = FVector4f(1.0f, 1.0f, 1.0f, 0.2f);
 
-    ImGuiTextFilter Filter;
+    virtual void Reset() override
+    {
+        Super::Reset();
+
+        ActiveColor = FVector4f(1.0f, 1.0f, 1.0f, 1.0f);
+        InactiveColor = FVector4f(1.0f, 1.0f, 1.0f, 0.2f);
+    }
 };

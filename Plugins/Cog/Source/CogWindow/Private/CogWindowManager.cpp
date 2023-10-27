@@ -1,11 +1,13 @@
 #include "CogWindowManager.h"
 
 #include "CogDebugDrawImGui.h"
-#include "CogImguiModule.h"
 #include "CogImguiInputHelper.h"
+#include "CogImguiModule.h"
 #include "CogImguiWidget.h"
 #include "CogWindow_Settings.h"
 #include "CogWindow_Spacing.h"
+#include "CogWindowConfig.h"
+#include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
 #include "Engine/Engine.h"
 #include "HAL/IConsoleManager.h"
@@ -51,12 +53,12 @@ void UCogWindowManager::InitializeInternal()
     IniHandler.UserData = this;
     ImGui::AddSettingsHandler(&IniHandler);
 
-    SpaceWindows.Add(CreateWindow<UCogWindow_Spacing>("Spacing 1", false));
-    SpaceWindows.Add(CreateWindow<UCogWindow_Spacing>("Spacing 2", false));
-    SpaceWindows.Add(CreateWindow<UCogWindow_Spacing>("Spacing 3", false));
-    SpaceWindows.Add(CreateWindow<UCogWindow_Spacing>("Spacing 4", false));
+    SpaceWindows.Add(CreateWindow<FCogWindow_Spacing>("Spacing 1", false));
+    SpaceWindows.Add(CreateWindow<FCogWindow_Spacing>("Spacing 2", false));
+    SpaceWindows.Add(CreateWindow<FCogWindow_Spacing>("Spacing 3", false));
+    SpaceWindows.Add(CreateWindow<FCogWindow_Spacing>("Spacing 4", false));
 
-    SettingsWindow = CreateWindow<UCogWindow_Settings>("Window.Settings", false);
+    SettingsWindow = CreateWindow<FCogWindow_Settings>("Window.Settings", false);
 
     ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
         *ToggleInputCommand,
@@ -87,10 +89,25 @@ void UCogWindowManager::InitializeInternal()
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::Shutdown()
 {
-    for (UCogWindow* Window : Windows)
+    //------------------------------------------------------------
+    // Destroy ImGui before destroying the windows to make sure 
+    // imgui serialize their visibility state in imgui.ini
+    //------------------------------------------------------------
+    ImGuiWidget->DestroyImGuiContext();
+
+    SaveConfig();
+
+    for (FCogWindow* Window : Windows)
     {
         Window->PreSaveConfig();
-        Window->SaveConfig();
+        Window->Shutdown();
+        delete Window;
+    }
+    Windows.Empty();
+
+    for (UCogWindowConfig* Config : Configs)
+    {
+        Config->SaveConfig();
     }
 
     for (IConsoleObject* ConsoleCommand : ConsoleCommands)
@@ -99,8 +116,6 @@ void UCogWindowManager::Shutdown()
     }
 
     FCogImguiModule::Get().DestroyImGuiWidget(ImGuiWidget);
-
-    SaveConfig();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -129,7 +144,7 @@ void UCogWindowManager::Tick(float DeltaTime)
         bRefreshDPIScale = false;
     }
 
-    for (UCogWindow* Window : Windows)
+    for (FCogWindow* Window : Windows)
     {
         Window->GameTick(DeltaTime);
     }
@@ -156,7 +171,7 @@ void UCogWindowManager::Render(float DeltaTime)
         }
     }
 
-    for (UCogWindow* Window : Windows)
+    for (FCogWindow* Window : Windows)
     {
         Window->RenderTick(DeltaTime);
 
@@ -183,9 +198,11 @@ void UCogWindowManager::Render(float DeltaTime)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::AddWindow(UCogWindow* Window, bool AddToMainMenu /*= true*/)
+void UCogWindowManager::AddWindow(FCogWindow* Window, const FString& Name, bool AddToMainMenu /*= true*/)
 {
+    Window->SetFullName(Name);
     Window->SetOwner(this);
+    Window->Initialize();
     Windows.Add(Window);
 
     if (AddToMainMenu)
@@ -198,16 +215,16 @@ void UCogWindowManager::AddWindow(UCogWindow* Window, bool AddToMainMenu /*= tru
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::AddMainMenuWidget(UCogWindow* Window)
+void UCogWindowManager::AddMainMenuWidget(FCogWindow* Window)
 {
     Window->SetOwner(this);
     MainMenuWidgets.Add(Window);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogWindow* UCogWindowManager::FindWindowByID(ImGuiID ID)
+FCogWindow* UCogWindowManager::FindWindowByID(ImGuiID ID)
 {
-    for (UCogWindow* Window : Windows)
+    for (FCogWindow* Window : Windows)
     {
         if (Window->GetID() == ID)
         {
@@ -227,16 +244,18 @@ void UCogWindowManager::SetHideAllWindows(bool Value)
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::ResetLayout()
 {
-    for (UCogWindow* Window : Windows)
+    for (FCogWindow* Window : Windows)
     {
         ImGui::SetWindowPos(TCHAR_TO_ANSI(*Window->GetName()), ImVec2(10, 10), ImGuiCond_Always);
     }
+
+    ImGui::ClearIniSettings();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::CloseAllWindows()
 {
-    for (UCogWindow* Window : Windows)
+    for (FCogWindow* Window : Windows)
     {
         Window->SetIsVisible(false);
     }
@@ -245,7 +264,7 @@ void UCogWindowManager::CloseAllWindows()
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::LoadLayout(int32 LayoutIndex)
 {
-    for (UCogWindow* Window : Windows)
+    for (FCogWindow* Window : Windows)
     {
         Window->SetIsVisible(false);
     }
@@ -265,12 +284,10 @@ void UCogWindowManager::SortMainMenu()
 {
     MainMenu.SubMenus.Empty();
 
-    Windows.Sort();
+    TArray<FCogWindow*> SortedWindows = Windows;
+    SortedWindows.Sort([](FCogWindow& Lhs, FCogWindow& Rhs) { return Lhs.GetFullName() < Rhs.GetFullName(); });
 
-    TArray<UCogWindow*> SortedWindows = Windows;
-    SortedWindows.Sort([](UCogWindow& Lhs, UCogWindow& Rhs) { return Lhs.GetFullName() < Rhs.GetFullName(); });
-
-    for (UCogWindow* Window : SortedWindows)
+    for (FCogWindow* Window : SortedWindows)
     {
         if (FMenu* Menu = AddMenu(Window->GetFullName()))
         {
@@ -360,7 +377,7 @@ void UCogWindowManager::RenderMainMenu()
 
             if (ImGui::BeginMenu("Spacing"))
             {
-                for (UCogWindow* SpaceWindow : SpaceWindows)
+                for (FCogWindow* SpaceWindow : SpaceWindows)
                 {
                     bool bSpaceVisible = SpaceWindow->GetIsVisible();
                     if (ImGui::MenuItem(TCHAR_TO_ANSI(*SpaceWindow->GetName()), nullptr, &bSpaceVisible))
@@ -382,7 +399,7 @@ void UCogWindowManager::RenderMainMenu()
         const float MinCursorX = ImGui::GetCursorPosX();
         float CursorX = ImGui::GetWindowWidth();
 
-        for (UCogWindow* Window : MainMenuWidgets)
+        for (FCogWindow* Window : MainMenuWidgets)
         {
             TArray<float> SubWidgetsWidths;
             float SimCursorX = CursorX;
@@ -483,7 +500,7 @@ void UCogWindowManager::RenderOptionMenu(UCogWindowManager::FMenu& Menu)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::RenderMenuItem(UCogWindow& Window, const char* MenuItemName)
+void UCogWindowManager::RenderMenuItem(FCogWindow& Window, const char* MenuItemName)
 {
     if (bShowWindowsInMainMenu)
     {
@@ -561,7 +578,7 @@ void UCogWindowManager::SettingsHandler_ReadLine(ImGuiContext* Context, ImGuiSet
     if (sscanf_s(Line, "0x%08X", &Id) == 1)
     {
         UCogWindowManager* Manager = (UCogWindowManager*)Handler->UserData;
-        if (UCogWindow* Window = Manager->FindWindowByID(Id))
+        if (FCogWindow* Window = Manager->FindWindowByID(Id))
         {
             Window->SetIsVisible(true);
         }
@@ -574,7 +591,7 @@ void UCogWindowManager::SettingsHandler_WriteAll(ImGuiContext* Context, ImGuiSet
     const UCogWindowManager* Manager = (UCogWindowManager*)Handler->UserData;
 
     Buffer->appendf("[%s][Windows]\n", Handler->TypeName);
-    for (UCogWindow* Window : Manager->Windows)
+    for (FCogWindow* Window : Manager->Windows)
     {
         if (Window->GetIsVisible())
         {
@@ -598,7 +615,7 @@ void UCogWindowManager::SetDPIScale(float Value)
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::ResetAllWindowsConfig()
 {
-    for (UCogWindow* Window : Windows)
+    for (FCogWindow* Window : Windows)
     {
         Window->ResetConfig();
     }
@@ -670,4 +687,46 @@ void UCogWindowManager::SortCommands(UPlayerInput* PlayerInput)
     {
         return Key1.Command.Compare(Key2.Command) < 0;
     });
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+UCogWindowConfig* UCogWindowManager::GetConfig(const TSubclassOf<UCogWindowConfig> ConfigClass)
+{
+    const UClass* Class = ConfigClass.Get();
+
+    for (UCogWindowConfig* Config : Configs)
+    {
+        if (Config && Config->IsA(Class))
+        {
+            return Cast<UCogWindowConfig>(Config);
+        }
+    }
+
+    UCogWindowConfig* Config = NewObject<UCogWindowConfig>(this, Class);
+    Configs.Add(Config);
+    return Config;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+const UObject* UCogWindowManager::GetAsset(const TSubclassOf<UObject> AssetClass) 
+{
+    const UClass* Class = AssetClass.Get();
+
+    for (const UObject* Asset : Assets)
+    {
+        if (Asset && Asset->IsA(Class))
+        {
+            return Asset;
+        }
+    }
+
+    const UObject* Asset = FCogWindowHelper::GetFirstAssetByClass(AssetClass);
+    if (Asset == nullptr)
+    {
+        return nullptr;
+    }
+
+    Assets.Add(Asset);
+
+    return Asset;
 }

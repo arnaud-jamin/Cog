@@ -118,15 +118,15 @@ void ACogSampleGameState::InitializeCog()
     //---------------------------------------
     // Engine
     //---------------------------------------
-    CogWindowManager->CreateWindow<UCogEngineWindow_Collisions>("Engine.Collision");
+    CogWindowManager->CreateWindow<FCogEngineWindow_Collisions>("Engine.Collision");
 
-    CogWindowManager->CreateWindow<UCogEngineWindow_CommandBindings>("Engine.Command Bindings");
+    CogWindowManager->CreateWindow<FCogEngineWindow_CommandBindings>("Engine.Command Bindings");
 
-    CogWindowManager->CreateWindow<UCogEngineWindow_DebugSettings>("Engine.Debug Settings");
+    CogWindowManager->CreateWindow<FCogEngineWindow_DebugSettings>("Engine.Debug Settings");
 
-    CogWindowManager->CreateWindow<UCogEngineWindow_ImGui>("Engine.ImGui");
+    CogWindowManager->CreateWindow<FCogEngineWindow_ImGui>("Engine.ImGui");
 
-    UCogEngineWindow_Inspector* Inspector = CogWindowManager->CreateWindow<UCogEngineWindow_Inspector>("Engine.Inspector");
+    FCogEngineWindow_Inspector* Inspector = CogWindowManager->CreateWindow<FCogEngineWindow_Inspector>("Engine.Inspector");
     Inspector->AddFavorite(GEngine->GetGameUserSettings(), [](UObject* Object)
     {
         if (UGameUserSettings* UserSettings = Cast<UGameUserSettings>(Object))
@@ -135,65 +135,65 @@ void ACogSampleGameState::InitializeCog()
         }
     });
 
-    CogWindowManager->CreateWindow<UCogEngineWindow_LogCategories>("Engine.Log Categories");
+    CogWindowManager->CreateWindow<FCogEngineWindow_LogCategories>("Engine.Log Categories");
 
-    CogWindowManager->CreateWindow<UCogEngineWindow_NetEmulation>("Engine.Net Emulation");
+    CogWindowManager->CreateWindow<FCogEngineWindow_NetEmulation>("Engine.Net Emulation");
 
-    CogWindowManager->CreateWindow<UCogEngineWindow_OutputLog>("Engine.Output Log");
+    CogWindowManager->CreateWindow<FCogEngineWindow_OutputLog>("Engine.Output Log");
 
-    CogWindowManager->CreateWindow<UCogEngineWindow_Metrics>("Engine.Metrics");
+    CogWindowManager->CreateWindow<FCogEngineWindow_Metrics>("Engine.Metrics");
 
-    CogWindowManager->CreateWindow<UCogEngineWindow_Plots>("Engine.Plots");
+    CogWindowManager->CreateWindow<FCogEngineWindow_Plots>("Engine.Plots");
 
-    SelectionWindow = CogWindowManager->CreateWindow<UCogEngineWindow_Selection>("Engine.Selection");
+    FCogEngineWindow_Selection* SelectionWindow = CogWindowManager->CreateWindow<FCogEngineWindow_Selection>("Engine.Selection");
     SelectionWindow->SetActorClasses({ ACharacter::StaticClass(), AActor::StaticClass(), AGameModeBase::StaticClass(), AGameStateBase::StaticClass() });
     SelectionWindow->SetTraceType(UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Pawn));
 
-    CogWindowManager->CreateWindow<UCogEngineWindow_Scalability>("Engine.Scalability");
+    CogWindowManager->CreateWindow<FCogEngineWindow_Scalability>("Engine.Scalability");
 
-    CogWindowManager->CreateWindow<UCogEngineWindow_Skeleton>("Engine.Skeleton");
+    CogWindowManager->CreateWindow<FCogEngineWindow_Skeleton>("Engine.Skeleton");
 
-    CogWindowManager->CreateWindow<UCogEngineWindow_Spawns>("Engine.Spawns");
+    CogWindowManager->CreateWindow<FCogEngineWindow_Spawns>("Engine.Spawns");
 
-    UCogEngineWindow_Stats* StatsWindow = CogWindowManager->CreateWindow<UCogEngineWindow_Stats>("Engine.Stats");
+    FCogEngineWindow_Stats* StatsWindow = CogWindowManager->CreateWindow<FCogEngineWindow_Stats>("Engine.Stats");
 
-    CogWindowManager->CreateWindow<UCogEngineWindow_TimeScale>("Engine.Time Scale");
+    CogWindowManager->CreateWindow<FCogEngineWindow_TimeScale>("Engine.Time Scale");
 
     //---------------------------------------
     // Abilities
     //---------------------------------------
-    CogWindowManager->CreateWindow<UCogAbilityWindow_Abilities>("Gameplay.Abilities");
+    CogWindowManager->CreateWindow<FCogAbilityWindow_Abilities>("Gameplay.Abilities");
 
-    CogWindowManager->CreateWindow<UCogAbilityWindow_Attributes>("Gameplay.Attributes");
+    CogWindowManager->CreateWindow<FCogAbilityWindow_Attributes>("Gameplay.Attributes");
 
-    CogWindowManager->CreateWindow<UCogAbilityWindow_Cheats>("Gameplay.Cheats");
+    CogWindowManager->CreateWindow<FCogAbilityWindow_Cheats>("Gameplay.Cheats");
 
-    CogWindowManager->CreateWindow<UCogAbilityWindow_Effects>("Gameplay.Effects");
+    CogWindowManager->CreateWindow<FCogAbilityWindow_Effects>("Gameplay.Effects");
 
-    CogWindowManager->CreateWindow<UCogAbilityWindow_Pools>("Gameplay.Pools");
+    CogWindowManager->CreateWindow<FCogAbilityWindow_Pools>("Gameplay.Pools");
 
-    CogWindowManager->CreateWindow<UCogAbilityWindow_Tags>("Gameplay.Tags");
+    CogWindowManager->CreateWindow<FCogAbilityWindow_Tags>("Gameplay.Tags");
 
-    CogWindowManager->CreateWindow<UCogAbilityWindow_Tweaks>("Gameplay.Tweaks");
+    CogWindowManager->CreateWindow<FCogAbilityWindow_Tweaks>("Gameplay.Tweaks");
 
     //---------------------------------------
     // AI
     //---------------------------------------
-    CogWindowManager->CreateWindow<UCogAIWindow_BehaviorTree>("AI.Behavior Tree");
+    CogWindowManager->CreateWindow<FCogAIWindow_BehaviorTree>("AI.Behavior Tree");
 
-    CogWindowManager->CreateWindow<UCogAIWindow_Blackboard>("AI.Blackboard");
+    CogWindowManager->CreateWindow<FCogAIWindow_Blackboard>("AI.Blackboard");
 
     //---------------------------------------
     // Input
     //---------------------------------------
-    CogWindowManager->CreateWindow<UCogInputWindow_Actions>("Input.Actions");
+    CogWindowManager->CreateWindow<FCogInputWindow_Actions>("Input.Actions");
 
-    CogWindowManager->CreateWindow<UCogInputWindow_Gamepad>("Input.Gamepad");
+    CogWindowManager->CreateWindow<FCogInputWindow_Gamepad>("Input.Gamepad");
 
     //---------------------------------------
     // Main Menu Widget
     //---------------------------------------
-    CogWindowManager->AddMainMenuWidget(SelectionWindow.Get());
+    CogWindowManager->AddMainMenuWidget(SelectionWindow);
     CogWindowManager->AddMainMenuWidget(StatsWindow);
 }
 

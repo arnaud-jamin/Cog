@@ -9,7 +9,17 @@
 #include "UObject/UnrealType.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Inspector::RenderHelp()
+void FCogEngineWindow_Inspector::Initialize()
+{
+    Super::Initialize();
+
+    bHasMenu = true;
+
+    Config = GetConfig<UCogEngineConfig_Inspector>();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_Inspector::RenderHelp()
 {
     ImGui::Text(
         "This window can be used to inspect the properties of a UObject. "
@@ -17,13 +27,7 @@ void UCogEngineWindow_Inspector::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogEngineWindow_Inspector::UCogEngineWindow_Inspector()
-{
-    bHasMenu = true;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Inspector::SetInspectedObject(UObject* Value)
+void FCogEngineWindow_Inspector::SetInspectedObject(UObject* Value)
 {
     if (InspectedObject == Value)
     {
@@ -34,7 +38,7 @@ void UCogEngineWindow_Inspector::SetInspectedObject(UObject* Value)
     
     if (InspectedObject != GetSelection())
     {
-        bSyncWithSelection = false;
+        Config->bSyncWithSelection = false;
     }
 
     if (HistoryIndex != History.Num() - 1)
@@ -51,14 +55,14 @@ void UCogEngineWindow_Inspector::SetInspectedObject(UObject* Value)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Inspector::AddFavorite(UObject* Object)
+void FCogEngineWindow_Inspector::AddFavorite(UObject* Object)
 {
     Favorite& Favorite = Favorites.AddDefaulted_GetRef();
     Favorite.Object = Object;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Inspector::AddFavorite(UObject* Object, FCogEngineInspectorApplyFunction ApplyFunction)
+void FCogEngineWindow_Inspector::AddFavorite(UObject* Object, FCogEngineInspectorApplyFunction ApplyFunction)
 {
     Favorite& Favorite = Favorites.AddDefaulted_GetRef();
     Favorite.Object = Object;
@@ -66,7 +70,7 @@ void UCogEngineWindow_Inspector::AddFavorite(UObject* Object, FCogEngineInspecto
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Inspector::RenderContent()
+void FCogEngineWindow_Inspector::RenderContent()
 {
     Super::RenderContent();
 
@@ -76,7 +80,7 @@ void UCogEngineWindow_Inspector::RenderContent()
     // Objects to inspect Combo
     //--------------------------
 
-    if (bSyncWithSelection || InspectedObject == nullptr)
+    if (Config->bSyncWithSelection || InspectedObject == nullptr)
     {
         SetInspectedObject(GetSelection());
     }
@@ -104,7 +108,7 @@ void UCogEngineWindow_Inspector::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FCogEngineInspectorApplyFunction UCogEngineWindow_Inspector::FindObjectApplyFunction(const UObject* Object) const
+FCogEngineInspectorApplyFunction FCogEngineWindow_Inspector::FindObjectApplyFunction(const UObject* Object) const
 {
     for (const Favorite& Favorite : Favorites)
     {
@@ -118,7 +122,7 @@ FCogEngineInspectorApplyFunction UCogEngineWindow_Inspector::FindObjectApplyFunc
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Inspector::RenderMenu()
+void FCogEngineWindow_Inspector::RenderMenu()
 {
     bCollapseAllCategories = false;
     bExpandAllCategories = false;
@@ -239,7 +243,7 @@ void UCogEngineWindow_Inspector::RenderMenu()
             {
                 HistoryIndex = NewHistoryIndex;
                 InspectedObject = History[HistoryIndex];
-                bSyncWithSelection = false;
+                Config->bSyncWithSelection = false;
             }
         }
 
@@ -253,7 +257,7 @@ void UCogEngineWindow_Inspector::RenderMenu()
         //-----------------------------------
         if (ImGui::BeginMenu("Options"))
         {
-            ImGui::Checkbox("Sync With Selection", &bSyncWithSelection);
+            ImGui::Checkbox("Sync With Selection", &Config->bSyncWithSelection);
             if (ImGui::IsItemHovered())
             {
                 ImGui::SetTooltip("Should the inspector be synced with the actor selection ?");
@@ -261,19 +265,19 @@ void UCogEngineWindow_Inspector::RenderMenu()
 
             ImGui::Separator();
 
-            ImGui::Checkbox("Sort by name", &bSortByName);
-            ImGui::Checkbox("Show background", &bShowRowBackground);
-            ImGui::Checkbox("Show borders", &bShowBorders);
+            ImGui::Checkbox("Sort by name", &Config->bSortByName);
+            ImGui::Checkbox("Show background", &Config->bShowRowBackground);
+            ImGui::Checkbox("Show borders", &Config->bShowBorders);
 #if WITH_EDITORONLY_DATA
-            ImGui::Checkbox("Show display name", &bShowDisplayName);
-            ImGui::Checkbox("Show categories", &bShowCategories);
+            ImGui::Checkbox("Show display name", &Config->bShowDisplayName);
+            ImGui::Checkbox("Show categories", &Config->bShowCategories);
 
             ImGui::Separator();
-            if (ImGui::MenuItem("Collapse all categories", nullptr, false, bShowCategories))
+            if (ImGui::MenuItem("Collapse all categories", nullptr, false, Config->bShowCategories))
             {
                 bCollapseAllCategories = true;
             }
-            if (ImGui::MenuItem("Expand all categories", nullptr, false, bShowCategories))
+            if (ImGui::MenuItem("Expand all categories", nullptr, false, Config->bShowCategories))
             {
                 bExpandAllCategories = true;
             }
@@ -287,7 +291,7 @@ void UCogEngineWindow_Inspector::RenderMenu()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderInspector()
+bool FCogEngineWindow_Inspector::RenderInspector()
 {
     const UObject* Object = GetInspectedObject();
     if (Object == nullptr)
@@ -315,7 +319,7 @@ bool UCogEngineWindow_Inspector::RenderInspector()
     // Render properties with categories
     //----------------------------------------------------------------------
 
-    if ((bShowCategories) != 0)
+    if ((Config->bShowCategories) != 0)
     {
         IsPropertyGridRendered = true;
 
@@ -369,12 +373,12 @@ bool UCogEngineWindow_Inspector::RenderInspector()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderBegin()
+bool FCogEngineWindow_Inspector::RenderBegin()
 {
     FCogWindowWidgets::PushStyleCompact();
 
     ImGuiTableFlags TableFlags = ImGuiTableFlags_Resizable;
-    if ((bShowBorders) != 0)
+    if ((Config->bShowBorders) != 0)
     {
         TableFlags |= ImGuiTableFlags_Borders;
     }
@@ -383,7 +387,7 @@ bool UCogEngineWindow_Inspector::RenderBegin()
         TableFlags |= ImGuiTableFlags_NoBordersInBodyUntilResize;
     }
 
-    if ((bShowRowBackground) != 0)
+    if ((Config->bShowRowBackground) != 0)
     {
         TableFlags |= ImGuiTableFlags_RowBg;
     }
@@ -399,18 +403,18 @@ bool UCogEngineWindow_Inspector::RenderBegin()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Inspector::RenderEnd()
+void FCogEngineWindow_Inspector::RenderEnd()
 {
     ImGui::EndTable();
     FCogWindowWidgets::PopStyleCompact();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FString UCogEngineWindow_Inspector::GetPropertyName(const FProperty& Property)
+FString FCogEngineWindow_Inspector::GetPropertyName(const FProperty& Property)
 {
 #if WITH_EDITORONLY_DATA
 
-    if (bShowDisplayName && Property.GetDisplayNameText().IsEmpty() == false)
+    if (Config->bShowDisplayName && Property.GetDisplayNameText().IsEmpty() == false)
     {
         return Property.GetDisplayNameText().ToString();
     }
@@ -425,9 +429,9 @@ FString UCogEngineWindow_Inspector::GetPropertyName(const FProperty& Property)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderPropertyList(TArray<const FProperty*>& Properties, uint8* PointerToValue)
+bool FCogEngineWindow_Inspector::RenderPropertyList(TArray<const FProperty*>& Properties, uint8* PointerToValue)
 {
-    if (bSortByName)
+    if (Config->bSortByName)
     {
         Properties.Sort([this](const FProperty& Lhs, const FProperty& Rhs) { return GetPropertyName(Lhs) < GetPropertyName(Rhs); });
     }
@@ -446,7 +450,7 @@ bool UCogEngineWindow_Inspector::RenderPropertyList(TArray<const FProperty*>& Pr
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderProperty(const FProperty* Property, uint8* PointerToValue, int IndexInArray)
+bool FCogEngineWindow_Inspector::RenderProperty(const FProperty* Property, uint8* PointerToValue, int IndexInArray)
 {
     bool HasChanged = false;
 
@@ -647,7 +651,7 @@ bool UCogEngineWindow_Inspector::RenderProperty(const FProperty* Property, uint8
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderBool(const FBoolProperty* BoolProperty, uint8* PointerToValue)
+bool FCogEngineWindow_Inspector::RenderBool(const FBoolProperty* BoolProperty, uint8* PointerToValue)
 {
     bool HasChanged = false;
 
@@ -662,7 +666,7 @@ bool UCogEngineWindow_Inspector::RenderBool(const FBoolProperty* BoolProperty, u
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderByte(const FByteProperty* ByteProperty, uint8* PointerToValue)
+bool FCogEngineWindow_Inspector::RenderByte(const FByteProperty* ByteProperty, uint8* PointerToValue)
 {
     bool HasChanged = false;
 
@@ -677,7 +681,7 @@ bool UCogEngineWindow_Inspector::RenderByte(const FByteProperty* ByteProperty, u
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderInt8(const FInt8Property* Int8Property, uint8* PointerToValue)
+bool FCogEngineWindow_Inspector::RenderInt8(const FInt8Property* Int8Property, uint8* PointerToValue)
 {
     bool HasChanged = false;
 
@@ -692,7 +696,7 @@ bool UCogEngineWindow_Inspector::RenderInt8(const FInt8Property* Int8Property, u
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderInt(const FIntProperty* IntProperty, uint8* PointerToValue)
+bool FCogEngineWindow_Inspector::RenderInt(const FIntProperty* IntProperty, uint8* PointerToValue)
 {
     bool HasChanged = false;
 
@@ -707,7 +711,7 @@ bool UCogEngineWindow_Inspector::RenderInt(const FIntProperty* IntProperty, uint
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderInt64(const FInt64Property* Int64Property, uint8* PointerToValue)
+bool FCogEngineWindow_Inspector::RenderInt64(const FInt64Property* Int64Property, uint8* PointerToValue)
 {
     bool HasChanged = false;
 
@@ -722,7 +726,7 @@ bool UCogEngineWindow_Inspector::RenderInt64(const FInt64Property* Int64Property
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderUInt32(const FUInt32Property* UInt32Property, uint8* PointerToValue)
+bool FCogEngineWindow_Inspector::RenderUInt32(const FUInt32Property* UInt32Property, uint8* PointerToValue)
 {
     bool HasChanged = false;
 
@@ -737,7 +741,7 @@ bool UCogEngineWindow_Inspector::RenderUInt32(const FUInt32Property* UInt32Prope
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderFloat(const FFloatProperty* FloatProperty, uint8* PointerToValue)
+bool FCogEngineWindow_Inspector::RenderFloat(const FFloatProperty* FloatProperty, uint8* PointerToValue)
 {
     bool HasChanged = false;
 
@@ -752,7 +756,7 @@ bool UCogEngineWindow_Inspector::RenderFloat(const FFloatProperty* FloatProperty
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderDouble(const FDoubleProperty* DoubleProperty, uint8* PointerToValue)
+bool FCogEngineWindow_Inspector::RenderDouble(const FDoubleProperty* DoubleProperty, uint8* PointerToValue)
 {
     bool HasChanged = false;
 
@@ -767,13 +771,13 @@ bool UCogEngineWindow_Inspector::RenderDouble(const FDoubleProperty* DoublePrope
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderEnum(const FEnumProperty* EnumProperty, uint8* PointerToValue)
+bool FCogEngineWindow_Inspector::RenderEnum(const FEnumProperty* EnumProperty, uint8* PointerToValue)
 {
     return FCogWindowWidgets::ComboboxEnum("##Enum", EnumProperty, PointerToValue);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderString(const FStrProperty* StrProperty, uint8* PointerToValue)
+bool FCogEngineWindow_Inspector::RenderString(const FStrProperty* StrProperty, uint8* PointerToValue)
 {
     FString Text;
     StrProperty->ExportTextItem_Direct(Text, PointerToValue, nullptr, nullptr, PPF_None, nullptr);
@@ -792,7 +796,7 @@ bool UCogEngineWindow_Inspector::RenderString(const FStrProperty* StrProperty, u
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderName(const FNameProperty* NameProperty, uint8* PointerToValue)
+bool FCogEngineWindow_Inspector::RenderName(const FNameProperty* NameProperty, uint8* PointerToValue)
 {
     FString NameValue;
     NameProperty->ExportTextItem_Direct(NameValue, PointerToValue, nullptr, nullptr, PPF_None, nullptr);
@@ -804,7 +808,7 @@ bool UCogEngineWindow_Inspector::RenderName(const FNameProperty* NameProperty, u
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderText(const FTextProperty* TextProperty, uint8* PointerToValue)
+bool FCogEngineWindow_Inspector::RenderText(const FTextProperty* TextProperty, uint8* PointerToValue)
 {
     FString Text;
     TextProperty->ExportTextItem_Direct(Text, PointerToValue, nullptr, nullptr, PPF_None, nullptr);
@@ -816,7 +820,7 @@ bool UCogEngineWindow_Inspector::RenderText(const FTextProperty* TextProperty, u
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderObject(UObject* Object, bool ShowChildren)
+bool FCogEngineWindow_Inspector::RenderObject(UObject* Object, bool ShowChildren)
 {
     if (Object == nullptr)
     {
@@ -856,7 +860,7 @@ bool UCogEngineWindow_Inspector::RenderObject(UObject* Object, bool ShowChildren
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderStruct(const FStructProperty* StructProperty, uint8* PointerToValue, bool ShowChildren)
+bool FCogEngineWindow_Inspector::RenderStruct(const FStructProperty* StructProperty, uint8* PointerToValue, bool ShowChildren)
 {
     ImGui::BeginDisabled();
     ImGui::Text("%s", TCHAR_TO_ANSI(*StructProperty->Struct->GetClass()->GetName()));
@@ -881,7 +885,7 @@ bool UCogEngineWindow_Inspector::RenderStruct(const FStructProperty* StructPrope
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderClass(const FClassProperty* ClassProperty)
+bool FCogEngineWindow_Inspector::RenderClass(const FClassProperty* ClassProperty)
 {
     if (ClassProperty->MetaClass == nullptr)
     {
@@ -900,7 +904,7 @@ bool UCogEngineWindow_Inspector::RenderClass(const FClassProperty* ClassProperty
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderInterface(const FInterfaceProperty* InterfaceProperty)
+bool FCogEngineWindow_Inspector::RenderInterface(const FInterfaceProperty* InterfaceProperty)
 {
     UClass* Class = InterfaceProperty->InterfaceClass;
     if (Class == nullptr)
@@ -920,7 +924,7 @@ bool UCogEngineWindow_Inspector::RenderInterface(const FInterfaceProperty* Inter
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::RenderArray(const FArrayProperty* ArrayProperty, uint8* PointerToValue, bool ShowChildren)
+bool FCogEngineWindow_Inspector::RenderArray(const FArrayProperty* ArrayProperty, uint8* PointerToValue, bool ShowChildren)
 {
     FScriptArrayHelper Helper(ArrayProperty, PointerToValue);
     int32 Num = Helper.Num();
@@ -946,7 +950,7 @@ bool UCogEngineWindow_Inspector::RenderArray(const FArrayProperty* ArrayProperty
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogEngineWindow_Inspector::HasPropertyAnyChildren(const FProperty* Property, uint8* PointerToValue)
+bool FCogEngineWindow_Inspector::HasPropertyAnyChildren(const FProperty* Property, uint8* PointerToValue)
 {
     if (const FStructProperty* StructProperty = CastField<FStructProperty>(Property))
     {

@@ -14,8 +14,19 @@
 #include "GameFramework/Pawn.h"
 #include "imgui_internal.h"
 
+
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAIWindow_BehaviorTree::RenderHelp()
+void FCogAIWindow_BehaviorTree::Initialize()
+{
+    Super::Initialize();
+
+    bHasMenu = true;
+
+    Config = GetConfig<UCogAIConfig_BehaviorTree>();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAIWindow_BehaviorTree::RenderHelp()
 {
     ImGui::Text(
         "This window displays the behavior tree of the selected actor. "
@@ -23,13 +34,7 @@ void UCogAIWindow_BehaviorTree::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogAIWindow_BehaviorTree::UCogAIWindow_BehaviorTree()
-{
-    bHasMenu = true;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogAIWindow_BehaviorTree::GameTick(float DeltaTime)
+void FCogAIWindow_BehaviorTree::GameTick(float DeltaTime)
 {
     Super::GameTick(DeltaTime);
 
@@ -72,9 +77,9 @@ void UCogAIWindow_BehaviorTree::GameTick(float DeltaTime)
 
         if (i > 0)
         {
-            FCogDebugDraw::Arrow(LogCogAI, this, LastLocation, Location, FColor::White, false, 0);
-            FCogDebugDraw::Point(LogCogAI, this, LastLocation, 10.0f, FColor::White, false, 0);
-            FCogDebugDraw::Point(LogCogAI, this, Location, 10.0f, FColor::White, false, 0);
+            FCogDebugDraw::Arrow(LogCogAI, Pawn, LastLocation, Location, FColor::White, false, 0);
+            FCogDebugDraw::Point(LogCogAI, Pawn, LastLocation, 10.0f, FColor::White, false, 0);
+            FCogDebugDraw::Point(LogCogAI, Pawn, Location, 10.0f, FColor::White, false, 0);
         }
 
         LastLocation = Location;
@@ -118,16 +123,22 @@ void UCogAIWindow_BehaviorTree::GameTick(float DeltaTime)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAIWindow_BehaviorTree::RenderContent()
+void FCogAIWindow_BehaviorTree::RenderContent()
 {
     Super::RenderContent();
+
+    if (Config == nullptr)
+    {
+        ImGui::TextDisabled("No Config");
+        return;
+    }
 
     if (ImGui::BeginMenuBar())
     {
         if (ImGui::BeginMenu("Options"))
         {
-            ImGui::ColorEdit4("Active Color", (float*)&ActiveColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-            ImGui::ColorEdit4("Inactive Color", (float*)&InactiveColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("Active Color", (float*)&Config->ActiveColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("Inactive Color", (float*)&Config->InactiveColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
             ImGui::EndMenu();
         }
 
@@ -206,7 +217,7 @@ void UCogAIWindow_BehaviorTree::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAIWindow_BehaviorTree::RenderNode(UBehaviorTreeComponent& BehaviorTreeComponent, UBTNode* Node, bool OpenAllChildren)
+void FCogAIWindow_BehaviorTree::RenderNode(UBehaviorTreeComponent& BehaviorTreeComponent, UBTNode* Node, bool OpenAllChildren)
 {
     const char* NodeName = TCHAR_TO_ANSI(*Node->GetNodeName());
     const bool ShowNode = Filter.PassFilter(NodeName);
@@ -346,7 +357,7 @@ void UCogAIWindow_BehaviorTree::RenderNode(UBehaviorTreeComponent& BehaviorTreeC
         // Name
         //------------------------
         ImGui::SameLine();
-        const ImVec4 NameColor = IsActive ? FCogImguiHelper::ToImVec4(ActiveColor) : FCogImguiHelper::ToImVec4(InactiveColor);
+        const ImVec4 NameColor = IsActive ? FCogImguiHelper::ToImVec4(Config->ActiveColor) : FCogImguiHelper::ToImVec4(Config->InactiveColor);
         ImGui::TextColored(NameColor, "%s", NodeName);
     }
 

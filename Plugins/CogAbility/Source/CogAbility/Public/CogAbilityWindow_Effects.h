@@ -4,7 +4,6 @@
 #include "GameplayTagContainer.h"
 #include "CogWindow.h"
 #include "imgui.h"
-#include "CogAbilityWindow_Effects.generated.h"
 
 class UAbilitySystemComponent;
 class UCogAbilityDataAsset;
@@ -15,14 +14,14 @@ struct FGameplayModifierInfo;
 struct FModifierSpec;
 namespace EGameplayModOp { enum Type; };
 
-UCLASS()
-class COGABILITY_API UCogAbilityWindow_Effects : public UCogWindow
+//--------------------------------------------------------------------------------------------------------------------------
+class COGABILITY_API FCogAbilityWindow_Effects : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 public:
 
-    UCogAbilityWindow_Effects();
+    virtual void Initialize() override;
 
 protected:
 
@@ -50,6 +49,5 @@ protected:
 
     ImVec4 GetEffectModifierColor(const FModifierSpec& ModSpec, const FGameplayModifierInfo& ModInfo, float BaseValue) const;
 
-    UPROPERTY()
     TObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
 };

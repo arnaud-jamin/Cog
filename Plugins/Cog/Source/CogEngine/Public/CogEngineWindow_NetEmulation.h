@@ -2,12 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
-#include "CogEngineWindow_NetEmulation.generated.h"
 
-UCLASS()
-class COGENGINE_API UCogEngineWindow_NetEmulation : public UCogWindow
+class COGENGINE_API FCogEngineWindow_NetEmulation : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 protected:
 

@@ -2,16 +2,17 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
+#include "CogWindowConfig.h"
 #include "CogEngineWindow_DebugSettings.generated.h"
 
-UCLASS(Config = Cog)
-class COGENGINE_API UCogEngineWindow_DebugSettings : public UCogWindow
+//--------------------------------------------------------------------------------------------------------------------------
+class COGENGINE_API FCogEngineWindow_DebugSettings : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 public:
 
-    UCogEngineWindow_DebugSettings();
+    virtual void Initialize() override;
 
 protected:
 
@@ -21,11 +22,21 @@ protected:
 
     virtual void PreSaveConfig() override;
 
-    virtual void PostInitProperties() override;
-
     virtual void RenderContent() override;
 
 private:
+
+    TWeakObjectPtr<UCogEngineConfig_DebugSettings> Config = nullptr;
+
+};
+
+//--------------------------------------------------------------------------------------------------------------------------
+UCLASS(Config = Cog)
+class UCogEngineConfig_DebugSettings : public UCogWindowConfig
+{
+    GENERATED_BODY()
+
+public:
 
     UPROPERTY(Config)
     bool bIsFilteringBySelection = true;
@@ -71,4 +82,25 @@ private:
 
     UPROPERTY(Config)
     float TextSize = 1.0f;
+
+    virtual void Reset() override
+    {
+        Super::Reset();
+
+        bIsFilteringBySelection = true;
+        Persistent = false;
+        TextShadow = true;
+        Fade2D = true;
+        Duration = 3.0f;
+        DepthPriority = 0;
+        Segments = 12;
+        Thickness = 0.0f;
+        ServerThickness = 2.0f;
+        ServerColorMultiplier = 0.8f;
+        ArrowSize = 10.0f;
+        AxesScale = 1.0f;
+        GradientColorIntensity = 0.0f;
+        GradientColorSpeed = 2.0f;
+        TextSize = 1.0f;
+    }
 };

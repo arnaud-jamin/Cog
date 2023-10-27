@@ -9,13 +9,15 @@
 #include "imgui_internal.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogAbilityWindow_Pools::UCogAbilityWindow_Pools()
+void FCogAbilityWindow_Pools::Initialize()
 {
-    Asset = FCogWindowHelper::GetFirstAssetByClass<UCogAbilityDataAsset>();
+    Super::Initialize();
+
+    Asset = GetAsset<UCogAbilityDataAsset>();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Pools::RenderHelp()
+void FCogAbilityWindow_Pools::RenderHelp()
 {
     ImGui::Text(
         "This window displays attributes of the selected actor as pools. "
@@ -25,7 +27,7 @@ void UCogAbilityWindow_Pools::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Pools::RenderContent()
+void FCogAbilityWindow_Pools::RenderContent()
 {
     Super::RenderContent();
 
@@ -56,7 +58,7 @@ void UCogAbilityWindow_Pools::RenderContent()
 
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Pools::DrawPool(const UAbilitySystemComponent* AbilitySystemComponent, const FCogAbilityPool& Pool)
+void FCogAbilityWindow_Pools::DrawPool(const UAbilitySystemComponent* AbilitySystemComponent, const FCogAbilityPool& Pool)
 {
     if (AbilitySystemComponent->HasAttributeSetForAttribute(Pool.Max) == false)
     {

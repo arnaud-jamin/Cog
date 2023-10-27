@@ -2,20 +2,22 @@
 
 #include "CoreMinimal.h"
 #include "imgui.h"
-#include "CogWindow.generated.h"
 
-class UCogWindowManager;
 class APawn;
 class APlayerController;
+class UCogWindowConfig;
+class UCogWindowManager;
+class UWorld;
 
-UCLASS(Config = Cog)
-class COGWINDOW_API UCogWindow : public UObject
+class COGWINDOW_API FCogWindow
 {
-    GENERATED_BODY()
-
 public:
     
+    virtual ~FCogWindow() {}
+
     virtual void Initialize() {}
+
+    virtual void Shutdown() {}
 
     virtual void ResetConfig() {}
 
@@ -58,11 +60,23 @@ public:
 
     UCogWindowManager* GetOwner() const { return Owner; }
 
+    template<class T>
+    T* GetConfig() { return Cast<T>(GetConfig(T::StaticClass())); }
+
+    UCogWindowConfig* GetConfig(const TSubclassOf<UCogWindowConfig> ConfigClass);
+
+    template<class T>
+    const T* GetAsset() { return Cast<T>(GetAsset(T::StaticClass())); }
+
+    const UObject* GetAsset(const TSubclassOf<UObject> AssetClass);
+
 protected:
     
     friend class UCogWindowManager;
 
     virtual const FString& GetTitle() const { return Title; }
+
+    virtual UWorld* GetWorld() const;
 
     virtual void RenderHelp();
 
@@ -105,3 +119,4 @@ protected:
 
     TWeakObjectPtr<AActor> OverridenSelection;
 };
+

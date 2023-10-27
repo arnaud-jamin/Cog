@@ -6,9 +6,18 @@
 #include "GameFramework/Pawn.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAIWindow_Blackboard::Initialize()
+{
+    Super::Initialize();
+
+    bHasMenu = true;
+
+    Config = GetConfig<UCogAIConfig_Blackboard>();
+}
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAIWindow_Blackboard::RenderHelp()
+void FCogAIWindow_Blackboard::RenderHelp()
 {
     ImGui::Text(
         "This window displays the blackboard of the selected actor. "
@@ -16,22 +25,23 @@ void UCogAIWindow_Blackboard::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogAIWindow_Blackboard::UCogAIWindow_Blackboard()
+void FCogAIWindow_Blackboard::ResetConfig()
 {
-    bHasMenu = true;
+    Super::ResetConfig();
+    
+    Config->Reset();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAIWindow_Blackboard::RenderContent()
+void FCogAIWindow_Blackboard::RenderContent()
 {
     Super::RenderContent();
-
 
     if (ImGui::BeginMenuBar())
     {
         if (ImGui::BeginMenu("Options"))
         {
-            ImGui::Checkbox("Sort by name", &bSortByName);
+            ImGui::Checkbox("Sort by name", &Config->bSortByName);
             ImGui::EndMenu();
         }
 
@@ -96,7 +106,7 @@ void UCogAIWindow_Blackboard::RenderContent()
         Offset += It->Keys.Num();
     }
     
-    if (bSortByName)
+    if (Config->bSortByName)
     {
         Keys.Sort([](const FBlackboardEntry& Key1, const FBlackboardEntry& Key2)
         {

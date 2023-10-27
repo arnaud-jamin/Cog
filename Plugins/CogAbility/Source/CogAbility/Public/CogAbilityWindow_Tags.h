@@ -2,20 +2,19 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
-#include "CogAbilityWindow_Tags.generated.h"
 
 class UAbilitySystemComponent;
 struct FGameplayTagContainer;
 struct FGameplayTag;
 
-UCLASS()
-class COGABILITY_API UCogAbilityWindow_Tags : public UCogWindow
+//--------------------------------------------------------------------------------------------------------------------------
+class COGABILITY_API FCogAbilityWindow_Tags : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 public:
 
-    UCogAbilityWindow_Tags();
+    virtual void Initialize() override;
 
 protected:
 

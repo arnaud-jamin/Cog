@@ -2,12 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
-#include "CogWindow_Spacing.generated.h"
 
-UCLASS()
-class COGWINDOW_API UCogWindow_Spacing : public UCogWindow
+class COGWINDOW_API FCogWindow_Spacing : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 public:
     

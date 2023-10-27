@@ -12,7 +12,18 @@
 #include "GameFramework/Character.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Attributes::RenderHelp()
+void FCogAbilityWindow_Attributes::Initialize()
+{
+    Super::Initialize();
+
+    bHasMenu = true;
+
+    Asset = GetAsset<UCogAbilityDataAsset>();
+    Config = GetConfig<UCogAbilityConfig_Attributes>();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_Attributes::RenderHelp()
 {
     ImGui::Text(
         "This window displays the gameplay attributes of the selected actor. "
@@ -24,26 +35,15 @@ void UCogAbilityWindow_Attributes::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogAbilityWindow_Attributes::UCogAbilityWindow_Attributes()
-{
-    bHasMenu = true;
-
-    Asset = FCogWindowHelper::GetFirstAssetByClass<UCogAbilityDataAsset>();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Attributes::ResetConfig()
+void FCogAbilityWindow_Attributes::ResetConfig()
 {
     Super::ResetConfig();
 
-    bSortByName = true;
-    bGroupByAttributeSet = false;
-    bGroupByCategory = false;
-    bShowOnlyModified = false;
+    Config->Reset();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Attributes::RenderContent()
+void FCogAbilityWindow_Attributes::RenderContent()
 {
     Super::RenderContent();
 
@@ -57,10 +57,10 @@ void UCogAbilityWindow_Attributes::RenderContent()
     {
         if (ImGui::BeginMenu("Options"))
         {
-            ImGui::Checkbox("Sort by name", &bSortByName);
-            ImGui::Checkbox("Group by attribute set", &bGroupByAttributeSet);
-            ImGui::Checkbox("Group by category", &bGroupByCategory);
-            ImGui::Checkbox("Show Only Modified", &bShowOnlyModified);
+            ImGui::Checkbox("Sort by name", &Config->SortByName);
+            ImGui::Checkbox("Group by attribute set", &Config->GroupByAttributeSet);
+            ImGui::Checkbox("Group by category", &Config->GroupByCategory);
+            ImGui::Checkbox("Show Only Modified", &Config->ShowOnlyModified);
             ImGui::EndMenu();
         }
 
@@ -69,8 +69,8 @@ void UCogAbilityWindow_Attributes::RenderContent()
         ImGui::EndMenuBar();
     }
 
-    bool bGroupByAttributeSetValue = Filter.IsActive() == false && bShowOnlyModified == false && bGroupByAttributeSet;
-    bool bGroupByCategoryValue = Filter.IsActive() == false && bShowOnlyModified == false && bGroupByCategory;
+    bool bGroupByAttributeSetValue = Filter.IsActive() == false && Config->ShowOnlyModified == false && Config->GroupByAttributeSet;
+    bool bGroupByCategoryValue = Filter.IsActive() == false && Config->ShowOnlyModified == false && Config->GroupByCategory;
 
     if (ImGui::BeginTable("Attributes", 3, ImGuiTableFlags_SizingFixedFit 
                                          | ImGuiTableFlags_Resizable 
@@ -178,7 +178,7 @@ void UCogAbilityWindow_Attributes::RenderContent()
                         //------------------------------------------------------------------------------------------
                         // Sort attributes within a category by their name
                         //------------------------------------------------------------------------------------------
-                        if (bSortByName)
+                        if (Config->SortByName)
                         {
                             AttributesInCategory.Sort([](const FGameplayAttribute& Lhs, const FGameplayAttribute& Rhs)
                                 {
@@ -207,7 +207,7 @@ void UCogAbilityWindow_Attributes::RenderContent()
                             const float BaseValue = AbilitySystemComponent->GetNumericAttributeBase(Attribute);
                             const float CurrentValue = AbilitySystemComponent->GetNumericAttribute(Attribute);
 
-                            if (bShowOnlyModified && FMath::IsNearlyEqual(CurrentValue, BaseValue))
+                            if (Config->ShowOnlyModified && FMath::IsNearlyEqual(CurrentValue, BaseValue))
                             {
                                 continue;
                             }
@@ -293,7 +293,7 @@ void UCogAbilityWindow_Attributes::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Attributes::DrawAttributeInfo(const UAbilitySystemComponent& AbilitySystemComponent, const FGameplayAttribute& Attribute)
+void FCogAbilityWindow_Attributes::DrawAttributeInfo(const UAbilitySystemComponent& AbilitySystemComponent, const FGameplayAttribute& Attribute)
 {
     if (ImGui::BeginTable("Attribute", 2, ImGuiTableFlags_Borders))
     {
@@ -371,7 +371,7 @@ void UCogAbilityWindow_Attributes::DrawAttributeInfo(const UAbilitySystemCompone
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ImVec4 UCogAbilityWindow_Attributes::GetAttributeColor(const UAbilitySystemComponent& AbilitySystemComponent, const FGameplayAttribute& Attribute) const
+ImVec4 FCogAbilityWindow_Attributes::GetAttributeColor(const UAbilitySystemComponent& AbilitySystemComponent, const FGameplayAttribute& Attribute) const
 {
     const float BaseValue = AbilitySystemComponent.GetNumericAttributeBase(Attribute);
     const float CurrentValue = AbilitySystemComponent.GetNumericAttribute(Attribute);
@@ -380,7 +380,7 @@ ImVec4 UCogAbilityWindow_Attributes::GetAttributeColor(const UAbilitySystemCompo
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ImVec4 UCogAbilityWindow_Attributes::GetEffectModifierColor(const FModifierSpec& ModSpec, const FGameplayModifierInfo& ModInfo, float BaseValue) const
+ImVec4 FCogAbilityWindow_Attributes::GetEffectModifierColor(const FModifierSpec& ModSpec, const FGameplayModifierInfo& ModInfo, float BaseValue) const
 {
     const float ModValue = ModSpec.GetEvaluatedMagnitude();
     return FCogAbilityHelper::GetEffectModifierColor(Asset.Get(), ModSpec.GetEvaluatedMagnitude(), ModInfo.ModifierOp, BaseValue);

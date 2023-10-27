@@ -1,14 +1,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogWindow.h"
 #include "imgui.h"
 #include "CogWindowManager.generated.h"
 
 class IConsoleObject;
 class SCogImguiWidget;
-class UCogWindow;
-class UCogWindow_Settings;
+class FCogWindow;
+class FCogWindow_Settings;
+class UCogWindowConfig;
 class UPlayerInput;
 class UWorld;
 struct ImGuiSettingsHandler;
@@ -38,21 +38,11 @@ public:
 
     virtual void Tick(float DeltaTime);
 
-    template<class T>
-    T* CreateWindow(const FString& Name, bool AddToMainMenu = true)
-    {
-        T* Window = NewObject<T>(this);
-        Window->SetFullName(Name);
-        Window->Initialize();
-        AddWindow(Window, AddToMainMenu);
-        return Window;
-    }
+    virtual void AddWindow(FCogWindow* Window, const FString& Name, bool AddToMainMenu = true);
 
-    virtual void AddWindow(UCogWindow* Window, bool AddToMainMenu = true);
+    virtual void AddMainMenuWidget(FCogWindow* Window);
 
-    virtual void AddMainMenuWidget(UCogWindow* Window);
-
-    virtual UCogWindow* FindWindowByID(ImGuiID ID);
+    virtual FCogWindow* FindWindowByID(ImGuiID ID);
 
     virtual void CloseAllWindows();
 
@@ -90,14 +80,39 @@ public:
 
     static void SortCommands(UPlayerInput* PlayerInput);
 
+    UCogWindowConfig* GetConfig(const TSubclassOf<UCogWindowConfig> ConfigClass);
+
+    const UObject* GetAsset(const TSubclassOf<UObject> AssetClass);
+
+    template<class T>
+    T* CreateWindow(const FString& Name, bool AddToMainMenu = true)
+    {
+        T* Window = new T();
+        AddWindow(Window, Name, AddToMainMenu);
+        return Window;
+    }
+
+    template<class T>
+    T* GetConfig()
+    { 
+        static_assert(TPointerIsConvertibleFromTo<T, const UCogWindowConfig>::Value);
+        return Cast<T>(&GetConfig(T::StaticClass()));
+    }
+
+    template<typename T>
+    static T* GetAsset()
+    {
+        return Cast<T>(GetAsset(T::StaticClass()));
+    }
+
 protected:
 
-    friend class UCogWindow_Settings;
+    friend class FCogWindow_Settings;
 
     struct FMenu
     {
         FString Name;
-        UCogWindow* Window = nullptr;
+        FCogWindow* Window = nullptr;
         TArray<FMenu> SubMenus;
     };
 
@@ -111,7 +126,7 @@ protected:
 
     virtual void RenderOptionMenu(FMenu& Menu);
 
-    virtual void RenderMenuItem(UCogWindow& Window, const char* MenuItemName);
+    virtual void RenderMenuItem(FCogWindow& Window, const char* MenuItemName);
 
     virtual void RenderLoadLayoutMenuItem(const UPlayerInput* PlayerInput, int LayoutIndex);
 
@@ -130,16 +145,10 @@ protected:
     void TickDPI();
 
     UPROPERTY()
-    TArray<UCogWindow*> Windows;
+    mutable TArray<UCogWindowConfig*> Configs;
 
     UPROPERTY()
-    TArray<UCogWindow*> SpaceWindows;
-
-    UPROPERTY()
-    UCogWindow_Settings* SettingsWindow = nullptr;
-    
-    UPROPERTY()
-    TArray<UCogWindow*> MainMenuWidgets;
+    mutable TArray<const UObject*> Assets;
 
     UPROPERTY(Config)
     bool bCompactMode = false;
@@ -160,6 +169,14 @@ protected:
     bool bRegisterDefaultCommands = true;
 
     TSharedPtr<SCogImguiWidget> ImGuiWidget = nullptr;
+
+    TArray<FCogWindow*> Windows;
+
+    TArray<FCogWindow*> SpaceWindows;
+
+    FCogWindow_Settings* SettingsWindow = nullptr;
+
+    TArray<FCogWindow*> MainMenuWidgets;
 
     FMenu MainMenu;
 

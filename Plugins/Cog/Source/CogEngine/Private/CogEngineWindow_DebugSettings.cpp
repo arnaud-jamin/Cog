@@ -4,7 +4,7 @@
 #include "CogWindowWidgets.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_DebugSettings::RenderHelp()
+void FCogEngineWindow_DebugSettings::RenderHelp()
 {
     ImGui::Text(
         "This window can be used to tweak how the debug display is drawn. "
@@ -13,79 +13,63 @@ void UCogEngineWindow_DebugSettings::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_DebugSettings::ResetConfig()
+void FCogEngineWindow_DebugSettings::Initialize()
+{
+    Super::Initialize();
+
+    bHasMenu = true;
+
+    Config = GetConfig<UCogEngineConfig_DebugSettings>();
+
+    FCogDebugSettings::Persistent = Config->Persistent;
+    FCogDebugSettings::TextShadow = Config->TextShadow;
+    FCogDebugSettings::Fade2D = Config->Fade2D;
+    FCogDebugSettings::Duration = Config->Duration;
+    FCogDebugSettings::DepthPriority = Config->DepthPriority;
+    FCogDebugSettings::Segments = Config->Segments;
+    FCogDebugSettings::Thickness = Config->Thickness;
+    FCogDebugSettings::ServerThickness = Config->ServerThickness;
+    FCogDebugSettings::ServerColorMultiplier = Config->ServerColorMultiplier;
+    FCogDebugSettings::ArrowSize = Config->ArrowSize;
+    FCogDebugSettings::AxesScale = Config->AxesScale;
+    FCogDebugSettings::GradientColorIntensity = Config->GradientColorIntensity;
+    FCogDebugSettings::GradientColorSpeed = Config->GradientColorSpeed;
+    FCogDebugSettings::TextSize = Config->TextSize;
+
+    FCogDebugSettings::SetIsFilteringBySelection(GetWorld(), Config->bIsFilteringBySelection);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_DebugSettings::ResetConfig()
 {
     Super::ResetConfig();
 
-    bIsFilteringBySelection = true;
-    Persistent = false;
-    TextShadow = true;
-    Fade2D = true;
-    Duration = 3.0f;
-    DepthPriority = 0;
-    Segments = 12;
-    Thickness = 0.0f;
-    ServerThickness = 2.0f;
-    ServerColorMultiplier = 0.8f;
-    ArrowSize = 10.0f;
-    AxesScale = 1.0f;
-    GradientColorIntensity = 0.0f;
-    GradientColorSpeed = 2.0f;
-    TextSize = 1.0f;
+    Config->Reset();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_DebugSettings::PostInitProperties()
-{
-    Super::PostInitProperties();
-
-    FCogDebugSettings::Persistent               = Persistent;
-    FCogDebugSettings::TextShadow               = TextShadow;
-    FCogDebugSettings::Fade2D                   = Fade2D;
-    FCogDebugSettings::Duration                 = Duration;
-    FCogDebugSettings::DepthPriority            = DepthPriority;
-    FCogDebugSettings::Segments                 = Segments;
-    FCogDebugSettings::Thickness                = Thickness;
-    FCogDebugSettings::ServerThickness          = ServerThickness;
-    FCogDebugSettings::ServerColorMultiplier    = ServerColorMultiplier;
-    FCogDebugSettings::ArrowSize                = ArrowSize;
-    FCogDebugSettings::AxesScale                = AxesScale;
-    FCogDebugSettings::GradientColorIntensity   = GradientColorIntensity;
-    FCogDebugSettings::GradientColorSpeed       = GradientColorSpeed;
-    FCogDebugSettings::TextSize                 = TextSize;
-
-    FCogDebugSettings::SetIsFilteringBySelection(GetWorld(), bIsFilteringBySelection);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_DebugSettings::PreSaveConfig()
+void FCogEngineWindow_DebugSettings::PreSaveConfig()
 {
     Super::PreSaveConfig();
 
-    Persistent               = FCogDebugSettings::Persistent;
-    TextShadow               = FCogDebugSettings::TextShadow;
-    Fade2D                   = FCogDebugSettings::Fade2D;
-    Duration                 = FCogDebugSettings::Duration;
-    DepthPriority            = FCogDebugSettings::DepthPriority;
-    Segments                 = FCogDebugSettings::Segments;
-    Thickness                = FCogDebugSettings::Thickness;
-    ServerThickness          = FCogDebugSettings::ServerThickness;
-    ServerColorMultiplier    = FCogDebugSettings::ServerColorMultiplier;
-    ArrowSize                = FCogDebugSettings::ArrowSize;
-    AxesScale                = FCogDebugSettings::AxesScale;
-    GradientColorIntensity   = FCogDebugSettings::GradientColorIntensity;
-    GradientColorSpeed       = FCogDebugSettings::GradientColorSpeed;
-    TextSize                 = FCogDebugSettings::TextSize;
+    Config->Persistent               = FCogDebugSettings::Persistent;
+    Config->TextShadow               = FCogDebugSettings::TextShadow;
+    Config->Fade2D                   = FCogDebugSettings::Fade2D;
+    Config->Duration                 = FCogDebugSettings::Duration;
+    Config->DepthPriority            = FCogDebugSettings::DepthPriority;
+    Config->Segments                 = FCogDebugSettings::Segments;
+    Config->Thickness                = FCogDebugSettings::Thickness;
+    Config->ServerThickness          = FCogDebugSettings::ServerThickness;
+    Config->ServerColorMultiplier    = FCogDebugSettings::ServerColorMultiplier;
+    Config->ArrowSize                = FCogDebugSettings::ArrowSize;
+    Config->AxesScale                = FCogDebugSettings::AxesScale;
+    Config->GradientColorIntensity   = FCogDebugSettings::GradientColorIntensity;
+    Config->GradientColorSpeed       = FCogDebugSettings::GradientColorSpeed;
+    Config->TextSize                 = FCogDebugSettings::TextSize;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogEngineWindow_DebugSettings::UCogEngineWindow_DebugSettings()
-{
-    bHasMenu = true;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_DebugSettings::RenderContent()
+void FCogEngineWindow_DebugSettings::RenderContent()
 {
     Super::RenderContent();
 
@@ -99,10 +83,10 @@ void UCogEngineWindow_DebugSettings::RenderContent()
         ImGui::EndMenuBar();
     }
 
-    bIsFilteringBySelection = FCogDebugSettings::GetIsFilteringBySelection();
-    if (ImGui::Checkbox("Filter by selection", &bIsFilteringBySelection))
+    Config->bIsFilteringBySelection = FCogDebugSettings::GetIsFilteringBySelection();
+    if (ImGui::Checkbox("Filter by selection", &Config->bIsFilteringBySelection))
     {
-        FCogDebugSettings::SetIsFilteringBySelection(GetWorld(), bIsFilteringBySelection);
+        FCogDebugSettings::SetIsFilteringBySelection(GetWorld(), Config->bIsFilteringBySelection);
     }
     if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
     {

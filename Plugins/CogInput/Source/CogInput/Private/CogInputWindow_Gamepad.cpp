@@ -10,15 +10,18 @@
 #include "InputMappingContext.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogInputWindow_Gamepad::UCogInputWindow_Gamepad()
+void FCogInputWindow_Gamepad::Initialize()
 {
-    Asset = FCogWindowHelper::GetFirstAssetByClass<UCogInputDataAsset>();
+    Super::Initialize();
+
+    Asset = GetAsset<UCogInputDataAsset>();
+    Config = GetConfig<UCogInputConfig_Gamepad>();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogInputWindow_Gamepad::PreRender(ImGuiWindowFlags& WindowFlags)
+void FCogInputWindow_Gamepad::PreRender(ImGuiWindowFlags& WindowFlags)
 {
-    if (bShowAsOverlay)
+    if (Config->bShowAsOverlay)
     {
         WindowFlags = ImGuiWindowFlags_NoTitleBar
             | ImGuiWindowFlags_NoScrollbar
@@ -29,24 +32,18 @@ void UCogInputWindow_Gamepad::PreRender(ImGuiWindowFlags& WindowFlags)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogInputWindow_Gamepad::ResetConfig()
+void FCogInputWindow_Gamepad::ResetConfig()
 {
     Super::ResetConfig();
 
-    bShowAsOverlay = false;
-    bInvertRightStickY = false;
-    bInvertLeftStickY = false;
-    BackgroundColor = FVector4f(0.03f, 0.03f, 0.03f, 1.0f);
-    ButtonColor = FVector4f(0.2f, 0.2f, 0.2f, 1.0f);
-    BorderColor = FVector4f(0.03f, 0.03f, 0.03f, 1.0f);
-    PressedColor = FVector4f(0.6f, 0.6f, 0.6f, 1.0f);
-    HoveredColor = FVector4f(0.3f, 0.3f, 0.3f, 1.0f);
-    InjectColor = FVector4f(1.0f, 0.5f, 0.0f, 0.5f);
-    Border = 0.02f;
+    if (Config != nullptr)
+    {
+        Config->Reset();
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogInputWindow_Gamepad::InputContextMenu(const FKey& Key, FCogInjectActionInfo* ActionInfoButton, FCogInjectActionInfo* ActionInfo2D)
+void FCogInputWindow_Gamepad::InputContextMenu(const FKey& Key, FCogInjectActionInfo* ActionInfoButton, FCogInjectActionInfo* ActionInfo2D)
 {
     if (ImGui::BeginPopupContextItem())
     {
@@ -57,7 +54,7 @@ void UCogInputWindow_Gamepad::InputContextMenu(const FKey& Key, FCogInjectAction
         {
             ImGui::Checkbox("Pressed", &ActionInfoButton->bPressed);
             ImGui::Checkbox("Repeat", &ActionInfoButton->bRepeat);
-            FCogWindowWidgets::SliderWithReset("Period", &RepeatPeriod, 0.0f, 10.0f, 0.5f, "%0.1fs");
+            FCogWindowWidgets::SliderWithReset("Period", &Config->RepeatPeriod, 0.0f, 10.0f, 0.5f, "%0.1fs");
         }
 
         if (ActionInfoButton != nullptr && ActionInfoButton->Action != nullptr && ActionInfoButton->Action->ValueType == EInputActionValueType::Axis1D)
@@ -76,7 +73,7 @@ void UCogInputWindow_Gamepad::InputContextMenu(const FKey& Key, FCogInjectAction
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogInputWindow_Gamepad::OnButtonClicked(FCogInjectActionInfo* ActionInfo)
+void FCogInputWindow_Gamepad::OnButtonClicked(FCogInjectActionInfo* ActionInfo)
 {
     if (ActionInfo == nullptr)
     {
@@ -99,7 +96,7 @@ void UCogInputWindow_Gamepad::OnButtonClicked(FCogInjectActionInfo* ActionInfo)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogInputWindow_Gamepad::AddButton(const FKey& Key, const ImVec2& RelativePosition, const ImVec2& RelativeSize, const ImVec2& Alignment, float RelativeRounding, ImDrawFlags Flags)
+void FCogInputWindow_Gamepad::AddButton(const FKey& Key, const ImVec2& RelativePosition, const ImVec2& RelativeSize, const ImVec2& Alignment, float RelativeRounding, ImDrawFlags Flags)
 {
     ImGui::PushID((void*)(&Key));
 
@@ -127,23 +124,23 @@ void UCogInputWindow_Gamepad::AddButton(const FKey& Key, const ImVec2& RelativeP
         OnButtonClicked(ActionInfo);
     }
 
-    ImU32 Color = FCogImguiHelper::ToImU32(ButtonColor);
+    ImU32 Color = FCogImguiHelper::ToImU32(Config->ButtonColor);
     if (IsPressed)
     {
-        Color = FCogImguiHelper::ToImU32(PressedColor);
+        Color = FCogImguiHelper::ToImU32(Config->PressedColor);
     }
     else if (ImGui::IsItemHovered())
     {
-        Color = FCogImguiHelper::ToImU32(HoveredColor);
+        Color = FCogImguiHelper::ToImU32(Config->HoveredColor);
     }
 
     InputContextMenu(Key, ActionInfo, nullptr);
 
-    if (Border > 0.0f)
+    if (Config->Border > 0.0f)
     {
         const bool Inject = ActionInfo != nullptr && (ActionInfo->bPressed || ActionInfo->bRepeat);
-        const ImU32 BColor = Inject ? FCogImguiHelper::ToImU32(InjectColor) : FCogImguiHelper::ToImU32(BorderColor);
-        DrawList->AddRect(Position, Position + Size, BColor, RelativeRounding * CanvasSize.x, Flags, Border * CanvasSize.x);
+        const ImU32 BColor = Inject ? FCogImguiHelper::ToImU32(Config->InjectColor) : FCogImguiHelper::ToImU32(Config->BorderColor);
+        DrawList->AddRect(Position, Position + Size, BColor, RelativeRounding * CanvasSize.x, Flags, Config->Border * CanvasSize.x);
     }
 
     DrawList->AddRectFilled(Position, Position + Size, Color, RelativeRounding * CanvasSize.x, Flags);
@@ -152,7 +149,7 @@ void UCogInputWindow_Gamepad::AddButton(const FKey& Key, const ImVec2& RelativeP
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogInputWindow_Gamepad::AddStick(const FKey& Key2D, const FKey& KeyBool, bool InvertY, float RelativeAmplitude, const ImVec2& RelativePosition, float RelativeRadius)
+void FCogInputWindow_Gamepad::AddStick(const FKey& Key2D, const FKey& KeyBool, bool InvertY, float RelativeAmplitude, const ImVec2& RelativePosition, float RelativeRadius)
 {
     ImGui::PushID((void*)(&Key2D));
 
@@ -179,23 +176,23 @@ void UCogInputWindow_Gamepad::AddStick(const FKey& Key2D, const FKey& KeyBool, b
         OnButtonClicked(ActionInfoBool);
     }
 
-    ImU32 Color = FCogImguiHelper::ToImU32(ButtonColor);
+    ImU32 Color = FCogImguiHelper::ToImU32(Config->ButtonColor);
     if (Input->GetKeyValue(KeyBool) > 0.0f)
     {
-        Color = FCogImguiHelper::ToImU32(PressedColor);
+        Color = FCogImguiHelper::ToImU32(Config->PressedColor);
     }
     else if (ImGui::IsItemHovered())
     {
-        Color = FCogImguiHelper::ToImU32(HoveredColor);
+        Color = FCogImguiHelper::ToImU32(Config->HoveredColor);
     }
 
     InputContextMenu(Key2D, ActionInfoBool, ActionInfo2D);
 
-    if (Border > 0.0f)
+    if (Config->Border > 0.0f)
     {
         const bool Inject = ActionInfoBool != nullptr && (ActionInfoBool->bPressed || ActionInfoBool->bRepeat);
-        const ImU32 BColor = Inject ? FCogImguiHelper::ToImU32(InjectColor) : FCogImguiHelper::ToImU32(BorderColor);
-        DrawList->AddCircle(StickPosition, Radius, BColor, 0, Border * CanvasSize.x);
+        const ImU32 BColor = Inject ? FCogImguiHelper::ToImU32(Config->InjectColor) : FCogImguiHelper::ToImU32(Config->BorderColor);
+        DrawList->AddCircle(StickPosition, Radius, BColor, 0, Config->Border * CanvasSize.x);
     }
 
     DrawList->AddCircleFilled(StickPosition, Radius, Color);
@@ -205,7 +202,7 @@ void UCogInputWindow_Gamepad::AddStick(const FKey& Key2D, const FKey& KeyBool, b
 
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogInputWindow_Gamepad::RenderContent()
+void FCogInputWindow_Gamepad::RenderContent()
 {
     Super::RenderContent();
 
@@ -306,33 +303,33 @@ void UCogInputWindow_Gamepad::RenderContent()
     const ImVec2 ContentMin = ImGui::GetCursorScreenPos();
     const ImVec2 ContentSize = ImGui::GetContentRegionAvail();
     const ImVec2 ContentMax = ContentMin + ContentSize;
-    const ImVec2 OverlayOffset = ImVec2(0.0f, bShowAsOverlay ? ImGui::GetFrameHeight() : 0.0f);
+    const ImVec2 OverlayOffset = ImVec2(0.0f, Config->bShowAsOverlay ? ImGui::GetFrameHeight() : 0.0f);
     
-    const ImVec2 Padding = ImVec2(Border * 0.5f * ContentSize.x, Border * 0.5f * ContentSize.x);
+    const ImVec2 Padding = ImVec2(Config->Border * 0.5f * ContentSize.x, Config->Border * 0.5f * ContentSize.x);
     CanvasMin = ContentMin + OverlayOffset + Padding;
     CanvasSize = ImVec2(FMath::Max(ContentSize.x, 50.0f), ContentSize.x * AspectRatio) - (Padding * 2);
     CanvasMax = CanvasMin + CanvasSize + OverlayOffset;
 
     DrawList = ImGui::GetWindowDrawList();
-    ImGui::Dummy(bShowAsOverlay ? CanvasMax - CanvasMin : ContentSize);
+    ImGui::Dummy(Config->bShowAsOverlay ? CanvasMax - CanvasMin : ContentSize);
     if (ImGui::BeginPopupContextItem("Gamepad"))
     {
         if (ImGui::Button("Close", ImVec2(-1.0f, 0)))
         {
             SetIsVisible(false);
         }
-        ImGui::Checkbox("Overlay", &bShowAsOverlay);
+        ImGui::Checkbox("Overlay", &Config->bShowAsOverlay);
         ImGui::Separator();
-        ImGui::Checkbox("Invert Left Stick Y", &bInvertLeftStickY);
-        ImGui::Checkbox("Invert Right Stick Y", &bInvertRightStickY);
+        ImGui::Checkbox("Invert Left Stick Y", &Config->bInvertLeftStickY);
+        ImGui::Checkbox("Invert Right Stick Y", &Config->bInvertRightStickY);
         ImGui::Separator();
-        ImGui::ColorEdit4("Background Color", (float*)&BackgroundColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-        ImGui::ColorEdit4("Border Color", (float*)&BorderColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-        ImGui::ColorEdit4("Button Color", (float*)&ButtonColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-        ImGui::ColorEdit4("Pressed Color", (float*)&PressedColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-        ImGui::ColorEdit4("Hovered Color", (float*)&HoveredColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-        ImGui::ColorEdit4("Inject Color", (float*)&InjectColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-        FCogWindowWidgets::SliderWithReset("Border", &Border, 0.0f, 0.1f, 0.02f, "%0.3f");
+        ImGui::ColorEdit4("Background Color", (float*)&Config->BackgroundColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        ImGui::ColorEdit4("Border Color", (float*)&Config->BorderColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        ImGui::ColorEdit4("Button Color", (float*)&Config->ButtonColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        ImGui::ColorEdit4("Pressed Color", (float*)&Config->PressedColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        ImGui::ColorEdit4("Hovered Color", (float*)&Config->HoveredColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        ImGui::ColorEdit4("Inject Color", (float*)&Config->InjectColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        FCogWindowWidgets::SliderWithReset("Border", &Config->Border, 0.0f, 0.1f, 0.02f, "%0.3f");
         ImGui::EndPopup();
     }
 
@@ -356,28 +353,28 @@ void UCogInputWindow_Gamepad::RenderContent()
     //------------------------------
     // Gamepad
     //------------------------------
-    if (Border > 0.0f)
+    if (Config->Border > 0.0f)
     {
-        DrawList->AddRect(CanvasMin + CanvasSize * ImVec2(0.0f, 0.16f), CanvasMin + CanvasSize * ImVec2(1.0f, 0.7f), FCogImguiHelper::ToImU32(BorderColor), GamepadRound * CanvasSize.x, 0, Border * CanvasSize.x);
-        DrawList->AddRect(CanvasMin + CanvasSize * ImVec2(0.0f, 0.16f), CanvasMin + CanvasSize * ImVec2(HandleWidth, 1.0f), FCogImguiHelper::ToImU32(BorderColor), GamepadRound * CanvasSize.x, 0, Border * CanvasSize.x);
-        DrawList->AddRect(CanvasMin + CanvasSize * ImVec2(1.0f - HandleWidth, 0.16f), CanvasMin + CanvasSize * ImVec2(1.0f, 1.0f), FCogImguiHelper::ToImU32(BorderColor), GamepadRound * CanvasSize.x, 0, Border * CanvasSize.x);
+        DrawList->AddRect(CanvasMin + CanvasSize * ImVec2(0.0f, 0.16f), CanvasMin + CanvasSize * ImVec2(1.0f, 0.7f), FCogImguiHelper::ToImU32(Config->BorderColor), GamepadRound * CanvasSize.x, 0, Config->Border * CanvasSize.x);
+        DrawList->AddRect(CanvasMin + CanvasSize * ImVec2(0.0f, 0.16f), CanvasMin + CanvasSize * ImVec2(HandleWidth, 1.0f), FCogImguiHelper::ToImU32(Config->BorderColor), GamepadRound * CanvasSize.x, 0, Config->Border * CanvasSize.x);
+        DrawList->AddRect(CanvasMin + CanvasSize * ImVec2(1.0f - HandleWidth, 0.16f), CanvasMin + CanvasSize * ImVec2(1.0f, 1.0f), FCogImguiHelper::ToImU32(Config->BorderColor), GamepadRound * CanvasSize.x, 0, Config->Border * CanvasSize.x);
 
-        DrawList->AddCircle(CanvasMin + CanvasSize * LS_Pos, StickBaseRadius* CanvasSize.x, FCogImguiHelper::ToImU32(BorderColor), 0, Border* CanvasSize.x);
-        DrawList->AddCircle(CanvasMin + CanvasSize * RS_Pos, StickBaseRadius* CanvasSize.x, FCogImguiHelper::ToImU32(BorderColor), 0, Border* CanvasSize.x);
+        DrawList->AddCircle(CanvasMin + CanvasSize * LS_Pos, StickBaseRadius* CanvasSize.x, FCogImguiHelper::ToImU32(Config->BorderColor), 0, Config->Border * CanvasSize.x);
+        DrawList->AddCircle(CanvasMin + CanvasSize * RS_Pos, StickBaseRadius* CanvasSize.x, FCogImguiHelper::ToImU32(Config->BorderColor), 0, Config->Border * CanvasSize.x);
     }
 
-    DrawList->AddRectFilled(CanvasMin + CanvasSize * ImVec2(0.0f, 0.16f), CanvasMin + CanvasSize * ImVec2(1.0f, 0.7f), FCogImguiHelper::ToImU32(BackgroundColor), GamepadRound * CanvasSize.x);
-    DrawList->AddRectFilled(CanvasMin + CanvasSize * ImVec2(0.0f, 0.16f), CanvasMin + CanvasSize * ImVec2(HandleWidth, 1.0f), FCogImguiHelper::ToImU32(BackgroundColor), GamepadRound * CanvasSize.x);
-    DrawList->AddRectFilled(CanvasMin + CanvasSize * ImVec2(1.0f - HandleWidth, 0.16f), CanvasMin + CanvasSize * ImVec2(1.0f, 1.0f), FCogImguiHelper::ToImU32(BackgroundColor), GamepadRound * CanvasSize.x);
+    DrawList->AddRectFilled(CanvasMin + CanvasSize * ImVec2(0.0f, 0.16f), CanvasMin + CanvasSize * ImVec2(1.0f, 0.7f), FCogImguiHelper::ToImU32(Config->BackgroundColor), GamepadRound * CanvasSize.x);
+    DrawList->AddRectFilled(CanvasMin + CanvasSize * ImVec2(0.0f, 0.16f), CanvasMin + CanvasSize * ImVec2(HandleWidth, 1.0f), FCogImguiHelper::ToImU32(Config->BackgroundColor), GamepadRound * CanvasSize.x);
+    DrawList->AddRectFilled(CanvasMin + CanvasSize * ImVec2(1.0f - HandleWidth, 0.16f), CanvasMin + CanvasSize * ImVec2(1.0f, 1.0f), FCogImguiHelper::ToImU32(Config->BackgroundColor), GamepadRound * CanvasSize.x);
     
-    DrawList->AddCircleFilled(CanvasMin + CanvasSize * LS_Pos, StickBaseRadius* CanvasSize.x, FCogImguiHelper::ToImU32(BackgroundColor));
-    DrawList->AddCircleFilled(CanvasMin + CanvasSize * RS_Pos, StickBaseRadius* CanvasSize.x, FCogImguiHelper::ToImU32(BackgroundColor));
+    DrawList->AddCircleFilled(CanvasMin + CanvasSize * LS_Pos, StickBaseRadius* CanvasSize.x, FCogImguiHelper::ToImU32(Config->BackgroundColor));
+    DrawList->AddCircleFilled(CanvasMin + CanvasSize * RS_Pos, StickBaseRadius* CanvasSize.x, FCogImguiHelper::ToImU32(Config->BackgroundColor));
 
     //------------------------------
     // Sticks
     //------------------------------
-    AddStick(EKeys::Gamepad_Left2D, EKeys::Gamepad_LeftThumbstick, bInvertLeftStickY, StickAmplitude, LS_Pos, StickRadius);
-    AddStick(EKeys::Gamepad_Right2D, EKeys::Gamepad_RightThumbstick, bInvertRightStickY, StickAmplitude, RS_Pos, StickRadius);
+    AddStick(EKeys::Gamepad_Left2D, EKeys::Gamepad_LeftThumbstick, Config->bInvertLeftStickY, StickAmplitude, LS_Pos, StickRadius);
+    AddStick(EKeys::Gamepad_Right2D, EKeys::Gamepad_RightThumbstick, Config->bInvertRightStickY, StickAmplitude, RS_Pos, StickRadius);
 
     //------------------------------
     // DPad Buttons
@@ -407,7 +404,7 @@ void UCogInputWindow_Gamepad::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogInputWindow_Gamepad::RenderTick(float DeltaSeconds)
+void FCogInputWindow_Gamepad::RenderTick(float DeltaSeconds)
 {
     Super::RenderTick(DeltaSeconds);
 
@@ -432,7 +429,7 @@ void UCogInputWindow_Gamepad::RenderTick(float DeltaSeconds)
     float WorldTime = GetWorld()->GetTimeSeconds();
     if (RepeatTime < WorldTime)
     {
-        RepeatTime = WorldTime + RepeatPeriod;
+        RepeatTime = WorldTime + Config->RepeatPeriod;
         IsTimeToRepeat = true;
     }
 

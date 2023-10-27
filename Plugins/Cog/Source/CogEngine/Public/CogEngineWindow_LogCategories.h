@@ -2,16 +2,16 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
-#include "CogEngineWindow_LogCategories.generated.h"
 
-UCLASS()
-class COGENGINE_API UCogEngineWindow_LogCategories : public UCogWindow
+class COGENGINE_API FCogEngineWindow_LogCategories : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 public:
 
-    UCogEngineWindow_LogCategories();
+    virtual void Initialize() override;
+
+protected:
 
     virtual void ResetConfig() override;
 

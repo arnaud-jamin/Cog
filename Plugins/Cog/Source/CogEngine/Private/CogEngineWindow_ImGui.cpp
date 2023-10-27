@@ -4,12 +4,7 @@
 #include "implot.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogEngineWindow_ImGui::UCogEngineWindow_ImGui()
-{
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_ImGui::RenderTick(float DeltaTime)
+void FCogEngineWindow_ImGui::RenderTick(float DeltaTime)
 {
     Super::RenderTick(DeltaTime);
 
@@ -42,7 +37,7 @@ void UCogEngineWindow_ImGui::RenderTick(float DeltaTime)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_ImGui::RenderContent()
+void FCogEngineWindow_ImGui::RenderContent()
 {
     Super::RenderContent();
 

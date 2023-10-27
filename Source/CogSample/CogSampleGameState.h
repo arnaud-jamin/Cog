@@ -6,7 +6,6 @@
 #include "CogSampleGameState.generated.h"
 
 class UCogWindowManager;
-class UCogEngineWindow_Selection;
 class UCogSampleAbilitySystemComponent;
 
 UCLASS()
@@ -41,12 +40,7 @@ private:
 
     void InitializeCog();
 
-    void RegisterCommands();
-
-    void UnregisterCommands();
-
     TObjectPtr<UCogWindowManager> CogWindowManager = nullptr;
-    TObjectPtr<UCogEngineWindow_Selection> SelectionWindow = nullptr;
 
 #endif //ENABLE_COG
 };

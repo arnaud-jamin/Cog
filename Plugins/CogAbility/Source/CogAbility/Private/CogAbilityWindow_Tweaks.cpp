@@ -8,15 +8,17 @@
 #include "CogWindowWidgets.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogAbilityWindow_Tweaks::UCogAbilityWindow_Tweaks()
+void FCogAbilityWindow_Tweaks::Initialize()
 {
+    Super::Initialize();
+
     bHasMenu = true;
 
-    Asset = FCogWindowHelper::GetFirstAssetByClass<UCogAbilityDataAsset>();
+    Asset = GetAsset<UCogAbilityDataAsset>();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Tweaks::RenderHelp()
+void FCogAbilityWindow_Tweaks::RenderHelp()
 {
     ImGui::Text(
         "This window can be used to apply tweaks to all the loaded actors. "
@@ -27,7 +29,7 @@ void UCogAbilityWindow_Tweaks::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Tweaks::RenderContent()
+void FCogAbilityWindow_Tweaks::RenderContent()
 {
     Super::RenderContent();
 
@@ -124,7 +126,7 @@ void UCogAbilityWindow_Tweaks::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogAbilityWindow_Tweaks::DrawTweak(ACogAbilityReplicator* Replicator, int32 TweakIndex, int32 TweakCategoryIndex)
+void FCogAbilityWindow_Tweaks::DrawTweak(ACogAbilityReplicator* Replicator, int32 TweakIndex, int32 TweakCategoryIndex)
 {
     if (Asset->TweaksCategories.IsValidIndex(TweakCategoryIndex) == false)
     {

@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
+#include "CogWindowConfig.h"
 #include "CogAbilityWindow_Attributes.generated.h"
 
 class UAbilitySystemComponent;
@@ -10,14 +11,14 @@ struct FGameplayAttribute;
 struct FModifierSpec;
 struct FGameplayModifierInfo;
 
-UCLASS(Config = Cog)
-class COGABILITY_API UCogAbilityWindow_Attributes : public UCogWindow
+//--------------------------------------------------------------------------------------------------------------------------
+class COGABILITY_API FCogAbilityWindow_Attributes : public FCogWindow
 {
-    GENERATED_BODY()
+    typedef FCogWindow Super;
 
 public:
 
-    UCogAbilityWindow_Attributes();
+    virtual void Initialize() override;
 
 protected:
 
@@ -35,20 +36,40 @@ protected:
 
 private:
 
-    UPROPERTY(Config)
-    bool bSortByName = true;
-
-    UPROPERTY(Config)
-    bool bGroupByAttributeSet = false;
-
-    UPROPERTY(Config)
-    bool bGroupByCategory = false;
-
-    UPROPERTY(Config)
-    bool bShowOnlyModified = false;
-
     ImGuiTextFilter Filter;
 
-    UPROPERTY()
     TObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
+    
+    TObjectPtr<UCogAbilityConfig_Attributes> Config = nullptr;
+};
+
+//--------------------------------------------------------------------------------------------------------------------------
+UCLASS(Config = Cog)
+class UCogAbilityConfig_Attributes : public UCogWindowConfig
+{
+    GENERATED_BODY()
+
+public:
+
+    UPROPERTY(Config)
+    bool SortByName = true;
+
+    UPROPERTY(Config)
+    bool GroupByAttributeSet = false;
+
+    UPROPERTY(Config)
+    bool GroupByCategory = false;
+
+    UPROPERTY(Config)
+    bool ShowOnlyModified = false;
+
+    virtual void Reset() override
+    {
+        Super::Reset();
+
+        SortByName = true;
+        GroupByAttributeSet = false;
+        GroupByCategory = false;
+        ShowOnlyModified = false;
+    }
 };

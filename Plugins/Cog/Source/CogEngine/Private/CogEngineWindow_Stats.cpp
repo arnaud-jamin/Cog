@@ -12,7 +12,7 @@ ImVec4 StatOrangeColor(1.0f, 0.7f, 0.4f, 1.0f);
 ImVec4 StatGreenColor(0.5f, 1.0f, 0.6f, 1.0f);
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Stats::RenderHelp()
+void FCogEngineWindow_Stats::RenderHelp()
 {
     ImGui::Text(
         "This window displays engine stats such as FPS, Ping, Packet Loss. "
@@ -20,7 +20,7 @@ void UCogEngineWindow_Stats::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Stats::RenderContent()
+void FCogEngineWindow_Stats::RenderContent()
 {
     Super::RenderContent();
 
@@ -55,7 +55,7 @@ void UCogEngineWindow_Stats::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-float UCogEngineWindow_Stats::GetMainMenuWidgetWidth(int32 WidgetIndex, float MaxWidth)
+float FCogEngineWindow_Stats::GetMainMenuWidgetWidth(int32 WidgetIndex, float MaxWidth)
 {
     const APlayerController* PlayerController = GetLocalPlayerController();
     const UNetConnection* Connection = PlayerController != nullptr ? PlayerController->GetNetConnection() : nullptr;
@@ -71,7 +71,7 @@ float UCogEngineWindow_Stats::GetMainMenuWidgetWidth(int32 WidgetIndex, float Ma
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Stats::RenderMainMenuWidget(int32 WidgetIndex, float Width)
+void FCogEngineWindow_Stats::RenderMainMenuWidget(int32 WidgetIndex, float Width)
 {
     switch (WidgetIndex)
     {
@@ -82,7 +82,7 @@ void UCogEngineWindow_Stats::RenderMainMenuWidget(int32 WidgetIndex, float Width
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Stats::RenderMainMenuWidgetFramerate(float Width)
+void FCogEngineWindow_Stats::RenderMainMenuWidgetFramerate(float Width)
 {
     extern ENGINE_API float GAverageFPS;
     int32 Fps = (int32)GAverageFPS;
@@ -119,7 +119,7 @@ void UCogEngineWindow_Stats::RenderMainMenuWidgetFramerate(float Width)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Stats::RenderMainMenuWidgetPing(float Width)
+void FCogEngineWindow_Stats::RenderMainMenuWidgetPing(float Width)
 {
     const APlayerController* PlayerController = GetLocalPlayerController();
     const APlayerState* PlayerState = PlayerController != nullptr ? PlayerController->GetPlayerState<APlayerState>() : nullptr;
@@ -168,7 +168,7 @@ void UCogEngineWindow_Stats::RenderMainMenuWidgetPing(float Width)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Stats::RenderMainMenuWidgetPacketLoss(float Width)
+void FCogEngineWindow_Stats::RenderMainMenuWidgetPacketLoss(float Width)
 {
     const APlayerController* PlayerController = GetLocalPlayerController();
     UNetConnection* Connection = PlayerController != nullptr ? PlayerController->GetNetConnection() : nullptr;
@@ -222,7 +222,7 @@ void UCogEngineWindow_Stats::RenderMainMenuWidgetPacketLoss(float Width)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ImVec4 UCogEngineWindow_Stats::GetFpsColor(float Value, float Good /*= 50.0f*/, float Medium /*= 30.0f*/)
+ImVec4 FCogEngineWindow_Stats::GetFpsColor(float Value, float Good /*= 50.0f*/, float Medium /*= 30.0f*/)
 {
     if (Value > Good)
     {
@@ -238,7 +238,7 @@ ImVec4 UCogEngineWindow_Stats::GetFpsColor(float Value, float Good /*= 50.0f*/, 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ImVec4 UCogEngineWindow_Stats::GetPingColor(float Value, float Good /*= 100.0f*/, float Medium /*= 200.0f*/)
+ImVec4 FCogEngineWindow_Stats::GetPingColor(float Value, float Good /*= 100.0f*/, float Medium /*= 200.0f*/)
 {
     if (Value > Medium)
     {
@@ -254,7 +254,7 @@ ImVec4 UCogEngineWindow_Stats::GetPingColor(float Value, float Good /*= 100.0f*/
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ImVec4 UCogEngineWindow_Stats::GetPacketLossColor(float Value, float Good /*= 10.0f*/, float Medium /*= 20.0f*/)
+ImVec4 FCogEngineWindow_Stats::GetPacketLossColor(float Value, float Good /*= 10.0f*/, float Medium /*= 20.0f*/)
 {
     if (Value > Medium)
     {

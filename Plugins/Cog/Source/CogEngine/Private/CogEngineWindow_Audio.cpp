@@ -3,7 +3,7 @@
 #include "Engine/Engine.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Audio::RenderHelp()
+void FCogEngineWindow_Audio::RenderHelp()
 {
     ImGui::Text(
         "This window displays audio settings. "
@@ -11,9 +11,7 @@ void UCogEngineWindow_Audio::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_Audio::RenderContent()
+void FCogEngineWindow_Audio::RenderContent()
 {
     Super::RenderContent();
-
-
 }

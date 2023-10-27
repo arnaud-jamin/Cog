@@ -6,7 +6,15 @@
 #include "CogDebugLog.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_LogCategories::RenderHelp()
+void FCogEngineWindow_LogCategories::Initialize()
+{
+    Super::Initialize();
+
+    bHasMenu = true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_LogCategories::RenderHelp()
 {
     ImGui::Text(
         "This window can be used to activate and deactivate log categories."
@@ -19,13 +27,7 @@ void UCogEngineWindow_LogCategories::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogEngineWindow_LogCategories::UCogEngineWindow_LogCategories()
-{
-    bHasMenu = true;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_LogCategories::ResetConfig()
+void FCogEngineWindow_LogCategories::ResetConfig()
 {
     Super::ResetConfig();
 
@@ -33,7 +35,7 @@ void UCogEngineWindow_LogCategories::ResetConfig()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineWindow_LogCategories::RenderContent()
+void FCogEngineWindow_LogCategories::RenderContent()
 {
     Super::RenderContent();
 
