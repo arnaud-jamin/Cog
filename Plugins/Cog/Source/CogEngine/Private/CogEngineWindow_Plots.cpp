@@ -383,7 +383,7 @@ void FCogEngineWindow_Plots::RenderContent()
                                         if (Entry.FindValue(ImPlot::GetPlotMousePos().x, Value))
                                         {
                                             ImGui::BeginTooltip();
-                                            ImGui::Text("%s: %0.1f", Label.Get(), Value);
+                                            ImGui::Text("%s: %0.2f", Label.Get(), Value);
                                             ImGui::EndTooltip();
                                         }
                                     }

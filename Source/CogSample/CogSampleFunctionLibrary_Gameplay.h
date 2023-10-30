@@ -107,4 +107,7 @@ public:
     static bool IsActorMatchingTags(const AActor* Actor, const FGameplayTagContainer& RequiredTags, const FGameplayTagContainer& IgnoredTags);
 
     static void MakeOutgoingSpecs(const AActor* Actor, const TArray<TSubclassOf<UGameplayEffect>>& Effects, const TArray<FGameplayEffectSpecHandle>& BakedEffects, TMap<TSubclassOf<UGameplayEffect>, FGameplayEffectSpecHandle>& Result);
+
+    static APlayerController* GetFirstLocalPlayerController(UObject* WorldContextObject);
+
 };

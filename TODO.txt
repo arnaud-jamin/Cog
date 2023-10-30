@@ -10,6 +10,7 @@
 - CogEngine: Add screen settings (fullscreen, borderless, window and resolution)
 - CogEngine: make a better widget for CheckBoxState for input shortcuts
 - CogEngine: save active log categories
+- CogEngine: add menu on the PlotWindow wih the controls
 
 - CogSample: Add a custom window in sample (changing the character faction)
 - CogSample: Create more abilities
@@ -19,5 +20,6 @@
 - CogSample: Add more debug for area (change color on tick, duration ...)
 
 - CogDebug: Check KismetExecutionMessage for warnings. As an exemple it is used by GEngine::GetWorldFromContextObject.
+- CogDebug: Rework Tickness and Duration params.
 
 - CogInput: Add gamepad stick drag to set their values

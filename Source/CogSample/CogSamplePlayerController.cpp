@@ -11,6 +11,7 @@
 #if ENABLE_COG
 #include "CogAbilityReplicator.h"
 #include "CogDebugDraw.h"
+#include "CogDebugPlot.h"
 #include "CogDebugReplicator.h"
 #include "CogEngineReplicator.h"
 #endif //ENABLE_COG
@@ -202,3 +203,29 @@ void ACogSamplePlayerController::Server_SetTarget_Implementation(AActor* Value)
 {
     Target = Value;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+const ACogSamplePlayerController* ACogSamplePlayerController::GetFirstLocalPlayerController(UObject* WorldContextObject)
+{
+    UWorld* const World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
+    if (World == nullptr)
+    {
+        return nullptr;
+    }
+
+    UGameInstance* const GameInstance = World->GetGameInstance();
+    if (GameInstance == nullptr)
+    {
+        return nullptr;
+    }
+
+    ACogSamplePlayerController* PlayerController = Cast<ACogSamplePlayerController>(GameInstance->GetFirstLocalPlayerController(World));
+    return PlayerController;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+float ACogSamplePlayerController::GetClientLag() const
+{
+    return (PlayerState != nullptr && GetNetMode() != NM_Standalone) ? (0.0001f * 0.5f * PlayerState->ExactPing) : 0.f;
+}
+

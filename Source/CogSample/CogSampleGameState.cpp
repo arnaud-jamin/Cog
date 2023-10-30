@@ -102,6 +102,11 @@ void ACogSampleGameState::Tick(float DeltaSeconds)
     FCogDebugPlot::PlotValue(this, "Frame Rate", GAverageFPS);
     FCogDebugPlot::PlotValue(this, "Frame Time", GAverageMS);
 
+    //const float LocalWorldTime = GetWorld()->GetTimeSeconds();
+    //const float ServerWorldTime = GetServerWorldTimeSeconds();
+    //const float ServerWorldTimeDelta = LocalWorldTime - ServerWorldTime;
+    //FCogDebugPlot::PlotValue(this, "Server World Time Delta", ServerWorldTimeDelta);
+
     CogWindowManager->Tick(DeltaSeconds);
 
 #endif //ENABLE_COG

@@ -6,11 +6,73 @@
 #include "CogSampleFunctionLibrary_Gameplay.h"
 #include "CogSampleFunctionLibrary_Team.h"
 #include "CogSampleLogCategories.h"
+#include "CogSamplePlayerController.h"
+#include "GameFramework/Character.h"
+#include "Net/Core/PushModel/PushModel.h"
+#include "Net/UnrealNetwork.h"
 
 #if ENABLE_COG
 #include "CogDebugLog.h"
 #include "CogDebugDraw.h"
 #endif //ENABLE_COG
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Postulates:
+//--------------------------------------------------------------------------------------------------------------------------
+//
+//  Projectiles can be launched by a Player or a NPC.
+//  Projectiles can hit the world, or another player, or a NPC.
+//  When hitting characters, projectiles do not hit the characters' capsules, but their animated hit boxes.
+//  The server do not update animations and therefore do not update animated hit boxes(like Fortnite)
+//  The server applies the gameplay effects related to projectile hit.
+//
+//--------------------------------------------------------------------------------------------------------------------------
+// Questions/Answers:
+//--------------------------------------------------------------------------------------------------------------------------
+//
+//  Where should projectile collision happen ? On the server, or on the client ?
+//
+//      On the clients.If projectiles should hit animated hit boxes, and if hit boxes are not updated on the server, 
+//      then we need to rely on the clients to perform the collision detection.Clients should send the hit result to the 
+//      server, the server should verify if the result is valid(anti cheat), and then apply gameplay effects.
+//
+//  If the projectile is launched by a NPC and hit a player, which client should send the hit result to the server ? 
+//  The client that got hit, or another client that also detected the hit ? 
+// 
+//
+//
+//  If the projectile is launched by a player and hit another player, which client should detect and send the hit result 
+//  to the server ? The player that launched the projectile or/ and the player that got hit ?
+//
+//      If the server only receives the hit from the client that got hit, then that client can prevent this message 
+//      from being sent, or he can alter the message to gain advantages. The server needs another information. 
+//      This information can come from the launcher of the projectile.
+//
+//  If the projectile is launched by a NPC and hit another NPC, which client should send the hit result to the server ?
+//
+//      One client could be made responsible to detect hits received by a specific NPC.
+// 
+//--------------------------------------------------------------------------------------------------------------------------
+UCogSampleProjectileComponent::UCogSampleProjectileComponent(const FObjectInitializer& ObjectInitializer)
+    : Super(ObjectInitializer)
+{
+    SetIsReplicatedByDefault(true);
+    bAutoActivate = false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleProjectileComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    FDoRepLifetimeParams Params;
+    Params.bIsPushBased = true;
+
+    Params.Condition = COND_None;
+    DOREPLIFETIME_WITH_PARAMS_FAST(UCogSampleProjectileComponent, ServerSpawnLocation, Params);
+    DOREPLIFETIME_WITH_PARAMS_FAST(UCogSampleProjectileComponent, ServerSpawnRotation, Params);
+    DOREPLIFETIME_WITH_PARAMS_FAST(UCogSampleProjectileComponent, ServerSpawnVelocity, Params);
+}
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSampleProjectileComponent::BeginPlay()
@@ -20,10 +82,7 @@ void UCogSampleProjectileComponent::BeginPlay()
     Creator = UCogSampleFunctionLibrary_Gameplay::GetCreator(GetOwner());
     SpawnPrediction = GetOwner()->FindComponentByClass<UCogSampleSpawnPredictionComponent>();
 
-    if (GetOwner()->HasAuthority())
-    {
-        RegisterAllEffects();
-    }
+    RegisterAllEffects();
 
     Collision = Cast<USphereComponent>(CollisionReference.GetComponent(GetOwner()));
     if (Collision != nullptr)
@@ -37,14 +96,59 @@ void UCogSampleProjectileComponent::BeginPlay()
         AssistanceOverlap->OnComponentBeginOverlap.AddDynamic(this, &UCogSampleProjectileComponent::OnAssistanceOverlapBegin);
     }
 
+    if (GetOwner()->GetLocalRole() != ROLE_Authority)
+    {
+        Activate(false);
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleProjectileComponent::Activate(bool bReset)
+{
+
+    //------------------------------------------------------------------------------------------------
+    // Save the spawn location and rotation and get them replicated because, we want remote clients 
+    // to tick projectiles on their own, and be synced with the server. To do so they need to 
+    // recompute (to catchup) the projectile movement from its initial location, rotation and velocity.
+    // If we don't reposition the remote client projectile at its initial values, we get some offset
+    // because the server doesn't necessarly replicates the location and rotation of the projectile
+    // at its spawn frame.
+    //------------------------------------------------------------------------------------------------
+    if (GetOwner()->GetLocalRole() == ROLE_Authority)
+    {
+        COMPARE_ASSIGN_AND_MARK_PROPERTY_DIRTY(UCogSampleProjectileComponent, ServerSpawnLocation, GetOwner()->GetActorLocation(), this);
+        COMPARE_ASSIGN_AND_MARK_PROPERTY_DIRTY(UCogSampleProjectileComponent, ServerSpawnRotation, GetOwner()->GetActorRotation(), this);
+        COMPARE_ASSIGN_AND_MARK_PROPERTY_DIRTY(UCogSampleProjectileComponent, ServerSpawnVelocity, Velocity, this);
+    }
+    else
+    {
+        GetOwner()->SetActorLocationAndRotation(ServerSpawnLocation, ServerSpawnRotation);
+        Velocity = ServerSpawnVelocity;
+    }
+
+    Super::Activate(bReset);
+
 #if ENABLE_COG
+    DrawDebugCurrentState(FColor::Green);
     if (FCogDebugLog::IsLogCategoryActive(LogCogProjectile))
     {
         LastDebugLocation = GetOwner()->GetActorLocation();
     }
 #endif //ENABLE_COG
-}
 
+    //--------------------------------------------------------------------------
+    // Catchup after settings LastDebugLocation because Tick will be triggered 
+    // by Catchup and LastDebugLocation is used in Tick debug draw.
+    //--------------------------------------------------------------------------
+    if (GetOwner()->GetLocalRole() != ROLE_Authority)
+    {
+        if (const ACogSamplePlayerController* Controller = ACogSamplePlayerController::GetFirstLocalPlayerController(this))
+        {
+            Catchup(Controller->GetClientLag());
+        }
+    }
+
+}
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSampleProjectileComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -68,8 +172,8 @@ void UCogSampleProjectileComponent::TickComponent(float DeltaTime, enum ELevelTi
         const float CollisionRadius = Collision != nullptr ? Collision->GetScaledSphereRadius() : 0.0f;
         const float AssistanceRadius = AssistanceOverlap != nullptr ? AssistanceOverlap->GetScaledSphereRadius() : 0.0f;
         const float DebugRadius = FMath::Max(CollisionRadius, AssistanceRadius);
-        const FColor Color = SpawnPrediction != nullptr ? SpawnPrediction->GetRoleColor() : FColor(128, 128, 128, 255);
         const bool Show = SpawnPrediction == nullptr || SpawnPrediction->GetRole() != ECogSampleSpawnPredictionRole::Replicated;
+        const FColor Color = (SpawnPrediction != nullptr ? SpawnPrediction->GetRoleColor() : FColor(128, 128, 128, 255)).WithAlpha(IsCatchingUp ? 100 : 255);
 
         if (Show && UpdatedComponent != nullptr)
         {
@@ -99,28 +203,39 @@ void UCogSampleProjectileComponent::TickComponent(float DeltaTime, enum ELevelTi
 #endif //ENABLE_COG
 }
 //--------------------------------------------------------------------------------------------------------------------------
-//void UCogSampleProjectileComponent::CatchupReplicatedActor(float CatchupDuration)
-//{
-//    COG_LOG_OBJECT(LogCogProjectile, ELogVerbosity::Verbose, Creator.Get(), TEXT("Projectile:%s - Role:%s - CatchupDuration:%0.2f"), *GetName(), *GetRoleName(), CatchupDuration);
-//
-//    const FVector OldPosition = GetOwner()->GetActorLocation();
-//    const float OldSpeed = Velocity.Length();
-//
-//    TickComponent(CatchupDuration, LEVELTICK_All, nullptr);
-//
-//    COG_LOG_OBJECT(LogCogProjectile, ELogVerbosity::Verbose, Creator, TEXT("Distance:%0.2f - OldSpeed:%0.2f - NewSpeed:%0.2f"),
-//        (GetOwner()->GetActorLocation() - OldPosition).Length(),
-//        OldSpeed,
-//        Velocity.Length());
-//
-//    if (SpawnPrediction != nullptr)
-//    {
-//        if (UCogSampleSpawnPrediction* SpawnPrediction2 = SpawnPrediction->GetSpawnPrediction())
-//        {
-//            SpawnPrediction2->ProjectileMovement->Velocity = ProjectileMovement->Velocity;
-//        }
-//    }
-//}
+void UCogSampleProjectileComponent::Catchup(float CatchupDuration)
+{
+    COG_LOG_OBJECT(LogCogProjectile, ELogVerbosity::Verbose, Creator.Get(), TEXT("Projectile:%s - Role:%s - CatchupDuration:%0.2f"), *GetName(), *GetRoleName(), CatchupDuration);
+
+    IsCatchingUp = true;
+    TickComponent(CatchupDuration, LEVELTICK_All, nullptr);
+    IsCatchingUp = false;
+
+#if ENABLE_COG
+    DrawDebugCurrentState(FColor::Red);
+#endif //ENABLE_COG
+}
+
+
+//--------------------------------------------------------------------------------------------------------------------------
+#if ENABLE_COG
+
+void UCogSampleProjectileComponent::DrawDebugCurrentState(const FColor& Color, bool DrawVelocity)
+{
+    if (FCogDebugLog::IsLogCategoryActive(LogCogProjectile))
+    {
+        float CollisionRadius = Collision != nullptr ? Collision->GetScaledSphereRadius() : 0.0f;
+        float AssistanceRadius = AssistanceOverlap != nullptr ? AssistanceOverlap->GetScaledSphereRadius() : 0.0f;
+        float DebugRadius = FMath::Max(CollisionRadius, AssistanceRadius);
+        FCogDebugDraw::Sphere(LogCogProjectile, GetOwner(), GetOwner()->GetActorLocation(), DebugRadius, Color, true, 0);
+
+        if (DrawVelocity)
+        {
+            FCogDebugDraw::Arrow(LogCogProjectile, GetOwner(), GetOwner()->GetActorLocation(), GetOwner()->GetActorLocation() + Velocity * 0.1f, Color, true, 0);
+        }
+    }
+}
+#endif //ENABLE_COG
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSampleProjectileComponent::RegisterAllEffects()
@@ -180,16 +295,6 @@ bool UCogSampleProjectileComponent::ShouldProcessOverlap(AActor* OtherActor, UPr
         COG_LOG_OBJECT(LogCogProjectile, ELogVerbosity::Verbose, Creator.Get(), TEXT("Skipped:HittingCreator"));
         return false;
     }
-
-    ////-----------------------------------------------------------------------------------------
-    //// Don't overlap if OtherActor is the simulated proxy replicated one time from server to
-    //// client for synch-up
-    ////-----------------------------------------------------------------------------------------
-    //if (OtherActor->IsA(AGPCoreProjectile::StaticClass()) && OtherActor->GetLocalRole() == ROLE_SimulatedProxy)
-    //{
-    //    COG_LOG_OBJECT(LogCogProjectile, ELogVerbosity::Verbose, Creator.Get(), TEXT("Skipped:SimulatedProxyProjectile"));
-    //    return false;
-    //}
 
     if (IsAlreadyProcessingAnOverlap)
     {
@@ -369,14 +474,23 @@ bool UCogSampleProjectileComponent::ShouldHit_Implementation(const FHitResult& H
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogSampleProjectileComponent::Hit_Implementation(const FHitResult& HitResult, FCogSampleHitConsequence& hitConsequence)
+void UCogSampleProjectileComponent::Hit_Implementation(const FHitResult& HitResult, FCogSampleHitConsequence& HitConsequence)
 {
     AActor* HitActor = HitResult.GetActor();
 
 #if ENABLE_COG
+    DrawDebugCurrentState(FColor::White, false);
     FCogDebugDraw::Arrow(LogCogProjectile, GetOwner(), HitResult.Location, HitResult.Location + HitResult.Normal * 50.0f, FColor::Red, true, 0);
     FCogDebugDraw::Box(LogCogProjectile, GetOwner(), HitResult.Location, FVector(0.0f, 5.0f, 5.0f), FRotationMatrix::MakeFromX(HitResult.Normal).ToQuat(), FColor::Red, true, 0);
+    FCogDebugDraw::Arrow(LogCogProjectile, GetOwner(), HitResult.ImpactPoint, HitResult.ImpactPoint + HitResult.ImpactNormal * 50.0f, FColor::Yellow, true, 0);
+    FCogDebugDraw::Box(LogCogProjectile, GetOwner(), HitResult.ImpactPoint, FVector(0.0f, 5.0f, 5.0f), FRotationMatrix::MakeFromX(HitResult.ImpactNormal).ToQuat(), FColor::Yellow, true, 0);
 #endif //ENABLE_COG
+
+    UAbilitySystemComponent* TargetAbilitySystem = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(HitActor);
+    if (TargetAbilitySystem == nullptr)
+    {
+        return;
+    }
 
     for (const FCogSampleProjectileEffectConfig& EffectConfig : Effects)
     {
@@ -400,12 +514,6 @@ void UCogSampleProjectileComponent::Hit_Implementation(const FHitResult& HitResu
             }
 
             if (UCogSampleFunctionLibrary_Gameplay::IsDead(HitActor) && EffectConfig.AffectDead == false)
-            {
-                continue;
-            }
-
-            UAbilitySystemComponent* TargetAbilitySystem = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(HitActor);
-            if (TargetAbilitySystem == nullptr)
             {
                 continue;
             }

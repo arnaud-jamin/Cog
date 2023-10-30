@@ -25,11 +25,15 @@ class ACogSamplePlayerController
 
 public:
     
+    static const ACogSamplePlayerController* GetFirstLocalPlayerController(UObject* WorldContextObject);
+
     ACogSamplePlayerController();
 
     virtual void BeginPlay() override;
 
     virtual void Tick(float DeltaSeconds) override;
+
+    float GetClientLag() const;
 
     //----------------------------------------------------------------------------------------------------------------------
     // Possession

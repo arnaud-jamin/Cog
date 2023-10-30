@@ -8,8 +8,6 @@
 #include "CogSampleProjectileComponent.generated.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-// FCogSampleProjectileEffectConfig
-//--------------------------------------------------------------------------------------------------------------------------
 USTRUCT(BlueprintType)
 struct FCogSampleProjectileEffectConfig
 {
@@ -25,8 +23,6 @@ struct FCogSampleProjectileEffectConfig
     TArray<TSubclassOf<UGameplayEffect>> Effects;
 };
 
-//--------------------------------------------------------------------------------------------------------------------------
-// FCogSampleHitConsequence
 //--------------------------------------------------------------------------------------------------------------------------
 USTRUCT(BlueprintType)
 struct FCogSampleHitConsequence
@@ -44,8 +40,6 @@ struct FCogSampleHitConsequence
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
-// UCogSampleProjectileComponent
-//--------------------------------------------------------------------------------------------------------------------------
 UCLASS(BlueprintType, meta = (BlueprintSpawnableComponent))
 class UCogSampleProjectileComponent : public UProjectileMovementComponent
 {
@@ -53,9 +47,15 @@ class UCogSampleProjectileComponent : public UProjectileMovementComponent
 
 public:
     
+    UCogSampleProjectileComponent(const FObjectInitializer& ObjectInitializer);
+
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
     virtual void BeginPlay() override;
 
     virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction);
+
+    virtual void Activate(bool bReset) override;
 
     UFUNCTION(BlueprintCallable)
     void ClearHitActors();
@@ -70,7 +70,7 @@ protected:
 
     virtual FString GetRoleName() const;
 
-    //virtual void CatchupReplicatedActor(float CatchupDuration);
+    virtual void Catchup(float CatchupDuration);
 
     virtual bool ShouldProcessOverlap(AActor* OtherActor, UPrimitiveComponent* OtherComp, bool RequireValidActor);
 
@@ -91,11 +91,11 @@ protected:
 
     void RegisterAllEffects();
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, Category = "Projectile")
     FComponentReference CollisionReference;
 
-    UPROPERTY(EditAnywhere)
-    FComponentReference OverlapReference;
+    UPROPERTY(EditAnywhere, Category = "Projectile")
+    FComponentReference OverlapReference; 
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
     bool CanHitCreator = false;
@@ -114,6 +114,15 @@ protected:
     UPROPERTY()
     TWeakObjectPtr<UCogSampleSpawnPredictionComponent> SpawnPrediction = nullptr;
 
+    UPROPERTY(Replicated)
+    FVector ServerSpawnLocation = FVector::ZeroVector;
+
+    UPROPERTY(Replicated)
+    FRotator ServerSpawnRotation = FRotator::ZeroRotator;
+
+    UPROPERTY(Replicated)
+    FVector ServerSpawnVelocity = FVector::ZeroVector;
+
     /** Re-entrancy guard */
     bool IsAlreadyProcessingAnOverlap = false;
 
@@ -122,7 +131,13 @@ protected:
 
     TMap<TSubclassOf<UGameplayEffect>, FGameplayEffectSpecHandle> EffectsMap;
 
+    float SpawnTime = 0.0f;
+
+    bool IsCatchingUp = false;
+
 #if ENABLE_COG
+    void DrawDebugCurrentState(const FColor& Color, bool DrawVelocity = true);
+
     FVector LastDebugLocation = FVector::ZeroVector;
 #endif //ENABLE_COG
 };

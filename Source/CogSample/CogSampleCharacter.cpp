@@ -87,7 +87,6 @@ void ACogSampleCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
     DOREPLIFETIME_WITH_PARAMS_FAST(ACogSampleCharacter, ActiveAbilityHandles, Params);
 }
 
-
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleCharacter::PostInitializeComponents()
 {
