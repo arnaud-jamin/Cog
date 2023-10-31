@@ -275,7 +275,7 @@ public class CogSample : ModuleRules
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         PublicDependencyModuleNames.AddRange(new string[] 
         { 
-            "CogCommon",  // The CogCommon is required on all target configuration
+            "CogCommon",  // CogCommon is required on all target configuration
             "AIModule",
             "Core",
             "CoreUObject", 
