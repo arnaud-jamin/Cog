@@ -79,6 +79,9 @@ protected:
 
     virtual void TryHit(const FHitResult& Hit);
 
+    UFUNCTION(Server, Reliable)
+    virtual void Server_Hit(const FHitResult& Hit);
+
     UFUNCTION()
     virtual void OnCollisionOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool IsFromSweep, const FHitResult& SweepHit);
 
@@ -86,7 +89,7 @@ protected:
     virtual void OnAssistanceOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool IsFromSweep, const FHitResult& SweepHit);
 
     UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-    bool ShouldHit(const FHitResult& hit);
+    bool ShouldHit(const FHitResult& Hit);
 
     /** Blueprint hook called when projectile hits something */
     UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
@@ -140,6 +143,7 @@ protected:
 
 #if ENABLE_COG
     void DrawDebugCurrentState(const FColor& Color, bool DrawVelocity = true);
+    void DrawDebugHitResult(const FHitResult& HitResult);
 
     FVector LastDebugLocation = FVector::ZeroVector;
 #endif //ENABLE_COG

@@ -29,13 +29,13 @@
 
 //--------------------------------------------------------------------------------------------------------------------------
 #define COG_LOG_FUNC(LogCategory, Verbosity, Format, ...)                                                                   \
-    COG_LOG(LogCategory, Verbosity, TEXT("%s - %s"), ANSI_TO_TCHAR(__FUNCTION__), *FString::Printf(Format, ##__VA_ARGS__)); \
+    COG_LOG(LogCategory, Verbosity, TEXT("%s | %s"), ANSI_TO_TCHAR(__FUNCTION__), *FString::Printf(Format, ##__VA_ARGS__)); \
 
 //--------------------------------------------------------------------------------------------------------------------------
 #define COG_LOG_OBJECT(LogCategory, Verbosity, Object, Format, ...)                                                         \
     if (COG_LOG_ACTIVE_FOR_OBJECT(Object) || (int32)Verbosity <= (int32)ELogVerbosity::Warning)                             \
     {                                                                                                                       \
-        COG_LOG(LogCategory, Verbosity, TEXT("%s - %s - %s"),                                                               \
+        COG_LOG(LogCategory, Verbosity, TEXT("%s | %s | %s"),                                                               \
             *GetNameSafe(Object),                                                                                           \
             ANSI_TO_TCHAR(__FUNCTION__),                                                                                    \
             *FString::Printf(Format, ##__VA_ARGS__));                                                                       \
@@ -45,7 +45,7 @@
 #define COG_LOG_OBJECT_NO_CONTEXT(LogCategory, Verbosity, Object, Format, ...)                                              \
     if (COG_LOG_ACTIVE_FOR_OBJECT(Object) || (int32)Verbosity <= (int32)ELogVerbosity::Warning)                             \
     {                                                                                                                       \
-        COG_LOG(LogCategory, Verbosity, TEXT("%s - %s"), *GetNameSafe(Object), *FString::Printf(Format, ##__VA_ARGS__));    \
+        COG_LOG(LogCategory, Verbosity, TEXT("%s | %s"), *GetNameSafe(Object), *FString::Printf(Format, ##__VA_ARGS__));    \
     }                                                                                                                       \
 
 #else //ENABLE_COG

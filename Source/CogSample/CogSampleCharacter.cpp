@@ -14,6 +14,7 @@
 #include "CogSampleRootMotionParams.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
+#include "Engine/CollisionProfile.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -107,6 +108,12 @@ void ACogSampleCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+    if (GetWorld()->GetNetMode() == NM_DedicatedServer)
+    {
+        GetMesh()->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+    }
+    
 
     TryFinishInitialize();
     RefreshServerAnimTickOption();

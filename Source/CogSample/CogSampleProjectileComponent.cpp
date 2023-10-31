@@ -82,7 +82,7 @@ void UCogSampleProjectileComponent::BeginPlay()
     Creator = UCogSampleFunctionLibrary_Gameplay::GetCreator(GetOwner());
     SpawnPrediction = GetOwner()->FindComponentByClass<UCogSampleSpawnPredictionComponent>();
 
-    COG_LOG_OBJECT(LogCogProjectile, ELogVerbosity::Verbose, Creator.Get(), TEXT("Projectile:%s - Role:%s - IsActive:%d"), *GetNameSafe(GetOwner()), *GetRoleName(), IsActive());
+    COG_LOG_OBJECT(LogCogProjectile, ELogVerbosity::Verbose, Creator.Get(), TEXT("Projectile:%s | Role:%s | IsActive:%d"), *GetNameSafe(GetOwner()), *GetRoleName(), IsActive());
 
     RegisterAllEffects();
 
@@ -110,7 +110,7 @@ void UCogSampleProjectileComponent::BeginPlay()
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSampleProjectileComponent::Activate(bool bReset)
 {
-    COG_LOG_OBJECT(LogCogProjectile, ELogVerbosity::Verbose, Creator.Get(), TEXT("Projectile:%s - Role:%s - bReset:%d"), *GetNameSafe(GetOwner()), *GetRoleName(), bReset);
+    COG_LOG_OBJECT(LogCogProjectile, ELogVerbosity::Verbose, Creator.Get(), TEXT("Projectile:%s | Role:%s | bReset:%d"), *GetNameSafe(GetOwner()), *GetRoleName(), bReset);
 
     //------------------------------------------------------------------------------------------------
     // Save the spawn location and rotation and get them replicated because, we want remote clients 
@@ -210,7 +210,7 @@ void UCogSampleProjectileComponent::TickComponent(float DeltaTime, enum ELevelTi
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSampleProjectileComponent::Catchup(float CatchupDuration)
 {
-    COG_LOG_OBJECT(LogCogProjectile, ELogVerbosity::Verbose, Creator.Get(), TEXT("Projectile:%s - Role:%s - CatchupDuration:%dms"), *GetNameSafe(GetOwner()), *GetRoleName(), (int32)(CatchupDuration * 1000));
+    COG_LOG_OBJECT(LogCogProjectile, ELogVerbosity::Verbose, Creator.Get(), TEXT("Projectile:%s | Role:%s | CatchupDuration:%dms"), *GetNameSafe(GetOwner()), *GetRoleName(), (int32)(CatchupDuration * 1000));
 
     IsCatchingUp = true;
     TickComponent(CatchupDuration, LEVELTICK_All, nullptr);
@@ -240,6 +240,17 @@ void UCogSampleProjectileComponent::DrawDebugCurrentState(const FColor& Color, b
         }
     }
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleProjectileComponent::DrawDebugHitResult(const FHitResult& HitResult)
+{
+    FCogDebugDraw::Arrow(LogCogProjectile, GetOwner(), HitResult.Location, HitResult.Location + HitResult.Normal * 50.0f, FColor::Red, true, 0);
+    FCogDebugDraw::Box(LogCogProjectile, GetOwner(), HitResult.Location, FVector(0.0f, 5.0f, 5.0f), FRotationMatrix::MakeFromX(HitResult.Normal).ToQuat(), FColor::Red, true, 0);
+    FCogDebugDraw::Arrow(LogCogProjectile, GetOwner(), HitResult.ImpactPoint, HitResult.ImpactPoint + HitResult.ImpactNormal * 50.0f, FColor::Yellow, true, 0);
+    FCogDebugDraw::Box(LogCogProjectile, GetOwner(), HitResult.ImpactPoint, FVector(0.0f, 5.0f, 5.0f), FRotationMatrix::MakeFromX(HitResult.ImpactNormal).ToQuat(), FColor::Yellow, true, 0);
+}
+
+
 #endif //ENABLE_COG
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -268,11 +279,11 @@ bool UCogSampleProjectileComponent::ShouldProcessOverlap(AActor* OtherActor, UPr
         return false;
     }
 
-    if (GetOwner()->GetLocalRole() != ROLE_Authority)
-    {
-        COG_LOG_OBJECT(LogCogProjectile, ELogVerbosity::Verbose, Creator.Get(), TEXT("Skipped:NotAuthority"));
-        return false;
-    }
+    //if (GetOwner()->GetLocalRole() == ROLE_Authority)
+    //{
+    //    COG_LOG_OBJECT(LogCogProjectile, ELogVerbosity::Verbose, Creator.Get(), TEXT("Skipped:NotAuthority"));
+    //    return false;
+    //}
 
     //if (IsStopped)
     //{
@@ -323,7 +334,7 @@ bool UCogSampleProjectileComponent::ShouldProcessOverlap(AActor* OtherActor, UPr
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSampleProjectileComponent::OnCollisionOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool IsFromSweep, const FHitResult& SweepHit)
 {
-    COG_LOG_OBJECT(LogCogProjectile, ELogVerbosity::Verbose, Creator.Get(), TEXT("Projectile:%s - Role:%s - Other:%s - Comp:%s"),
+    COG_LOG_OBJECT(LogCogProjectile, ELogVerbosity::Verbose, Creator.Get(), TEXT("Projectile:%s | Role:%s | Other:%s | Comp:%s"),
         *GetNameSafe(GetOwner()),
         *GetRoleName(),
         *GetNameSafe(OtherActor),
@@ -383,7 +394,7 @@ void UCogSampleProjectileComponent::OnCollisionOverlapBegin(UPrimitiveComponent*
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSampleProjectileComponent::OnAssistanceOverlapBegin(UPrimitiveComponent* overlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool IsFromSweep, const FHitResult& Hit)
 {
-    COG_LOG_OBJECT(LogCogProjectile, ELogVerbosity::Verbose, Creator.Get(), TEXT("Projectile:%s - Role:%s - Other:%s - Comp:%s"),
+    COG_LOG_OBJECT(LogCogProjectile, ELogVerbosity::Verbose, Creator.Get(), TEXT("Projectile:%s | Role:%s | Other:%s | Comp:%s"),
         *GetNameSafe(GetOwner()),
         *GetRoleName(),
         *GetNameSafe(OtherActor),
@@ -436,7 +447,7 @@ void UCogSampleProjectileComponent::OnAssistanceOverlapBegin(UPrimitiveComponent
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSampleProjectileComponent::TryHit(const FHitResult& HitResult)
 {
-    COG_LOG_OBJECT(LogCogProjectile, ELogVerbosity::Verbose, Creator.Get(), TEXT("Projectile:%s - Role:%s - Other:%s - Comp:%s - Bone:%s"),
+    COG_LOG_OBJECT(LogCogProjectile, ELogVerbosity::Verbose, Creator.Get(), TEXT("Projectile:%s | Role:%s | Other:%s | Comp:%s | Bone:%s"),
         *GetNameSafe(GetOwner()),
         *GetRoleName(),
         *GetNameSafe(HitResult.GetActor()),
@@ -469,7 +480,7 @@ void UCogSampleProjectileComponent::TryHit(const FHitResult& HitResult)
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSampleProjectileComponent::StopSimulating(const FHitResult& HitResult)
 {
-    COG_LOG_OBJECT(LogCogProjectile, ELogVerbosity::Verbose, Creator.Get(), TEXT("Projectile:%s - Role:%s - Other:%s - Comp:%s - Bone:%s"),
+    COG_LOG_OBJECT(LogCogProjectile, ELogVerbosity::Verbose, Creator.Get(), TEXT("Projectile:%s | Role:%s | Other:%s | Comp:%s | Bone:%s"),
         *GetNameSafe(GetOwner()),
         *GetRoleName(),
         *GetNameSafe(HitResult.GetActor()),
@@ -494,15 +505,41 @@ bool UCogSampleProjectileComponent::ShouldHit_Implementation(const FHitResult& H
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSampleProjectileComponent::Hit_Implementation(const FHitResult& HitResult, FCogSampleHitConsequence& HitConsequence)
 {
-    AActor* HitActor = HitResult.GetActor();
+#if ENABLE_COG
+    DrawDebugCurrentState(FColor::White, false);
+    DrawDebugHitResult(HitResult);
+#endif //ENABLE_COG
+
+    Server_Hit(HitResult);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FString UCogSampleProjectileComponent::GetRoleName() const
+{
+    if (SpawnPrediction == nullptr)
+    {
+        return TEXT("No Prediction");
+    }
+
+    return SpawnPrediction->GetRoleName();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleProjectileComponent::Server_Hit_Implementation(const FHitResult& HitResult)
+{
+    COG_LOG_OBJECT(LogCogProjectile, ELogVerbosity::Verbose, Creator.Get(), TEXT("Projectile:%s | Role:%s | Other:%s | Comp:%s | Bone:%s"),
+        *GetNameSafe(GetOwner()),
+        *GetRoleName(),
+        *GetNameSafe(HitResult.GetActor()),
+        *GetNameSafe(HitResult.GetComponent()),
+        *HitResult.BoneName.ToString());
 
 #if ENABLE_COG
     DrawDebugCurrentState(FColor::White, false);
-    FCogDebugDraw::Arrow(LogCogProjectile, GetOwner(), HitResult.Location, HitResult.Location + HitResult.Normal * 50.0f, FColor::Red, true, 0);
-    FCogDebugDraw::Box(LogCogProjectile, GetOwner(), HitResult.Location, FVector(0.0f, 5.0f, 5.0f), FRotationMatrix::MakeFromX(HitResult.Normal).ToQuat(), FColor::Red, true, 0);
-    FCogDebugDraw::Arrow(LogCogProjectile, GetOwner(), HitResult.ImpactPoint, HitResult.ImpactPoint + HitResult.ImpactNormal * 50.0f, FColor::Yellow, true, 0);
-    FCogDebugDraw::Box(LogCogProjectile, GetOwner(), HitResult.ImpactPoint, FVector(0.0f, 5.0f, 5.0f), FRotationMatrix::MakeFromX(HitResult.ImpactNormal).ToQuat(), FColor::Yellow, true, 0);
+    DrawDebugHitResult(HitResult);
 #endif //ENABLE_COG
+
+    AActor* HitActor = HitResult.GetActor();
 
     UAbilitySystemComponent* TargetAbilitySystem = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(HitActor);
     if (TargetAbilitySystem == nullptr)
@@ -541,16 +578,3 @@ void UCogSampleProjectileComponent::Hit_Implementation(const FHitResult& HitResu
         }
     }
 }
-
-//--------------------------------------------------------------------------------------------------------------------------
-FString UCogSampleProjectileComponent::GetRoleName() const
-{
-    if (SpawnPrediction == nullptr)
-    {
-        return TEXT("No Prediction");
-    }
-
-    return SpawnPrediction->GetRoleName();
-}
-
-
