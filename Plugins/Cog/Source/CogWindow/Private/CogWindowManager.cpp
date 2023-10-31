@@ -53,12 +53,12 @@ void UCogWindowManager::InitializeInternal()
     IniHandler.UserData = this;
     ImGui::AddSettingsHandler(&IniHandler);
 
-    SpaceWindows.Add(CreateWindow<FCogWindow_Spacing>("Spacing 1", false));
-    SpaceWindows.Add(CreateWindow<FCogWindow_Spacing>("Spacing 2", false));
-    SpaceWindows.Add(CreateWindow<FCogWindow_Spacing>("Spacing 3", false));
-    SpaceWindows.Add(CreateWindow<FCogWindow_Spacing>("Spacing 4", false));
+    SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 1", false));
+    SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 2", false));
+    SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 3", false));
+    SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 4", false));
 
-    SettingsWindow = CreateWindow<FCogWindow_Settings>("Window.Settings", false);
+    SettingsWindow = AddWindow<FCogWindow_Settings>("Window.Settings", false);
 
     ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
         *ToggleInputCommand,

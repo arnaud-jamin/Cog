@@ -85,7 +85,7 @@ public:
     const UObject* GetAsset(const TSubclassOf<UObject> AssetClass);
 
     template<class T>
-    T* CreateWindow(const FString& Name, bool AddToMainMenu = true)
+    T* AddWindow(const FString& Name, bool AddToMainMenu = true)
     {
         T* Window = new T();
         AddWindow(Window, Name, AddToMainMenu);

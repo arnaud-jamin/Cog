@@ -57,6 +57,9 @@ public:
 
     virtual void Activate(bool bReset) override;
 
+    virtual void StopSimulating(const FHitResult& HitResult) override;
+
+
     UFUNCTION(BlueprintCallable)
     void ClearHitActors();
 

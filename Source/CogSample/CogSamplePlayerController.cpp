@@ -226,6 +226,8 @@ const ACogSamplePlayerController* ACogSamplePlayerController::GetFirstLocalPlaye
 //--------------------------------------------------------------------------------------------------------------------------
 float ACogSamplePlayerController::GetClientLag() const
 {
-    return (PlayerState != nullptr && GetNetMode() != NM_Standalone) ? (0.0001f * 0.5f * PlayerState->ExactPing) : 0.f;
+    const float Ping = (PlayerState != nullptr && GetNetMode() != NM_Standalone) ? PlayerState->ExactPing : 0.0f; 
+    const float HalfPingInSeconds = Ping * 0.0001f * 0.5f;
+    return HalfPingInSeconds;
 }
 
