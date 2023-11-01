@@ -25,7 +25,9 @@ class ACogSamplePlayerController
 
 public:
     
-    static const ACogSamplePlayerController* GetFirstLocalPlayerController(UObject* WorldContextObject);
+    static const ACogSamplePlayerController* GetFirstLocalPlayerControllerConst(UObject* WorldContextObject);
+
+    static ACogSamplePlayerController* GetFirstLocalPlayerController(UObject* WorldContextObject);
 
     ACogSamplePlayerController();
 
@@ -66,6 +68,12 @@ public:
     //----------------------------------------------------------------------------------------------------------------------
     UPROPERTY()
     TArray<UCogSampleSpawnPredictionComponent*> SpawnPredictions;
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Projectile Hit
+    //----------------------------------------------------------------------------------------------------------------------
+    UFUNCTION(Reliable, Server)
+    void Server_ProjectileHit(UCogSampleProjectileComponent* Projectile, const FHitResult& HitResult);
 
 private:
 

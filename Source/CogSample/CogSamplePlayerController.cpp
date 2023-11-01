@@ -4,6 +4,7 @@
 #include "CogSampleDefines.h"
 #include "CogSampleCharacter.h"
 #include "CogSampleLogCategories.h"
+#include "CogSampleProjectileComponent.h"
 #include "CogSampleTargetAcquisition.h"
 #include "GameFramework/PlayerState.h"
 #include "Net/UnrealNetwork.h"
@@ -205,7 +206,14 @@ void ACogSamplePlayerController::Server_SetTarget_Implementation(AActor* Value)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-const ACogSamplePlayerController* ACogSamplePlayerController::GetFirstLocalPlayerController(UObject* WorldContextObject)
+const ACogSamplePlayerController* ACogSamplePlayerController::GetFirstLocalPlayerControllerConst(UObject* WorldContextObject)
+{
+    const ACogSamplePlayerController* PlayerController = GetFirstLocalPlayerController(WorldContextObject);
+    return PlayerController;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+ACogSamplePlayerController* ACogSamplePlayerController::GetFirstLocalPlayerController(UObject* WorldContextObject)
 {
     UWorld* const World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
     if (World == nullptr)
@@ -231,3 +239,11 @@ float ACogSamplePlayerController::GetClientLag() const
     return HalfPingInSeconds;
 }
 
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSamplePlayerController::Server_ProjectileHit_Implementation(UCogSampleProjectileComponent* Projectile, const FHitResult& HitResult)
+{
+    if (Projectile != nullptr)
+    {
+        Projectile->Server_Hit(HitResult);
+    }
+}

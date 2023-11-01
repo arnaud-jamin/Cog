@@ -53,6 +53,8 @@
 //      One client could be made responsible to detect hits received by a specific NPC.
 // 
 //--------------------------------------------------------------------------------------------------------------------------
+
+//--------------------------------------------------------------------------------------------------------------------------
 UCogSampleProjectileComponent::UCogSampleProjectileComponent(const FObjectInitializer& ObjectInitializer)
     : Super(ObjectInitializer)
 {
@@ -81,6 +83,7 @@ void UCogSampleProjectileComponent::BeginPlay()
 
     Creator = UCogSampleFunctionLibrary_Gameplay::GetCreator(GetOwner());
     SpawnPrediction = GetOwner()->FindComponentByClass<UCogSampleSpawnPredictionComponent>();
+    LocalPlayerController = ACogSamplePlayerController::GetFirstLocalPlayerController(this);
 
     COG_LOG_OBJECT(LogCogProjectile, ELogVerbosity::Verbose, Creator.Get(), TEXT("Projectile:%s | Role:%s | IsActive:%d"), *GetNameSafe(GetOwner()), *GetRoleName(), IsActive());
 
@@ -105,6 +108,12 @@ void UCogSampleProjectileComponent::BeginPlay()
         //-----------------------------------------------------------------------------------------------
         Activate(true);
     }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSampleProjectileComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    Super::EndPlay(EndPlayReason);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -146,9 +155,9 @@ void UCogSampleProjectileComponent::Activate(bool bReset)
     //--------------------------------------------------------------------------
     if (GetOwner()->GetLocalRole() != ROLE_Authority)
     {
-        if (const ACogSamplePlayerController* Controller = ACogSamplePlayerController::GetFirstLocalPlayerController(this))
+        if (LocalPlayerController != nullptr)
         {
-            Catchup(Controller->GetClientLag());
+            Catchup(LocalPlayerController->GetClientLag());
         }
     }
 
@@ -510,6 +519,13 @@ void UCogSampleProjectileComponent::Hit_Implementation(const FHitResult& HitResu
     DrawDebugHitResult(HitResult);
 #endif //ENABLE_COG
 
+    if (LocalPlayerController == nullptr)
+    {
+        return;
+    }
+
+    LocalPlayerController->Server_ProjectileHit(this, HitResult);
+
     Server_Hit(HitResult);
 }
 
@@ -525,7 +541,7 @@ FString UCogSampleProjectileComponent::GetRoleName() const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogSampleProjectileComponent::Server_Hit_Implementation(const FHitResult& HitResult)
+void UCogSampleProjectileComponent::Server_Hit(const FHitResult& HitResult)
 {
     COG_LOG_OBJECT(LogCogProjectile, ELogVerbosity::Verbose, Creator.Get(), TEXT("Projectile:%s | Role:%s | Other:%s | Comp:%s | Bone:%s"),
         *GetNameSafe(GetOwner()),

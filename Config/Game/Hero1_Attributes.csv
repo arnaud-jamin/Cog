@@ -1,3 +1,6 @@
 ---,1.000000
 MaxStamina,1000.000000
-StaminaRegen,10.000000
+StaminaRegen,2.000000
+MaxHealth,1000.000000
+HealthRegen,0.100000
+BaseDamage,100.000000

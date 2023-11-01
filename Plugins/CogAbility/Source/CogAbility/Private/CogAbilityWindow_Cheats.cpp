@@ -98,12 +98,21 @@ void FCogAbilityWindow_Cheats::TryReapplyCheats()
 
     TArray<AActor*> Targets { LocalPawn };
 
-    for (const FString& AppliedCheatName : Config->AppliedCheats)
+    for (int32 i = Config->AppliedCheats.Num() - 1; i >= 0; i--)
     {
+        const FString& AppliedCheatName = Config->AppliedCheats[i];
+
         if (const FCogAbilityCheat* Cheat = Asset->PersistentEffects.FindByPredicate(
             [AppliedCheatName](const FCogAbilityCheat& Cheat) { return Cheat.Name == AppliedCheatName; }))
         {
             Replicator->ApplyCheat(LocalPawn, Targets, *Cheat);
+        }
+        else
+        {
+            //-----------------------------------------------------
+            // This cheat doesn't exist anymore. We can remove it.
+            //-----------------------------------------------------
+            Config->AppliedCheats.RemoveAt(i);
         }
     }
 
@@ -166,30 +175,33 @@ void FCogAbilityWindow_Cheats::RenderContent()
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
 
-        bool bHasChanged = false;
 
         int Index = 0;
         for (const FCogAbilityCheat& CheatEffect : Asset->PersistentEffects)
         {
             ImGui::PushID(Index);
-            bHasChanged |= AddCheat(ControlledActor, SelectedActor, CheatEffect, true);
+            AddCheat(ControlledActor, SelectedActor, CheatEffect, true);
             ImGui::PopID();
             Index++;
         }
 
-        //----------------------------------------------------------------
-        // When a persistent cheat has been changed, update the applied 
-        // cheats string array to be saved in the config later
-        //----------------------------------------------------------------
-        if (bHasChanged && SelectedActor == ControlledActor)
+        //----------------------------------------------------------------------------
+        // Update the config of applied cheat to reapply them on the next launch. 
+        // We do not updated them only when the the user input is pressed because
+        // the state of the cheat is lagging when connected to a server. 
+        // So we check if the array should be updated all the time.
+        //----------------------------------------------------------------------------
+        if (SelectedActor == ControlledActor)
         {
-            Config->AppliedCheats.Empty();
-
             for (const FCogAbilityCheat& CheatEffect : Asset->PersistentEffects)
             {
                 if (ACogAbilityReplicator::IsCheatActive(SelectedActor, CheatEffect))
                 {
-                    Config->AppliedCheats.Add(CheatEffect.Name);
+                    Config->AppliedCheats.AddUnique(CheatEffect.Name);
+                }
+                else
+                {
+                    Config->AppliedCheats.Remove(CheatEffect.Name);
                 }
             }
         }

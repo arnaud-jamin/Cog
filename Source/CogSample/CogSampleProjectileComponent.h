@@ -53,12 +53,15 @@ public:
 
     virtual void BeginPlay() override;
 
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
     virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction);
 
     virtual void Activate(bool bReset) override;
 
     virtual void StopSimulating(const FHitResult& HitResult) override;
 
+    virtual void Server_Hit(const FHitResult& Hit);
 
     UFUNCTION(BlueprintCallable)
     void ClearHitActors();
@@ -79,8 +82,6 @@ protected:
 
     virtual void TryHit(const FHitResult& Hit);
 
-    UFUNCTION(Server, Reliable)
-    virtual void Server_Hit(const FHitResult& Hit);
 
     UFUNCTION()
     virtual void OnCollisionOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool IsFromSweep, const FHitResult& SweepHit);
@@ -128,6 +129,9 @@ protected:
 
     UPROPERTY(Replicated)
     FVector ServerSpawnVelocity = FVector::ZeroVector;
+
+    UPROPERTY()
+    TWeakObjectPtr<ACogSamplePlayerController> LocalPlayerController = nullptr;
 
     /** Re-entrancy guard */
     bool IsAlreadyProcessingAnOverlap = false;
