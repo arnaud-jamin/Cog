@@ -43,32 +43,42 @@ void FCogInputWindow_Gamepad::ResetConfig()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogInputWindow_Gamepad::InputContextMenu(const FKey& Key, FCogInjectActionInfo* ActionInfoButton, FCogInjectActionInfo* ActionInfo2D)
+void FCogInputWindow_Gamepad::RenderButtonContextMenu(const FKey& Key, FCogInjectActionInfo* ActionInfoButton)
 {
-    if (ImGui::BeginPopupContextItem())
+    if (ActionInfoButton != nullptr)
     {
-        ImGui::Text("%s", TCHAR_TO_ANSI(*Key.GetFName().ToString()));
         ImGui::Separator();
 
-        if (ActionInfoButton != nullptr)
-        {
-            ImGui::Checkbox("Pressed", &ActionInfoButton->bPressed);
-            ImGui::Checkbox("Repeat", &ActionInfoButton->bRepeat);
-            FCogWindowWidgets::SliderWithReset("Period", &Config->RepeatPeriod, 0.0f, 10.0f, 0.5f, "%0.1fs");
-        }
+        ImGui::Checkbox("Pressed", &ActionInfoButton->bPressed);
+        ImGui::Checkbox("##Repeat", &ActionInfoButton->bRepeat);
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(FCogWindowWidgets::GetShortWidth() - ImGui::GetCursorPosX() + ImGui::GetStyle().ItemSpacing.x);
+        FCogWindowWidgets::SliderWithReset("Repeat", &Config->RepeatPeriod, 0.0f, 10.0f, 0.5f, "%0.1fs");
+    }
 
-        if (ActionInfoButton != nullptr && ActionInfoButton->Action != nullptr && ActionInfoButton->Action->ValueType == EInputActionValueType::Axis1D)
-        {
-            FCogWindowWidgets::SliderWithReset("X", &ActionInfoButton->X, -1.0f, 1.0f, 0.0f, "%0.2f");
-        }
+    if (ActionInfoButton != nullptr && ActionInfoButton->Action != nullptr && ActionInfoButton->Action->ValueType == EInputActionValueType::Axis1D)
+    {
+        ImGui::Separator();
 
-        if (ActionInfo2D != nullptr)
-        {
-            FCogWindowWidgets::SliderWithReset("X", &ActionInfo2D->X, -1.0f, 1.0f, 0.0f, "%0.2f");
-            FCogWindowWidgets::SliderWithReset("Y", &ActionInfo2D->Y, -1.0f, 1.0f, 0.0f, "%0.2f");
-        }
-    
-        ImGui::EndPopup();
+        FCogWindowWidgets::SetNextItemToShortWidth();
+        FCogWindowWidgets::SliderWithReset("X", &ActionInfoButton->X, -1.0f, 1.0f, 0.0f, "%0.2f");
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogInputWindow_Gamepad::RenderStickContextMenu(const FKey& Key, FCogInjectActionInfo* ActionInfo2D, bool& InvertY, float& Sensitivity)
+{
+    if (ActionInfo2D != nullptr)
+    {
+        ImGui::Separator();
+
+        FCogWindowWidgets::SetNextItemToShortWidth();
+        FCogWindowWidgets::SliderWithReset("X", &ActionInfo2D->X, -1.0f, 1.0f, 0.0f, "%0.2f");
+        FCogWindowWidgets::SetNextItemToShortWidth();
+        FCogWindowWidgets::SliderWithReset("Y", &ActionInfo2D->Y, -1.0f, 1.0f, 0.0f, "%0.2f");
+        ImGui::Checkbox("Invert Stick Y", &InvertY);
+        FCogWindowWidgets::SetNextItemToShortWidth();
+        FCogWindowWidgets::SliderWithReset("Sensitivity", &Sensitivity, 0.0f, 10.0f, 5.0f, "%0.1f");
     }
 }
 
@@ -96,7 +106,7 @@ void FCogInputWindow_Gamepad::OnButtonClicked(FCogInjectActionInfo* ActionInfo)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogInputWindow_Gamepad::AddButton(const FKey& Key, const ImVec2& RelativePosition, const ImVec2& RelativeSize, const ImVec2& Alignment, float RelativeRounding, ImDrawFlags Flags)
+void FCogInputWindow_Gamepad::RenderButton(const FKey& Key, const ImVec2& RelativePosition, const ImVec2& RelativeSize, const ImVec2& Alignment, float RelativeRounding, ImDrawFlags Flags)
 {
     ImGui::PushID((void*)(&Key));
 
@@ -134,7 +144,13 @@ void FCogInputWindow_Gamepad::AddButton(const FKey& Key, const ImVec2& RelativeP
         Color = FCogImguiHelper::ToImU32(Config->HoveredColor);
     }
 
-    InputContextMenu(Key, ActionInfo, nullptr);
+    if (ImGui::BeginPopupContextItem())
+    {
+        RenderMainContextMenu();
+        ImGui::Separator();
+        RenderButtonContextMenu(Key, ActionInfo);
+        ImGui::EndPopup();
+    }
 
     if (Config->Border > 0.0f)
     {
@@ -149,7 +165,7 @@ void FCogInputWindow_Gamepad::AddButton(const FKey& Key, const ImVec2& RelativeP
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogInputWindow_Gamepad::AddStick(const FKey& Key2D, const FKey& KeyBool, bool InvertY, float RelativeAmplitude, const ImVec2& RelativePosition, float RelativeRadius)
+void FCogInputWindow_Gamepad::RenderStick(const FKey& Key2D, const FKey& KeyBool, bool& InvertY, float& Sensitivity, float RelativeAmplitude, const ImVec2& RelativePosition, float RelativeRadius)
 {
     ImGui::PushID((void*)(&Key2D));
 
@@ -173,7 +189,46 @@ void FCogInputWindow_Gamepad::AddStick(const FKey& Key2D, const FKey& KeyBool, b
     ImGui::SetCursorScreenPos(ButtonPosition);
     if (ImGui::InvisibleButton("", ButtonSize))
     {
-        OnButtonClicked(ActionInfoBool);
+        if (ActionInfo2D->bIsMouseDraggingStick == false)
+        {
+            OnButtonClicked(ActionInfoBool);
+        }
+    }
+
+    if (ActionInfo2D->Action != nullptr)
+    {
+        if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
+        {
+            ActionInfo2D->bIsMouseDownOnStick = true;
+        }
+        else if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+        {
+            if (ActionInfo2D->bIsMouseDraggingStick && ImGui::GetCurrentContext()->IO.KeyCtrl == false)
+            {
+                ActionInfo2D->X = 0.0f;
+                ActionInfo2D->Y = 0.0f;
+            }
+
+            ActionInfo2D->bIsMouseDownOnStick = false;
+            ActionInfo2D->bIsMouseDraggingStick = false;
+        }
+
+        if (ActionInfo2D->bIsMouseDownOnStick)
+        {
+            if (ImGui::IsMouseDragging(ImGuiMouseButton_Left, 4.0f))
+            {
+                ActionInfo2D->bIsMouseDraggingStick = true;
+                ImVec2 Delta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left) * Sensitivity * 0.01f;
+                const float Length = ImLengthSqr(Delta);
+                if (Length > 1.0f)
+                {
+                    Delta = Delta / ImSqrt(Length);
+                }
+                
+                ActionInfo2D->X = Delta.x;
+                ActionInfo2D->Y = -Delta.y * (InvertY ? -1.0f : 1.0f);
+            }
+        }
     }
 
     ImU32 Color = FCogImguiHelper::ToImU32(Config->ButtonColor);
@@ -186,7 +241,13 @@ void FCogInputWindow_Gamepad::AddStick(const FKey& Key2D, const FKey& KeyBool, b
         Color = FCogImguiHelper::ToImU32(Config->HoveredColor);
     }
 
-    InputContextMenu(Key2D, ActionInfoBool, ActionInfo2D);
+    if (ImGui::BeginPopupContextItem())
+    {
+        RenderMainContextMenu();
+        RenderButtonContextMenu(KeyBool, ActionInfoBool);
+        RenderStickContextMenu(Key2D, ActionInfo2D, InvertY, Sensitivity);
+        ImGui::EndPopup();
+    }
 
     if (Config->Border > 0.0f)
     {
@@ -314,22 +375,7 @@ void FCogInputWindow_Gamepad::RenderContent()
     ImGui::Dummy(Config->bShowAsOverlay ? CanvasMax - CanvasMin : ContentSize);
     if (ImGui::BeginPopupContextItem("Gamepad"))
     {
-        if (ImGui::Button("Close", ImVec2(-1.0f, 0)))
-        {
-            SetIsVisible(false);
-        }
-        ImGui::Checkbox("Overlay", &Config->bShowAsOverlay);
-        ImGui::Separator();
-        ImGui::Checkbox("Invert Left Stick Y", &Config->bInvertLeftStickY);
-        ImGui::Checkbox("Invert Right Stick Y", &Config->bInvertRightStickY);
-        ImGui::Separator();
-        ImGui::ColorEdit4("Background Color", (float*)&Config->BackgroundColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-        ImGui::ColorEdit4("Border Color", (float*)&Config->BorderColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-        ImGui::ColorEdit4("Button Color", (float*)&Config->ButtonColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-        ImGui::ColorEdit4("Pressed Color", (float*)&Config->PressedColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-        ImGui::ColorEdit4("Hovered Color", (float*)&Config->HoveredColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-        ImGui::ColorEdit4("Inject Color", (float*)&Config->InjectColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-        FCogWindowWidgets::SliderWithReset("Border", &Config->Border, 0.0f, 0.1f, 0.02f, "%0.3f");
+        RenderMainContextMenu();
         ImGui::EndPopup();
     }
 
@@ -341,14 +387,14 @@ void FCogInputWindow_Gamepad::RenderContent()
     //------------------------------
     // Triggers
     //------------------------------
-    AddButton(EKeys::Gamepad_LeftTriggerAxis, ImVec2(0.18f, 0.12f), TriggerButtonSize, ImVec2(0.5f, 1.0f), TriggerRound, ImDrawFlags_RoundCornersTop);
-    AddButton(EKeys::Gamepad_RightTriggerAxis, ImVec2(1.f - 0.18f, 0.12f), TriggerButtonSize, ImVec2(0.5f, 1.0f), TriggerRound, ImDrawFlags_RoundCornersTop);
+    RenderButton(EKeys::Gamepad_LeftTriggerAxis, ImVec2(0.18f, 0.12f), TriggerButtonSize, ImVec2(0.5f, 1.0f), TriggerRound, ImDrawFlags_RoundCornersTop);
+    RenderButton(EKeys::Gamepad_RightTriggerAxis, ImVec2(1.f - 0.18f, 0.12f), TriggerButtonSize, ImVec2(0.5f, 1.0f), TriggerRound, ImDrawFlags_RoundCornersTop);
 
     //------------------------------
     // Shoulders
     //------------------------------
-    AddButton(EKeys::Gamepad_LeftShoulder, ImVec2(0.18f, 0.15f), BumperButtonSize, ImVec2(0.5f, 0.5f), BumperRound, ImDrawFlags_RoundCornersTop);
-    AddButton(EKeys::Gamepad_RightShoulder, ImVec2(1.f - 0.18f, 0.15f), BumperButtonSize, ImVec2(0.5f, 0.5f), BumperRound, ImDrawFlags_RoundCornersTop);
+    RenderButton(EKeys::Gamepad_LeftShoulder, ImVec2(0.18f, 0.15f), BumperButtonSize, ImVec2(0.5f, 0.5f), BumperRound, ImDrawFlags_RoundCornersTop);
+    RenderButton(EKeys::Gamepad_RightShoulder, ImVec2(1.f - 0.18f, 0.15f), BumperButtonSize, ImVec2(0.5f, 0.5f), BumperRound, ImDrawFlags_RoundCornersTop);
 
     //------------------------------
     // Gamepad
@@ -373,32 +419,32 @@ void FCogInputWindow_Gamepad::RenderContent()
     //------------------------------
     // Sticks
     //------------------------------
-    AddStick(EKeys::Gamepad_Left2D, EKeys::Gamepad_LeftThumbstick, Config->bInvertLeftStickY, StickAmplitude, LS_Pos, StickRadius);
-    AddStick(EKeys::Gamepad_Right2D, EKeys::Gamepad_RightThumbstick, Config->bInvertRightStickY, StickAmplitude, RS_Pos, StickRadius);
+    RenderStick(EKeys::Gamepad_Left2D, EKeys::Gamepad_LeftThumbstick, Config->bInvertLeftStickY, Config->LeftStickSensitivity,  StickAmplitude, LS_Pos, StickRadius);
+    RenderStick(EKeys::Gamepad_Right2D, EKeys::Gamepad_RightThumbstick, Config->bInvertRightStickY, Config->RightStickSensitivity, StickAmplitude, RS_Pos, StickRadius);
 
     //------------------------------
     // DPad Buttons
     //------------------------------
     const ImVec2 DPad_Pos(0.15f, 0.44f);
-    AddButton(EKeys::Gamepad_DPad_Up,      DPad_Pos + ImVec2(0.0f, -DpadButtonDistance / AspectRatio), DPadButtonSize, ImVec2(0.5f, 0.5f), DpadButtonRounding);
-    AddButton(EKeys::Gamepad_DPad_Down,    DPad_Pos + ImVec2(0.0f, DpadButtonDistance / AspectRatio),  DPadButtonSize, ImVec2(0.5f, 0.5f), DpadButtonRounding);
-    AddButton(EKeys::Gamepad_DPad_Left,    DPad_Pos + ImVec2(-DpadButtonDistance, 0.0f), DPadButtonSize, ImVec2(0.5f, 0.5f), DpadButtonRounding);
-    AddButton(EKeys::Gamepad_DPad_Right,   DPad_Pos + ImVec2(DpadButtonDistance, 0.0f),  DPadButtonSize, ImVec2(0.5f, 0.5f), DpadButtonRounding);
+    RenderButton(EKeys::Gamepad_DPad_Up,      DPad_Pos + ImVec2(0.0f, -DpadButtonDistance / AspectRatio), DPadButtonSize, ImVec2(0.5f, 0.5f), DpadButtonRounding);
+    RenderButton(EKeys::Gamepad_DPad_Down,    DPad_Pos + ImVec2(0.0f, DpadButtonDistance / AspectRatio),  DPadButtonSize, ImVec2(0.5f, 0.5f), DpadButtonRounding);
+    RenderButton(EKeys::Gamepad_DPad_Left,    DPad_Pos + ImVec2(-DpadButtonDistance, 0.0f), DPadButtonSize, ImVec2(0.5f, 0.5f), DpadButtonRounding);
+    RenderButton(EKeys::Gamepad_DPad_Right,   DPad_Pos + ImVec2(DpadButtonDistance, 0.0f),  DPadButtonSize, ImVec2(0.5f, 0.5f), DpadButtonRounding);
 
     //------------------------------
     // Face Buttons
     //------------------------------
     const ImVec2 Face_Pos(1.0f - 0.15f, 0.44f);
-    AddButton(EKeys::Gamepad_FaceButton_Top,       Face_Pos + ImVec2(0.0f, -DpadButtonDistance / AspectRatio), DPadButtonSize, ImVec2(0.5f, 0.5f), DpadButtonRounding);
-    AddButton(EKeys::Gamepad_FaceButton_Bottom,    Face_Pos + ImVec2(0.0f, DpadButtonDistance / AspectRatio),  DPadButtonSize, ImVec2(0.5f, 0.5f), DpadButtonRounding);
-    AddButton(EKeys::Gamepad_FaceButton_Left,      Face_Pos + ImVec2(-DpadButtonDistance, 0.0f), DPadButtonSize, ImVec2(0.5f, 0.5f), DpadButtonRounding);
-    AddButton(EKeys::Gamepad_FaceButton_Right,     Face_Pos + ImVec2(DpadButtonDistance, 0.0f),  DPadButtonSize, ImVec2(0.5f, 0.5f), DpadButtonRounding);
+    RenderButton(EKeys::Gamepad_FaceButton_Top,       Face_Pos + ImVec2(0.0f, -DpadButtonDistance / AspectRatio), DPadButtonSize, ImVec2(0.5f, 0.5f), DpadButtonRounding);
+    RenderButton(EKeys::Gamepad_FaceButton_Bottom,    Face_Pos + ImVec2(0.0f, DpadButtonDistance / AspectRatio),  DPadButtonSize, ImVec2(0.5f, 0.5f), DpadButtonRounding);
+    RenderButton(EKeys::Gamepad_FaceButton_Left,      Face_Pos + ImVec2(-DpadButtonDistance, 0.0f), DPadButtonSize, ImVec2(0.5f, 0.5f), DpadButtonRounding);
+    RenderButton(EKeys::Gamepad_FaceButton_Right,     Face_Pos + ImVec2(DpadButtonDistance, 0.0f),  DPadButtonSize, ImVec2(0.5f, 0.5f), DpadButtonRounding);
 
     //------------------------------
     // Special Buttons
     //------------------------------
-    AddButton(EKeys::Gamepad_Special_Left,  ImVec2(0.5f - SpecialButtonDistance * 0.5f, 0.35f), SpecialButtonSize, ImVec2(0.5f, 0.5f), SpecialButtonRound);
-    AddButton(EKeys::Gamepad_Special_Right, ImVec2(0.5f + SpecialButtonDistance * 0.5f, 0.35f), SpecialButtonSize, ImVec2(0.5f, 0.5f), SpecialButtonRound);
+    RenderButton(EKeys::Gamepad_Special_Left,  ImVec2(0.5f - SpecialButtonDistance * 0.5f, 0.35f), SpecialButtonSize, ImVec2(0.5f, 0.5f), SpecialButtonRound);
+    RenderButton(EKeys::Gamepad_Special_Right, ImVec2(0.5f + SpecialButtonDistance * 0.5f, 0.35f), SpecialButtonSize, ImVec2(0.5f, 0.5f), SpecialButtonRound);
 
     DrawList->PopClipRect();
 }
@@ -437,5 +483,36 @@ void FCogInputWindow_Gamepad::RenderTick(float DeltaSeconds)
     {
         FCogInjectActionInfo& ActionInfo = Entry.Value;
         ActionInfo.Inject(*EnhancedInput, IsTimeToRepeat);
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogInputWindow_Gamepad::RenderMainContextMenu()
+{
+    ImGui::MenuItem("Overlay", nullptr, &Config->bShowAsOverlay);
+
+    if (ImGui::MenuItem("Close"))
+    {
+        SetIsVisible(false);
+    }
+
+    if (ImGui::MenuItem("Reset"))
+    {
+        ResetConfig();
+    }
+
+    ImGui::Separator();
+
+    if (ImGui::BeginMenu("Display"))
+    {
+        ImGui::ColorEdit4("Background Color", (float*)&Config->BackgroundColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        ImGui::ColorEdit4("Border Color", (float*)&Config->BorderColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        ImGui::ColorEdit4("Button Color", (float*)&Config->ButtonColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        ImGui::ColorEdit4("Pressed Color", (float*)&Config->PressedColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        ImGui::ColorEdit4("Hovered Color", (float*)&Config->HoveredColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        ImGui::ColorEdit4("Inject Color", (float*)&Config->InjectColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        FCogWindowWidgets::SetNextItemToShortWidth();
+        FCogWindowWidgets::SliderWithReset("Border", &Config->Border, 0.0f, 0.1f, 0.02f, "%0.3f");
+        ImGui::EndMenu();
     }
 }

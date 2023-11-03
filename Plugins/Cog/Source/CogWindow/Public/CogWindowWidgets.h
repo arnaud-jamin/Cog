@@ -42,6 +42,8 @@ public:
 
     static void PopBackColor();
 
+    static float GetShortWidth();
+
     static void SetNextItemToShortWidth();
 
     static float GetFontWidth();

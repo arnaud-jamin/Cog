@@ -30,15 +30,17 @@ protected:
 
     virtual void RenderTick(float DeltaSeconds) override;
 
-private:
+    virtual void RenderButton(const FKey& Key, const ImVec2& Position, const ImVec2& Size, const ImVec2& Alignment, float Rounding, ImDrawFlags Flags = 0);
     
-    void AddButton(const FKey& Key, const ImVec2& Position, const ImVec2& Size, const ImVec2& Alignment, float Rounding, ImDrawFlags Flags = 0);
+    virtual void RenderStick(const FKey& Key2D, const FKey& KeyBool, bool& InvertY, float& Sensitivity, float Amplitude, const ImVec2& Position, float Radius);
     
-    void AddStick(const FKey& Key2D, const FKey& KeyBool, bool InvertY, float Amplitude, const ImVec2& Position, float Radius);
-    
-    void InputContextMenu(const FKey& Key, FCogInjectActionInfo* ActionInfoBool, FCogInjectActionInfo* ActionInfo2D);
-    
-    void OnButtonClicked(FCogInjectActionInfo* ActionInfo);
+    virtual void OnButtonClicked(FCogInjectActionInfo* ActionInfo);
+
+    virtual void RenderMainContextMenu();
+
+    virtual void RenderButtonContextMenu(const FKey& Key, FCogInjectActionInfo* ActionInfoButton);
+
+    virtual void RenderStickContextMenu(const FKey& Key, FCogInjectActionInfo* ActionInfo2D, bool& InvertY, float& Sensitivity);
 
     TObjectPtr<const UCogInputDataAsset> Asset;
 
@@ -77,6 +79,12 @@ public:
     bool bInvertLeftStickY = false;
 
     UPROPERTY(Config)
+    float LeftStickSensitivity = 5.0f;
+
+    UPROPERTY(Config)
+    float RightStickSensitivity = 1.0f;
+
+    UPROPERTY(Config)
     FVector4f BackgroundColor = FVector4f(0.03f, 0.03f, 0.03f, 1.0f);
 
     UPROPERTY(Config)
@@ -107,6 +115,8 @@ public:
         bShowAsOverlay = false;
         bInvertRightStickY = false;
         bInvertLeftStickY = false;
+        LeftStickSensitivity = 5.0f;
+        RightStickSensitivity = 1.0f;
         BackgroundColor = FVector4f(0.03f, 0.03f, 0.03f, 1.0f);
         ButtonColor = FVector4f(0.2f, 0.2f, 0.2f, 1.0f);
         BorderColor = FVector4f(0.03f, 0.03f, 0.03f, 1.0f);

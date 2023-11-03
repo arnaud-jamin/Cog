@@ -207,9 +207,15 @@ void FCogWindowWidgets::PopBackColor()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+float FCogWindowWidgets::GetShortWidth()
+{
+    return ImGui::GetFontSize() * 10;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void FCogWindowWidgets::SetNextItemToShortWidth()
 {
-    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 10);
+    ImGui::SetNextItemWidth(GetShortWidth());
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
