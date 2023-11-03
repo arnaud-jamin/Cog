@@ -19,6 +19,7 @@ void FCogAbilityWindow_Abilities::Initialize()
     bHasMenu = true;
 
     Asset = GetAsset<UCogAbilityDataAsset>();
+    Config = GetConfig<UCogAbilityConfig_Abilities>();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -30,6 +31,14 @@ void FCogAbilityWindow_Abilities::RenderHelp()
     "Right click an ability to open or close the ability separate window. "
     "Use the 'Give Ability' menu to manually give an ability from a list defined in the '%s' data asset. "
     , TCHAR_TO_ANSI(*GetNameSafe(Asset.Get())));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_Abilities::ResetConfig()
+{
+    Super::ResetConfig();
+
+    Config->Reset();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -112,30 +121,57 @@ void FCogAbilityWindow_Abilities::RenderAbiltiesMenu(AActor* Selection)
 {
     if (ImGui::BeginMenuBar())
     {
-        if (ImGui::BeginMenu("Give Ability"))
+        if (ImGui::BeginMenu("Options"))
         {
-            if (Asset != nullptr)
+            if (ImGui::BeginMenu("Give Ability"))
             {
-                int Index = 0;
-                for (TSubclassOf<UGameplayAbility> AbilityClass : Asset->Abilities)
+                if (Asset != nullptr)
                 {
-                    ImGui::PushID(Index);
-
-                    if (ImGui::MenuItem(TCHAR_TO_ANSI(*GetNameSafe(AbilityClass))))
+                    int Index = 0;
+                    for (TSubclassOf<UGameplayAbility> AbilityClass : Asset->Abilities)
                     {
-                        if (ACogAbilityReplicator* Replicator = ACogAbilityReplicator::GetLocalReplicator(*GetWorld()))
-                        {
-                            Replicator->GiveAbility(Selection, AbilityClass);
-                        }
-                    }
+                        ImGui::PushID(Index);
 
-                    ImGui::PopID();
-                    Index++;
+                        if (ImGui::MenuItem(TCHAR_TO_ANSI(*GetNameSafe(AbilityClass))))
+                        {
+                            if (ACogAbilityReplicator* Replicator = ACogAbilityReplicator::GetLocalReplicator(*GetWorld()))
+                            {
+                                Replicator->GiveAbility(Selection, AbilityClass);
+                            }
+                        }
+
+                        ImGui::PopID();
+                        Index++;
+                    }
                 }
+
+                ImGui::EndMenu();
+            }
+
+            ImGui::Separator();
+
+            ImGui::Checkbox("Sort by Name", &Config->SortByName);
+            ImGui::Checkbox("Show Active", &Config->ShowActive);
+            ImGui::Checkbox("Show Inactive", &Config->ShowInactive);
+            ImGui::Checkbox("Show Blocked", &Config->ShowBlocked);
+
+            ImGui::Separator();
+
+            ImGui::ColorEdit4("Active Color", (float*)&Config->ActiveColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("Inactive Color", (float*)&Config->InactiveColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("Blocked Color", (float*)&Config->BlockedColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+
+            ImGui::Separator();
+
+            if (ImGui::MenuItem("Reset"))
+            {
+                ResetConfig();
             }
 
             ImGui::EndMenu();
         }
+
+        FCogWindowWidgets::MenuSearchBar(Filter);
 
         ImGui::EndMenuBar();
     }
@@ -146,19 +182,75 @@ void FCogAbilityWindow_Abilities::RenderAbilitiesTable(UAbilitySystemComponent& 
 {
     TArray<FGameplayAbilitySpec>& Abilities = AbilitySystemComponent.GetActivatableAbilities();
 
-    if (ImGui::BeginTable("Abilities", 5, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersH | ImGuiTableFlags_NoBordersInBody))
+    TArray<FGameplayAbilitySpec> FitleredAbilities;
+
+    for (FGameplayAbilitySpec& Spec: Abilities)
+    {
+        const UGameplayAbility* Ability = Spec.GetPrimaryInstance();
+        if (Ability == nullptr)
+        {
+            Ability = Spec.Ability;
+        }
+
+        const bool IsJustBlocked = Ability->DoesAbilitySatisfyTagRequirements(AbilitySystemComponent) == false;
+        const bool IsJustActive = Spec.IsActive() && IsJustBlocked == false;
+        const bool IsJustInactive = Spec.IsActive() == false && IsJustBlocked == false;
+
+        if (Config->ShowBlocked == false && IsJustBlocked)
+        {
+            continue;
+        }
+
+        if (Config->ShowActive == false && IsJustActive)
+        {
+            continue;
+        }
+
+        if (Config->ShowInactive == false && IsJustInactive)
+        {
+            continue;
+        }
+
+        const char* AbilityName = TCHAR_TO_ANSI(*GetAbilityName(Ability));
+        if (Filter.PassFilter(AbilityName) == false)
+        {
+            continue;
+        }
+        
+        FitleredAbilities.Add(Spec);
+    }
+
+    if (Config->SortByName)
+    {
+        FitleredAbilities.Sort([](const FGameplayAbilitySpec& Lhs, const FGameplayAbilitySpec& Rhs)
+        {
+            return Lhs.Ability.GetName().Compare(Rhs.Ability.GetName()) < 0;
+        });
+    }
+    
+    if (ImGui::BeginTable("Abilities", 6, ImGuiTableFlags_SizingFixedFit
+                                        | ImGuiTableFlags_Resizable
+                                        | ImGuiTableFlags_NoBordersInBodyUntilResize
+                                        | ImGuiTableFlags_ScrollY
+                                        | ImGuiTableFlags_RowBg
+                                        | ImGuiTableFlags_BordersOuter
+                                        | ImGuiTableFlags_BordersV
+                                        | ImGuiTableFlags_Reorderable
+                                        | ImGuiTableFlags_Hideable))
     {
         ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupScrollFreeze(0, 1);
         ImGui::TableSetupColumn("Ability");
         ImGui::TableSetupColumn("Level");
         ImGui::TableSetupColumn("Input");
         ImGui::TableSetupColumn("Cooldown");
+        ImGui::TableSetupColumn("Blocked");
         ImGui::TableHeadersRow();
 
         static int SelectedIndex = -1;
         int Index = 0;
 
-        for (FGameplayAbilitySpec& Spec : Abilities)
+        for (FGameplayAbilitySpec& Spec : FitleredAbilities)
         {
             UGameplayAbility* Ability = Spec.GetPrimaryInstance();
             if (Ability == nullptr)
@@ -170,11 +262,7 @@ void FCogAbilityWindow_Abilities::RenderAbilitiesTable(UAbilitySystemComponent& 
 
             ImGui::PushID(Index);
 
-            ImVec4 Color(1.0f, 1.0f, 1.0f, 1.0f);
-            if (Asset != nullptr)
-            {
-                Color = FCogImguiHelper::ToImVec4(Spec.ActiveCount > 0 ? Asset->AbilityActiveColor : Asset->AbilityInactiveColor);
-            }
+            const ImVec4 Color = GetAbilityColor(AbilitySystemComponent, Spec);
             ImGui::PushStyleColor(ImGuiCol_Text, Color);
 
             //------------------------
@@ -221,8 +309,6 @@ void FCogAbilityWindow_Abilities::RenderAbilitiesTable(UAbilitySystemComponent& 
             //------------------------
             RenderAbilityContextMenu(AbilitySystemComponent, Spec, Index);
 
-            ImGui::PushStyleColor(ImGuiCol_Text, Color);
-
             //------------------------
             // Level
             //------------------------
@@ -244,7 +330,15 @@ void FCogAbilityWindow_Abilities::RenderAbilitiesTable(UAbilitySystemComponent& 
             ImGui::TableNextColumn();
             RenderAbilityCooldown(AbilitySystemComponent, *Ability);
 
-            ImGui::PopStyleColor(1);
+            //------------------------
+            // Blocked
+            //------------------------
+            ImGui::TableNextColumn();
+            const bool IsBlocked = Ability->DoesAbilitySatisfyTagRequirements(AbilitySystemComponent) == false;
+            if (IsBlocked)
+            {
+                ImGui::Text("Blocked");
+            }
 
             ImGui::PopID();
             Index++;
@@ -349,11 +443,7 @@ void FCogAbilityWindow_Abilities::RenderAbilityInfo(const UAbilitySystemComponen
         ImGui::TableSetupColumn("Property");
         ImGui::TableSetupColumn("Value");
 
-        ImVec4 Color(1.0f, 1.0f, 1.0f, 1.0f);
-        if (Asset != nullptr)
-        {
-            Color = FCogImguiHelper::ToImVec4(Spec.ActiveCount > 0 ? Asset->AbilityActiveColor : Asset->AbilityInactiveColor);
-        }
+        const ImVec4 Color = GetAbilityColor(AbilitySystemComponent, Spec);
 
         //------------------------
         // Name
@@ -435,6 +525,20 @@ void FCogAbilityWindow_Abilities::RenderAbilityInfo(const UAbilitySystemComponen
         ImGui::TableNextColumn();
         ImGui::Text("%d", Spec.InputPressed);
 
+        //------------------------
+        // AbilityTags
+        //------------------------
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+        ImGui::TextColored(TextColor, "AbilityTags");
+        ImGui::TableNextColumn();
+        const bool SatisfyTagRequirements = Ability->DoesAbilitySatisfyTagRequirements(AbilitySystemComponent);
+        FCogAbilityHelper::RenderTagContainer(Ability->AbilityTags);
+
+        //---------------------------------------------
+        // TODO: find a way to display blocking tags
+        //---------------------------------------------
+
         ImGui::EndTable();
     }
 }
@@ -505,4 +609,26 @@ void FCogAbilityWindow_Abilities::DeactivateAbility(UAbilitySystemComponent& Abi
 {
     Spec.InputPressed = false;
     AbilitySystemComponent.CancelAbilityHandle(Spec.Handle);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+ImVec4 FCogAbilityWindow_Abilities::GetAbilityColor(const UAbilitySystemComponent& AbilitySystemComponent, FGameplayAbilitySpec& Spec)
+{
+    UGameplayAbility* Ability = Spec.GetPrimaryInstance();
+    if (Ability == nullptr)
+    {
+        Ability = Spec.Ability;
+    }
+
+    if (Spec.IsActive())
+    {
+        return FCogImguiHelper::ToImVec4(Config->ActiveColor);
+    }
+
+    if (Ability != nullptr && Ability->DoesAbilitySatisfyTagRequirements(AbilitySystemComponent) == false)
+    {
+        return FCogImguiHelper::ToImVec4(Config->BlockedColor);
+    }
+
+    return FCogImguiHelper::ToImVec4(Config->InactiveColor);
 }

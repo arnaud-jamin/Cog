@@ -292,22 +292,24 @@ bool FCogWindowWidgets::ComboboxEnum(const char* Label, UEnum* Enum, int64 Curre
 bool FCogWindowWidgets::CheckBoxState(const char* Label, ECheckBoxState& State)
 {
     const char* TooltipText = nullptr;
+    
+    int32 Flags = 0;
     ImVec4 ButtonColor = ImGui::GetStyleColorVec4(ImGuiCol_Button);
     ImVec4 TextColor = ImGui::GetStyleColorVec4(ImGuiCol_Text);
 
     switch (State)
     {
-        case ECheckBoxState::Checked:
+        case ECheckBoxState::Unchecked:
         {
-            TooltipText = "Checked";
+            TooltipText = "Unchecked";
+            Flags = 0;
             break;
         }
 
-        case ECheckBoxState::Unchecked:
+        case ECheckBoxState::Checked:
         {
-            ButtonColor.w = 0.5f;
-            TextColor.w = 0.5f;
-            TooltipText = "Unchecked";
+            TooltipText = "Checked";
+            Flags = 3;
             break;
         }
 
@@ -316,38 +318,27 @@ bool FCogWindowWidgets::CheckBoxState(const char* Label, ECheckBoxState& State)
             ButtonColor.w = 0.1f;
             TextColor.w = 0.1f;
             TooltipText = "Undetermined";
+            Flags = 1;
             break;
         }
     }
 
-    ImGui::PushStyleColor(ImGuiCol_Text,            TextColor);
-    ImGui::PushStyleColor(ImGuiCol_Button,          ImVec4(ButtonColor.x, ButtonColor.y, ButtonColor.z, ButtonColor.w * 0.6f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered,   ImVec4(ButtonColor.x, ButtonColor.y, ButtonColor.z, ButtonColor.w * 0.8f));
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive,    ImVec4(ButtonColor.x, ButtonColor.y, ButtonColor.z, ButtonColor.w * 1.0f));
-    ImGui::PushStyleColor(ImGuiCol_Border,          ImVec4(1.0f, 1.0f, 1.0f, 0.1f));
+    ImGui::PushStyleColor(ImGuiCol_Text,             TextColor);
+    ImGui::PushStyleColor(ImGuiCol_FrameBg,          ImVec4(ButtonColor.x, ButtonColor.y, ButtonColor.z, ButtonColor.w * 0.6f));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgHovered,   ImVec4(ButtonColor.x, ButtonColor.y, ButtonColor.z, ButtonColor.w * 0.8f));
+    ImGui::PushStyleColor(ImGuiCol_FrameBgActive,    ImVec4(ButtonColor.x, ButtonColor.y, ButtonColor.z, ButtonColor.w * 1.0f));
+    ImGui::PushStyleColor(ImGuiCol_CheckMark,        ImVec4(ButtonColor.x, ButtonColor.y, ButtonColor.z, ButtonColor.w * 1.0f));
 
-    ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
+    const bool IsPressed = ImGui::CheckboxFlags(Label, &Flags, 3);
 
-    const bool Pressed = ImGui::Button(Label);
-
-    if (State == ECheckBoxState::Unchecked)
-    {
-        ImVec2 Pos = ImGui::GetItemRectMin();
-        ImVec2 Size = ImGui::GetItemRectSize();
-
-        ImGui::GetWindowDrawList()->AddLine(ImVec2(Pos.x, Pos.y + Size.y * 0.5f), ImVec2(Pos.x + Size.x, Pos.y + Size.y * 0.5f), IM_COL32(255, 255, 255, 255), 0.0f);
-    }
-
-    ImGui::PopStyleVar();
-
-    ImGui::PopStyleColor(5);
+    ImGui::PopStyleColor(6);
 
     if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
     {
         ImGui::SetTooltip(TooltipText);
     }
 
-    if (Pressed)
+    if (IsPressed)
     {
         switch (State)
         {
@@ -357,7 +348,7 @@ bool FCogWindowWidgets::CheckBoxState(const char* Label, ECheckBoxState& State)
         }
     }
 
-    return Pressed;
+    return IsPressed;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

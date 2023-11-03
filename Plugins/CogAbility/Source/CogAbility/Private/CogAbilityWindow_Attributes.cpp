@@ -2,6 +2,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
+#include "CogAbilityConfig_Alignment.h"
 #include "CogAbilityDataAsset.h"
 #include "CogAbilityHelper.h"
 #include "CogImguiHelper.h"
@@ -18,8 +19,8 @@ void FCogAbilityWindow_Attributes::Initialize()
 
     bHasMenu = true;
 
-    Asset = GetAsset<UCogAbilityDataAsset>();
     Config = GetConfig<UCogAbilityConfig_Attributes>();
+    AlignmentConfig = GetConfig<UCogAbilityConfig_Alignment>();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -57,10 +58,19 @@ void FCogAbilityWindow_Attributes::RenderContent()
     {
         if (ImGui::BeginMenu("Options"))
         {
-            ImGui::Checkbox("Sort by name", &Config->SortByName);
-            ImGui::Checkbox("Group by attribute set", &Config->GroupByAttributeSet);
-            ImGui::Checkbox("Group by category", &Config->GroupByCategory);
+            ImGui::Checkbox("Sort by Name", &Config->SortByName);
+            ImGui::Checkbox("Group by Attribute Set", &Config->GroupByAttributeSet);
+            ImGui::Checkbox("Group by Category", &Config->GroupByCategory);
             ImGui::Checkbox("Show Only Modified", &Config->ShowOnlyModified);
+            ImGui::Separator();
+            ImGui::ColorEdit4("Positive Color", (float*)&AlignmentConfig->PositiveColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("Negative Color", (float*)&AlignmentConfig->NegativeColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("Neutral Color", (float*)&AlignmentConfig->NeutralColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::Separator();
+            if (ImGui::MenuItem("Reset"))
+            {
+                ResetConfig();
+            }
             ImGui::EndMenu();
         }
 
@@ -214,24 +224,8 @@ void FCogAbilityWindow_Attributes::RenderContent()
 
                             ImGui::TableNextRow();
 
-                            FLinearColor Color = FLinearColor::White;
-                            if (Asset != nullptr)
-                            {
-                                if (CurrentValue > BaseValue)
-                                {
-                                    Color = Asset->PositiveEffectColor;
-                                }
-                                else if (CurrentValue < BaseValue)
-                                {
-                                    Color = Asset->NegativeEffectColor; 
-                                }
-                                else
-                                {
-                                    Color = Asset->NeutralEffectColor;
-                                }
-                            }
-
-                            ImGui::PushStyleColor(ImGuiCol_Text, FCogImguiHelper::ToImVec4(Color));
+                            const ImVec4 Color = FCogImguiHelper::ToImVec4(AlignmentConfig->GetAttributeColor(*AbilitySystemComponent, Attribute));
+                            ImGui::PushStyleColor(ImGuiCol_Text, Color);
 
                             //------------------------
                             // Name
@@ -255,7 +249,7 @@ void FCogAbilityWindow_Attributes::RenderContent()
                                 FCogWindowWidgets::EndTableTooltip();
                             }
 
-                            ImGui::PushStyleColor(ImGuiCol_Text, FCogImguiHelper::ToImVec4(Color));
+                            ImGui::PushStyleColor(ImGuiCol_Text, Color);
 
                             //------------------------
                             // Base Value
@@ -330,7 +324,7 @@ void FCogAbilityWindow_Attributes::DrawAttributeInfo(const UAbilitySystemCompone
         ImGui::TableNextColumn();
         ImGui::TextColored(TextColor, "Current Value");
         ImGui::TableNextColumn();
-        ImGui::PushStyleColor(ImGuiCol_Text, GetAttributeColor(AbilitySystemComponent, Attribute));
+        ImGui::PushStyleColor(ImGuiCol_Text, FCogImguiHelper::ToImVec4(AlignmentConfig->GetAttributeColor(AbilitySystemComponent, Attribute)));
         ImGui::Text("%0.2f", CurrentValue);
         ImGui::PopStyleColor(1);
 
@@ -361,27 +355,11 @@ void FCogAbilityWindow_Attributes::DrawAttributeInfo(const UAbilitySystemCompone
                     ImGui::TableNextColumn();
                     ImGui::Text("%s", TCHAR_TO_ANSI(*FCogAbilityHelper::CleanupName(GetNameSafe(ActiveEffect->Spec.Def))));
                     ImGui::Text("%s", TCHAR_TO_ANSI(*EGameplayModOpToString(ModInfo.ModifierOp)));
-                    ImGui::TextColored(GetEffectModifierColor(ModSpec, ModInfo, BaseValue), "%0.2f", ModSpec.GetEvaluatedMagnitude());
+                    ImGui::TextColored(FCogImguiHelper::ToImVec4(AlignmentConfig->GetEffectModifierColor(ModSpec, ModInfo, BaseValue)), "%0.2f", ModSpec.GetEvaluatedMagnitude());
                 }
             }
         }
 
         ImGui::EndTable();
     }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-ImVec4 FCogAbilityWindow_Attributes::GetAttributeColor(const UAbilitySystemComponent& AbilitySystemComponent, const FGameplayAttribute& Attribute) const
-{
-    const float BaseValue = AbilitySystemComponent.GetNumericAttributeBase(Attribute);
-    const float CurrentValue = AbilitySystemComponent.GetNumericAttribute(Attribute);
-    ImVec4 Color = FCogAbilityHelper::GetAttributeColor(Asset.Get(), BaseValue, CurrentValue);
-    return Color;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-ImVec4 FCogAbilityWindow_Attributes::GetEffectModifierColor(const FModifierSpec& ModSpec, const FGameplayModifierInfo& ModInfo, float BaseValue) const
-{
-    const float ModValue = ModSpec.GetEvaluatedMagnitude();
-    return FCogAbilityHelper::GetEffectModifierColor(Asset.Get(), ModSpec.GetEvaluatedMagnitude(), ModInfo.ModifierOp, BaseValue);
 }

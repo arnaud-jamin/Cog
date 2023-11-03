@@ -1,6 +1,7 @@
 #include "CogAbilityWindow_Cheats.h"
 
 #include "AbilitySystemGlobals.h"
+#include "CogAbilityConfig_Alignment.h"
 #include "CogAbilityDataAsset.h"
 #include "CogAbilityReplicator.h"
 #include "CogCommonAllegianceActorInterface.h"
@@ -22,6 +23,7 @@ void FCogAbilityWindow_Cheats::Initialize()
 
     Asset = GetAsset<UCogAbilityDataAsset>();
     Config = GetConfig<UCogAbilityConfig_Cheats>();
+    AlignmentConfig = GetConfig<UCogAbilityConfig_Alignment>();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -44,6 +46,7 @@ void FCogAbilityWindow_Cheats::ResetConfig()
     Super::ResetConfig();
 
     Config->Reset();
+    AlignmentConfig->Reset();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -159,6 +162,18 @@ void FCogAbilityWindow_Cheats::RenderContent()
             {
                 ImGui::EndDisabled();
             }
+
+            ImGui::Separator();
+            ImGui::ColorEdit4("Positive Color", (float*)&AlignmentConfig->PositiveColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("Negative Color", (float*)&AlignmentConfig->NegativeColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("Neutral Color", (float*)&AlignmentConfig->NeutralColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            
+            ImGui::Separator();
+            if (ImGui::MenuItem("Reset"))
+            {
+                ResetConfig();
+            }
+
             ImGui::EndMenu();
         }
 
@@ -228,26 +243,14 @@ bool FCogAbilityWindow_Cheats::AddCheat(AActor* ControlledActor, AActor* Selecte
         return false;
     }
 
+    const UGameplayEffect* EffectCDO = Cheat.Effect->GetDefaultObject<UGameplayEffect>();
+    
+    if (EffectCDO != nullptr)
+    {
+        FCogWindowWidgets::PushBackColor(FCogImguiHelper::ToImVec4(AlignmentConfig->GetEffectColor(Asset, *EffectCDO)));
+    }
+
     bool bIsPressed = false;
-
-    const FGameplayTagContainer& Tags = Cheat.Effect->GetDefaultObject<UGameplayEffect>()->InheritableGameplayEffectTags.CombinedTags;
-
-    FLinearColor Color;
-    if (Tags.HasTag(Asset->NegativeEffectTag))
-    {
-        Color = Asset->NegativeEffectColor;
-    }
-    else if (Tags.HasTag(Asset->PositiveEffectTag))
-    {
-        Color = Asset->PositiveEffectColor;
-    }
-    else
-    {
-        Color = Asset->NeutralEffectColor;
-    }
-        
-    FCogWindowWidgets::PushBackColor(FCogImguiHelper::ToImVec4(Color));
-
     if (IsPersistent)
     {
         bool isEnabled = ACogAbilityReplicator::IsCheatActive(SelectedActor, Cheat);
@@ -280,7 +283,10 @@ bool FCogAbilityWindow_Cheats::AddCheat(AActor* ControlledActor, AActor* Selecte
         ImGui::EndTooltip();
     }
 
-    FCogWindowWidgets::PopBackColor();
+    if (EffectCDO != nullptr)
+    {
+        FCogWindowWidgets::PopBackColor();
+    }
 
     return bIsPressed;
 }

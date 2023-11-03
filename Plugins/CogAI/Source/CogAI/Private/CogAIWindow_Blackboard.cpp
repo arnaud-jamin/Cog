@@ -41,7 +41,7 @@ void FCogAIWindow_Blackboard::RenderContent()
     {
         if (ImGui::BeginMenu("Options"))
         {
-            ImGui::Checkbox("Sort by name", &Config->bSortByName);
+            ImGui::Checkbox("Sort by Name", &Config->bSortByName);
             ImGui::EndMenu();
         }
 

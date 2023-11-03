@@ -66,16 +66,18 @@ void FCogEngineWindow_CommandBindings::RenderContent()
     {
         ImGui::PushID(Index);
 
-        if (FCogWindowWidgets::KeyBind(KeyBind))
-        {
-            PlayerInput->SaveConfig();
-        }
-        
-        ImGui::SameLine();
         if (FCogWindowWidgets::DeleteArrayItemButton())
         {
             IndexToRemove = Index;
         }
+        
+        ImGui::SameLine();
+
+        if (FCogWindowWidgets::KeyBind(KeyBind))
+        {
+            PlayerInput->SaveConfig();
+        }
+
 
         ImGui::PopID();
         Index++;

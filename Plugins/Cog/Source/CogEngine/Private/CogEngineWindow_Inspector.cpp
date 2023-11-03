@@ -265,19 +265,19 @@ void FCogEngineWindow_Inspector::RenderMenu()
 
             ImGui::Separator();
 
-            ImGui::Checkbox("Sort by name", &Config->bSortByName);
-            ImGui::Checkbox("Show background", &Config->bShowRowBackground);
-            ImGui::Checkbox("Show borders", &Config->bShowBorders);
+            ImGui::Checkbox("Sort by Name", &Config->bSortByName);
+            ImGui::Checkbox("Show Background", &Config->bShowRowBackground);
+            ImGui::Checkbox("Show Sorders", &Config->bShowBorders);
 #if WITH_EDITORONLY_DATA
-            ImGui::Checkbox("Show display name", &Config->bShowDisplayName);
-            ImGui::Checkbox("Show categories", &Config->bShowCategories);
+            ImGui::Checkbox("Show Display Name", &Config->bShowDisplayName);
+            ImGui::Checkbox("Show Categories", &Config->bShowCategories);
 
             ImGui::Separator();
-            if (ImGui::MenuItem("Collapse all categories", nullptr, false, Config->bShowCategories))
+            if (ImGui::MenuItem("Collapse All Categories", nullptr, false, Config->bShowCategories))
             {
                 bCollapseAllCategories = true;
             }
-            if (ImGui::MenuItem("Expand all categories", nullptr, false, Config->bShowCategories))
+            if (ImGui::MenuItem("Expand All Categories", nullptr, false, Config->bShowCategories))
             {
                 bExpandAllCategories = true;
             }

@@ -141,12 +141,6 @@ public:
     UPROPERTY(Category = "Abilities", EditAnywhere)
     TArray<TSubclassOf<UGameplayAbility>> Abilities;
 
-    UPROPERTY(Category = "Abilities", EditAnywhere)
-    FLinearColor AbilityActiveColor = FLinearColor(1.0f, 0.8f, 0.0f, 1.0f);
-    
-    UPROPERTY(Category = "Abilities", EditAnywhere)
-    FLinearColor AbilityInactiveColor = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
-
     //----------------------------------------------------------------------------------------------------------------------
     // Cheats
     //----------------------------------------------------------------------------------------------------------------------
@@ -156,15 +150,6 @@ public:
     
     UPROPERTY(Category = "Cheats", EditAnywhere)
     FGameplayTag PositiveEffectTag;
-
-    UPROPERTY(Category = "Cheats", EditAnywhere)
-    FLinearColor NeutralEffectColor = FLinearColor(0.5f, 0.5f, 0.5f, 1.0f);
-
-    UPROPERTY(Category = "Cheats", EditAnywhere)
-    FLinearColor NegativeEffectColor = FLinearColor(1.0f, 0.5f, 0.5f, 1.0f);
-
-    UPROPERTY(Category = "Cheats", EditAnywhere)
-    FLinearColor PositiveEffectColor = FLinearColor(0.0f, 1.0f, 0.5f, 1.0f);
 
     UPROPERTY(Category = "Cheats", EditAnywhere, meta = (TitleProperty = "Name"))
     TArray<FCogAbilityCheat> PersistentEffects;

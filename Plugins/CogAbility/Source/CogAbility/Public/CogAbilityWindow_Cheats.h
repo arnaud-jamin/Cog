@@ -6,6 +6,8 @@
 #include "CogAbilityWindow_Cheats.generated.h"
 
 class AActor;
+class UCogAbilityConfig_Alignment;
+class UCogAbilityConfig_Cheats;
 class UCogAbilityDataAsset;
 struct FCogAbilityCheat;
 
@@ -37,6 +39,8 @@ protected:
     TObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
 
     TObjectPtr<UCogAbilityConfig_Cheats> Config = nullptr;
+
+    TObjectPtr<UCogAbilityConfig_Alignment> AlignmentConfig = nullptr;
 
     bool bHasReappliedCheats = false;
 };

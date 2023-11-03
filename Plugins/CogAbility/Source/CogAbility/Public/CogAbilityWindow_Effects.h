@@ -3,16 +3,20 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "CogWindow.h"
+#include "CogWindowConfig.h"
 #include "imgui.h"
+#include "CogAbilityWindow_Effects.generated.h"
 
 class UAbilitySystemComponent;
+class UCogAbilityConfig_Alignment;
+class UCogAbilityConfig_Effects;
 class UCogAbilityDataAsset;
 class UGameplayEffect;
+namespace EGameplayModOp { enum Type; };
 struct FActiveGameplayEffect;
 struct FActiveGameplayEffectHandle;
 struct FGameplayModifierInfo;
 struct FModifierSpec;
-namespace EGameplayModOp { enum Type; };
 
 //--------------------------------------------------------------------------------------------------------------------------
 class COGABILITY_API FCogAbilityWindow_Effects : public FCogWindow
@@ -29,14 +33,16 @@ protected:
 
     virtual void RenderContent() override;
 
+    virtual void RenderTick(float DetlaTime) override;
+
+    virtual void ResetConfig() override;
+
     virtual void RenderEffectsTable();
 
     virtual void RenderEffectRow(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffectHandle& ActiveHandle, int32 Index, int32& Selected);
 
     virtual void RenderEffectInfo(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffect& ActiveEffect, const UGameplayEffect& Effect);
     
-    virtual void RenderTagContainer(const FGameplayTagContainer& Container);
-
     virtual void RenderRemainingTime(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffect& ActiveEffect);
 
     virtual void RenderStacks(const FActiveGameplayEffect& ActiveEffect, const UGameplayEffect& Effect);
@@ -44,10 +50,45 @@ protected:
     virtual void RenderPrediction(const FActiveGameplayEffect& ActiveEffect, bool Short);
 
     virtual FString GetEffectName(const UGameplayEffect& Effect);
+    
+    virtual FString GetEffectNameSafe(const UGameplayEffect* Effect);
 
-    ImVec4 GetEffectColor(const UGameplayEffect& Effect) const;
+    virtual void RenderOpenEffects();
 
-    ImVec4 GetEffectModifierColor(const FModifierSpec& ModSpec, const FGameplayModifierInfo& ModInfo, float BaseValue) const;
+    virtual void OpenEffect(const FActiveGameplayEffectHandle& Handle);
+
+    virtual void CloseEffect(const FActiveGameplayEffectHandle& Handle);
 
     TObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
+
+    TObjectPtr<UCogAbilityConfig_Effects> Config = nullptr;
+
+    TObjectPtr<UCogAbilityConfig_Alignment> AlignmentConfig = nullptr;
+
+    TArray<FActiveGameplayEffectHandle> OpenedEffects;
+
+    ImGuiTextFilter Filter;
+};
+
+//--------------------------------------------------------------------------------------------------------------------------
+UCLASS(Config = Cog)
+class UCogAbilityConfig_Effects : public UCogWindowConfig
+{
+    GENERATED_BODY()
+
+public:
+
+    UPROPERTY(Config)
+    bool SortByName = true;
+
+    UPROPERTY(Config)
+    bool SortByAlignment = true;
+
+    virtual void Reset() override
+    {
+        Super::Reset();
+
+        SortByName = true;
+        SortByAlignment = true;
+    }
 };

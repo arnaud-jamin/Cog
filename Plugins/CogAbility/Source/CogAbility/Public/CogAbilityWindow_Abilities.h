@@ -2,11 +2,14 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
+#include "CogWindowConfig.h"
 #include "GameplayAbilitySpecHandle.h"
+#include "CogAbilityWindow_Abilities.generated.h"
 
 class UAbilitySystemComponent;
-class UGameplayAbility;
+class UCogAbilityConfig_Abilities;
 class UCogAbilityDataAsset;
+class UGameplayAbility;
 struct FGameplayAbilitySpec;
 
 class COGABILITY_API FCogAbilityWindow_Abilities : public FCogWindow
@@ -18,6 +21,8 @@ public:
     virtual void Initialize() override;
 
 protected:
+
+    virtual void ResetConfig() override;
     
     virtual void RenderHelp() override;
 
@@ -51,7 +56,7 @@ protected:
 
     virtual void CloseAbility(const FGameplayAbilitySpecHandle& Handle);
 
-private:
+    virtual ImVec4 GetAbilityColor(const UAbilitySystemComponent& AbilitySystemComponent, FGameplayAbilitySpec& Spec);
 
     FGameplayAbilitySpecHandle AbilityHandleToActivate;
 
@@ -60,4 +65,51 @@ private:
     TArray<FGameplayAbilitySpecHandle> OpenedAbilities;
 
     TObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
+
+    TObjectPtr<UCogAbilityConfig_Abilities> Config = nullptr;
+
+    ImGuiTextFilter Filter;
+};
+
+//--------------------------------------------------------------------------------------------------------------------------
+UCLASS(Config = Cog)
+class UCogAbilityConfig_Abilities : public UCogWindowConfig
+{
+    GENERATED_BODY()
+
+public:
+
+    UPROPERTY(Config)
+    bool SortByName = false;
+
+    UPROPERTY(Config)
+    bool ShowActive = true;
+
+    UPROPERTY(Config)
+    bool ShowInactive = true;
+
+    UPROPERTY(Config)
+    bool ShowBlocked = true;
+
+    UPROPERTY(Config)
+    FVector4f ActiveColor = FVector4f(0.0f, 1.0f, 0.5f, 1.0f);
+
+    UPROPERTY(Config)
+    FVector4f InactiveColor = FVector4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+    UPROPERTY(Config)
+    FVector4f BlockedColor = FVector4f(1.0f, 0.5f, 0.5f, 1.0f);
+
+    virtual void Reset() override
+    {
+        Super::Reset();
+
+        SortByName = false;
+        ShowActive = true;
+        ShowInactive = true;
+        ShowBlocked = true;
+        ActiveColor = FVector4f(0.0f, 1.0f, 0.5f, 1.0f);
+        InactiveColor = FVector4f(1.0f, 1.0f, 1.0f, 1.0f);
+        BlockedColor = FVector4f(1.0f, 0.5f, 0.5f, 1.0f);
+    }
 };

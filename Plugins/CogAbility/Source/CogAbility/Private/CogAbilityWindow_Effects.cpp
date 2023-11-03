@@ -3,6 +3,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
 #include "AttributeSet.h"
+#include "CogAbilityConfig_Alignment.h"
 #include "CogAbilityDataAsset.h"
 #include "CogAbilityHelper.h"
 #include "CogImguiHelper.h"
@@ -16,9 +17,11 @@ void FCogAbilityWindow_Effects::Initialize()
 {
     Super::Initialize();
 
-    bHasMenu = false;
+    bHasMenu = true;
 
     Asset = GetAsset<UCogAbilityDataAsset>();
+    Config = GetConfig<UCogAbilityConfig_Effects>();
+    AlignmentConfig = GetConfig<UCogAbilityConfig_Alignment>();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -31,9 +34,51 @@ void FCogAbilityWindow_Effects::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_Effects::ResetConfig()
+{
+    Super::ResetConfig();
+
+    Config->Reset();
+    AlignmentConfig->Reset();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_Effects::RenderTick(float DetlaTime)
+{
+    Super::RenderTick(DetlaTime);
+
+    RenderOpenEffects();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Effects::RenderContent()
 {
     Super::RenderContent();
+
+    if (ImGui::BeginMenuBar())
+    {
+        if (ImGui::BeginMenu("Options"))
+        {
+            ImGui::Checkbox("Sort by Name", &Config->SortByName);
+            ImGui::Checkbox("Sort by Alignment", &Config->SortByAlignment);
+            
+            ImGui::Separator();
+            ImGui::ColorEdit4("Positive Color", (float*)&AlignmentConfig->PositiveColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("Negative Color", (float*)&AlignmentConfig->NegativeColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("Neutral Color", (float*)&AlignmentConfig->NeutralColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            
+            ImGui::Separator();
+            if (ImGui::MenuItem("Reset"))
+            {
+                ResetConfig();
+            }
+            ImGui::EndMenu();
+        }
+
+        FCogWindowWidgets::MenuSearchBar(Filter);
+
+        ImGui::EndMenuBar();
+    }
 
     RenderEffectsTable();
 }
@@ -47,30 +92,86 @@ void FCogAbilityWindow_Effects::RenderEffectsTable()
         return;
     }
 
-    ImGui::BeginTable("Effects", 4, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersH | ImGuiTableFlags_NoBordersInBody);
-    ImGui::TableSetupColumn("Effect");
-    ImGui::TableSetupColumn("Remaining Time");
-    ImGui::TableSetupColumn("Stacks");
-    ImGui::TableSetupColumn("Prediction");
-    ImGui::TableHeadersRow();
-
-    static int SelectedIndex = -1;
-    int Index = 0;
-
-    FGameplayEffectQuery Query;
-    for (const FActiveGameplayEffectHandle& ActiveHandle : AbilitySystemComponent->GetActiveEffects(Query))
+    if (ImGui::BeginTable("Effects", 4, ImGuiTableFlags_SizingFixedFit
+                                        | ImGuiTableFlags_Resizable
+                                        | ImGuiTableFlags_NoBordersInBodyUntilResize
+                                        | ImGuiTableFlags_ScrollY
+                                        | ImGuiTableFlags_RowBg
+                                        | ImGuiTableFlags_BordersOuter
+                                        | ImGuiTableFlags_BordersV
+                                        | ImGuiTableFlags_Reorderable
+                                        | ImGuiTableFlags_Hideable))
     {
-        RenderEffectRow(*AbilitySystemComponent, ActiveHandle, Index, SelectedIndex);
-    }
 
-    ImGui::EndTable();
+        ImGui::TableSetupScrollFreeze(0, 1);
+        ImGui::TableSetupColumn("Effect");
+        ImGui::TableSetupColumn("Remaining Time");
+        ImGui::TableSetupColumn("Stacks");
+        ImGui::TableSetupColumn("Prediction");
+        ImGui::TableHeadersRow();
+
+        static int SelectedIndex = -1;
+        int Index = 0;
+
+        FGameplayEffectQuery Query;
+        TArray<FActiveGameplayEffectHandle> Effects = AbilitySystemComponent->GetActiveEffects(Query);
+
+        if (Config->SortByName || Config->SortByAlignment)
+        {
+            Effects.Sort([&](const FActiveGameplayEffectHandle& Handle1, const FActiveGameplayEffectHandle& Handle2)
+            {
+                const FActiveGameplayEffect* ActiveEffect1 = AbilitySystemComponent->GetActiveGameplayEffect(Handle1);
+                const FActiveGameplayEffect* ActiveEffect2 = AbilitySystemComponent->GetActiveGameplayEffect(Handle2);
+                const UGameplayEffect* Effect1 = ActiveEffect1 != nullptr ? ActiveEffect1->Spec.Def : nullptr;
+                const UGameplayEffect* Effect2 = ActiveEffect2 != nullptr ? ActiveEffect2->Spec.Def : nullptr;
+            
+                bool NameOrder = false;
+                if (Config->SortByName)
+                {
+                    const FString EffectName1 = GetEffectNameSafe(Effect1);
+                    const FString EffectName2 = GetEffectNameSafe(Effect2);
+                    NameOrder = EffectName1.Compare(EffectName2) < 0;
+                    if (Config->SortByAlignment == false)
+                    {
+                        return NameOrder;   
+                    }
+                }
+
+                bool AlignmentOrder = false;
+                if (Config->SortByAlignment)
+                {
+                    const FGameplayTagContainer& Tags1 = Effect1->InheritableGameplayEffectTags.CombinedTags;
+                    const FGameplayTagContainer& Tags2 = Effect2->InheritableGameplayEffectTags.CombinedTags;
+                    const int32 Pos1 = Tags1.HasTag(Asset->PositiveEffectTag) ? 1 : Tags1.HasTag(Asset->NegativeEffectTag) ? -1 : 0;
+                    const int32 Pos2 = Tags2.HasTag(Asset->PositiveEffectTag) ? 1 : Tags2.HasTag(Asset->NegativeEffectTag) ? -1 : 0;
+                    const int32 Diff = Pos2 - Pos1;
+                    if (Diff == 0)
+                    {
+                        return NameOrder;
+                    }
+
+                    return Diff < 0;
+                }
+
+                return false;
+            });
+        }
+
+        for (const FActiveGameplayEffectHandle& ActiveHandle : Effects)
+        {
+            ImGui::PushID(Index);
+            RenderEffectRow(*AbilitySystemComponent, ActiveHandle, Index, SelectedIndex);
+            ImGui::PopID();
+            Index++;
+        }
+
+        ImGui::EndTable();
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Effects::RenderEffectRow(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffectHandle& ActiveHandle, int32 Index, int32& Selected)
 {
-    ImGui::PushID(Index);
-
     const FActiveGameplayEffect* ActiveEffectPtr = AbilitySystemComponent.GetActiveGameplayEffect(ActiveHandle);
     if (ActiveEffectPtr == nullptr)
     {
@@ -86,6 +187,13 @@ void FCogAbilityWindow_Effects::RenderEffectRow(const UAbilitySystemComponent& A
     const FActiveGameplayEffect& ActiveEffect = *ActiveEffectPtr;
     const UGameplayEffect& Effect = *EffectPtr;
 
+    const char* EffectName = TCHAR_TO_ANSI(*GetEffectName(Effect));
+    if (Filter.PassFilter(EffectName) == false)
+    {
+        return;
+    }
+
+
     ImGui::TableNextRow(ImGuiTableRowFlags_None, 0.0f);
 
     //------------------------
@@ -93,9 +201,9 @@ void FCogAbilityWindow_Effects::RenderEffectRow(const UAbilitySystemComponent& A
     //------------------------
     ImGui::TableNextColumn();
 
-    ImGui::PushStyleColor(ImGuiCol_Text, GetEffectColor(Effect));
+    ImGui::PushStyleColor(ImGuiCol_Text, FCogImguiHelper::ToImVec4(AlignmentConfig->GetEffectColor(Asset, Effect)));
 
-    if (ImGui::Selectable(TCHAR_TO_ANSI(*GetEffectName(Effect)), Selected == Index, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap | ImGuiSelectableFlags_AllowDoubleClick))
+    if (ImGui::Selectable(EffectName, Selected == Index, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap | ImGuiSelectableFlags_AllowDoubleClick))
     {
         Selected = Index;
     }
@@ -117,9 +225,17 @@ void FCogAbilityWindow_Effects::RenderEffectRow(const UAbilitySystemComponent& A
     //------------------------
     if (ImGui::BeginPopupContextItem())
     {
-        if (ImGui::Button("Open"))
+        bool bOpen = OpenedEffects.Contains(ActiveHandle);
+        if (ImGui::Checkbox("Open", &bOpen))
         {
-            //GetOwner()->GetPropertyGrid()->Open(EffectPtr);
+            if (bOpen)
+            {
+                OpenEffect(ActiveHandle);
+            }
+            else
+            {
+                CloseEffect(ActiveHandle);
+            }
             ImGui::CloseCurrentPopup();
         }
         ImGui::EndPopup();
@@ -143,8 +259,7 @@ void FCogAbilityWindow_Effects::RenderEffectRow(const UAbilitySystemComponent& A
     ImGui::TableNextColumn();
     RenderPrediction(ActiveEffect, true);
 
-    ImGui::PopID();
-    Index++;
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -218,7 +333,7 @@ void FCogAbilityWindow_Effects::RenderEffectInfo(const UAbilitySystemComponent& 
         ImGui::TableNextColumn();
         ImGui::TextColored(TextColor, "Dynamic Asset Tags");
         ImGui::TableNextColumn();
-        RenderTagContainer(ActiveEffect.Spec.GetDynamicAssetTags());
+        FCogAbilityHelper::RenderTagContainer(ActiveEffect.Spec.GetDynamicAssetTags());
 
         //------------------------
         // All Asset Tags
@@ -229,7 +344,7 @@ void FCogAbilityWindow_Effects::RenderEffectInfo(const UAbilitySystemComponent& 
         ImGui::TableNextColumn();
         FGameplayTagContainer AllAssetTagsContainer;
         ActiveEffect.Spec.GetAllAssetTags(AllAssetTagsContainer);
-        RenderTagContainer(AllAssetTagsContainer);
+        FCogAbilityHelper::RenderTagContainer(AllAssetTagsContainer);
 
         //------------------------
         // All Granted Tags
@@ -240,7 +355,7 @@ void FCogAbilityWindow_Effects::RenderEffectInfo(const UAbilitySystemComponent& 
         ImGui::TableNextColumn();
         FGameplayTagContainer AllGrantedTagsContainer;
         ActiveEffect.Spec.GetAllGrantedTags(AllGrantedTagsContainer);
-        RenderTagContainer(AllGrantedTagsContainer);
+        FCogAbilityHelper::RenderTagContainer(AllGrantedTagsContainer);
 
         //------------------------
         // Modifiers
@@ -259,21 +374,10 @@ void FCogAbilityWindow_Effects::RenderEffectInfo(const UAbilitySystemComponent& 
             ImGui::TableNextColumn();
             ImGui::Text("%s", TCHAR_TO_ANSI(*ModInfo.Attribute.GetName()));
             ImGui::Text("%s", TCHAR_TO_ANSI(*EGameplayModOpToString(ModInfo.ModifierOp)));
-            ImGui::TextColored(GetEffectModifierColor(ModSpec, ModInfo, AttributeBaseValue), "%0.2f", ModSpec.GetEvaluatedMagnitude());
+            ImGui::TextColored(FCogImguiHelper::ToImVec4(AlignmentConfig->GetEffectModifierColor(ModSpec, ModInfo, AttributeBaseValue)), "%0.2f", ModSpec.GetEvaluatedMagnitude());
         }
 
         ImGui::EndTable();
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogAbilityWindow_Effects::RenderTagContainer(const FGameplayTagContainer& Container)
-{
-    TArray<FGameplayTag> GameplayTags;
-    Container.GetGameplayTagArray(GameplayTags);
-    for (FGameplayTag Tag : GameplayTags)
-    {
-        ImGui::Text("%s", TCHAR_TO_ANSI(*Tag.ToString()));
     }
 }
 
@@ -282,6 +386,17 @@ FString FCogAbilityWindow_Effects::GetEffectName(const UGameplayEffect& Effect)
 {
     FString Str = FCogAbilityHelper::CleanupName(Effect.GetName());
     return Str;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FString FCogAbilityWindow_Effects::GetEffectNameSafe(const UGameplayEffect* Effect)
+{
+    if (Effect == nullptr)
+    {
+        return "none";
+    }
+
+    return GetEffectName(*Effect);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -344,15 +459,58 @@ void FCogAbilityWindow_Effects::RenderPrediction(const FActiveGameplayEffect& Ac
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ImVec4 FCogAbilityWindow_Effects::GetEffectColor(const UGameplayEffect& Effect) const
+void FCogAbilityWindow_Effects::OpenEffect(const FActiveGameplayEffectHandle& Handle)
 {
-    return FCogAbilityHelper::GetEffectColor(Asset.Get(), Effect);
+    OpenedEffects.AddUnique(Handle);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ImVec4 FCogAbilityWindow_Effects::GetEffectModifierColor(const FModifierSpec& ModSpec, const FGameplayModifierInfo& ModInfo, float BaseValue) const
+void FCogAbilityWindow_Effects::CloseEffect(const FActiveGameplayEffectHandle& Handle)
 {
-    const float ModValue = ModSpec.GetEvaluatedMagnitude();
-    return FCogAbilityHelper::GetEffectModifierColor(Asset.Get(), ModSpec.GetEvaluatedMagnitude(), ModInfo.ModifierOp, BaseValue);
+    OpenedEffects.Remove(Handle);
 }
 
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_Effects::RenderOpenEffects()
+{
+    AActor* Selection = GetSelection();
+    if (Selection == nullptr)
+    {
+        return;
+    }
+
+    UAbilitySystemComponent* AbilitySystemComponent = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Selection, true);
+    if (AbilitySystemComponent == nullptr)
+    {
+        return;
+    }
+
+    for (int i = OpenedEffects.Num() - 1; i >= 0; --i)
+    {
+        FActiveGameplayEffectHandle Handle = OpenedEffects[i];
+
+        const FActiveGameplayEffect* ActiveEffectPtr = AbilitySystemComponent->GetActiveGameplayEffect(Handle);
+        if (ActiveEffectPtr == nullptr)
+        {
+            return;
+        }
+
+        const UGameplayEffect* Effect = ActiveEffectPtr->Spec.Def;
+        if (Effect == nullptr)
+        {
+            return;
+        }
+
+        bool Open = true;
+        if (ImGui::Begin(TCHAR_TO_ANSI(*GetEffectName(*Effect)), &Open))
+        {
+            RenderEffectInfo(*AbilitySystemComponent, *ActiveEffectPtr, *Effect);
+            ImGui::End();
+        }
+
+        if (Open == false)
+        {
+            OpenedEffects.RemoveAt(i);
+        }
+    }
+}
