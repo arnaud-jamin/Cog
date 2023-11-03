@@ -348,10 +348,10 @@ void ACogSampleGameState::BeginPlay()
     CogWindowManagerRef = CogWindowManager;
 
     // Add windows
-    CogWindowManager->CreateWindow<FCogEngineWindow_DebugSettings>("Engine.Debug Settings");
-    CogWindowManager->CreateWindow<FCogEngineWindow_ImGui>("Engine.ImGui");
-    CogWindowManager->CreateWindow<FCogAbilityWindow_Abilities>("Gameplay.Abilities");
-    CogWindowManager->CreateWindow<FCogAbilityWindow_Attributes>("Gameplay.Attributes");
+    CogWindowManager->AddWindow<FCogEngineWindow_DebugSettings>("Engine.Debug Settings");
+    CogWindowManager->AddWindow<FCogEngineWindow_ImGui>("Engine.ImGui");
+    CogWindowManager->AddWindow<FCogAbilityWindow_Abilities>("Gameplay.Abilities");
+    CogWindowManager->AddWindow<FCogAbilityWindow_Attributes>("Gameplay.Attributes");
 
     [...]
 #endif //ENABLE_COG
