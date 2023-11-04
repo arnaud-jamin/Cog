@@ -17,6 +17,8 @@ public:
 
 protected:
 
+    virtual void Initialize() override;
+
     virtual void RenderHelp() override;
 
     virtual void RenderContent() override;

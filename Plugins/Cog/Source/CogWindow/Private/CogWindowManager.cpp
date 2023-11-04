@@ -205,6 +205,12 @@ void UCogWindowManager::AddWindow(FCogWindow* Window, const FString& Name, bool 
     Window->Initialize();
     Windows.Add(Window);
 
+    if (Window->HasWidget())
+    {
+        Widgets.Add(Window);
+        //Widgets.Sort()
+    }
+
     if (AddToMainMenu)
     {
         if (FMenu* Menu = AddMenu(Window->GetFullName()))
@@ -212,13 +218,6 @@ void UCogWindowManager::AddWindow(FCogWindow* Window, const FString& Name, bool 
             Menu->Window = Window;
         }
     }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::AddMainMenuWidget(FCogWindow* Window)
-{
-    Window->SetOwner(this);
-    MainMenuWidgets.Add(Window);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -388,6 +387,44 @@ void UCogWindowManager::RenderMainMenu()
                 ImGui::EndMenu();
             }
 
+            if (ImGui::BeginMenu("Widgets"))
+            {
+                for (int32 i = 0; i < Widgets.Num(); ++i)
+                {
+                    FCogWindow* Window = Widgets[i];
+
+                    ImGui::PushID(i);
+
+                    bool Visible = Window->GetIsWidgetVisible();
+                    if (ImGui::Checkbox(TCHAR_TO_ANSI(*Window->GetName()), &Visible))
+                    {
+                        Window->SetIsWidgetVisible(Visible);
+                    }
+
+                    if (ImGui::IsItemActive() && ImGui::IsItemHovered() == false)
+                    {
+                        int iNext = i + (ImGui::GetMouseDragDelta(0).y < 0.f ? -1 : 1);
+                        if (iNext >= 0 && iNext < Widgets.Num())
+                        {
+                            Widgets[i] = Widgets[iNext];
+                            Widgets[iNext] = Window;
+                            ImGui::ResetMouseDragDelta();
+                        }
+                    }
+
+                    if (i == 0)
+                    {
+                        ImGui::SameLine();
+                        FCogWindowWidgets::HelpMarker("Drag and drop the widget name to reorder them.");
+                    }
+
+                    ImGui::PopID();
+                }
+
+
+                ImGui::EndMenu();
+            }
+
             ImGui::Separator();
 
             RenderMenuItem(*SettingsWindow, "Settings");
@@ -398,9 +435,20 @@ void UCogWindowManager::RenderMainMenu()
 
         const float MinCursorX = ImGui::GetCursorPosX();
         float CursorX = ImGui::GetWindowWidth();
-
-        for (FCogWindow* Window : MainMenuWidgets)
+        
+        //------------------------------------------------------------
+        // Render in reverse order because it makes more sense 
+        // when looking at the widget ordered list in the UI.
+        //------------------------------------------------------------
+        for (int32 WindowIndex = Widgets.Num() - 1;  WindowIndex >= 0; WindowIndex--)
         {
+            FCogWindow* Window = Widgets[WindowIndex];
+
+            if (Window->GetIsWidgetVisible() == false)
+            {
+                continue;
+            }
+
             TArray<float> SubWidgetsWidths;
             float SimCursorX = CursorX;
             for (int32 SubWidgetIndex = 0; ; ++SubWidgetIndex)
@@ -563,24 +611,62 @@ void UCogWindowManager::SettingsHandler_ClearAll(ImGuiContext* Context, ImGuiSet
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::SettingsHandler_ApplyAll(ImGuiContext* Context, ImGuiSettingsHandler* Handler)
 {
+    UCogWindowManager* Manager = (UCogWindowManager*)Handler->UserData;
+
+    Manager->Widgets.Sort([](const FCogWindow& Window1, const FCogWindow& Window2)
+    {
+        return Window1.GetWidgetOrderIndex() < Window2.GetWidgetOrderIndex();
+    });
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void* UCogWindowManager::SettingsHandler_ReadOpen(ImGuiContext* Context, ImGuiSettingsHandler* Handler, const char* Name)
 {
-    return (void*)1;
+    if (strcmp(Name, "Windows") == 0)
+    {
+        return (void*)1;
+    }
+
+    if (strcmp(Name, "Widgets") == 0)
+    {
+        UCogWindowManager* Manager = (UCogWindowManager*)Handler->UserData;
+        Manager->WidgetsOrderIndex = 0;
+
+        return (void*)2;
+    }
+
+    return nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::SettingsHandler_ReadLine(ImGuiContext* Context, ImGuiSettingsHandler* Handler, void* Entry, const char* Line)
 {
-    ImGuiID Id;
-    if (sscanf_s(Line, "0x%08X", &Id) == 1)
+    if (Entry == (void*)1)
     {
-        UCogWindowManager* Manager = (UCogWindowManager*)Handler->UserData;
-        if (FCogWindow* Window = Manager->FindWindowByID(Id))
+        ImGuiID Id;
+        if (sscanf_s(Line, "0x%08X", &Id) == 1)
         {
-            Window->SetIsVisible(true);
+            UCogWindowManager* Manager = (UCogWindowManager*)Handler->UserData;
+            if (FCogWindow* Window = Manager->FindWindowByID(Id))
+            {
+                Window->SetIsVisible(true);
+            }
+        }
+    }
+    else if (Entry == (void*)2)
+    {
+        ImGuiID Id;
+        int32 Visible = false;
+        if (sscanf_s(Line, "0x%08X %d", &Id, &Visible) == 2)
+        {
+            UCogWindowManager* Manager = (UCogWindowManager*)Handler->UserData;
+            if (FCogWindow* Window = Manager->FindWindowByID(Id))
+            {
+                Window->SetWidgetOrderIndex(Manager->WidgetsOrderIndex);
+                Window->SetIsWidgetVisible(Visible > 0);
+            }
+
+            Manager->WidgetsOrderIndex++;
         }
     }
 }
@@ -598,6 +684,14 @@ void UCogWindowManager::SettingsHandler_WriteAll(ImGuiContext* Context, ImGuiSet
             Buffer->appendf("0x%08X\n", Window->GetID());
         }
     }
+    Buffer->append("\n");
+
+    Buffer->appendf("[%s][Widgets]\n", Handler->TypeName);
+    for (FCogWindow* Window : Manager->Widgets)
+    {
+        Buffer->appendf("0x%08X %d\n", Window->GetID(), Window->GetIsWidgetVisible());
+    }
+    Buffer->append("\n");
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

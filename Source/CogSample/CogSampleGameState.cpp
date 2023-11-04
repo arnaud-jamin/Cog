@@ -194,12 +194,6 @@ void ACogSampleGameState::InitializeCog()
     CogWindowManager->AddWindow<FCogInputWindow_Actions>("Input.Actions");
 
     CogWindowManager->AddWindow<FCogInputWindow_Gamepad>("Input.Gamepad");
-
-    //---------------------------------------
-    // Main Menu Widget
-    //---------------------------------------
-    CogWindowManager->AddMainMenuWidget(SelectionWindow);
-    CogWindowManager->AddMainMenuWidget(StatsWindow);
 }
 
 #endif //ENABLE_COG

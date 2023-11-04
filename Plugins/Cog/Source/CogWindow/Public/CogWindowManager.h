@@ -40,8 +40,6 @@ public:
 
     virtual void AddWindow(FCogWindow* Window, const FString& Name, bool AddToMainMenu = true);
 
-    virtual void AddMainMenuWidget(FCogWindow* Window);
-
     virtual FCogWindow* FindWindowByID(ImGuiID ID);
 
     virtual void CloseAllWindows();
@@ -132,6 +130,8 @@ protected:
 
     virtual void RenderSaveLayoutMenuItem(const UPlayerInput* PlayerInput, int LayoutIndex);
 
+    virtual void TickDPI();
+
     static void SettingsHandler_ClearAll(ImGuiContext* ctx, ImGuiSettingsHandler*);
 
     static void SettingsHandler_ApplyAll(ImGuiContext* ctx, ImGuiSettingsHandler*);
@@ -142,7 +142,6 @@ protected:
 
     static void SettingsHandler_WriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler, ImGuiTextBuffer* buf);
     
-    void TickDPI();
 
     UPROPERTY()
     mutable TArray<UCogWindowConfig*> Configs;
@@ -172,11 +171,13 @@ protected:
 
     TArray<FCogWindow*> Windows;
 
+    TArray<FCogWindow*> Widgets;
+
+    int32 WidgetsOrderIndex = 0;
+
     TArray<FCogWindow*> SpaceWindows;
 
     FCogWindow_Settings* SettingsWindow = nullptr;
-
-    TArray<FCogWindow*> MainMenuWidgets;
 
     FMenu MainMenu;
 

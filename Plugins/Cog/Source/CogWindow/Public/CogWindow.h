@@ -56,6 +56,16 @@ public:
 
     void SetIsVisible(bool Value) { bIsVisible = Value; }
 
+    bool HasWidget() const { return bHasWidget; }
+
+    bool GetIsWidgetVisible() const { return bIsWidgetVisible; }
+
+    void SetIsWidgetVisible(bool Value) { bIsWidgetVisible = Value; }
+    
+    int32 GetWidgetOrderIndex() const { return WidgetOrderIndex; }
+
+    void SetWidgetOrderIndex(int32 Value) { WidgetOrderIndex = Value; }
+
     void SetOwner(UCogWindowManager* InOwner) { Owner = InOwner; }
 
     UCogWindowManager* GetOwner() const { return Owner; }
@@ -98,12 +108,17 @@ protected:
 
 protected:
 
-    UPROPERTY(Config)
     bool bHideMenu = false;
 
     bool bHasMenu = false;
 
     bool bIsVisible = false;
+
+    bool bHasWidget = false;
+
+    bool bIsWidgetVisible = false;
+
+    int32 WidgetOrderIndex = -1;
 
     ImGuiID ID;
 
