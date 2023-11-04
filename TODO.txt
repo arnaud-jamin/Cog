@@ -3,6 +3,8 @@
 
 - CogWindow: Add reset window position menu item or reset layout (window can get far away)
 - CogWindow: Try to remove CogWindow dependency to cogimgui. Should only depends on imgui (currently use setdpiscale of cogimgui)
+- CogWindow: Overlay window should have achnoring options (top bottom left right center mid)
+- CogWindow: Hide menu is not saved anymore
 
 - CogEngine: More stats in the stats window
 - CogEngine: Overlay mode of stats.
@@ -22,6 +24,4 @@
 - CogSample: Add more debug for area (change color on tick, duration ...)
 
 - CogDebug: Check KismetExecutionMessage for warnings. As an exemple it is used by GEngine::GetWorldFromContextObject.
-- CogDebug: Rework Tickness and Duration params.
-
-- CogInput: Add gamepad stick drag to set their values
+- CogDebug: Rework Thickness and Duration params.
