@@ -21,13 +21,15 @@ public:
 
 protected:
 
+    virtual void GetTagContainer(FGameplayTagContainer& TagContainer) {}
+
     virtual void ResetConfig();
 
     virtual void RenderHelp() override;
 
     virtual void RenderContent() override;
 
-    virtual void RenderTagContainer(const FString& TagContainerName, const UAbilitySystemComponent& AbilitySystemComponent, FGameplayTagContainer& TagContainer);
+    virtual void RenderTagContainer(const UAbilitySystemComponent& AbilitySystemComponent, FGameplayTagContainer& TagContainer);
 
     virtual void RenderTag(const UAbilitySystemComponent& AbilitySystemComponent, const FGameplayTag& Tag);
 
@@ -36,6 +38,31 @@ protected:
     TObjectPtr<UCogAbilityConfig_Tags> Config = nullptr;
 
     ImGuiTextFilter Filter;
+};
+
+//--------------------------------------------------------------------------------------------------------------------------
+class COGABILITY_API FCogAbilityWindow_OwnedTags : public FCogAbilityWindow_Tags
+{
+    typedef FCogAbilityWindow_Tags Super;
+
+    virtual void Initialize() override;
+
+    virtual void RenderHelp() override;
+
+    virtual void GetTagContainer(FGameplayTagContainer& TagContainer);
+};
+
+
+//--------------------------------------------------------------------------------------------------------------------------
+class COGABILITY_API FCogAbilityWindow_BlockedTags : public FCogAbilityWindow_Tags
+{
+    typedef FCogAbilityWindow_Tags Super;
+
+    virtual void Initialize() override;
+
+    virtual void RenderHelp() override;
+
+    virtual void GetTagContainer(FGameplayTagContainer& TagContainer);
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -55,4 +82,18 @@ public:
 
         SortByName = false;
     }
+};
+
+//--------------------------------------------------------------------------------------------------------------------------
+UCLASS(Config = Cog)
+class UCogAbilityConfig_OwnedTags : public UCogAbilityConfig_Tags
+{
+    GENERATED_BODY()
+};
+
+//--------------------------------------------------------------------------------------------------------------------------
+UCLASS(Config = Cog)
+class UCogAbilityConfig_BlockedAbilitiesTags : public UCogAbilityConfig_Tags
+{
+    GENERATED_BODY()
 };

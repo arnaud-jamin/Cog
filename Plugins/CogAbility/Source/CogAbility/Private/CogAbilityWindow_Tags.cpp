@@ -11,8 +11,6 @@ void FCogAbilityWindow_Tags::Initialize()
     Super::Initialize();
 
     bHasMenu = true;
-
-    Config = GetConfig<UCogAbilityConfig_Tags>();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -42,11 +40,10 @@ void FCogAbilityWindow_Tags::RenderContent()
         return;
     }
 
-    FGameplayTagContainer OwnedTags, BlockedTags;
-    AbilitySystemComponent->GetOwnedGameplayTags(OwnedTags);
-    AbilitySystemComponent->GetBlockedAbilityTags(BlockedTags);
+    FGameplayTagContainer Tags;
+    GetTagContainer(Tags);
 
-    RenderTagContainer("Owned Tags", *AbilitySystemComponent, OwnedTags);
+    RenderTagContainer(*AbilitySystemComponent, Tags);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -75,9 +72,9 @@ void FCogAbilityWindow_Tags::RenderMenu()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogAbilityWindow_Tags::RenderTagContainer(const FString& TagContainerName, const UAbilitySystemComponent& AbilitySystemComponent, FGameplayTagContainer& TagContainer)
+void FCogAbilityWindow_Tags::RenderTagContainer(const UAbilitySystemComponent& AbilitySystemComponent, FGameplayTagContainer& TagContainer)
 {
-    if (ImGui::BeginTable(TCHAR_TO_ANSI(*TagContainerName), 2, ImGuiTableFlags_SizingFixedFit
+    if (ImGui::BeginTable("Tags", 2, ImGuiTableFlags_SizingFixedFit
                                                                 | ImGuiTableFlags_Resizable
                                                                 | ImGuiTableFlags_NoBordersInBodyUntilResize
                                                                 | ImGuiTableFlags_ScrollY
@@ -89,7 +86,7 @@ void FCogAbilityWindow_Tags::RenderTagContainer(const FString& TagContainerName,
     {
         ImGui::TableSetupScrollFreeze(0, 1);
         ImGui::TableSetupColumn("Count");
-        ImGui::TableSetupColumn(TCHAR_TO_ANSI(*TagContainerName));
+        ImGui::TableSetupColumn(TCHAR_TO_ANSI(*GetName()));
         ImGui::TableHeadersRow();
 
         TArray<FGameplayTag> Tags;
@@ -207,4 +204,56 @@ void FCogAbilityWindow_Tags::RenderTag(const UAbilitySystemComponent& AbilitySys
 
         ImGui::EndTable();
     }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// FCogAbilityWindow_OwnedTags
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_OwnedTags::Initialize()
+{
+    Super::Initialize();
+    Config = GetConfig<UCogAbilityConfig_OwnedTags>();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_OwnedTags::RenderHelp()
+{
+    ImGui::Text("This window displays gameplay tags of the selected actor. ");
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_OwnedTags::GetTagContainer(FGameplayTagContainer& TagContainer)
+{
+    UAbilitySystemComponent* AbilitySystemComponent = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetSelection(), true);
+    if (AbilitySystemComponent == nullptr)
+    {
+        return;
+    }
+
+    AbilitySystemComponent->GetOwnedGameplayTags(TagContainer);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_BlockedTags::Initialize()
+{
+    Super::Initialize();
+    Config = GetConfig<UCogAbilityConfig_BlockedAbilitiesTags>();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_BlockedTags::RenderHelp()
+{
+    ImGui::Text("This window displays the tags blocking abilities of the selected actor.");
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_BlockedTags::GetTagContainer(FGameplayTagContainer& TagContainer)
+{
+    UAbilitySystemComponent* AbilitySystemComponent = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetSelection(), true);
+    if (AbilitySystemComponent == nullptr)
+    {
+        return;
+    }
+
+    AbilitySystemComponent->GetBlockedAbilityTags(TagContainer);
 }

@@ -171,13 +171,15 @@ void ACogSampleGameState::InitializeCog()
 
     CogWindowManager->AddWindow<FCogAbilityWindow_Attributes>("Gameplay.Attributes");
 
+    CogWindowManager->AddWindow<FCogAbilityWindow_BlockedTags>("Gameplay.Blocking Tags");
+
     CogWindowManager->AddWindow<FCogAbilityWindow_Cheats>("Gameplay.Cheats");
 
     CogWindowManager->AddWindow<FCogAbilityWindow_Effects>("Gameplay.Effects");
 
     CogWindowManager->AddWindow<FCogAbilityWindow_Pools>("Gameplay.Pools");
 
-    CogWindowManager->AddWindow<FCogAbilityWindow_Tags>("Gameplay.Tags");
+    CogWindowManager->AddWindow<FCogAbilityWindow_OwnedTags>("Gameplay.Owned Tags");
 
     CogWindowManager->AddWindow<FCogAbilityWindow_Tweaks>("Gameplay.Tweaks");
 
