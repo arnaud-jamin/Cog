@@ -17,6 +17,7 @@ void FCogAbilityWindow_Abilities::Initialize()
     Super::Initialize();
 
     bHasMenu = true;
+    bNoPadding = true;
 
     Asset = GetAsset<UCogAbilityDataAsset>();
     Config = GetConfig<UCogAbilityConfig_Abilities>();
@@ -233,7 +234,6 @@ void FCogAbilityWindow_Abilities::RenderAbilitiesTable(UAbilitySystemComponent& 
                                         | ImGuiTableFlags_NoBordersInBodyUntilResize
                                         | ImGuiTableFlags_ScrollY
                                         | ImGuiTableFlags_RowBg
-                                        | ImGuiTableFlags_BordersOuter
                                         | ImGuiTableFlags_BordersV
                                         | ImGuiTableFlags_Reorderable
                                         | ImGuiTableFlags_Hideable))

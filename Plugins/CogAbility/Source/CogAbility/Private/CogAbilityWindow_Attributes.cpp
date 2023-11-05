@@ -18,6 +18,7 @@ void FCogAbilityWindow_Attributes::Initialize()
     Super::Initialize();
 
     bHasMenu = true;
+    bNoPadding = true;
 
     Config = GetConfig<UCogAbilityConfig_Attributes>();
     AlignmentConfig = GetConfig<UCogAbilityConfig_Alignment>();
@@ -87,7 +88,6 @@ void FCogAbilityWindow_Attributes::RenderContent()
                                          | ImGuiTableFlags_NoBordersInBodyUntilResize 
                                          | ImGuiTableFlags_ScrollY 
                                          | ImGuiTableFlags_RowBg 
-                                         | ImGuiTableFlags_BordersOuter 
                                          | ImGuiTableFlags_BordersV 
                                          | ImGuiTableFlags_Reorderable 
                                          | ImGuiTableFlags_Hideable))

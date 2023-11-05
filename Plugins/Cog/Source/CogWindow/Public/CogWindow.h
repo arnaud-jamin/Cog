@@ -110,6 +110,8 @@ protected:
 
     bool bHideMenu = false;
 
+    bool bNoPadding = false;
+
     bool bHasMenu = false;
 
     bool bIsVisible = false;

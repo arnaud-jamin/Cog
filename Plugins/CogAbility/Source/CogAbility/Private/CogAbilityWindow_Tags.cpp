@@ -11,6 +11,7 @@ void FCogAbilityWindow_Tags::Initialize()
     Super::Initialize();
 
     bHasMenu = true;
+    bNoPadding = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -79,7 +80,6 @@ void FCogAbilityWindow_Tags::RenderTagContainer(const UAbilitySystemComponent& A
                                                                 | ImGuiTableFlags_NoBordersInBodyUntilResize
                                                                 | ImGuiTableFlags_ScrollY
                                                                 | ImGuiTableFlags_RowBg
-                                                                | ImGuiTableFlags_BordersOuter
                                                                 | ImGuiTableFlags_BordersV
                                                                 | ImGuiTableFlags_Reorderable
                                                                 | ImGuiTableFlags_Hideable))

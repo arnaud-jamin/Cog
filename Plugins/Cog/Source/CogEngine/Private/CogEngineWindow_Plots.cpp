@@ -13,6 +13,7 @@ void FCogEngineWindow_Plots::Initialize()
     Super::Initialize();
 
     bHasMenu = true;
+    bNoPadding = true;
 
     Config = GetConfig<UCogEngineConfig_Plots>();
 }
@@ -48,8 +49,13 @@ void FCogEngineWindow_Plots::RenderContent()
 
     RenderMenu();
 
-    if (ImGui::BeginTable("PlotTable", 2, ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable))
+    if (ImGui::BeginTable("PlotTable", 2, ImGuiTableFlags_RowBg 
+                                        | ImGuiTableFlags_Resizable 
+                                        | ImGuiTableFlags_BordersV
+                                        | ImGuiTableFlags_NoPadInnerX
+                                        | ImGuiTableFlags_NoPadOuterX))
     {
+
         ImGui::TableSetupColumn("PlotsList", ImGuiTableColumnFlags_WidthFixed, FCogWindowWidgets::GetFontWidth() * 20.0f);
         ImGui::TableSetupColumn("Plots", ImGuiTableColumnFlags_WidthStretch, 0.0f);
         ImGui::TableNextRow();
@@ -107,6 +113,57 @@ void FCogEngineWindow_Plots::RenderMenu()
         FCogWindowWidgets::ToggleMenuButton(&FCogDebugPlot::Pause, "Pause", ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
 
         ImGui::EndMenuBar();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_Plots::RenderPlotsList(TArray<FCogDebugPlotEntry*>& VisiblePlots)
+{
+    if (ImGui::BeginChild("Plots", ImVec2(0, -1)))
+    {
+        int Index = 0;
+
+        ImGui::Indent(6);
+
+        for (FCogDebugPlotEntry& Entry : FCogDebugPlot::Plots)
+        {
+            if (Entry.CurrentYAxis != ImAxis_COUNT && Entry.CurrentRow != INDEX_NONE)
+            {
+                VisiblePlots.Add(&Entry);
+            }
+
+            ImGui::PushID(Index);
+
+            ImGui::PushStyleColor(ImGuiCol_Text, Entry.IsEventPlot ? IM_COL32(128, 128, 255, 255) : IM_COL32(255, 255, 255, 255));
+            ImGui::Selectable(TCHAR_TO_ANSI(*Entry.Name.ToString()), false, 0);
+            ImGui::PopStyleColor();
+
+            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+            {
+                const auto EntryName = StringCast<ANSICHAR>(*Entry.Name.ToString());
+                ImGui::SetDragDropPayload("DragAndDrop", EntryName.Get(), EntryName.Length() + 1);
+                ImGui::Text(EntryName.Get());
+                ImGui::EndDragDropSource();
+            }
+
+            ImGui::PopID();
+            Index++;
+        }
+
+        ImGui::Unindent();
+    }
+    ImGui::EndChild();
+
+    if (ImGui::BeginDragDropTarget())
+    {
+        if (const ImGuiPayload* Payload = ImGui::AcceptDragDropPayload("DragAndDrop"))
+        {
+            if (FCogDebugPlotEntry* Plot = FCogDebugPlot::FindPlot(FName((const char*)Payload->Data)))
+            {
+                Plot->ResetAxis();
+            }
+        }
+        ImGui::EndDragDropTarget();
     }
 }
 
@@ -293,54 +350,6 @@ void FCogEngineWindow_Plots::RenderPlots(const TArray<FCogDebugPlotEntry*>& Visi
         }
     }
     ImGui::EndChild();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Plots::RenderPlotsList(TArray<FCogDebugPlotEntry*>& VisiblePlots)
-{
-    if (ImGui::BeginChild("Plots", ImVec2(0, -1)))
-    {
-        int Index = 0;
-
-        for (FCogDebugPlotEntry& Plot : FCogDebugPlot::Plots)
-        {
-            const auto Label = StringCast<ANSICHAR>(*Plot.Name.ToString());
-
-            if (Plot.CurrentYAxis != ImAxis_COUNT && Plot.CurrentRow != INDEX_NONE)
-            {
-                VisiblePlots.Add(&Plot);
-            }
-
-            ImGui::PushID(Index);
-
-            ImGui::PushStyleColor(ImGuiCol_Text, Plot.IsEventPlot ? IM_COL32(128, 128, 255, 255) : IM_COL32(255, 255, 255, 255));
-            ImGui::Selectable(Label.Get(), false, 0);
-            ImGui::PopStyleColor();
-
-            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
-            {
-                ImGui::SetDragDropPayload("DragAndDrop", Label.Get(), Label.Length() + 1);
-                ImGui::TextUnformatted(Label.Get());
-                ImGui::EndDragDropSource();
-            }
-
-            ImGui::PopID();
-            Index++;
-        }
-    }
-    ImGui::EndChild();
-
-    if (ImGui::BeginDragDropTarget())
-    {
-        if (const ImGuiPayload* Payload = ImGui::AcceptDragDropPayload("DragAndDrop"))
-        {
-            if (FCogDebugPlotEntry* Plot = FCogDebugPlot::FindPlot(FName((const char*)Payload->Data)))
-            {
-                Plot->ResetAxis();
-            }
-        }
-        ImGui::EndDragDropTarget();
-    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

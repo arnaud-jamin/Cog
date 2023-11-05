@@ -12,6 +12,7 @@ void FCogAIWindow_Blackboard::Initialize()
     Super::Initialize();
 
     bHasMenu = true;
+    bNoPadding = true;
 
     Config = GetConfig<UCogAIConfig_Blackboard>();
 }
@@ -119,7 +120,6 @@ void FCogAIWindow_Blackboard::RenderContent()
                                          | ImGuiTableFlags_NoBordersInBodyUntilResize 
                                          | ImGuiTableFlags_ScrollY 
                                          | ImGuiTableFlags_RowBg 
-                                         | ImGuiTableFlags_BordersOuter 
                                          | ImGuiTableFlags_BordersV 
                                          | ImGuiTableFlags_Reorderable 
                                          | ImGuiTableFlags_Hideable))

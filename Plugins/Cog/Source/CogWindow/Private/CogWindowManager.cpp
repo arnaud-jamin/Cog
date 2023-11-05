@@ -415,7 +415,7 @@ void UCogWindowManager::RenderMainMenu()
                     if (i == 0)
                     {
                         ImGui::SameLine();
-                        FCogWindowWidgets::HelpMarker("Drag and drop the widget name to reorder them.");
+                        FCogWindowWidgets::HelpMarker("Drag and drop the widget names to reorder them.");
                     }
 
                     ImGui::PopID();

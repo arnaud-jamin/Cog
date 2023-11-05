@@ -25,7 +25,7 @@ protected:
     virtual void RenderTick(float DeltaTime) override;
 
     virtual void RenderContent() override;
-
+    
     void RenderPlotsList(TArray<FCogDebugPlotEntry*>& VisiblePlots);
 
     void RenderPlots(const TArray<FCogDebugPlotEntry*>& VisiblePlots);

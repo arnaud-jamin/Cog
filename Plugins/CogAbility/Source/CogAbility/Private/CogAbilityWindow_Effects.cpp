@@ -18,6 +18,7 @@ void FCogAbilityWindow_Effects::Initialize()
     Super::Initialize();
 
     bHasMenu = true;
+    bNoPadding = true;
 
     Asset = GetAsset<UCogAbilityDataAsset>();
     Config = GetConfig<UCogAbilityConfig_Effects>();
@@ -97,7 +98,6 @@ void FCogAbilityWindow_Effects::RenderEffectsTable()
                                         | ImGuiTableFlags_NoBordersInBodyUntilResize
                                         | ImGuiTableFlags_ScrollY
                                         | ImGuiTableFlags_RowBg
-                                        | ImGuiTableFlags_BordersOuter
                                         | ImGuiTableFlags_BordersV
                                         | ImGuiTableFlags_Reorderable
                                         | ImGuiTableFlags_Hideable))

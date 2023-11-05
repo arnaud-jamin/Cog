@@ -63,8 +63,18 @@ void FCogWindow::Render(float DeltaTime)
         WindowFlags |= ImGuiWindowFlags_MenuBar;
     }
 
+    if (bNoPadding)
+    {
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+    }
+
     if (ImGui::Begin(TCHAR_TO_ANSI(*WindowTitle), &bIsVisible, WindowFlags))
     {
+        if (bNoPadding)
+        {
+            ImGui::PopStyleVar(1);
+        }
+
         if (GetOwner()->GetShowHelp())
         {
             if (ImGui::IsItemHovered())
@@ -101,6 +111,13 @@ void FCogWindow::Render(float DeltaTime)
 
         RenderContent();
         ImGui::End();
+    }
+    else
+    {
+        if (bNoPadding)
+        {
+            ImGui::PopStyleVar(1);
+        }
     }
 
     PostRender();
