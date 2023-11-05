@@ -73,6 +73,43 @@ void FCogWindowWidgets::ProgressBarCentered(float Fraction, const ImVec2& Size, 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void FCogWindowWidgets::ToggleMenuButton(bool* Value, const char* Text, const ImVec4& TrueColor)
+{
+    bool IsTrue = *Value;
+    if (IsTrue)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Button,          ImVec4(TrueColor.x, TrueColor.y, TrueColor.z, TrueColor.w * 0.6f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered,   ImVec4(TrueColor.x, TrueColor.y, TrueColor.z, TrueColor.w * 0.8f));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive,    ImVec4(TrueColor.x, TrueColor.y, TrueColor.z, TrueColor.w * 1.0f));
+    }
+    else
+    {
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+    }
+
+    if (ImGui::Button(Text))
+    {
+        *Value = !*Value;
+    }
+    
+    if (IsTrue)
+    {
+        ImGui::PopStyleColor(3);
+    }
+    else
+    {
+        ImGui::PopStyleColor(1);
+    }
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogWindowWidgets::ToggleButton(bool* Value, const char* Text, const ImVec4& TrueColor, const ImVec4& FalseColor, const ImVec2& Size)
+{
+    ToggleButton(Value, Text, Text, TrueColor, FalseColor, Size);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void FCogWindowWidgets::ToggleButton(bool* Value, const char* TextTrue, const char* TextFalse, const ImVec4& TrueColor, const ImVec4& FalseColor, const ImVec2& Size)
 {
     if (*Value)
