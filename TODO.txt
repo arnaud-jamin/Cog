@@ -1,5 +1,6 @@
 - CogImGui: Add a way to create and override CogImguiwidget
 - CogImGui: Try to find a global solution to prevent crash when breaking in a blueprint from an imgui action (reset the stack)
+- CogImgui: support multi viewports
 
 - CogWindow: Add reset window position menu item or reset layout (window can get far away)
 - CogWindow: Try to remove CogWindow dependency to cogimgui. Should only depends on imgui (currently use setdpiscale of cogimgui)
