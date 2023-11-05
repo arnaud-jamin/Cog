@@ -5,6 +5,7 @@
 - CogWindow: Try to remove CogWindow dependency to cogimgui. Should only depends on imgui (currently use setdpiscale of cogimgui)
 - CogWindow: Overlay window should have achnoring options (top bottom left right center mid)
 - CogWindow: Hide menu is not saved anymore
+- CogWindow: DPI change on mousewheel should be a command with a key bind as the rest.
 
 - CogEngine: More stats in the stats window
 - CogEngine: Overlay mode of stats.
@@ -16,7 +17,7 @@
 - CogEngine: Improve collision window: Add Query Type, Single or Multi, By Channel or Object Type, Object Type.
 - CogEngine: Add multi selection to the selection window actor filter (Character+GameState for example).
 
-- CogSample: Add a custom window in sample (changing the character faction)
+- CogSample: Add more info in the team window
 - CogSample: Create more abilities
 - CogSample: Push Model
 - CogSample: Add timescale game tweak 

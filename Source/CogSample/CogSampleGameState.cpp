@@ -44,6 +44,7 @@
 #include "CogInputWindow_Actions.h"
 #include "CogInputWindow_Gamepad.h"
 #include "CogSampleLogCategories.h"
+#include "CogSampleWindow_Team.h"
 #include "CogWindowManager.h"
 
 #include "GameFramework/GameUserSettings.h"
@@ -180,6 +181,8 @@ void ACogSampleGameState::InitializeCog()
     CogWindowManager->AddWindow<FCogAbilityWindow_Pools>("Gameplay.Pools");
 
     CogWindowManager->AddWindow<FCogAbilityWindow_OwnedTags>("Gameplay.Owned Tags");
+
+    CogWindowManager->AddWindow<FCogSampleWindow_Team>("Gameplay.Team");
 
     CogWindowManager->AddWindow<FCogAbilityWindow_Tweaks>("Gameplay.Tweaks");
 
