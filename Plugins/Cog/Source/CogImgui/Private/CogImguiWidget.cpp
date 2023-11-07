@@ -30,6 +30,11 @@ void SCogImguiWidget::Construct(const FArguments& InArgs)
     FontAtlas = InArgs._FontAtlas;
     Render = InArgs._Render;
 
+    if (FCogImguiModule::Get().GetEnableInput() == false)
+    {
+        SetVisibility(EVisibility::SelfHitTestInvisible);
+    }
+
     ImGuiContext = ImGui::CreateContext(FontAtlas);
     ImPlotContext = ImPlot::CreateContext();
     ImPlot::SetImGuiContext(ImGuiContext);
@@ -163,6 +168,8 @@ void SCogImguiWidget::TickFocus()
 //--------------------------------------------------------------------------------------------------------------------------
 void SCogImguiWidget::TakeFocus()
 {
+    SetVisibility(EVisibility::Visible);
+
     FSlateApplication& SlateApplication = FSlateApplication::Get();
 
     PreviousUserFocusedWidget = SlateApplication.GetUserFocusedWidget(SlateApplication.GetUserIndexForKeyboard());
@@ -182,6 +189,8 @@ void SCogImguiWidget::TakeFocus()
 //--------------------------------------------------------------------------------------------------------------------------
 void SCogImguiWidget::ReturnFocus()
 {
+    SetVisibility(EVisibility::SelfHitTestInvisible);
+
     if (HasKeyboardFocus())
     {
         auto FocusWidgetPtr = PreviousUserFocusedWidget.IsValid()
@@ -459,6 +468,11 @@ FReply SCogImguiWidget::OnMouseMove(const FGeometry& MyGeometry, const FPointerE
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiWidget::OnFocusReceived(const FGeometry& MyGeometry, const FFocusEvent& FocusEvent)
 {
+    if (FCogImguiModule::Get().GetEnableInput() == false)
+    {
+        return FReply::Unhandled();
+    }
+
     Super::OnFocusReceived(MyGeometry, FocusEvent);
 
     FSlateApplication::Get().ResetToDefaultPointerInputSettings();

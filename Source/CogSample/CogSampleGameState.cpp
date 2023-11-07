@@ -108,7 +108,10 @@ void ACogSampleGameState::Tick(float DeltaSeconds)
     //const float ServerWorldTimeDelta = LocalWorldTime - ServerWorldTime;
     //FCogDebugPlot::PlotValue(this, "Server World Time Delta", ServerWorldTimeDelta);
 
-    CogWindowManager->Tick(DeltaSeconds);
+    if (CogWindowManager != nullptr)
+    {
+        CogWindowManager->Tick(DeltaSeconds);
+    }
 
 #endif //ENABLE_COG
 }
