@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "imgui.h"
+#include <GameFramework/PlayerInput.h>
 #include "UObject/ReflectedTypeAccessors.h"
 
 class UEnum;

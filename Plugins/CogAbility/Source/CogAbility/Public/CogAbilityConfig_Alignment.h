@@ -7,7 +7,7 @@
 class UAbilitySystemComponent;
 class UCogAbilityDataAsset;
 class UGameplayEffect;
-namespace EGameplayModOp { enum Type; };
+namespace EGameplayModOp { enum Type : int; };
 struct FGameplayAttribute;
 struct FGameplayModifierInfo;
 struct FModifierSpec;
