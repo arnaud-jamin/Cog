@@ -45,7 +45,7 @@ private:
 
     ImFontAtlas DefaultFontAtlas;
 
-    bool bEnabledInput = true;
+    bool bEnabledInput = false;
 
     bool bIsInitialized = false;
 };
