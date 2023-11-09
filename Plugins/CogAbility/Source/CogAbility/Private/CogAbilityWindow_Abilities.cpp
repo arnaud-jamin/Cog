@@ -351,7 +351,12 @@ void FCogAbilityWindow_Abilities::RenderAbilitiesTable(UAbilitySystemComponent& 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Abilities::RenderAbilityCooldown(const UAbilitySystemComponent& AbilitySystemComponent, UGameplayAbility& Ability)
 {
-    FGameplayAbilitySpec* Spec = Ability.GetCurrentAbilitySpec();
+	if (!Ability.IsInstantiated())
+	{
+		return;
+	}
+
+	FGameplayAbilitySpec* Spec = Ability.GetCurrentAbilitySpec();
 
     if (Spec == nullptr)
     {
