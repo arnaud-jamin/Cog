@@ -16,15 +16,6 @@ struct ImPlotContext;
 using FCogImguiRenderFunction = TFunction<void(float DeltaTime)>;
 
 //--------------------------------------------------------------------------------------------------------------------------
-UENUM()
-enum class ECogImGuiInputMode : uint8
-{
-    Inactive,
-    Exclusive,
-    Shared
-};
-
-//--------------------------------------------------------------------------------------------------------------------------
 class COGIMGUI_API SCogImguiWidget : public SCompoundWidget
 {
     typedef SCompoundWidget Super;
