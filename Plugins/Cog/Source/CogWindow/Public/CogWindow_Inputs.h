@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
-#include "CogImGuiKeyInfo.h"
 
 class COGWINDOW_API FCogWindow_Inputs : public FCogWindow
 {

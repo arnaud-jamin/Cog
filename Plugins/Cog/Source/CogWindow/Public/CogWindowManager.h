@@ -6,6 +6,8 @@
 #include "CogWindowManager.generated.h"
 
 class FCogWindow;
+class FCogWindow_Inputs;
+class FCogWindow_Layouts;
 class FCogWindow_Settings;
 class IConsoleObject;
 class SCogImguiWidget;
@@ -91,8 +93,9 @@ public:
 
 protected:
 
-    friend class FCogWindow_Settings;
     friend class FCogWindow_Inputs;
+    friend class FCogWindow_Layouts;
+    friend class FCogWindow_Settings;
 
     struct FMenu
     {
@@ -112,10 +115,6 @@ protected:
     virtual void RenderOptionMenu(FMenu& Menu);
 
     virtual void RenderMenuItem(FCogWindow& Window, const char* MenuItemName);
-
-    virtual void RenderLoadLayoutMenuItem(const UPlayerInput* PlayerInput, int LayoutIndex);
-
-    virtual void RenderSaveLayoutMenuItem(const UPlayerInput* PlayerInput, int LayoutIndex);
 
     virtual void TickDPI();
 
@@ -200,6 +199,8 @@ protected:
     FCogWindow_Inputs* InputsWindow = nullptr;
 
     FCogWindow_Settings* SettingsWindow = nullptr;
+
+    FCogWindow_Layouts* LayoutsWindow = nullptr;
 
     FMenu MainMenu;
 

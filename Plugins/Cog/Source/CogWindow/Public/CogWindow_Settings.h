@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
-#include "CogImGuiKeyInfo.h"
 
 class COGWINDOW_API FCogWindow_Settings : public FCogWindow
 {
@@ -15,7 +14,4 @@ public:
 protected: 
 
     virtual void RenderContent() override;
-
-private:
-
 };

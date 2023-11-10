@@ -4,6 +4,7 @@
 #include "CogImguiInputHelper.h"
 #include "CogImguiModule.h"
 #include "CogWindow_Inputs.h"
+#include "CogWindow_Layouts.h"
 #include "CogWindow_Settings.h"
 #include "CogWindow_Spacing.h"
 #include "CogWindowConfig.h"
@@ -63,7 +64,7 @@ void UCogWindowManager::InitializeInternal()
     SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 4", false));
 
     InputsWindow = AddWindow<FCogWindow_Inputs>("Window.Inputs", false);
-
+    LayoutsWindow = AddWindow<FCogWindow_Layouts>("Window.Layouts", false);
     SettingsWindow = AddWindow<FCogWindow_Settings>("Window.Settings", false);
 
     ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
@@ -354,32 +355,15 @@ void UCogWindowManager::RenderMainMenu()
                 CloseAllWindows();
             }
 
-            if (ImGui::MenuItem("Reset Window Layout"))
-            {
-                ResetLayout();
-            }
 
-            if (ImGui::BeginMenu("Load Window Layout"))
-            {
-                for (int32 i = 1; i <= 4; ++i)
-                {
-                    RenderLoadLayoutMenuItem(PlayerInput, i);
-                }
-
-                ImGui::EndMenu();
-            }
-
-            if (ImGui::BeginMenu("Save Window Layout"))
-            {
-                for (int32 i = 1; i <= 4; ++i)
-                {
-                    RenderSaveLayoutMenuItem(PlayerInput, i);
-                }
-
-                ImGui::EndMenu();
-            }
 
             ImGui::Separator();
+
+            RenderMenuItem(*InputsWindow, "Inputs");
+            
+            RenderMenuItem(*LayoutsWindow, "Layouts");
+
+            RenderMenuItem(*SettingsWindow, "Settings");
 
             if (ImGui::BeginMenu("Spacing"))
             {
@@ -428,14 +412,8 @@ void UCogWindowManager::RenderMainMenu()
                     ImGui::PopID();
                 }
 
-
                 ImGui::EndMenu();
             }
-
-            RenderMenuItem(*InputsWindow, "Inputs");
-
-            RenderMenuItem(*SettingsWindow, "Settings");
- 
             
             ImGui::EndMenu();
         }
@@ -509,28 +487,6 @@ void UCogWindowManager::RenderMainMenu()
         }
 
         ImGui::EndMainMenuBar();
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::RenderLoadLayoutMenuItem(const UPlayerInput* PlayerInput, int LayoutIndex)
-{
-    FString Command = FString::Printf(TEXT("%s %d"), *LoadLayoutCommand, LayoutIndex);
-    FString Shortcut = FCogImguiInputHelper::CommandToString(PlayerInput, Command);
-    if (ImGui::MenuItem(TCHAR_TO_ANSI(*FString::Printf(TEXT("Load Layout %d"), LayoutIndex)), TCHAR_TO_ANSI(*Shortcut)))
-    {
-        LoadLayout(LayoutIndex);
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::RenderSaveLayoutMenuItem(const UPlayerInput* PlayerInput, int LayoutIndex)
-{
-    FString Command = FString::Printf(TEXT("%s %d"), *SaveLayoutCommand, LayoutIndex);
-    FString Shortcut = FCogImguiInputHelper::CommandToString(PlayerInput, Command);
-    if (ImGui::MenuItem(TCHAR_TO_ANSI(*FString::Printf(TEXT("Save Layout %d"), LayoutIndex)), TCHAR_TO_ANSI(*Shortcut)))
-    {
-        SaveLayout(LayoutIndex);
     }
 }
 
