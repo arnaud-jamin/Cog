@@ -130,18 +130,18 @@ void FCogInputWindow_Actions::RenderContent()
 
                     const ImVec4 ActiveColor(1, 0.8f, 0, 1);
                     const ImVec4 InnactiveColor(0.3f, 0.3f, 0.3f, 1);
-                    const ImVec2 ButtonWidth(FCogWindowWidgets::GetFontWidth() * 10, 0);
+                    const ImVec2 ButtonSize(FCogWindowWidgets::GetFontWidth() * 10, 0);
 
                     ImGui::TableNextColumn();
                     ImGui::BeginDisabled();
                     bool Value = ActionValue.Get<bool>();
-                    FCogWindowWidgets::ToggleButton(&Value, "Pressed##Value", "Released##Value", ActiveColor, InnactiveColor, ButtonWidth);
+                    FCogWindowWidgets::ToggleButton(&Value, "Pressed##Value", "Released##Value", ActiveColor, InnactiveColor, ButtonSize);
                     ImGui::EndDisabled();
 
                     ImGui::TableNextColumn();
-                    FCogWindowWidgets::ToggleButton(&ActionInfo.bPressed, "Pressed##Inject", "Released##Inject", ActiveColor, InnactiveColor, ButtonWidth);
+                    FCogWindowWidgets::ToggleButton(&ActionInfo.bPressed, "Pressed##Inject", "Released##Inject", ActiveColor, InnactiveColor, ButtonSize);
                     ImGui::SameLine();
-                    FCogWindowWidgets::ToggleButton(&ActionInfo.bRepeat, "Repeat", "Repeat", ActiveColor, InnactiveColor, ButtonWidth);
+                    FCogWindowWidgets::ToggleButton(&ActionInfo.bRepeat, "Repeat", "Repeat", ActiveColor, InnactiveColor, ButtonSize);
                     break;
                 }
 

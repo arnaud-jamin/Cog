@@ -18,11 +18,11 @@ public:
 
     static void ProgressBarCentered(float Fraction, const ImVec2& Size, const char* Overlay);
 
-    static void ToggleMenuButton(bool* Value, const char* Text, const ImVec4& TrueColor);
+    static bool ToggleMenuButton(bool* Value, const char* Text, const ImVec4& TrueColor);
 
-    static void ToggleButton(bool* Value, const char* Text, const ImVec4& TrueColor, const ImVec4& FalseColor, const ImVec2& Size = ImVec2(0, 0));
+    static bool ToggleButton(bool* Value, const char* Text, const ImVec4& TrueColor, const ImVec4& FalseColor, const ImVec2& Size = ImVec2(0, 0));
 
-    static void ToggleButton(bool* Value, const char* TextTrue, const char* TextFalse, const ImVec4& TrueColor, const ImVec4& FalseColor, const ImVec2& Size = ImVec2(0, 0));
+    static bool ToggleButton(bool* Value, const char* TextTrue, const char* TextFalse, const ImVec4& TrueColor, const ImVec4& FalseColor, const ImVec2& Size = ImVec2(0, 0));
 
     static bool MultiChoiceButton(const char* Label, bool IsSelected, const ImVec2& Size = ImVec2(0, 0));
 

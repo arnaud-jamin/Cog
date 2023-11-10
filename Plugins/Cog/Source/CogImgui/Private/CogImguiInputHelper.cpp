@@ -48,22 +48,6 @@ UPlayerInput* FCogImguiInputHelper::GetPlayerInput(const UWorld& World)
 bool FCogImguiInputHelper::IsKeyEventHandled(UWorld* World, const FKeyEvent& KeyEvent)
 {
     //------------------------------------------------------------------------------------------------
-    // Do not handle the input if imgui input is disabled
-    //------------------------------------------------------------------------------------------------
-    if (FCogImguiModule::Get().GetEnableInput() == false)
-    {
-        return false;
-    }
-
-    //------------------------------------------------------------------------------------------------
-    // We want the user to control the character with its gamepad even when imgui has the input.
-    //------------------------------------------------------------------------------------------------
-    if (KeyEvent.GetKey().IsGamepadKey())
-    {
-        return false;
-    }
-    
-    //------------------------------------------------------------------------------------------------
     // We want the user to be able to open the console command when imgui has the input.
     //------------------------------------------------------------------------------------------------
     if (IsConsoleEvent(KeyEvent))

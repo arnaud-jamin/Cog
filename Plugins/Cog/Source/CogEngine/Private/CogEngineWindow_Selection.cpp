@@ -136,8 +136,8 @@ void FCogEngineWindow_Selection::ToggleSelectionMode()
 void FCogEngineWindow_Selection::ActivateSelectionMode()
 {
     bSelectionModeActive = true;
-    bImGuiHadInputBeforeEnteringSelectionMode = FCogImguiModule::Get().GetEnableInput();
-    FCogImguiModule::Get().SetEnableInput(true);
+    bIsInputEnabledBeforeEnteringSelectionMode = GetOwner()->GetImGuiWidget()->GetEnableInput();
+    GetOwner()->GetImGuiWidget()->SetEnableInput(true);
     GetOwner()->SetHideAllWindows(true);
 }
 
@@ -158,10 +158,7 @@ void FCogEngineWindow_Selection::DeactivateSelectionMode()
     // When in selection mode we need imgui to have the input focus
     // When leaving selection mode we want to leave it as is was before
     //--------------------------------------------------------------------------------------------
-    if (bImGuiHadInputBeforeEnteringSelectionMode == false)
-    {
-        FCogImguiModule::Get().SetEnableInput(false);
-    }
+    GetOwner()->GetImGuiWidget()->SetEnableInput(bIsInputEnabledBeforeEnteringSelectionMode);
 
     GetOwner()->SetHideAllWindows(false);
 }

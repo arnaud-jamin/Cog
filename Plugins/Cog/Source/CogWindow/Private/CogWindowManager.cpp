@@ -3,7 +3,7 @@
 #include "CogDebugDrawImGui.h"
 #include "CogImguiInputHelper.h"
 #include "CogImguiModule.h"
-#include "CogImguiWidget.h"
+#include "CogWindow_Inputs.h"
 #include "CogWindow_Settings.h"
 #include "CogWindow_Spacing.h"
 #include "CogWindowConfig.h"
@@ -41,6 +41,10 @@ void UCogWindowManager::PostInitProperties()
 void UCogWindowManager::InitializeInternal()
 {
     ImGuiWidget = FCogImguiModule::Get().CreateImGuiWidget(GEngine->GameViewport, [this](float DeltaTime) { Render(DeltaTime); });
+    ImGuiWidget->SetEnableInput(bEnableInput);
+    ImGuiWidget->SetShareGamepad(bShareGamepad);
+    ImGuiWidget->SetShareKeyboard(bShareKeyboard);
+    ImGuiWidget->SetShareMouse(bShareMouse);
 
     ImGuiSettingsHandler IniHandler;
     IniHandler.TypeName = "Cog";
@@ -58,12 +62,14 @@ void UCogWindowManager::InitializeInternal()
     SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 3", false));
     SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 4", false));
 
+    InputsWindow = AddWindow<FCogWindow_Inputs>("Window.Inputs", false);
+
     SettingsWindow = AddWindow<FCogWindow_Settings>("Window.Settings", false);
 
     ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
         *ToggleInputCommand,
         TEXT("Toggle the input focus between the Game and ImGui"),
-        FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& Args) { FCogImguiModule::Get().ToggleEnableInput(); }), 
+        FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { ToggleInputMode(); }), 
         ECVF_Cheat));
 
     ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
@@ -89,6 +95,14 @@ void UCogWindowManager::InitializeInternal()
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::Shutdown()
 {
+    //------------------------------------------------------------
+    // To save the input mode for the next session
+    //------------------------------------------------------------
+    bEnableInput = ImGuiWidget->GetEnableInput();
+    bShareGamepad = ImGuiWidget->GetEnableInput();
+    bShareKeyboard = ImGuiWidget->GetEnableInput();
+    bShareMouse = ImGuiWidget->GetEnableInput();
+
     //------------------------------------------------------------
     // Destroy ImGui before destroying the windows to make sure 
     // imgui serialize their visibility state in imgui.ini
@@ -165,7 +179,7 @@ void UCogWindowManager::Render(float DeltaTime)
 
     if (bHideAllWindows == false)
     {
-        if (FCogImguiModule::Get().GetEnableInput())
+        if (ImGuiWidget->GetEnableInput() || bHideMainMenuOnGameInput == false)
         {
             RenderMainMenu();
         }
@@ -335,13 +349,6 @@ void UCogWindowManager::RenderMainMenu()
 
         if (ImGui::BeginMenu("Window"))
         {
-            if (ImGui::MenuItem("Toggle Input", TCHAR_TO_ANSI(*FCogImguiInputHelper::CommandToString(PlayerInput, ToggleInputCommand))))
-            {
-                FCogImguiModule::Get().ToggleEnableInput();
-            }
-            ImGui::Separator();
-
-
             if (ImGui::MenuItem("Close All Windows"))
             {
                 CloseAllWindows();
@@ -425,7 +432,7 @@ void UCogWindowManager::RenderMainMenu()
                 ImGui::EndMenu();
             }
 
-            ImGui::Separator();
+            RenderMenuItem(*InputsWindow, "Inputs");
 
             RenderMenuItem(*SettingsWindow, "Settings");
  
@@ -823,4 +830,10 @@ const UObject* UCogWindowManager::GetAsset(const TSubclassOf<UObject> AssetClass
     Assets.Add(Asset);
 
     return Asset;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogWindowManager::ToggleInputMode()
+{
+    ImGuiWidget->SetEnableInput(!ImGuiWidget->GetEnableInput());
 }

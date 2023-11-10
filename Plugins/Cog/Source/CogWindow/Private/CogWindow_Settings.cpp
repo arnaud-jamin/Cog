@@ -33,7 +33,9 @@ void FCogWindow_Settings::RenderContent()
     ImGui::Checkbox("Compact Mode", &GetOwner()->bCompactMode);
 
     ImGui::Checkbox("Show Windows In Main Menu", &GetOwner()->bShowWindowsInMainMenu);
-    
+
+    ImGui::Checkbox("Hide Main Menu On Game Input", &GetOwner()->bHideMainMenuOnGameInput);
+
     ImGui::Checkbox("Show Window Help", &GetOwner()->bShowHelp);
 
     ImGui::Separator();

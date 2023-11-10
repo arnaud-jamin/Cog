@@ -8,6 +8,7 @@
 
 class IConsoleObject;
 class UCogEngineConfig_Selection;
+enum class ECogImGuiInputMode : uint8;
 
 //--------------------------------------------------------------------------------------------------------------------------
 class COGENGINE_API FCogEngineWindow_Selection : public FCogWindow
@@ -82,7 +83,7 @@ protected:
 
     bool bSelectionModeActive = false;
 
-    bool bImGuiHadInputBeforeEnteringSelectionMode = false;
+    bool bIsInputEnabledBeforeEnteringSelectionMode;
 
     int32 WaitInputReleased = 0;
 

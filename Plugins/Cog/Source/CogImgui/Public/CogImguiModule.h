@@ -31,12 +31,6 @@ public:
     
     ImFontAtlas& GetDefaultFontAtlas() { return DefaultFontAtlas; }
 
-    bool GetEnableInput() const { return bEnabledInput; }
-    
-    void SetEnableInput(bool Value) { bEnabledInput = Value; }
-    
-    void ToggleEnableInput() { bEnabledInput = !bEnabledInput; }
-    
 private:
 
     void Initialize();
@@ -44,8 +38,6 @@ private:
     FCogImguiTextureManager TextureManager;
 
     ImFontAtlas DefaultFontAtlas;
-
-    bool bEnabledInput = true;
 
     bool bIsInitialized = false;
 };
