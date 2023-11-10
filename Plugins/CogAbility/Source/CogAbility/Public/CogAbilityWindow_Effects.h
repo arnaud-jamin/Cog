@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ActiveGameplayEffectHandle.h"
 #include "GameplayTagContainer.h"
 #include "CogWindow.h"
 #include "CogWindowConfig.h"
@@ -14,7 +15,6 @@ class UCogAbilityDataAsset;
 class UGameplayEffect;
 namespace EGameplayModOp { enum Type; };
 struct FActiveGameplayEffect;
-struct FActiveGameplayEffectHandle;
 struct FGameplayModifierInfo;
 struct FModifierSpec;
 
