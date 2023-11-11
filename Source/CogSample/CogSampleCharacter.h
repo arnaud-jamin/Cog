@@ -1,5 +1,7 @@
 #pragma once
 
+#include "CoreMinimal.h"
+
 #include "AbilitySystemInterface.h"
 #include "ActiveGameplayEffectHandle.h"
 #include "AttributeSet.h"
@@ -10,11 +12,12 @@
 #include "CogSampleProgressionLevelInterface.h"
 #include "CogSampleTargetableInterface.h"
 #include "CogSampleTeamInterface.h"
-#include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "GameplayAbilitySpecHandle.h"
+#include "GameplayEffectTypes.h"
 #include "GameplayTagContainer.h"
 #include "InputActionValue.h"
+
 #include "CogSampleCharacter.generated.h"
 
 class UCameraComponent;
@@ -74,6 +77,7 @@ public:
 
 //--------------------------------------------------------------------------------------------------------------------------
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCogSampleCharacterEventDelegate, ACogSampleCharacter*, Character);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FCogSampleAimingChangedEventDelegate, ACogSampleCharacter*, Character, bool, IsAiming);
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(config=Game)
@@ -145,6 +149,19 @@ public:
     virtual bool IsDead() const override;
 
     //----------------------------------------------------------------------------------------------------------------------
+    // Aiming
+    //----------------------------------------------------------------------------------------------------------------------
+
+    UFUNCTION(BlueprintCallable)
+    virtual void SetIsAiming(bool Value);
+
+    UFUNCTION(BlueprintPure)
+    virtual bool GetIsAiming() const { return bIsAiming; }
+
+    UPROPERTY(BlueprintAssignable)
+    FCogSampleAimingChangedEventDelegate OnAimingChanged;
+
+    //----------------------------------------------------------------------------------------------------------------------
     // Team
     //----------------------------------------------------------------------------------------------------------------------
     
@@ -166,6 +183,7 @@ public:
     //----------------------------------------------------------------------------------------------------------------------
     // Camera
     //----------------------------------------------------------------------------------------------------------------------
+
     USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
     UCameraComponent* GetFollowCamera() const { return FollowCamera; }
@@ -179,6 +197,7 @@ public:
     //----------------------------------------------------------------------------------------------------------------------
     // Input
     //----------------------------------------------------------------------------------------------------------------------
+
     FVector TransformInputInWorldSpace(const FVector& Input) const;
 
     FVector GetMoveInput() const { return MoveInput; }
@@ -280,6 +299,9 @@ protected:
     UPROPERTY()
     AController* InitialController = nullptr;
 
+    UPROPERTY(EditDefaultsOnly, Category = "GameplayTags")
+    FGameplayTagBlueprintPropertyMap GameplayTagPropertyMap;
+
     //----------------------------------------------------------------------------------------------------------------------
     // Inputs
     //----------------------------------------------------------------------------------------------------------------------
@@ -358,5 +380,12 @@ protected:
     void Client_ApplyRootMotion(const FCogSampleRootMotionParams& Params);
 
     uint16 ApplyRootMotionShared(const FCogSampleRootMotionParams& Params);
+
+    //----------------------------------------------------------------------------------------------------------------------
+    // Aiming
+    //----------------------------------------------------------------------------------------------------------------------
+    
+    bool bIsAiming = false;
+
 };
 

@@ -294,6 +294,8 @@ void ACogSampleCharacter::InitializeAbilitySystem()
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleCharacter::RegisterToAbilitySystemEvents()
 {
+    GameplayTagPropertyMap.Initialize(this, AbilitySystem);
+
     //----------------------------------------
     // Register to Tag change events
     //----------------------------------------
@@ -859,3 +861,16 @@ bool ACogSampleCharacter::GetMontage(FName MontageName, UAnimMontage*& Montage, 
     Montage = Row->Montage;
     return Montage != nullptr;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSampleCharacter::SetIsAiming(bool Value)
+{
+    if (bIsAiming == Value)
+    {
+        return;
+    }
+
+    bIsAiming = Value;
+    OnAimingChanged.Broadcast(this, bIsAiming);
+}
+
