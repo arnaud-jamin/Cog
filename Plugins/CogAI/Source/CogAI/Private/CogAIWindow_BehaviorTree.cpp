@@ -247,11 +247,11 @@ void FCogAIWindow_BehaviorTree::RenderNode(UBehaviorTreeComponent& BehaviorTreeC
         const bool HasChildren = CompositeNode != nullptr && CompositeNode->GetChildrenNum() > 0;
         if (HasChildren && Filter.IsActive() == false)
         {
-            OpenChildren = ImGui::TreeNodeEx("##Node", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanFullWidth);
+            OpenChildren = ImGui::TreeNodeEx("##Node", ImGuiSelectableFlags_AllowOverlap | ImGuiTreeNodeFlags_SpanFullWidth);
         }
         else
         {
-            ImGui::TreeNodeEx("##Node", ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanFullWidth);
+            ImGui::TreeNodeEx("##Node", ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiSelectableFlags_AllowOverlap | ImGuiTreeNodeFlags_SpanFullWidth);
         }
 
         const bool IsControlDown = ImGui::GetCurrentContext()->IO.KeyCtrl;

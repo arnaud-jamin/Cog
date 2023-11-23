@@ -164,7 +164,7 @@ void FCogEngineWindow_Metrics::DrawMetricRow(const char* RowTitle, float Mitigat
 {
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
-    ImGui::Selectable(RowTitle, false, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap | ImGuiSelectableFlags_AllowDoubleClick);
+    ImGui::Selectable(RowTitle, false, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap | ImGuiSelectableFlags_AllowDoubleClick);
     ImGui::TableNextColumn();
     ImGui::TextColored(Color, "%.1f", MitigatedValue);
     ImGui::TableNextColumn();

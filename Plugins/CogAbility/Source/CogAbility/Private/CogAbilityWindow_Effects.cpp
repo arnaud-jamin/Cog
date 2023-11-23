@@ -203,7 +203,7 @@ void FCogAbilityWindow_Effects::RenderEffectRow(const UAbilitySystemComponent& A
 
     ImGui::PushStyleColor(ImGuiCol_Text, FCogImguiHelper::ToImVec4(AlignmentConfig->GetEffectColor(Asset, Effect)));
 
-    if (ImGui::Selectable(EffectName, Selected == Index, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap | ImGuiSelectableFlags_AllowDoubleClick))
+    if (ImGui::Selectable(EffectName, Selected == Index, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap | ImGuiSelectableFlags_AllowDoubleClick))
     {
         Selected = Index;
     }

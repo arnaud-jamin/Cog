@@ -197,7 +197,6 @@ void UCogWindowManager::Render(float DeltaTime)
                 ImGui::SetNextWindowBgAlpha(0.35f);
             }
 
-            ImGui::DockSpaceOverViewport(0, ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingInCentralNode | ImGuiDockNodeFlags_AutoHideTabBar);
             Window->Render(DeltaTime);
         }
     }

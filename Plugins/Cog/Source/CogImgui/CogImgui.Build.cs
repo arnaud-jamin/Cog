@@ -5,61 +5,38 @@ public class CogImgui : ModuleRules
 {
 	public CogImgui(ReadOnlyTargetRules Target) : base(Target)
 	{
-		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-        bLegacyPublicIncludePaths = false;
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicIncludePaths.AddRange(
-			new string[] {
-                Path.Combine(ModuleDirectory, "../ThirdParty/imgui/"),
-                Path.Combine(ModuleDirectory, "../ThirdParty/implot/"),
-            }
-			);
-				
-		
-		PrivateIncludePaths.AddRange(
-			new string[] {
-                "ThirdParty/imgui",
-                "ThirdParty/implot",
-            }
-			);
-			
-		
-		PublicDependencyModuleNames.AddRange(
-			new string[]
-			{
-				"Core",
-                "Projects"
-			}
-            );
-			
-		
-		PrivateDependencyModuleNames.AddRange(
-			new string[]
-			{
-				"CoreUObject",
-				"Engine",
-                "InputCore",
-				"Slate",
-                "SlateCore",
-			}
-			);
+        PublicDependencyModuleNames.AddRange(new[]
+        {
+            "Core",
+            "ImGui",
+            "ImPlot",
+        });
 
-        DynamicallyLoadedModuleNames.AddRange(
-			new string[]
-			{
-			}
-			);
+        PrivateDependencyModuleNames.AddRange(new[]
+        {
+            "ApplicationCore",
+            "CoreUObject",
+            "Engine",
+            "InputCore",
+            "Slate",
+            "SlateCore"
+        });
 
         if (Target.bBuildEditor)
         {
-            PrivateDependencyModuleNames.AddRange(
-                new string[]
-                {
-                    "EditorStyle",
-                    "Settings",
-                    "UnrealEd",
-                }
-                );
+            PrivateDependencyModuleNames.AddRange(new[]
+            {
+                "MainFrame",
+                "EditorStyle",
+                "Settings",
+                "UnrealEd",
+            });
         }
+
+        PublicDefinitions.Add("IMGUI_USER_CONFIG=\"CogImGuiConfig.h\"");
+        PublicDefinitions.Add("IMGUI_API=COGIMGUI_API");
+        PublicDefinitions.Add("IMPLOT_API=COGIMGUI_API");
     }
 }

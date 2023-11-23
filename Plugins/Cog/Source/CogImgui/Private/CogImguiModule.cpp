@@ -1,8 +1,11 @@
 #include "CogImguiModule.h"
 
-#include "Engine/GameViewportClient.h"
-#include "Widgets/Layout/SScaleBox.h"
 #include "CogImguiWidget.h"
+#include "Engine/Engine.h"
+#include "Engine/GameViewportClient.h"
+#include "HAL/LowLevelMemTracker.h"
+#include "HAL/UnrealMemory.h"
+#include "Widgets/Layout/SScaleBox.h"
 
 #define LOCTEXT_NAMESPACE "FCogImguiModule"
 
@@ -11,9 +14,22 @@
 constexpr int32 Cog_ZOrder = 10000;
 
 //--------------------------------------------------------------------------------------------------------------------------
+static void* ImGui_MemAlloc(size_t Size, void* UserData)
+{
+    LLM_SCOPE_BYNAME(TEXT("ImGui"));
+    return FMemory::Malloc(Size);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+static void ImGui_MemFree(void* Ptr, void* UserData)
+{
+    FMemory::Free(Ptr);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiModule::StartupModule()
 {
-
+    ImGui::SetAllocatorFunctions(ImGui_MemAlloc, ImGui_MemFree);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

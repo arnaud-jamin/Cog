@@ -381,7 +381,7 @@ bool FCogWindowWidgets::CheckBoxState(const char* Label, ECheckBoxState& State)
 
     const bool IsPressed = ImGui::CheckboxFlags(Label, &Flags, 3);
 
-    ImGui::PopStyleColor(6);
+    ImGui::PopStyleColor(5);
 
     if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
     {

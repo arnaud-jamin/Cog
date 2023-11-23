@@ -155,13 +155,13 @@ void FCogEngineWindow_Collisions::RenderContent()
     //-------------------------------------------------
     for (int ChannelIndex = 0; ChannelIndex < (int32)ECC_MAX; ++ChannelIndex)
     {
-        ImGui::PushID(ChannelIndex);
-
         const FChannel& Channel = Channels[ChannelIndex];
         if (Channel.IsValid == false)
         {
             continue;
         }
+
+        ImGui::PushID(ChannelIndex);
 
         ImColor Color = FCogImguiHelper::ToImColor(Channel.Color);
         ImGui::ColorEdit4("Color", (float*)&Color.Value, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);

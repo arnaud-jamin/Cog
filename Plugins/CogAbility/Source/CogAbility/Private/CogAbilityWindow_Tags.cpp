@@ -125,7 +125,7 @@ void FCogAbilityWindow_Tags::RenderTagContainer(const UAbilitySystemComponent& A
             // Name
             //------------------------
             ImGui::TableNextColumn();
-            if (ImGui::Selectable(TCHAR_TO_ANSI(*Tag.GetTagName().ToString()), Selected == Index, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowItemOverlap | ImGuiSelectableFlags_AllowDoubleClick))
+            if (ImGui::Selectable(TCHAR_TO_ANSI(*Tag.GetTagName().ToString()), Selected == Index, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap | ImGuiSelectableFlags_AllowDoubleClick))
             {
                 Selected = Index;
             }
