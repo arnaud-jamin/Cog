@@ -5,7 +5,7 @@
 #include "Rendering/RenderingCommon.h"
 #include "UObject/WeakObjectPtr.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
-#include "Widgets/SCompoundWidget.h"
+#include "Widgets/SLeafWidget.h"
 
 class IInputProcessor;
 class UGameViewportClient;
@@ -17,9 +17,9 @@ struct ImPlotContext;
 using FCogImguiRenderFunction = TFunction<void(float DeltaTime)>;
 
 //--------------------------------------------------------------------------------------------------------------------------
-class COGIMGUI_API SCogImguiWidget : public SCompoundWidget
+class COGIMGUI_API SCogImguiWidget : public SLeafWidget
 {
-    typedef SCompoundWidget Super;
+    typedef SLeafWidget Super;
 
 public:
 
@@ -87,6 +87,8 @@ protected:
     virtual void OnDpiChanged();
 
     virtual bool IsConsoleOpened() const;
+
+    virtual void DrawDebug();
 
     TWeakObjectPtr<UGameViewportClient> GameViewport;
 

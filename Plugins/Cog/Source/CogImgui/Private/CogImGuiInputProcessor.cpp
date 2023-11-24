@@ -41,16 +41,7 @@ void FImGuiInputProcessor::Tick(const float DeltaTime, FSlateApplication& SlateA
         UE_LOG(LogCogImGui, VeryVerbose, TEXT("FImGuiInputProcessor::Tick | HasGamePad Changed"));
     }
 
-    if (IO.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-    {
-        const FVector2D MousePosition = SlateApp.GetCursorPos();
-        IO.AddMousePosEvent(MousePosition.X, MousePosition.Y);
-    }
-    else
-    {
-        const FVector2D MousePosition = TransformScreenPointToImGui(MainWidget->GetTickSpaceGeometry(), SlateApp.GetCursorPos());
-        IO.AddMousePosEvent(MousePosition.X, MousePosition.Y);
-    }
+    AddMousePosEvent(SlateApp.GetCursorPos());
 
     if ((IO.ConfigFlags & ImGuiConfigFlags_NoMouse) == 0)
     {
@@ -182,24 +173,14 @@ bool FImGuiInputProcessor::HandleAnalogInputEvent(FSlateApplication& SlateApp, c
 //--------------------------------------------------------------------------------------------------------------------------
 bool FImGuiInputProcessor::HandleMouseMoveEvent(FSlateApplication& SlateApp, const FPointerEvent& Event)
 {
-    ImGuiIO& IO = ImGui::GetIO();
-
-    if (IO.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-    {
-        const FVector2D MousePosition = Event.GetScreenSpacePosition();;
-        IO.AddMousePosEvent(MousePosition.X, MousePosition.Y);
-    }
-    else
-    {
-        const FVector2D MousePosition = TransformScreenPointToImGui(MainWidget->GetTickSpaceGeometry(), Event.GetScreenSpacePosition());
-        IO.AddMousePosEvent(MousePosition.X, MousePosition.Y);
-    }
+    AddMousePosEvent(Event.GetScreenSpacePosition());
 
     if (MainWidget->GetEnableInput() && MainWidget->GetShareMouse() == false)
     {
         return TerminateEvent;
     }
 
+    ImGuiIO& IO = ImGui::GetIO();
     const bool Result = IO.WantCaptureMouse ? TerminateEvent : ForwardEvent;
     return Result;
 }
@@ -240,6 +221,20 @@ bool FImGuiInputProcessor::HandleMouseButtonEvent(FSlateApplication& SlateApp, c
     const bool Result = IO.WantCaptureMouse ? TerminateEvent : ForwardEvent;
     UE_LOG(LogCogImGui, VeryVerbose, TEXT("FImGuiInputProcessor::HandleMouseButtonEvent | Button:%d | IsButtonDown:%d | WantCaptureMouse:%d | TerminateEvent:%d"), Button, IsButtonDown, IO.WantCaptureMouse, Result);
     return Result;
+}
+//--------------------------------------------------------------------------------------------------------------------------
+void FImGuiInputProcessor::AddMousePosEvent(const FVector2D& MousePosition) const
+{
+    ImGuiIO& IO = ImGui::GetIO();
+    if (IO.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        IO.AddMousePosEvent(MousePosition.X, MousePosition.Y);
+    }
+    else
+    {
+        const FVector2D TransformedMousePosition = MousePosition - MainWidget->GetTickSpaceGeometry().GetAbsolutePosition();
+        IO.AddMousePosEvent(TransformedMousePosition.X, TransformedMousePosition.Y);
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

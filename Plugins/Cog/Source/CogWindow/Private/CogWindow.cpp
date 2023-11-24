@@ -110,7 +110,6 @@ void FCogWindow::Render(float DeltaTime)
         }
 
         RenderContent();
-        ImGui::End();
     }
     else
     {
@@ -119,6 +118,8 @@ void FCogWindow::Render(float DeltaTime)
             ImGui::PopStyleVar(1);
         }
     }
+
+    ImGui::End();
 
     PostRender();
 }

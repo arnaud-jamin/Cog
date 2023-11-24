@@ -37,6 +37,8 @@ protected:
 
 	bool HandleMouseButtonEvent(FSlateApplication& SlateApp, const FPointerEvent& Event, bool IsButtonDown);
 
+	void AddMousePosEvent(const FVector2D& MousePosition) const;
+
 	bool IsKeyBoundToCommand(const FKeyEvent& KeyEvent);
 
 	static ImGuiKey ToImKey(const FKey& Key);

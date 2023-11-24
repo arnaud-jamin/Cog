@@ -98,20 +98,6 @@ void SCogImguiWidget::Tick(const FGeometry& AllottedGeometry, const double InCur
     TickKeyModifiers();
     TickFocus();
     TickImGui(InDeltaTime);
-
-    //ImGuiIO& IO = ImGui::GetIO();
-    //if (GetEnableInput())
-    //{
-    //    IO.ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
-    //    IO.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-    //    IO.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
-    //}
-    //else
-    //{
-    //    IO.ConfigFlags |= ImGuiConfigFlags_NoMouse;
-    //    IO.ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard;
-    //    IO.ConfigFlags &= ~ImGuiConfigFlags_NavEnableGamepad;
-    //}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -138,18 +124,18 @@ void SCogImguiWidget::TickImGui(float InDeltaTime)
     }
 
     ImGui::SetCurrentContext(ImGuiContext);
-    ImGuiIO& IO = ImGui::GetIO();
-    IO.DeltaTime = InDeltaTime;
-
     ImPlot::SetImGuiContext(ImGuiContext);
     ImPlot::SetCurrentContext(ImPlotContext);
 
-    FVector2D DisplaySize;
-    GameViewport->GetViewportSize(DisplaySize);
-    IO.DisplaySize = FCogImguiHelper::ToImVec2(DisplaySize);
+    ImGuiIO& IO = ImGui::GetIO();
+    IO.DeltaTime = FApp::GetDeltaTime();
+    IO.DisplaySize = FCogImguiHelper::ToImVec2(GetTickSpaceGeometry().GetAbsoluteSize());
 
     ImGui::NewFrame();
+    
     Render(InDeltaTime);
+    //DrawDebug();
+
     ImGui::Render();
 
     if ((IO.ConfigFlags & ImGuiConfigFlags_NoMouse) == 0)
@@ -247,7 +233,7 @@ int32 SCogImguiWidget::OnPaint(
     bool bParentEnabled) const
 {
 
-    const FSlateRenderTransform& WidgetToScreen = AllottedGeometry.GetAccumulatedRenderTransform();
+    const FSlateRenderTransform& WidgetToScreen = AllottedGeometry.GetAccumulatedRenderTransform().GetTranslation();
     const FSlateRenderTransform ImGuiToScreen = FCogImguiHelper::RoundTranslation(ImGuiRenderTransform.Concatenate(WidgetToScreen));
 
     FCogImguiTextureManager& TextureManager = FCogImguiModule::Get().GetTextureManager();
@@ -281,13 +267,14 @@ int32 SCogImguiWidget::OnPaint(
         }
     }
 
-    return Super::OnPaint(Args, AllottedGeometry, MyClippingRect, OutDrawElements, LayerId, WidgetStyle, bParentEnabled);
+    return LayerId;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 FVector2D SCogImguiWidget::ComputeDesiredSize(float Scale) const
 {
-    return Super::ComputeDesiredSize(Scale);
+    return FVector2D::ZeroVector;
+    //return Super::ComputeDesiredSize(Scale);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -419,3 +406,35 @@ FReply SCogImguiWidget::OnKeyChar(const FGeometry& MyGeometry, const FCharacterE
     const FReply Result = IO.WantCaptureKeyboard ? FReply::Handled() : FReply::Unhandled();
     return Result;
 }
+
+
+//--------------------------------------------------------------------------------------------------------------------------
+void SCogImguiWidget::DrawDebug()
+{
+    if (ImGui::Begin("ImGui Integration Debug"))
+    {
+        ImGui::BeginDisabled();
+
+        ImVec2 AbsPos = FCogImguiHelper::ToImVec2(GetTickSpaceGeometry().GetAbsolutePosition());
+        ImGui::InputFloat2("Widget Abs Pos", &AbsPos.x, "%0.1f");
+
+        ImVec2 AbsSize = FCogImguiHelper::ToImVec2(GetTickSpaceGeometry().GetAbsoluteSize());
+        ImGui::InputFloat2("Widget Abs Size", &AbsSize.x, "%0.1f");
+
+        ImVec2 LocalSize = FCogImguiHelper::ToImVec2(GetTickSpaceGeometry().GetLocalSize());
+        ImGui::InputFloat2("Widget Local Size", &LocalSize.x, "%0.1f");
+
+        FSlateApplication& SlateApp = FSlateApplication::Get();
+        ImVec2 MousePosition = FCogImguiHelper::ToImVec2(SlateApp.GetCursorPos());
+        ImGui::InputFloat2("Mouse", &MousePosition.x, "%0.1f");
+
+        ImGuiIO& IO = ImGui::GetIO();
+        ImGui::InputFloat2("ImGui Mouse", &IO.MousePos.x, "%0.1f");
+
+        ImGui::EndDisabled();
+    }
+    ImGui::End();
+}
+
+
+

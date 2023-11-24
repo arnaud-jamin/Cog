@@ -70,20 +70,9 @@ TSharedPtr<SCogImguiWidget> FCogImguiModule::CreateImGuiWidget(UGameViewportClie
     SAssignNew(ImguiWidget, SCogImguiWidget)
         .GameViewport(GameViewport)
         .FontAtlas(FontAtlas)
-        .Render(Render)
-        .Clipping(EWidgetClipping::ClipToBounds);
+        .Render(Render);
 
-    TSharedPtr<SScaleBox> ScaleWidget;
-    SAssignNew(ScaleWidget, SScaleBox)
-        .IgnoreInheritedScale(true)
-        .HAlign(HAlign_Fill)
-        .VAlign(VAlign_Fill)
-        .Visibility(EVisibility::SelfHitTestInvisible)
-        [
-            ImguiWidget.ToSharedRef()
-        ];
-
-    GameViewport->AddViewportWidgetContent(ScaleWidget.ToSharedRef(), Cog_ZOrder);
+    GameViewport->AddViewportWidgetContent(ImguiWidget.ToSharedRef(), TNumericLimits<int32>::Max());
 
     return ImguiWidget;
 }

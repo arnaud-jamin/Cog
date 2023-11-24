@@ -37,6 +37,7 @@ void FCogWindow_Inputs::PreSaveConfig()
 
     if (SCogImguiWidget* ImGuiWidget = GetOwner()->GetImGuiWidget().Get())
     {
+        Config->bEnableInput = ImGuiWidget->GetEnableInput();
         Config->bShareMouse = ImGuiWidget->GetShareMouse();
     }
 }
