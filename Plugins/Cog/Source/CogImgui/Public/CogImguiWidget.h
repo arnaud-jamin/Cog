@@ -96,7 +96,7 @@ protected:
 
     bool bEnableInput = false;
 
-    bool bShareMouse = false;
+    bool bShareMouse = true;
 
     FSlateRenderTransform ImGuiRenderTransform;
 

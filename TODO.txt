@@ -1,6 +1,6 @@
 - CogImGui: Add a way to create and override CogImguiwidget
 - CogImGui: Try to find a global solution to prevent crash when breaking in a blueprint from an imgui action (reset the stack)
-- CogImgui: support multi viewports
+- CogImgui: Support multi viewports
 
 - CogWindow: Add reset window position menu item or reset layout (window can get far away)
 - CogWindow: Try to remove CogWindow dependency to cogimgui. Should only depends on imgui (currently use setdpiscale of cogimgui)
@@ -8,6 +8,7 @@
 - CogWindow: Hide menu is not saved anymore
 - CogWindow: DPI change on mousewheel should be a command with a key bind as the rest.
 - CogWindow: Add more window help and tooltip on input window and more
+- CogWindow: Support loading/saving custom style
 
 - CogEngine: More stats in the stats window
 - CogEngine: Overlay mode of stats.
@@ -28,3 +29,6 @@
 
 - CogDebug: Check KismetExecutionMessage for warnings. As an exemple it is used by GEngine::GetWorldFromContextObject.
 - CogDebug: Rework Thickness and Duration params.
+
+- CogInput: Add help about usnig CTRL+Drag on the stick to lock them
+

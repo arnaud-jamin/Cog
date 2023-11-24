@@ -55,6 +55,6 @@ public:
         bShareMouse = true;
         bNavEnableKeyboard = true;
         bNavEnableGamepad = true;
-        bNavNoCaptureInput = false;
+        bNavNoCaptureInput = true;
     }
 };

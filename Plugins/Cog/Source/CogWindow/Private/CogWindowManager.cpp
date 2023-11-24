@@ -683,11 +683,10 @@ bool UCogWindowManager::RegisterDefaultCommandBindings()
 
     UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*GetWorld());
 
-    AddCommand(PlayerInput, "Cog.ToggleInput", EKeys::Tab);
-    AddCommand(PlayerInput, "Cog.LoadLayout 1", EKeys::F1);
-    AddCommand(PlayerInput, "Cog.LoadLayout 2", EKeys::F2);
-    AddCommand(PlayerInput, "Cog.LoadLayout 3", EKeys::F3);
-    AddCommand(PlayerInput, "Cog.LoadLayout 4", EKeys::F4);
+    AddCommand(PlayerInput, "Cog.ToggleInput", EKeys::F1);
+    AddCommand(PlayerInput, "Cog.LoadLayout 1", EKeys::F2);
+    AddCommand(PlayerInput, "Cog.LoadLayout 2", EKeys::F3);
+    AddCommand(PlayerInput, "Cog.LoadLayout 3", EKeys::F4);
     AddCommand(PlayerInput, "Cog.ToggleSelectionMode", EKeys::F5);
 
     SortCommands(PlayerInput);

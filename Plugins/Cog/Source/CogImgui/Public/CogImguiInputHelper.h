@@ -38,8 +38,6 @@ public:
 
     static bool IsStopPlaySessionEvent(const FKeyEvent& KeyEvent);
 
-    static ImGuiKey KeyEventToImGuiKey(const FKeyEvent& KeyEvent);
-
     static uint32 MouseButtonToImGuiMouseButton(const FKey& MouseButton);
 
     static EMouseCursor::Type ToSlateMouseCursor(ImGuiMouseCursor MouseCursor);
@@ -55,8 +53,4 @@ public:
     {
         return static_cast<ImWchar>(Char);
     }
-
-    static void InitializeKeyMap();
-
-    static TMap<FKey, ImGuiKey> KeyMap;
 };

@@ -386,18 +386,12 @@ void FCogEngineWindow_Selection::TickSelectionMode()
         return;
     }
 
-    if (ImGui::IsItemHovered(ImGuiHoveredFlags_AnyWindow))
-    {
-        return;
-    }
-
     APlayerController* PlayerController = GetLocalPlayerController();
     if (PlayerController == nullptr)
     {
         DeactivateSelectionMode();
         return;
     }
-
 
     ImDrawList* DrawList = ImGui::GetBackgroundDrawList();
     DrawList->AddRect(ImVec2(0, 0), ImGui::GetIO().DisplaySize, IM_COL32(255, 0, 0, 128), 0.0f, 0, 20.0f);

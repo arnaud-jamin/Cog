@@ -51,18 +51,24 @@ void SCogImguiWidget::Construct(const FArguments& InArgs)
     //--------------------------------------------------------------------
     // Register input processor to forward input events to imgui
     //--------------------------------------------------------------------
-    UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*GameViewport->GetWorld());
-    InputProcessor = MakeShared<FImGuiInputProcessor>(PlayerInput, this);
-    FSlateApplication::Get().RegisterInputPreProcessor(InputProcessor.ToSharedRef(), 0);
+    if (FSlateApplication::IsInitialized())
+    {
+        UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*GameViewport->GetWorld());
+        InputProcessor = MakeShared<FImGuiInputProcessor>(PlayerInput, this);
+        FSlateApplication::Get().RegisterInputPreProcessor(InputProcessor.ToSharedRef(), 0);
+    }
 }
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
 //--------------------------------------------------------------------------------------------------------------------------
 SCogImguiWidget::~SCogImguiWidget()
 {
-    if (InputProcessor.IsValid())
+    if (FSlateApplication::IsInitialized())
     {
-        FSlateApplication::Get().UnregisterInputPreProcessor(InputProcessor);
+        if (InputProcessor.IsValid())
+        {
+            FSlateApplication::Get().UnregisterInputPreProcessor(InputProcessor);
+        }
     }
 
     DestroyImGuiContext();
