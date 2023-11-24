@@ -1,6 +1,7 @@
 #include "CogSampleLogCategories.h"
 
 #include "AbilitySystemLog.h"
+#include "CogImguiHelper.h"
 #include "CogSampleDefines.h"
 
 #if ENABLE_COG
@@ -39,6 +40,7 @@ namespace CogSampleLog
         FCogDebugLog::AddLogCategory(LogCogBaseAimRotation, "Base Aim Rotation", "Debug Draw of a Character BaseAimRotation");
         FCogDebugLog::AddLogCategory(LogCogCollision, "Collision", "Debug Draw a Character Collision");
         FCogDebugLog::AddLogCategory(LogCogControlRotation, "Control Rotation", "Debug Draw of the Character Control Rotation");
+        FCogDebugLog::AddLogCategory(LogCogImGui, "ImGui", "Log related to imgui integration");
         FCogDebugLog::AddLogCategory(LogCogInput, "Input", "Log about the input actions");
         FCogDebugLog::AddLogCategory(LogCogPosition, "Position", "Debug draw of a character position");
         FCogDebugLog::AddLogCategory(LogCogPossession, "Possession", "Log about the possession of a PlayerController over a Character");

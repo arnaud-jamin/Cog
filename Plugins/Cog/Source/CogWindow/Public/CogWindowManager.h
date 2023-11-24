@@ -73,7 +73,7 @@ public:
 
     virtual void ResetAllWindowsConfig();
 
-    virtual bool RegisterDefaultCommands();
+    virtual bool RegisterDefaultCommandBindings();
     
     UCogWindowConfig* GetConfig(const TSubclassOf<UCogWindowConfig> ConfigClass);
 
@@ -143,18 +143,6 @@ protected:
 
     UPROPERTY()
     mutable TArray<const UObject*> Assets;
-
-    UPROPERTY(Config)
-    bool bEnableInput = false;
-
-    UPROPERTY(Config)
-    bool bShareGamepad = true;
-
-    UPROPERTY(Config)
-    bool bShareKeyboard = false;
-
-    UPROPERTY(Config)
-    bool bShareMouse = false;
 
     UPROPERTY(Config)
     bool bCompactMode = false;

@@ -59,7 +59,7 @@ void FCogEngineWindow_CommandBindings::RenderContent()
             "[F5]   Cog.ToggleSelectionMode\n"
     ))
     {
-        GetOwner()->RegisterDefaultCommands();
+        GetOwner()->RegisterDefaultCommandBindings();
     }
 
     for (FKeyBind& KeyBind : PlayerInput->DebugExecBindings)

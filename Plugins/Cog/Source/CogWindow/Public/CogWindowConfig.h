@@ -13,6 +13,11 @@ public:
     UPROPERTY(Config)
     bool bHideMenu = false;
 
+    UCogWindowConfig()
+    {
+        Reset();
+    }
+
     virtual void Reset()
     {
         bHideMenu = true;

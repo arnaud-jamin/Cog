@@ -31,7 +31,7 @@ void UCogWindowManager::PostInitProperties()
 
     if (bRegisterDefaultCommands)
     {
-        if (RegisterDefaultCommands())
+        if (RegisterDefaultCommandBindings())
         {
             bRegisterDefaultCommands = false;
         }
@@ -42,10 +42,6 @@ void UCogWindowManager::PostInitProperties()
 void UCogWindowManager::InitializeInternal()
 {
     ImGuiWidget = FCogImguiModule::Get().CreateImGuiWidget(GEngine->GameViewport, [this](float DeltaTime) { Render(DeltaTime); });
-    ImGuiWidget->SetEnableInput(bEnableInput);
-    ImGuiWidget->SetShareGamepad(bShareGamepad);
-    ImGuiWidget->SetShareKeyboard(bShareKeyboard);
-    ImGuiWidget->SetShareMouse(bShareMouse);
 
     ImGuiSettingsHandler IniHandler;
     IniHandler.TypeName = "Cog";
@@ -97,12 +93,13 @@ void UCogWindowManager::InitializeInternal()
 void UCogWindowManager::Shutdown()
 {
     //------------------------------------------------------------
-    // To save the input mode for the next session
+    // Call PreSaveConfig before destroying imgui context
+    // if PreSaveConfig needs to read ImGui IO for example
     //------------------------------------------------------------
-    bEnableInput = ImGuiWidget->GetEnableInput();
-    bShareGamepad = ImGuiWidget->GetEnableInput();
-    bShareKeyboard = ImGuiWidget->GetEnableInput();
-    bShareMouse = ImGuiWidget->GetEnableInput();
+    for (FCogWindow* Window : Windows)
+    {
+        Window->PreSaveConfig();
+    }
 
     //------------------------------------------------------------
     // Destroy ImGui before destroying the windows to make sure 
@@ -114,7 +111,6 @@ void UCogWindowManager::Shutdown()
 
     for (FCogWindow* Window : Windows)
     {
-        Window->PreSaveConfig();
         Window->Shutdown();
         delete Window;
     }
@@ -678,7 +674,7 @@ void UCogWindowManager::ResetAllWindowsConfig()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogWindowManager::RegisterDefaultCommands()
+bool UCogWindowManager::RegisterDefaultCommandBindings()
 {
     if (GetWorld() == nullptr)
     {
@@ -790,5 +786,6 @@ const UObject* UCogWindowManager::GetAsset(const TSubclassOf<UObject> AssetClass
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::ToggleInputMode()
 {
+    UE_LOG(LogCogImGui, Verbose, TEXT("UCogWindowManager::ToggleInputMode"));
     ImGuiWidget->SetEnableInput(!ImGuiWidget->GetEnableInput());
 }

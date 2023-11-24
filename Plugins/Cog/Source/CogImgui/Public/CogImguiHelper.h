@@ -4,6 +4,8 @@
 #include "imgui.h"
 #include "Layout/SlateRect.h"
 
+COGIMGUI_API DECLARE_LOG_CATEGORY_EXTERN(LogCogImGui, Warning, All);
+
 struct ImGuiWindow;
 
 using CogTextureIndex = int32;
@@ -48,4 +50,5 @@ public:
 
     static FSlateRenderTransform RoundTranslation(const FSlateRenderTransform& Transform);
 
+    static void SetFlags(int32& Value, int32 Flags, bool EnableFlags);
 };

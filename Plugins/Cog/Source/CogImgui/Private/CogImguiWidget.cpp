@@ -2,6 +2,7 @@
 
 #include "CogImguiInputHelper.h"
 #include "CogImguiInputHelper.h"
+#include "CogImGuiInputProcessor.h"
 #include "CogImguiModule.h"
 #include "CogImguiModule.h"
 #include "CogImguiTextureManager.h"
@@ -30,7 +31,7 @@ void SCogImguiWidget::Construct(const FArguments& InArgs)
     FontAtlas = InArgs._FontAtlas;
     Render = InArgs._Render;
 
-    RefreshVisibility();
+    SetVisibility(EVisibility::SelfHitTestInvisible);
 
     ImGuiContext = ImGui::CreateContext(FontAtlas);
     ImPlotContext = ImPlot::CreateContext();
@@ -43,12 +44,27 @@ void SCogImguiWidget::Construct(const FArguments& InArgs)
     IO.IniFilename = IniFilename;
     IO.DisplaySize = ImVec2(100, 100);
     IO.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    IO.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    IO.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+    IO.ConfigFlags |= ImGuiConfigFlags_NavNoCaptureKeyboard;
+
+    //--------------------------------------------------------------------
+    // Register input processor to forward input events to imgui
+    //--------------------------------------------------------------------
+    UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*GameViewport->GetWorld());
+    InputProcessor = MakeShared<FImGuiInputProcessor>(PlayerInput, this);
+    FSlateApplication::Get().RegisterInputPreProcessor(InputProcessor.ToSharedRef(), 0);
 }
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
 //--------------------------------------------------------------------------------------------------------------------------
 SCogImguiWidget::~SCogImguiWidget()
 {
+    if (InputProcessor.IsValid())
+    {
+        FSlateApplication::Get().UnregisterInputPreProcessor(InputProcessor);
+    }
+
     DestroyImGuiContext();
 }
 
@@ -76,6 +92,20 @@ void SCogImguiWidget::Tick(const FGeometry& AllottedGeometry, const double InCur
     TickKeyModifiers();
     TickFocus();
     TickImGui(InDeltaTime);
+
+    //ImGuiIO& IO = ImGui::GetIO();
+    //if (GetEnableInput())
+    //{
+    //    IO.ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
+    //    IO.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    //    IO.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+    //}
+    //else
+    //{
+    //    IO.ConfigFlags |= ImGuiConfigFlags_NoMouse;
+    //    IO.ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard;
+    //    IO.ConfigFlags &= ~ImGuiConfigFlags_NavEnableGamepad;
+    //}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -116,7 +146,10 @@ void SCogImguiWidget::TickImGui(float InDeltaTime)
     Render(InDeltaTime);
     ImGui::Render();
 
-    SetCursor(FCogImguiInputHelper::ToSlateMouseCursor(ImGui::GetMouseCursor()));
+    if ((IO.ConfigFlags & ImGuiConfigFlags_NoMouse) == 0)
+    {
+        SetCursor(FCogImguiInputHelper::ToSlateMouseCursor(ImGui::GetMouseCursor()));
+    }
 
     ImDrawData* DrawData = ImGui::GetDrawData();
     if (DrawData && DrawData->CmdListsCount > 0)
@@ -297,11 +330,6 @@ void SCogImguiWidget::SetAsCurrentContext()
 //--------------------------------------------------------------------------------------------------------------------------
 void SCogImguiWidget::SetEnableInput(bool Value)
 {
-    if (bEnableInput == Value)
-    {
-        return;
-    }
-
     bEnableInput = Value;
 
     if (bEnableInput)
@@ -313,19 +341,14 @@ void SCogImguiWidget::SetEnableInput(bool Value)
         ReturnFocus();
     }
 
-    RefreshVisibility();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void SCogImguiWidget::RefreshVisibility()
-{
+    ImGuiIO& IO = ImGui::GetIO();
     if (bEnableInput)
     {
-        SetVisibility(EVisibility::Visible);
+        IO.ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
     }
     else
     {
-        SetVisibility(EVisibility::SelfHitTestInvisible);
+        IO.ConfigFlags |= ImGuiConfigFlags_NoMouse;
     }
 }
 
@@ -366,156 +389,6 @@ void SCogImguiWidget::OnDpiChanged()
     NewStyle.ScaleAllSizes(DpiScale);
 }
 
-
-//--------------------------------------------------------------------------------------------------------------------------
-FReply SCogImguiWidget::OnKeyChar(const FGeometry& MyGeometry, const FCharacterEvent& CharacterEvent)
-{
-    if (bEnableInput == false)
-    {
-        ImGui::GetIO().AddInputCharacter(FCogImguiInputHelper::CastInputChar(CharacterEvent.GetCharacter()));
-    }
-
-    if (bShareKeyboard)
-    {
-        return FReply::Unhandled();
-    }
-
-    return FReply::Handled();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-FReply SCogImguiWidget::OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent)
-{
-    return HandleKeyEvent(MyGeometry, KeyEvent);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-FReply SCogImguiWidget::OnKeyUp(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent)
-{
-    return HandleKeyEvent(MyGeometry, KeyEvent);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-FReply SCogImguiWidget::HandleKeyEvent(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent)
-{
-    if (bEnableInput == false)
-    {
-        return FReply::Unhandled();
-    }
-
-    if (KeyEvent.GetKey().IsGamepadKey())
-    {
-        if (bShareGamepad)
-        {
-            // TODO: handle imgui gamepad
-            return FReply::Unhandled();
-        }
-    }
-    else
-    {
-        if (FCogImguiInputHelper::IsKeyEventHandled(GameViewport->GetWorld(), KeyEvent) == false)
-        {
-            return FReply::Unhandled();
-        }
-
-        ImGuiIO& IO = ImGui::GetIO();
-        IO.AddKeyEvent(FCogImguiInputHelper::KeyEventToImGuiKey(KeyEvent), false);
-        IO.AddKeyEvent(ImGuiMod_Ctrl, KeyEvent.IsControlDown());
-        IO.AddKeyEvent(ImGuiMod_Shift, KeyEvent.IsShiftDown());
-        IO.AddKeyEvent(ImGuiMod_Alt, KeyEvent.IsAltDown());
-        IO.AddKeyEvent(ImGuiMod_Super, KeyEvent.IsCommandDown());
-
-        if (bShareKeyboard)
-        {
-            return FReply::Unhandled();
-        }
-    }
-
-    return FReply::Handled();
-}
-
-
-//--------------------------------------------------------------------------------------------------------------------------
-FReply SCogImguiWidget::OnAnalogValueChanged(const FGeometry& MyGeometry, const FAnalogInputEvent& AnalogInputEvent)
-{
-    if (AnalogInputEvent.GetKey().IsGamepadKey())
-    {
-        if (bShareGamepad)
-        {
-            // TODO: handle imgui gamepad
-            return FReply::Unhandled();
-        }
-    }
-    else
-    {
-        if (bShareKeyboard)
-        {
-            return FReply::Unhandled();
-        }
-    }
-
-    return FReply::Handled();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-FReply SCogImguiWidget::OnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
-{
-    if (bEnableInput == false)
-    {
-        return FReply::Unhandled();
-    }
-
-    const uint32 MouseButton = FCogImguiInputHelper::MouseButtonToImGuiMouseButton(MouseEvent.GetEffectingButton());
-    ImGui::GetIO().AddMouseSourceEvent(ImGuiMouseSource_Mouse);
-    ImGui::GetIO().AddMouseButtonEvent(MouseButton, true);
-
-    return FReply::Handled();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-FReply SCogImguiWidget::OnMouseButtonUp(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
-{
-    if (bEnableInput == false)
-    {
-        return FReply::Unhandled();
-    }
-
-    const uint32 MouseButton = FCogImguiInputHelper::MouseButtonToImGuiMouseButton(MouseEvent.GetEffectingButton());
-    ImGui::GetIO().AddMouseSourceEvent(ImGuiMouseSource_Mouse);
-    ImGui::GetIO().AddMouseButtonEvent(MouseButton, false);
-
-    return FReply::Handled();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-FReply SCogImguiWidget::OnMouseWheel(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
-{
-    if (bEnableInput == false)
-    {
-        return FReply::Unhandled();
-    }
-
-    ImGui::GetIO().AddMouseSourceEvent(ImGuiMouseSource_Mouse);
-    ImGui::GetIO().AddMouseWheelEvent(0, MouseEvent.GetWheelDelta());
-
-    return FReply::Handled();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-FReply SCogImguiWidget::OnMouseMove(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
-{
-    if (bEnableInput == false)
-    {
-        return FReply::Unhandled();
-    }
-
-    ImGui::GetIO().AddMouseSourceEvent(ImGuiMouseSource_Mouse);
-    const FVector2D Pos = TransformScreenPointToImGui(MyGeometry, MouseEvent.GetScreenSpacePosition());
-    ImGui::GetIO().AddMousePosEvent(Pos.X, Pos.Y);
-
-    return FReply::Handled();
-}
-
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiWidget::OnFocusReceived(const FGeometry& MyGeometry, const FFocusEvent& FocusEvent)
 {
@@ -532,37 +405,11 @@ FReply SCogImguiWidget::OnFocusReceived(const FGeometry& MyGeometry, const FFocu
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void SCogImguiWidget::OnFocusLost(const FFocusEvent& FocusEvent)
+FReply SCogImguiWidget::OnKeyChar(const FGeometry& MyGeometry, const FCharacterEvent& CharacterEvent)
 {
-    return Super::OnFocusLost(FocusEvent);
-}
+    ImGuiIO& IO = ImGui::GetIO();
+    IO.AddInputCharacter(FCogImguiInputHelper::CastInputChar(CharacterEvent.GetCharacter()));
 
-//--------------------------------------------------------------------------------------------------------------------------
-void SCogImguiWidget::OnMouseEnter(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
-{
-    Super::OnMouseEnter(MyGeometry, MouseEvent);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void SCogImguiWidget::OnMouseLeave(const FPointerEvent& MouseEvent)
-{
-    Super::OnMouseLeave(MouseEvent);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-FReply SCogImguiWidget::OnTouchStarted(const FGeometry& MyGeometry, const FPointerEvent& TouchEvent)
-{
-    return Super::OnTouchStarted(MyGeometry, TouchEvent);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-FReply SCogImguiWidget::OnTouchMoved(const FGeometry& MyGeometry, const FPointerEvent& TouchEvent)
-{
-    return Super::OnTouchMoved(MyGeometry, TouchEvent);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-FReply SCogImguiWidget::OnTouchEnded(const FGeometry& MyGeometry, const FPointerEvent& TouchEvent)
-{
-    return Super::OnTouchEnded(MyGeometry, TouchEvent);
+    const FReply Result = IO.WantCaptureKeyboard ? FReply::Handled() : FReply::Unhandled();
+    return Result;
 }

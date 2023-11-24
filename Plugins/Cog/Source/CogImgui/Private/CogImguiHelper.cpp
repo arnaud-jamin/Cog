@@ -3,6 +3,8 @@
 #include "InputCoreTypes.h"
 #include "imgui_internal.h"
 
+DEFINE_LOG_CATEGORY(LogCogImGui);
+
 //----------------------------------------------------------------------------------------------------------------------
 FString FCogImguiHelper::GetIniSaveDirectory()
 {
@@ -123,4 +125,17 @@ FVector2D FCogImguiHelper::RoundVector(const FVector2D& Vector)
 FSlateRenderTransform FCogImguiHelper::RoundTranslation(const FSlateRenderTransform& Transform)
 {
     return FSlateRenderTransform(Transform.GetMatrix(), RoundVector(Transform.GetTranslation()));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogImguiHelper::SetFlags(int32& Value, int32 Flags, bool EnableFlags)
+{
+    if (EnableFlags)
+    {
+        Value |= Flags;
+    }
+    else
+    {
+        Value &= ~Flags;
+    }
 }

@@ -7,6 +7,7 @@
 - CogWindow: Overlay window should have achnoring options (top bottom left right center mid)
 - CogWindow: Hide menu is not saved anymore
 - CogWindow: DPI change on mousewheel should be a command with a key bind as the rest.
+- CogWindow: Add more window help and tooltip on input window and more
 
 - CogEngine: More stats in the stats window
 - CogEngine: Overlay mode of stats.

@@ -13,6 +13,32 @@ void FCogWindow_Inputs::Initialize()
     Super::Initialize();
 
     bHasMenu = false;
+
+    Config = GetConfig<UCogEngineConfig_Inputs>();
+
+    SCogImguiWidget* ImGuiWidget = GetOwner()->GetImGuiWidget().Get();
+    ImGuiWidget->SetEnableInput(Config->bEnableInput);
+
+    ImGuiIO& IO = ImGui::GetIO();
+    FCogImguiHelper::SetFlags(IO.ConfigFlags, ImGuiConfigFlags_NavEnableKeyboard, Config->bNavEnableKeyboard);
+    FCogImguiHelper::SetFlags(IO.ConfigFlags, ImGuiConfigFlags_NavEnableGamepad, Config->bNavEnableGamepad);
+    FCogImguiHelper::SetFlags(IO.ConfigFlags, ImGuiConfigFlags_NavNoCaptureKeyboard, Config->bNavNoCaptureInput);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogWindow_Inputs::PreSaveConfig()
+{
+    Super::PreSaveConfig();
+
+    ImGuiIO& IO = ImGui::GetIO();
+    Config->bNavEnableKeyboard = IO.ConfigFlags & ImGuiConfigFlags_NavEnableKeyboard;
+    Config->bNavEnableGamepad = IO.ConfigFlags & ImGuiConfigFlags_NavEnableGamepad;
+    Config->bNavNoCaptureInput = IO.ConfigFlags & ImGuiConfigFlags_NavNoCaptureKeyboard;
+
+    if (SCogImguiWidget* ImGuiWidget = GetOwner()->GetImGuiWidget().Get())
+    {
+        Config->bShareMouse = ImGuiWidget->GetShareMouse();
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -48,26 +74,15 @@ void FCogWindow_Inputs::RenderContent()
     }
 
     ImGui::Separator();
-
-    bool bShareGamepad = ImGuiWidget->GetShareGamepad();
-    if (ImGui::Checkbox("Share Gamepad", &bShareGamepad))
-    {
-        ImGuiWidget->SetShareGamepad(bShareGamepad);
-    }
-
-    bool bShareKeyboard = ImGuiWidget->GetShareKeyboard();
-    if (ImGui::Checkbox("Share Keyboard", &bShareKeyboard))
-    {
-        ImGuiWidget->SetShareKeyboard(bShareKeyboard);
-    }
-
+    
     bool bShareMouse = ImGuiWidget->GetShareMouse();
     if (ImGui::Checkbox("Share Mouse", &bShareMouse))
     {
-        //ImGuiWidget->SetShareMouse(bShareMouse);
+        ImGuiWidget->SetShareMouse(bShareMouse);
     }
-    if (ImGui::IsItemHovered())
-    {
-        ImGui::SetTooltip("Mouse sharing is currently not supported");
-    }
+
+    ImGuiIO& IO = ImGui::GetIO();
+    ImGui::CheckboxFlags("Keyboard Navigation", &IO.ConfigFlags, ImGuiConfigFlags_NavEnableKeyboard);
+    ImGui::CheckboxFlags("Gamepad Navigation", &IO.ConfigFlags, ImGuiConfigFlags_NavEnableGamepad);
+    ImGui::CheckboxFlags("Navigation No Capture", &IO.ConfigFlags, ImGuiConfigFlags_NavNoCaptureKeyboard);
 }
