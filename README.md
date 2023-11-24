@@ -14,7 +14,7 @@ Cog provides:
 
 General Info:
 - Cog can be used both in editor and package builds. It is disabled by default on shipping builds.
-- Press the `[Tab]` key or use the `Cog.ToggleInput` console command to open the ImGui Main Menu.
+- Press the `[F1]` key or use the `Cog.ToggleInput` console command to open the ImGui Main Menu.
 - Mouse over a window title to display its help.
 - Most windows display their contents based on a selected actor. The selector actor can be chosen using the `Engine/Selection` window or widget.
 
@@ -245,7 +245,7 @@ You must have Unreal 5.1 or greater and Visual Studio to launch the sample
 5. Make sure `Cog` is set as the startup project
 6. Start Debugging (F5)
 7. Once in Unreal, press Play (Alt+P)
-8. Press the `[Tab]` key or use the `Cog.ToggleInput` console command to open the Imgui Main Menu.
+8. Press the `[F1]` key or use the `Cog.ToggleInput` console command to open the Imgui Main Menu.
 
 ### Integrating Cog in your project
 
