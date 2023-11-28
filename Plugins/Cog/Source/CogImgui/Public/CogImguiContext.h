@@ -57,8 +57,6 @@ private:
 
 	void TryReleaseGameMouseCapture();
 
-	void RefreshDPIScale();
-
 	void BuildFont();
 
 	ULocalPlayer* GetLocalPlayer() const;

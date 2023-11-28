@@ -251,12 +251,18 @@ void FCogImguiContext::BeginFrame(float InDeltaTime)
     //-------------------------------------------------------------------------------------------------------
     if (bRefreshDPIScale)
     {
-        RefreshDPIScale();
+        bRefreshDPIScale = false;
+
+        BuildFont();
+
+        ImGuiStyle NewStyle = ImGuiStyle();
+        ImGui::GetStyle() = MoveTemp(NewStyle);
+        NewStyle.ScaleAllSizes(DpiScale);
     }
 
     ImGui::NewFrame();
 
-    DrawDebug();
+    //DrawDebug();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -622,18 +628,6 @@ void FCogImguiContext::SetDPIScale(float Value)
 
     DpiScale = Value;
     bRefreshDPIScale = true;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogImguiContext::RefreshDPIScale()
-{
-    bRefreshDPIScale = false;
-
-    BuildFont();
-
-    ImGuiStyle NewStyle = ImGuiStyle();
-    ImGui::GetStyle() = MoveTemp(NewStyle);
-    NewStyle.ScaleAllSizes(DpiScale);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
