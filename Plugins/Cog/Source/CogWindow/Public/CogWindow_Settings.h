@@ -89,9 +89,9 @@ public:
         bShowHelp = true;
         bShowWindowsInMainMenu = true;
         bEnableInput = false;
-        bShareMouse = true;
-        bNavEnableKeyboard = true;
-        bNavEnableGamepad = true;
+        bShareMouse = false;
+        bNavEnableKeyboard = false;
+        bNavEnableGamepad = false;
         bNavNoCaptureInput = true;
         bNoMouseCursorChange = false;
     }
