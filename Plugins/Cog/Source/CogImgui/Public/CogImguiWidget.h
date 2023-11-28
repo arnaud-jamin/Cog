@@ -8,6 +8,7 @@
 #include "Widgets/SLeafWidget.h"
 
 class FCogImguiContext;
+class SWindow;
 class UGameViewportClient;
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -33,11 +34,34 @@ public:
 
     virtual FVector2D ComputeDesiredSize(float Scale) const override;
 
+    virtual FReply OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent) override;
+    virtual FReply OnKeyUp(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent) override;
+    virtual FReply OnAnalogValueChanged(const FGeometry& MyGeometry, const FAnalogInputEvent& AnalogInputEvent) override;
+    virtual FReply OnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+    virtual FReply OnMouseButtonUp(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+    virtual FReply OnMouseWheel(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+    virtual FReply OnMouseMove(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+    virtual FReply OnFocusReceived(const FGeometry& MyGeometry, const FFocusEvent& FocusEvent) override;
+
     void SetDrawData(const ImDrawData* InDrawData);
+
+    TSharedPtr<const SWindow> GetWindow() const { return Window; }
+
+    void SetWindow(TSharedPtr<SWindow> Value) { Window = Value; }
 
 protected:
 
+    FReply HandleKeyEvent(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent);
+
+    void TickFocus();
+
+	void TakeFocus();
+
+    void ReturnFocus();
+
     TObjectPtr<FCogImguiContext> Context = nullptr;
+
+    TSharedPtr<SWindow> Window = nullptr;
 
     FSlateRenderTransform ImGuiRenderTransform;
 

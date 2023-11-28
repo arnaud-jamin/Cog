@@ -8,11 +8,11 @@ class UPlayerInput;
 enum ImGuiKey : int;
 struct FKeyBind;
 
-class FImGuiInputProcessor : public IInputProcessor
+class FCogImGuiInputProcessor : public IInputProcessor
 {
 public:
 
-	FImGuiInputProcessor(UPlayerInput* InPlayerInput, FCogImguiContext* InContext, SCogImguiWidget* InWidget);
+	FCogImGuiInputProcessor(UPlayerInput* InPlayerInput, FCogImguiContext* InContext, SCogImguiWidget* InWidget);
 
 	virtual void Tick(const float DeltaTime, FSlateApplication& SlateApp, TSharedRef<ICursor> SlateCursor) override;
 
@@ -38,21 +38,7 @@ protected:
 
 	bool HandleMouseButtonEvent(FSlateApplication& SlateApp, const FPointerEvent& Event, bool IsButtonDown);
 
-	bool IsMouseInsideMainViewport();
-
 	void AddMousePosEvent(const FVector2D& MousePosition) const;
-
-	bool IsKeyBoundToCommand(const FKeyEvent& KeyEvent);
-
-	static ImGuiKey ToImKey(const FKey& Key);
-
-	static bool IsKeyEventMatchingKeyBind(const FKeyEvent& KeyEvent, const FKeyBind& KeyBind);
-
-	static bool IsConsoleEvent(const FKeyEvent& KeyEvent);
-
-	static bool IsStopPlaySessionEvent(const FKeyEvent& KeyEvent);
-
-	static uint32 ToImGuiMouseButton(const FKey& MouseButton);
 
 	TObjectPtr<FCogImguiContext> Context = nullptr;
 

@@ -45,6 +45,10 @@ public:
 
 	void SetDPIScale(float Value);
 
+	TObjectPtr<const UGameViewportClient> GetGameViewport() const { return GameViewport; }
+
+	TSharedPtr<const SCogImguiWidget> GetMainWidget() const { return MainWidget; }
+
 private:
 
 	void OnDisplayMetricsChanged(const FDisplayMetrics& DisplayMetrics) const;
@@ -58,6 +62,12 @@ private:
 	void TryReleaseGameMouseCapture();
 
 	void BuildFont();
+
+	void ReturnFocus();
+
+	void TickFocus();
+
+	void TakeFocus();
 
 	ULocalPlayer* GetLocalPlayer() const;
 

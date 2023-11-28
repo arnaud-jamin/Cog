@@ -38,7 +38,9 @@ public:
 
     static bool IsStopPlaySessionEvent(const FKeyEvent& KeyEvent);
 
-    static uint32 MouseButtonToImGuiMouseButton(const FKey& MouseButton);
+    static uint32 ToImGuiMouseButton(const FKey& MouseButton);
+
+    static ImGuiKey ToImKey(const FKey& Key);
 
     static EMouseCursor::Type ToSlateMouseCursor(ImGuiMouseCursor MouseCursor);
 
@@ -47,6 +49,10 @@ public:
     static FString CommandToString(const UPlayerInput* PlayerInput, const FString& Command);
 
     static FString KeyBindToString(const FKeyBind& KeyBind);
+
+    static bool IsMouseInsideMainViewport();
+
+    static bool IsKeyBoundToCommand(const UPlayerInput* InPlayerInput, const FKeyEvent& KeyEvent);
 
     template<typename T, std::enable_if_t<(sizeof(T) <= sizeof(ImWchar)), T>* = nullptr>
     static ImWchar CastInputChar(T Char)

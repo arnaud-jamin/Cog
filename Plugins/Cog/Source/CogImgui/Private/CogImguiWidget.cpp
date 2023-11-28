@@ -3,6 +3,8 @@
 #include "CogImguiInputHelper.h"
 #include "CogImguiModule.h"
 #include "CogImguiWidget.h"
+
+#include "CogImGuiContext.h"
 #include "imgui.h"
 #include "SlateOptMacros.h"
 
@@ -12,7 +14,8 @@ void SCogImguiWidget::Construct(const FArguments& InArgs)
 {
     Context = InArgs._Context;
 
-    SetVisibility(EVisibility::SelfHitTestInvisible);
+    //SetVisibility(EVisibility::SelfHitTestInvisible);
+    SetVisibility(EVisibility::Visible);
 }
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
@@ -126,5 +129,226 @@ FReply SCogImguiWidget::OnKeyChar(const FGeometry& MyGeometry, const FCharacterE
     return Result;
 }
 
+//--------------------------------------------------------------------------------------------------------------------------
+FReply SCogImguiWidget::OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent)
+{
+    return HandleKeyEvent(MyGeometry, KeyEvent);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FReply SCogImguiWidget::OnKeyUp(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent)
+{
+    return HandleKeyEvent(MyGeometry, KeyEvent);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FReply SCogImguiWidget::HandleKeyEvent(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent)
+{
+    if (Context->GetEnableInput() == false)
+    {
+        return FReply::Unhandled();
+    }
+    if (KeyEvent.GetKey().IsGamepadKey())
+    {
+        //if (bShareGamepad)
+        //{
+        //    // TODO: handle imgui gamepad
+        //    return FReply::Unhandled();
+        //}
+    }
+    else
+    {
+        if (FCogImguiInputHelper::IsKeyEventHandled(Context->GetGameViewport()->GetWorld(), KeyEvent) == false)
+        {
+            return FReply::Unhandled();
+        }
+        ImGuiIO& IO = ImGui::GetIO();
+        IO.AddKeyEvent(FCogImguiInputHelper::ToImKey(KeyEvent.GetKey()), false);
+        IO.AddKeyEvent(ImGuiMod_Ctrl, KeyEvent.IsControlDown());
+        IO.AddKeyEvent(ImGuiMod_Shift, KeyEvent.IsShiftDown());
+        IO.AddKeyEvent(ImGuiMod_Alt, KeyEvent.IsAltDown());
+        IO.AddKeyEvent(ImGuiMod_Super, KeyEvent.IsCommandDown());
+        //if (bShareKeyboard)
+        //{
+        //    return FReply::Unhandled();
+        //}
+    }
+    return FReply::Handled();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FReply SCogImguiWidget::OnAnalogValueChanged(const FGeometry& MyGeometry, const FAnalogInputEvent& AnalogInputEvent)
+{
+    if (AnalogInputEvent.GetKey().IsGamepadKey())
+    {
+        //if (bShareGamepad)
+        //{
+        //    // TODO: handle imgui gamepad
+        //    return FReply::Unhandled();
+        //}
+
+    	return FReply::Unhandled();
+    }
+    else
+    {
+        //if (bShareKeyboard)
+        //{
+        //    return FReply::Unhandled();
+        //}
+    }
+    return FReply::Handled();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FReply SCogImguiWidget::OnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
+{
+    if (Context->GetEnableInput() == false)
+    {
+        UE_LOG(LogCogImGui, VeryVerbose, TEXT("SCogImguiWidget::OnMouseButtonDown | %s | Unhandled | EnableInput == false"), Window.IsValid() ? *Window->GetTitle().ToString() : *FString("None"));
+        return FReply::Unhandled();
+    }
+    const uint32 MouseButton = FCogImguiInputHelper::ToImGuiMouseButton(MouseEvent.GetEffectingButton());
+    ImGui::GetIO().AddMouseSourceEvent(ImGuiMouseSource_Mouse);
+    ImGui::GetIO().AddMouseButtonEvent(MouseButton, true);
+
+    UE_LOG(LogCogImGui, VeryVerbose, TEXT("SCogImguiWidget::OnMouseButtonDown | Window:%s | Handled"), Window.IsValid() ? *Window->GetTitle().ToString() : *FString("None"));
+    return FReply::Handled();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FReply SCogImguiWidget::OnMouseButtonUp(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
+{
+    if (Context->GetEnableInput() == false)
+    {
+        UE_LOG(LogCogImGui, VeryVerbose, TEXT("SCogImguiWidget::OnMouseButtonUp | Window:%s | Unhandled | EnableInput == false"), Window.IsValid() ? *Window->GetTitle().ToString() : *FString("None"));
+        return FReply::Unhandled();
+    }
+    const uint32 MouseButton = FCogImguiInputHelper::ToImGuiMouseButton(MouseEvent.GetEffectingButton());
+    ImGui::GetIO().AddMouseSourceEvent(ImGuiMouseSource_Mouse);
+    ImGui::GetIO().AddMouseButtonEvent(MouseButton, false);
+    UE_LOG(LogCogImGui, VeryVerbose, TEXT("SCogImguiWidget::OnMouseButtonUp | Window:%s | Handled"), Window.IsValid() ? *Window->GetTitle().ToString() : *FString("None"));
+    return FReply::Handled();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FReply SCogImguiWidget::OnMouseWheel(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
+{
+    if (Context->GetEnableInput() == false)
+    {
+        return FReply::Unhandled();
+    }
+    ImGui::GetIO().AddMouseSourceEvent(ImGuiMouseSource_Mouse);
+    ImGui::GetIO().AddMouseWheelEvent(0, MouseEvent.GetWheelDelta());
+    return FReply::Handled();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FReply SCogImguiWidget::OnMouseMove(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
+{
+    if (Context->GetEnableInput() == false)
+    {
+        //UE_LOG(LogCogImGui, VeryVerbose, TEXT("SCogImguiWidget::OnMouseMove | Window:%s | Unhandled | EnableInput == false"), Window.IsValid() ? *Window->GetTitle().ToString() : *FString("None"));
+        return FReply::Unhandled();
+    }
+
+    ImGuiIO& IO = ImGui::GetIO();
+    if (IO.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        IO.AddMousePosEvent(MouseEvent.GetScreenSpacePosition().X, MouseEvent.GetScreenSpacePosition().Y);
+    }
+    else
+    {
+        const FVector2D TransformedMousePosition = MouseEvent.GetScreenSpacePosition() - Context->GetMainWidget()->GetTickSpaceGeometry().GetAbsolutePosition();
+        IO.AddMousePosEvent(TransformedMousePosition.X, TransformedMousePosition.Y);
+    }
+
+    //UE_LOG(LogCogImGui, VeryVerbose, TEXT("SCogImguiWidget::OnMouseMove | Window:%s | Handled"), Window.IsValid() ? *Window->GetTitle().ToString() : *FString("None"));
+    return FReply::Handled();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FReply SCogImguiWidget::OnFocusReceived(const FGeometry& MyGeometry, const FFocusEvent& FocusEvent)
+{
+    return Super::OnFocusReceived(MyGeometry, FocusEvent);
+}
 
 
+//--------------------------------------------------------------------------------------------------------------------------
+//void SCogImguiWidget::TickFocus()
+//{
+//    FCogImguiModule& Module = FCogImguiModule::Get();
+//
+//    const bool bShouldEnableInput = Module.GetEnableInput();
+//    if (bEnableInput != bShouldEnableInput)
+//    {
+//        bEnableInput = bShouldEnableInput;
+//
+//        if (bEnableInput)
+//        {
+//            TakeFocus();
+//        }
+//        else
+//        {
+//            ReturnFocus();
+//        }
+//    }
+//    else if (bEnableInput)
+//    {
+//        const auto& ViewportWidget = GameViewport->GetGameViewportWidget();
+//        if (!HasKeyboardFocus() && !IsConsoleOpened() && (ViewportWidget->HasKeyboardFocus() || ViewportWidget->HasFocusedDescendants()))
+//        {
+//            TakeFocus();
+//        }
+//    }
+//}
+//
+//
+////--------------------------------------------------------------------------------------------------------------------------
+//void SCogImguiWidget::TakeFocus()
+//{
+//    FSlateApplication& SlateApplication = FSlateApplication::Get();
+//
+//    PreviousUserFocusedWidget = SlateApplication.GetUserFocusedWidget(SlateApplication.GetUserIndexForKeyboard());
+//
+//    if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
+//    {
+//        TSharedRef<SWidget> FocusWidget = SharedThis(this);
+//        LocalPlayer->GetSlateOperations().CaptureMouse(FocusWidget);
+//        LocalPlayer->GetSlateOperations().SetUserFocus(FocusWidget);
+//    }
+//    else
+//    {
+//        SlateApplication.SetKeyboardFocus(SharedThis(this));
+//    }
+//}
+//
+////--------------------------------------------------------------------------------------------------------------------------
+//void SCogImguiWidget::ReturnFocus()
+//{
+//    if (HasKeyboardFocus())
+//    {
+//        auto FocusWidgetPtr = PreviousUserFocusedWidget.IsValid()
+//            ? PreviousUserFocusedWidget.Pin()
+//            : GameViewport->GetGameViewportWidget();
+//
+//        if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
+//        {
+//            auto FocusWidgetRef = FocusWidgetPtr.ToSharedRef();
+//
+//            if (FocusWidgetPtr == GameViewport->GetGameViewportWidget())
+//            {
+//                LocalPlayer->GetSlateOperations().CaptureMouse(FocusWidgetRef);
+//            }
+//
+//            LocalPlayer->GetSlateOperations().SetUserFocus(FocusWidgetRef);
+//        }
+//        else
+//        {
+//            FSlateApplication& SlateApplication = FSlateApplication::Get();
+//            SlateApplication.ResetToDefaultPointerInputSettings();
+//            SlateApplication.SetUserFocus(SlateApplication.GetUserIndexForKeyboard(), FocusWidgetPtr);
+//        }
+//    }
+//
+//    PreviousUserFocusedWidget.Reset();
+//}

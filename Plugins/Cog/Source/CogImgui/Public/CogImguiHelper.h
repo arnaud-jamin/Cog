@@ -10,6 +10,9 @@ struct ImGuiWindow;
 
 using CogTextureIndex = int32;
 
+constexpr bool ForwardEvent = false;
+constexpr bool TerminateEvent = true;
+
 class COGIMGUI_API FCogImguiHelper
 {
 public:

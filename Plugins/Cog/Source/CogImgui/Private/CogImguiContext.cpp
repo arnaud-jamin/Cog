@@ -1,5 +1,6 @@
 #include "CogImGuiContext.h"
 
+#include "Application/ThrottleManager.h"
 #include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
 #include "CogImguiInputProcessor.h"
@@ -40,12 +41,12 @@ void FCogImguiContext::Initialize()
     //--------------------------------------------------------------------
     // Register input processor to forward input events to imgui
     //--------------------------------------------------------------------
-    if (FSlateApplication::IsInitialized())
-    {
-        UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*GameViewport->GetWorld());
-        InputProcessor = MakeShared<FImGuiInputProcessor>(PlayerInput, this, MainWidget.Get());
-        FSlateApplication::Get().RegisterInputPreProcessor(InputProcessor.ToSharedRef(), 0);
-    }
+    //if (FSlateApplication::IsInitialized())
+    //{
+    //    UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*GameViewport->GetWorld());
+    //    InputProcessor = MakeShared<FCogImGuiInputProcessor>(PlayerInput, this, MainWidget.Get());
+    //    FSlateApplication::Get().RegisterInputPreProcessor(InputProcessor.ToSharedRef(), 0);
+    //}
 
     ImGuiContext = ImGui::CreateContext();
     PlotContext = ImPlot::CreateContext();
@@ -103,6 +104,7 @@ void FCogImguiContext::Initialize()
         PlatformApplication->OnDisplayMetricsChanged().AddRaw(this, &FCogImguiContext::OnDisplayMetricsChanged);
         OnDisplayMetricsChanged(DisplayMetrics);
     }
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -119,10 +121,10 @@ void FCogImguiContext::Shutdown()
     {
         FSlateApplication& SlateApp = FSlateApplication::Get();
 
-        if (InputProcessor.IsValid())
-        {
-            SlateApp.UnregisterInputPreProcessor(InputProcessor);
-        }
+        //if (InputProcessor.IsValid())
+        //{
+        //    SlateApp.UnregisterInputPreProcessor(InputProcessor);
+        //}
 
         if (const TSharedPtr<GenericApplication> PlatformApplication = SlateApp.GetPlatformApplication())
         {
@@ -228,13 +230,13 @@ void FCogImguiContext::BeginFrame(float InDeltaTime)
     if (bEnableInput)
     {
         IO.ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
-
-        TryReleaseGameMouseCapture();
     }
     else
     {
         IO.ConfigFlags |= ImGuiConfigFlags_NoMouse;
     }
+
+    TickFocus();
 
     //-------------------------------------------------------------------------------------------------------
     // 
@@ -244,6 +246,20 @@ void FCogImguiContext::BeginFrame(float InDeltaTime)
     if (bHasMouse && bUpdateMouseMouseCursor)
     {
         MainWidget->SetCursor(FCogImguiInputHelper::ToSlateMouseCursor(ImGui::GetMouseCursor()));
+    }
+
+    //-------------------------------------------------------------------------------------------------------
+	// 
+	//-------------------------------------------------------------------------------------------------------
+    const FVector2D& MousePosition = SlateApp.GetCursorPos();
+    if (IO.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        IO.AddMousePosEvent(MousePosition.X, MousePosition.Y);
+    }
+    else
+    {
+        const FVector2D TransformedMousePosition = MousePosition - MainWidget->GetTickSpaceGeometry().GetAbsolutePosition();
+        IO.AddMousePosEvent(TransformedMousePosition.X, TransformedMousePosition.Y);
     }
 
     //-------------------------------------------------------------------------------------------------------
@@ -259,6 +275,7 @@ void FCogImguiContext::BeginFrame(float InDeltaTime)
         ImGui::GetStyle() = MoveTemp(NewStyle);
         NewStyle.ScaleAllSizes(DpiScale);
     }
+
 
     ImGui::NewFrame();
 
@@ -313,7 +330,8 @@ void FCogImguiContext::ImGui_CreateWindow(ImGuiViewport* Viewport)
 
     const TSharedRef<SWindow> Window =
         SNew(SWindow)
-        .Type(bTooltipWindow ? EWindowType::ToolTip : EWindowType::Normal)
+        //.Type(bTooltipWindow ? EWindowType::ToolTip : EWindowType::Normal)
+        .Type(EWindowType::ToolTip)
         .Style(&WindowStyle)
         .ScreenPosition(FCogImguiHelper::ToFVector2D(Viewport->Pos))
         .ClientSize(FCogImguiHelper::ToFVector2D(Viewport->Size))
@@ -342,6 +360,8 @@ void FCogImguiContext::ImGui_CreateWindow(ImGuiViewport* Viewport)
     {
         FSlateApplication::Get().AddWindow(Window);
     }
+
+    Widget->SetWindow(Window);
 
     FImGuiViewportData* ViewportData = new FImGuiViewportData();
     Viewport->PlatformUserData = ViewportData;
@@ -559,9 +579,14 @@ void FCogImguiContext::SetEnableInput(bool Value)
 {
     bEnableInput = Value; 
 
+    FSlateThrottleManager::Get().DisableThrottle(bEnableInput);
+
     if (bEnableInput == false)
     {
         TryGiveMouseCaptureBackToGame();
+    }
+    else
+    {
     }
 }
 
@@ -717,4 +742,81 @@ ULocalPlayer* FCogImguiContext::GetLocalPlayer() const
 
     ULocalPlayer* LocalPlayer = World->GetFirstLocalPlayerFromController();
     return LocalPlayer;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogImguiContext::TickFocus()
+{
+    const bool bShouldEnableInput = bEnableInput;
+    if (bEnableInput != bShouldEnableInput)
+    {
+        bEnableInput = bShouldEnableInput;
+
+        if (bEnableInput)
+        {
+            TakeFocus();
+        }
+        else
+        {
+            ReturnFocus();
+        }
+    }
+    else if (bEnableInput)
+    {
+        const auto& ViewportWidget = GameViewport->GetGameViewportWidget();
+        if (!MainWidget->HasKeyboardFocus() && !IsConsoleOpened() && (ViewportWidget->HasKeyboardFocus() || ViewportWidget->HasFocusedDescendants()))
+        {
+            TakeFocus();
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogImguiContext::TakeFocus()
+{
+    FSlateApplication& SlateApplication = FSlateApplication::Get();
+
+    PreviousMouseCaptor = SlateApplication.GetUserFocusedWidget(SlateApplication.GetUserIndexForKeyboard());
+
+    if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
+    {
+        TSharedRef<SWidget> FocusWidget = MainWidget->AsShared();
+        LocalPlayer->GetSlateOperations().CaptureMouse(FocusWidget);
+        LocalPlayer->GetSlateOperations().SetUserFocus(FocusWidget);
+    }
+    else
+    {
+        SlateApplication.SetKeyboardFocus(MainWidget->AsShared());
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogImguiContext::ReturnFocus()
+{
+    //if (MainWidget->HasKeyboardFocus())
+    //{
+    //    auto FocusWidgetPtr = PreviousMouseCaptor.IsValid()
+    //        ? PreviousMouseCaptor.Pin()
+    //        : GameViewport->GetGameViewportWidget();
+
+    //    if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
+    //    {
+    //        auto FocusWidgetRef = FocusWidgetPtr.ToSharedRef();
+
+    //        if (FocusWidgetPtr == GameViewport->GetGameViewportWidget())
+    //        {
+    //            LocalPlayer->GetSlateOperations().CaptureMouse(FocusWidgetRef);
+    //        }
+
+    //        LocalPlayer->GetSlateOperations().SetUserFocus(FocusWidgetRef);
+    //    }
+    //    else
+    //    {
+    //        FSlateApplication& SlateApplication = FSlateApplication::Get();
+    //        SlateApplication.ResetToDefaultPointerInputSettings();
+    //        SlateApplication.SetUserFocus(SlateApplication.GetUserIndexForKeyboard(), FocusWidgetPtr);
+    //    }
+    //}
+
+    //PreviousMouseCaptor.Reset();
 }
