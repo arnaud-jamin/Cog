@@ -64,13 +64,13 @@ public:
     bool bEnableInput = false;
 
     UPROPERTY(Config)
-    bool bShareMouse = true;
+    bool bShareMouse = false;
 
     UPROPERTY(Config)
-    bool bNavEnableKeyboard = true;
+    bool bNavEnableKeyboard = false;
 
     UPROPERTY(Config)
-    bool bNavEnableGamepad = true;
+    bool bNavEnableGamepad = false;
 
     UPROPERTY(Config)
     bool bNavNoCaptureInput = true;
