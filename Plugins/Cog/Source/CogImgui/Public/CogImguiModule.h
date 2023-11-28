@@ -1,10 +1,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogImguiWidget.h"
-#include "CogImguiKeyInfo.h"
-#include "CogImguiTextureManager.h"
-#include "imgui.h"
 #include "Modules/ModuleManager.h"
 
 class COGIMGUI_API FCogImguiModule : public IModuleInterface
@@ -22,22 +18,6 @@ public:
     virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
 
-    //----------------------------------------------------------------------------------------------------------------------
-    TSharedPtr<SCogImguiWidget> CreateImGuiWidget(UGameViewportClient* GameViewport,  FCogImguiRenderFunction Render, ImFontAtlas* FontAtlas = nullptr);
-
-    void DestroyImGuiWidget(TSharedPtr<SCogImguiWidget> ImGuiWidget);
-
-    FCogImguiTextureManager& GetTextureManager() { return TextureManager; }
-    
-    ImFontAtlas& GetDefaultFontAtlas() { return DefaultFontAtlas; }
-
 private:
 
-    void Initialize();
-
-    FCogImguiTextureManager TextureManager;
-
-    ImFontAtlas DefaultFontAtlas;
-
-    bool bIsInitialized = false;
 };

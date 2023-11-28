@@ -2,6 +2,7 @@
 
 #include "Framework/Application/IInputProcessor.h"
 
+class FCogImguiContext;
 class SCogImguiWidget;
 class UPlayerInput;
 enum ImGuiKey : int;
@@ -11,7 +12,7 @@ class FImGuiInputProcessor : public IInputProcessor
 {
 public:
 
-	FImGuiInputProcessor(UPlayerInput* InPlayerInput, SCogImguiWidget* InWidget);
+	FImGuiInputProcessor(UPlayerInput* InPlayerInput, FCogImguiContext* InContext, SCogImguiWidget* InWidget);
 
 	virtual void Tick(const float DeltaTime, FSlateApplication& SlateApp, TSharedRef<ICursor> SlateCursor) override;
 
@@ -37,6 +38,8 @@ protected:
 
 	bool HandleMouseButtonEvent(FSlateApplication& SlateApp, const FPointerEvent& Event, bool IsButtonDown);
 
+	bool IsMouseInsideMainViewport();
+
 	void AddMousePosEvent(const FVector2D& MousePosition) const;
 
 	bool IsKeyBoundToCommand(const FKeyEvent& KeyEvent);
@@ -50,6 +53,8 @@ protected:
 	static bool IsStopPlaySessionEvent(const FKeyEvent& KeyEvent);
 
 	static uint32 ToImGuiMouseButton(const FKey& MouseButton);
+
+	TObjectPtr<FCogImguiContext> Context = nullptr;
 
 	TObjectPtr<UPlayerInput> PlayerInput = nullptr;
 

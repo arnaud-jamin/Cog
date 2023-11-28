@@ -1,17 +1,10 @@
 #include "CogImguiModule.h"
 
-#include "CogImguiWidget.h"
-#include "Engine/Engine.h"
-#include "Engine/GameViewportClient.h"
+#include "imgui.h"
 #include "HAL/LowLevelMemTracker.h"
 #include "HAL/UnrealMemory.h"
-#include "Widgets/Layout/SScaleBox.h"
 
 #define LOCTEXT_NAMESPACE "FCogImguiModule"
-
-//--------------------------------------------------------------------------------------------------------------------------
-
-constexpr int32 Cog_ZOrder = 10000;
 
 //--------------------------------------------------------------------------------------------------------------------------
 static void* ImGui_MemAlloc(size_t Size, void* UserData)
@@ -35,64 +28,6 @@ void FCogImguiModule::StartupModule()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiModule::ShutdownModule()
 {
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogImguiModule::Initialize()
-{
-    TextureManager.InitializeErrorTexture();
-    TextureManager.CreatePlainTexture("ImGuiModule_Plain", 2, 2, FColor::White);
-
-    unsigned char* Pixels;
-    int Width, Height, Bpp;
-
-    DefaultFontAtlas.Clear();
-    DefaultFontAtlas.GetTexDataAsRGBA32(&Pixels, &Width, &Height, &Bpp);
-    const CogTextureIndex FontsTexureIndex = TextureManager.CreateTexture("ImGuiModule_FontAtlas", Width, Height, Bpp, Pixels);
-    DefaultFontAtlas.TexID = FCogImguiHelper::ToImTextureID(FontsTexureIndex);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-TSharedPtr<SCogImguiWidget> FCogImguiModule::CreateImGuiWidget(UGameViewportClient* GameViewport, FCogImguiRenderFunction Render, ImFontAtlas* FontAtlas /*= nullptr*/)
-{
-    if (bIsInitialized == false)
-    {
-        Initialize();
-        bIsInitialized = true;
-    }
-
-    if (FontAtlas == nullptr)
-    {
-        FontAtlas = &DefaultFontAtlas;
-    }
-
-    TSharedPtr<SCogImguiWidget> ImguiWidget;
-    SAssignNew(ImguiWidget, SCogImguiWidget)
-        .GameViewport(GameViewport)
-        .FontAtlas(FontAtlas)
-        .Render(Render);
-
-    GameViewport->AddViewportWidgetContent(ImguiWidget.ToSharedRef(), TNumericLimits<int32>::Max());
-
-    return ImguiWidget;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogImguiModule::DestroyImGuiWidget(TSharedPtr<SCogImguiWidget> ImGuiWidget)
-{
-    UGameViewportClient* Viewport = ImGuiWidget->GetGameViewport().Get();
-    if (Viewport == nullptr)
-    {
-        return;
-    }
-
-    TSharedPtr<SWidget> ParentWidget = ImGuiWidget->GetParentWidget();
-    if (ParentWidget.IsValid() == false)
-    {
-        return;
-    }
-
-    Viewport->RemoveViewportWidgetContent(ParentWidget.ToSharedRef());
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

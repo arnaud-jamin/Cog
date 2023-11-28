@@ -1,9 +1,9 @@
 #include "CogWindowManager.h"
 
 #include "CogDebugDrawImGui.h"
+#include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
 #include "CogImguiModule.h"
-#include "CogWindow_Inputs.h"
 #include "CogWindow_Layouts.h"
 #include "CogWindow_Settings.h"
 #include "CogWindow_Spacing.h"
@@ -41,7 +41,7 @@ void UCogWindowManager::PostInitProperties()
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::InitializeInternal()
 {
-    ImGuiWidget = FCogImguiModule::Get().CreateImGuiWidget(GEngine->GameViewport, [this](float DeltaTime) { Render(DeltaTime); });
+    Context.Initialize();
 
     ImGuiSettingsHandler IniHandler;
     IniHandler.TypeName = "Cog";
@@ -59,7 +59,6 @@ void UCogWindowManager::InitializeInternal()
     SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 3", false));
     SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 4", false));
 
-    InputsWindow = AddWindow<FCogWindow_Inputs>("Window.Inputs", false);
     LayoutsWindow = AddWindow<FCogWindow_Layouts>("Window.Layouts", false);
     SettingsWindow = AddWindow<FCogWindow_Settings>("Window.Settings", false);
 
@@ -86,7 +85,8 @@ void UCogWindowManager::InitializeInternal()
         TEXT("Save the layout. Cog.SaveLayout <Index>"),
         FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { if (Args.Num() > 0) { SaveLayout(FCString::Atoi(*Args[0])); }}), 
         ECVF_Cheat));
-
+    
+    IsInitialized = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -105,7 +105,7 @@ void UCogWindowManager::Shutdown()
     // Destroy ImGui before destroying the windows to make sure 
     // imgui serialize their visibility state in imgui.ini
     //------------------------------------------------------------
-    ImGuiWidget->DestroyImGuiContext();
+    Context.Shutdown();
 
     SaveConfig();
 
@@ -125,8 +125,6 @@ void UCogWindowManager::Shutdown()
     {
         IConsoleManager::Get().UnregisterConsoleObject(ConsoleCommand);
     }
-
-    FCogImguiModule::Get().DestroyImGuiWidget(ImGuiWidget);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -137,7 +135,7 @@ void UCogWindowManager::Tick(float DeltaTime)
         return;
     }
 
-    if (ImGuiWidget.IsValid() == false)
+    if (IsInitialized == false)
     {
         InitializeInternal();
     }
@@ -149,16 +147,14 @@ void UCogWindowManager::Tick(float DeltaTime)
         LayoutToLoad = -1;
     }
 
-    if (bRefreshDPIScale)
-    {
-        RefreshDPIScale();
-        bRefreshDPIScale = false;
-    }
-
     for (FCogWindow* Window : Windows)
     {
         Window->GameTick(DeltaTime);
     }
+
+    Context.BeginFrame(DeltaTime);
+    Render(DeltaTime);
+    Context.EndFrame();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -168,7 +164,7 @@ void UCogWindowManager::Render(float DeltaTime)
     ImGui::DockSpaceOverViewport(0, ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingInCentralNode | ImGuiDockNodeFlags_AutoHideTabBar);
     ImGui::PopStyleColor(1);
 
-    bool bCompactSaved = bCompactMode;
+    bool bCompactSaved = SettingsWindow->GetSettingsConfig()->bCompactMode;
     if (bCompactSaved)
     {
         FCogWindowWidgets::PushStyleCompact();
@@ -176,7 +172,7 @@ void UCogWindowManager::Render(float DeltaTime)
 
     if (bHideAllWindows == false)
     {
-        if (ImGuiWidget->GetEnableInput() || bHideMainMenuOnGameInput == false)
+        if (Context.GetEnableInput())
         {
             RenderMainMenu();
         }
@@ -188,7 +184,7 @@ void UCogWindowManager::Render(float DeltaTime)
 
         if (Window->GetIsVisible() && bHideAllWindows == false)
         {
-            if (bTransparentMode)
+            if (SettingsWindow->GetSettingsConfig()->bTransparentMode)
             {
                 ImGui::SetNextWindowBgAlpha(0.35f);
             }
@@ -201,8 +197,6 @@ void UCogWindowManager::Render(float DeltaTime)
     {
         FCogWindowWidgets::PopStyleCompact();
     }
-
-    TickDPI();
 
     FCogDebugDrawImGui::Draw();
 }
@@ -354,8 +348,6 @@ void UCogWindowManager::RenderMainMenu()
 
             ImGui::Separator();
 
-            RenderMenuItem(*InputsWindow, "Inputs");
-            
             RenderMenuItem(*LayoutsWindow, "Layouts");
 
             RenderMenuItem(*SettingsWindow, "Settings");
@@ -508,7 +500,7 @@ void UCogWindowManager::RenderOptionMenu(UCogWindowManager::FMenu& Menu)
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::RenderMenuItem(FCogWindow& Window, const char* MenuItemName)
 {
-    if (bShowWindowsInMainMenu)
+    if (SettingsWindow->GetSettingsConfig()->bShowWindowsInMainMenu)
     {
         ImGui::SetNextWindowSizeConstraints(
             ImVec2(FCogWindowWidgets::GetFontWidth() * 40, ImGui::GetTextLineHeightWithSpacing() * 5),
@@ -535,31 +527,7 @@ void UCogWindowManager::RenderMenuItem(FCogWindow& Window, const char* MenuItemN
     }
 }
 
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::TickDPI()
-{
-    const float MouseWheel = ImGui::GetIO().MouseWheel;
-    const bool IsControlDown = ImGui::GetIO().KeyCtrl;
-    if (IsControlDown && MouseWheel != 0)
-    {
-        SetDPIScale(FMath::Clamp(DPIScale + (MouseWheel > 0 ? 0.1f : -0.1f), 0.5f, 2.0f));
-    }
 
-    const bool IsMiddleMouseClicked = ImGui::GetIO().MouseClicked[2];
-    if (IsControlDown && IsMiddleMouseClicked)
-    {
-        SetDPIScale(1.0f);
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::RefreshDPIScale()
-{
-    if (SCogImguiWidget* Widget = ImGuiWidget.Get())
-    {
-        Widget->SetDPIScale(DPIScale);
-    }
-}
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::SettingsHandler_ClearAll(ImGuiContext* Context, ImGuiSettingsHandler* Handler)
@@ -650,18 +618,6 @@ void UCogWindowManager::SettingsHandler_WriteAll(ImGuiContext* Context, ImGuiSet
         Buffer->appendf("0x%08X %d\n", Window->GetID(), Window->GetIsWidgetVisible());
     }
     Buffer->append("\n");
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::SetDPIScale(float Value) 
-{
-    if (DPIScale == Value)
-    {
-        return;
-    }
-
-    DPIScale = Value; 
-    bRefreshDPIScale = true; 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -786,5 +742,5 @@ const UObject* UCogWindowManager::GetAsset(const TSubclassOf<UObject> AssetClass
 void UCogWindowManager::ToggleInputMode()
 {
     UE_LOG(LogCogImGui, Verbose, TEXT("UCogWindowManager::ToggleInputMode"));
-    ImGuiWidget->SetEnableInput(!ImGuiWidget->GetEnableInput());
+    Context.SetEnableInput(!Context.GetEnableInput());
 }

@@ -36,6 +36,7 @@
 #include "CogEngineWindow_Scalability.h"
 #include "CogEngineWindow_Selection.h"
 #include "CogEngineWindow_Skeleton.h"
+#include "CogEngineWindow_Slate.h"
 #include "CogEngineWindow_Spawns.h"
 #include "CogEngineWindow_Stats.h"
 #include "CogEngineWindow_TimeScale.h"
@@ -161,6 +162,8 @@ void ACogSampleGameState::InitializeCog()
     CogWindowManager->AddWindow<FCogEngineWindow_Scalability>("Engine.Scalability");
 
     CogWindowManager->AddWindow<FCogEngineWindow_Skeleton>("Engine.Skeleton");
+
+    CogWindowManager->AddWindow<FCogEngineWindow_Slate>("Engine.Slate");
 
     CogWindowManager->AddWindow<FCogEngineWindow_Spawns>("Engine.Spawns");
 

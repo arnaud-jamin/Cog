@@ -4,6 +4,7 @@
 #include "CogDebugSettings.h"
 #include "CogEngineReplicator.h"
 #include "CogImguiModule.h"
+#include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
 #include "CogWindowManager.h"
 #include "CogWindowWidgets.h"
@@ -136,8 +137,8 @@ void FCogEngineWindow_Selection::ToggleSelectionMode()
 void FCogEngineWindow_Selection::ActivateSelectionMode()
 {
     bSelectionModeActive = true;
-    bIsInputEnabledBeforeEnteringSelectionMode = GetOwner()->GetImGuiWidget()->GetEnableInput();
-    GetOwner()->GetImGuiWidget()->SetEnableInput(true);
+    bIsInputEnabledBeforeEnteringSelectionMode = GetOwner()->GetContext().GetEnableInput();
+    GetOwner()->GetContext().SetEnableInput(true);
     GetOwner()->SetHideAllWindows(true);
 }
 
@@ -158,7 +159,7 @@ void FCogEngineWindow_Selection::DeactivateSelectionMode()
     // When in selection mode we need imgui to have the input focus
     // When leaving selection mode we want to leave it as is was before
     //--------------------------------------------------------------------------------------------
-    GetOwner()->GetImGuiWidget()->SetEnableInput(bIsInputEnabledBeforeEnteringSelectionMode);
+    GetOwner()->GetContext().SetEnableInput(bIsInputEnabledBeforeEnteringSelectionMode);
 
     GetOwner()->SetHideAllWindows(false);
 }
@@ -393,15 +394,23 @@ void FCogEngineWindow_Selection::TickSelectionMode()
         return;
     }
 
-    ImDrawList* DrawList = ImGui::GetBackgroundDrawList();
-    DrawList->AddRect(ImVec2(0, 0), ImGui::GetIO().DisplaySize, IM_COL32(255, 0, 0, 128), 0.0f, 0, 20.0f);
-    FCogWindowWidgets::AddTextWithShadow(DrawList, ImVec2(20, 20), IM_COL32(255, 255, 255, 255), "Picking Mode. \n[LMB] Pick \n[RMB] Cancel");
+    ImGuiViewport* Viewport = ImGui::GetMainViewport();
+    if (Viewport == nullptr)
+    {
+        return;
+    }
+
+    const ImVec2 ViewportPos = Viewport->Pos;
+    const ImVec2 ViewportSize = Viewport->Size;
+    ImDrawList* DrawList = ImGui::GetBackgroundDrawList(Viewport);
+    DrawList->AddRect(ViewportPos, ViewportPos + ViewportSize, IM_COL32(255, 0, 0, 128), 0.0f, 0, 20.0f);
+    FCogWindowWidgets::AddTextWithShadow(DrawList, ViewportPos + ImVec2(20, 20), IM_COL32(255, 255, 255, 255), "Picking Mode. \n[LMB] Pick \n[RMB] Cancel");
 
     TSubclassOf<AActor> SelectedActorClass = GetSelectedActorClass();
 
     AActor* HoveredActor = nullptr;
     FVector WorldOrigin, WorldDirection;
-    if (UGameplayStatics::DeprojectScreenToWorld(PlayerController, FCogImguiHelper::ToVector2D(ImGui::GetMousePos()), WorldOrigin, WorldDirection))
+    if (UGameplayStatics::DeprojectScreenToWorld(PlayerController, FCogImguiHelper::ToFVector2D(ImGui::GetMousePos() - ViewportPos), WorldOrigin, WorldDirection))
     {
         //--------------------------------------------------------------------------------------------------------
         // Prioritize another actor than the selected actor unless we only touch the selected actor.
@@ -463,7 +472,13 @@ void FCogEngineWindow_Selection::DrawActorFrame(const AActor& Actor)
         return;
     }
 
-    ImDrawList* DrawList = ImGui::GetBackgroundDrawList();
+    ImGuiViewport* Viewport = ImGui::GetMainViewport();
+    if (Viewport == nullptr)
+    {
+        return;
+    }
+
+    ImDrawList* DrawList = ImGui::GetBackgroundDrawList(Viewport);
 
     FVector BoxOrigin, BoxExtent;
 
@@ -502,8 +517,8 @@ void FCogEngineWindow_Selection::DrawActorFrame(const AActor& Actor)
     if (ComputeBoundingBoxScreenPosition(PlayerController, BoxOrigin, BoxExtent, ScreenPosMin, ScreenPosMax))
     {
         const ImU32 Color = (&Actor == GetSelection()) ? IM_COL32(255, 255, 255, 255) : IM_COL32(255, 255, 255, 128);
-        DrawList->AddRect(FCogImguiHelper::ToImVec2(ScreenPosMin), FCogImguiHelper::ToImVec2(ScreenPosMax), Color, 0.0f, 0, 1.0f);
-        FCogWindowWidgets::AddTextWithShadow(DrawList, FCogImguiHelper::ToImVec2(ScreenPosMin + FVector2D(0, -14.0f)), Color, TCHAR_TO_ANSI(*GetActorName(Actor)));
+        DrawList->AddRect(FCogImguiHelper::ToImVec2(ScreenPosMin) + Viewport->Pos, FCogImguiHelper::ToImVec2(ScreenPosMax) + Viewport->Pos, Color, 0.0f, 0, 1.0f);
+        FCogWindowWidgets::AddTextWithShadow(DrawList, FCogImguiHelper::ToImVec2(ScreenPosMin + FVector2D(0, -14.0f)) + Viewport->Pos, Color, TCHAR_TO_ANSI(*GetActorName(Actor)));
     }
 }
 

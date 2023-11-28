@@ -1,12 +1,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogImguiWidget.h"
+#include "CogImguiContext.h"
 #include "imgui.h"
 #include "CogWindowManager.generated.h"
 
 class FCogWindow;
-class FCogWindow_Inputs;
 class FCogWindow_Layouts;
 class FCogWindow_Settings;
 class IConsoleObject;
@@ -55,26 +54,12 @@ public:
 
     virtual void SetHideAllWindows(bool Value);
 
-    virtual float GetDPIScale() const { return DPIScale; }
-
-    virtual void SetDPIScale(float Value);
-    
-    virtual bool GetCompactMode() const { return bCompactMode; }
-
-    virtual void SetCompactMode(bool Value) { bCompactMode = Value; }
-
-    virtual bool GetShowHelp() const { return bShowHelp; }
-
-    virtual void SetShowHelp(bool Value) { bShowHelp = Value; }
-
-    virtual bool GetPreviewWindowsInMenu() const { return bShowWindowsInMainMenu; }
-
-    virtual void SetPreviewWindowsInMenu(bool Value) { bShowWindowsInMainMenu = Value; }
-
     virtual void ResetAllWindowsConfig();
 
     virtual bool RegisterDefaultCommandBindings();
     
+    const FCogWindow_Settings* GetSettingsWindow() const { return SettingsWindow; }
+
     UCogWindowConfig* GetConfig(const TSubclassOf<UCogWindowConfig> ConfigClass);
 
     template<class T>
@@ -85,7 +70,9 @@ public:
     template<typename T> 
     T* GetAsset();
 
-    TSharedPtr<SCogImguiWidget> GetImGuiWidget() const { return ImGuiWidget; }
+    const FCogImguiContext& GetContext() const { return Context; }
+
+    FCogImguiContext& GetContext() { return Context; }
 
     static void AddCommand(UPlayerInput* PlayerInput, const FString& Command, const FKey& Key);
 
@@ -93,7 +80,6 @@ public:
 
 protected:
 
-    friend class FCogWindow_Inputs;
     friend class FCogWindow_Layouts;
     friend class FCogWindow_Settings;
 
@@ -106,8 +92,6 @@ protected:
 
     virtual void InitializeInternal();
 
-    virtual void RefreshDPIScale();
-
     virtual void RenderMainMenu();
     
     virtual FMenu* AddMenu(const FString& Name);
@@ -115,8 +99,6 @@ protected:
     virtual void RenderOptionMenu(FMenu& Menu);
 
     virtual void RenderMenuItem(FCogWindow& Window, const char* MenuItemName);
-
-    virtual void TickDPI();
 
     virtual void ToggleInputMode();
 
@@ -145,36 +127,9 @@ protected:
     mutable TArray<const UObject*> Assets;
 
     UPROPERTY(Config)
-    bool bCompactMode = false;
-
-    UPROPERTY(Config)
-    bool bTransparentMode = false;
-
-    UPROPERTY(Config)
-    float DPIScale = 1.0f;
-
-    UPROPERTY(Config)
-    bool bShowHelp = true;
-
-    UPROPERTY(Config)
-    bool bShowWindowsInMainMenu = true;
-
-    UPROPERTY(Config)
     bool bRegisterDefaultCommands = true;
 
-    UPROPERTY(Config)
-    bool bAuthorizeInactiveInput = true;
-
-    UPROPERTY(Config)
-    bool bAuthorizeExclusiveInput = true;
-
-    UPROPERTY(Config)
-    bool bAuthorizeSharedInput = true;
-
-    UPROPERTY(Config)
-    bool bHideMainMenuOnGameInput = true;
-
-    TSharedPtr<SCogImguiWidget> ImGuiWidget = nullptr;
+    FCogImguiContext Context;
 
     TArray<FCogWindow*> Windows;
 
@@ -183,8 +138,6 @@ protected:
     int32 WidgetsOrderIndex = 0;
 
     TArray<FCogWindow*> SpaceWindows;
-
-    FCogWindow_Inputs* InputsWindow = nullptr;
 
     FCogWindow_Settings* SettingsWindow = nullptr;
 
@@ -198,7 +151,7 @@ protected:
 
     bool bHideAllWindows = false;
 
-    bool bRefreshDPIScale = false;
+    bool IsInitialized = false;
 
     TArray<IConsoleObject*> ConsoleCommands;
 };

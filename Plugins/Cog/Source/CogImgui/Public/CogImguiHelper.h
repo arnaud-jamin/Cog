@@ -20,11 +20,13 @@ public:
 
     static ImGuiWindow* GetCurrentWindow();
 
-    static FColor UnpackImU32Color(ImU32 Color);
+    static FColor ToFColor(ImU32 Color);
 
     static FSlateRect ToSlateRect(const ImVec4& Value);
 
-    static FVector2D ToVector2D(const ImVec2& Value);
+    static FVector2f ToFVector2f(const ImVec2& Value);
+
+    static FVector2D ToFVector2D(const ImVec2& Value);
 
     static ImVec2 ToImVec2(const FVector2D& Value);
 

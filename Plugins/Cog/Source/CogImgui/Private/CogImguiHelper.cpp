@@ -31,7 +31,7 @@ ImGuiWindow* FCogImguiHelper::GetCurrentWindow()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FColor FCogImguiHelper::UnpackImU32Color(ImU32 Color)
+FColor FCogImguiHelper::ToFColor(ImU32 Color)
 {
     return FColor
     {
@@ -49,7 +49,13 @@ FSlateRect FCogImguiHelper::ToSlateRect(const ImVec4& Value)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FVector2D FCogImguiHelper::ToVector2D(const ImVec2& Value)
+FVector2f FCogImguiHelper::ToFVector2f(const ImVec2& Value)
+{
+    return FVector2f(Value.x, Value.y);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FVector2D FCogImguiHelper::ToFVector2D(const ImVec2& Value)
 {
     return FVector2D(Value.x, Value.y);
 }
@@ -89,7 +95,6 @@ ImVec4 FCogImguiHelper::ToImVec4(const FVector4f& Value)
 {
     return ImVec4(Value.X, Value.Y, Value.Z, Value.W);
 }
-
 
 //--------------------------------------------------------------------------------------------------------------------------
 ImU32 FCogImguiHelper::ToImU32(const FColor& Value)

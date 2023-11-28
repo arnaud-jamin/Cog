@@ -228,7 +228,7 @@ void FCogEngineWindow_Collisions::RenderContent()
         case 2:
         {
             FVector Direction;
-            UGameplayStatics::DeprojectScreenToWorld(PlayerController, FCogImguiHelper::ToVector2D(ImGui::GetMousePos()), QueryStart, Direction);
+            UGameplayStatics::DeprojectScreenToWorld(PlayerController, FCogImguiHelper::ToFVector2D(ImGui::GetMousePos()), QueryStart, Direction);
             QueryEnd = QueryStart + Direction * Config->QueryDistance;
             QueryRadius = Config->QueryThickness;
             break;

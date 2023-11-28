@@ -3,9 +3,11 @@
 #include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
 #include "CogImguiWidget.h"
+#include "CogImguiContext.h"
 #include "GameFramework/InputSettings.h"
 #include "GameFramework/PlayerInput.h"
 #include "imgui.h"
+#include "imgui_internal.h"
 #include "Slate/SGameLayerManager.h"
 
 #if WITH_EDITOR
@@ -16,9 +18,10 @@ constexpr bool ForwardEvent = false;
 constexpr bool TerminateEvent = true;
 
 //--------------------------------------------------------------------------------------------------------------------------
-FImGuiInputProcessor::FImGuiInputProcessor(UPlayerInput* InPlayerInput, SCogImguiWidget* InMainWidget)
+FImGuiInputProcessor::FImGuiInputProcessor(UPlayerInput* InPlayerInput, FCogImguiContext* InContext, SCogImguiWidget* InMainWidget)
 {
     PlayerInput = InPlayerInput;
+    Context = InContext;
     MainWidget = InMainWidget;
 }
 
@@ -43,14 +46,16 @@ void FImGuiInputProcessor::Tick(const float DeltaTime, FSlateApplication& SlateA
 
     AddMousePosEvent(SlateApp.GetCursorPos());
 
-    if ((IO.ConfigFlags & ImGuiConfigFlags_NoMouse) == 0)
+    const bool bHasMouse = (IO.ConfigFlags & ImGuiConfigFlags_NoMouse) == 0;
+    const bool bUpdateMouseMouseCursor = (IO.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange) == 0;
+    if (bHasMouse && bUpdateMouseMouseCursor)
     {
         SlateCursor->SetType(FCogImguiInputHelper::ToSlateMouseCursor(ImGui::GetMouseCursor()));
     }
 
     if (IO.WantSetMousePos)
     {
-        SlateApp.SetCursorPos(FCogImguiHelper::ToVector2D(IO.MousePos));
+        SlateApp.SetCursorPos(FCogImguiHelper::ToFVector2D(IO.MousePos));
         //UE_LOG(LogCogImGui, VeryVerbose, TEXT("FImGuiInputProcessor::Tick | SetCursorPos"));
     }
 }
@@ -175,7 +180,7 @@ bool FImGuiInputProcessor::HandleMouseMoveEvent(FSlateApplication& SlateApp, con
 {
     AddMousePosEvent(Event.GetScreenSpacePosition());
 
-    if (MainWidget->GetEnableInput() && MainWidget->GetShareMouse() == false)
+    if (Context->GetEnableInput() && Context->GetShareMouse() == false && IsMouseInsideMainViewport())
     {
         return TerminateEvent;
     }
@@ -211,7 +216,7 @@ bool FImGuiInputProcessor::HandleMouseButtonEvent(FSlateApplication& SlateApp, c
     const uint32 Button = ToImGuiMouseButton(Event.GetEffectingButton());
     IO.AddMouseButtonEvent(Button, IsButtonDown);
 
-    if (MainWidget->GetEnableInput() && MainWidget->GetShareMouse() == false)
+    if (Context->GetEnableInput() && Context->GetShareMouse() == false && IsMouseInsideMainViewport())
     {
         const bool Result = TerminateEvent;
         UE_LOG(LogCogImGui, VeryVerbose, TEXT("FImGuiInputProcessor::HandleMouseButtonEvent | Button:%d | IsButtonDown:%d | WantCaptureMouse:%d | TerminateEvent:%d | ShareMouse == false"), Button, IsButtonDown, IO.WantCaptureMouse, Result);
@@ -235,6 +240,19 @@ void FImGuiInputProcessor::AddMousePosEvent(const FVector2D& MousePosition) cons
         const FVector2D TransformedMousePosition = MousePosition - MainWidget->GetTickSpaceGeometry().GetAbsolutePosition();
         IO.AddMousePosEvent(TransformedMousePosition.X, TransformedMousePosition.Y);
     }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FImGuiInputProcessor::IsMouseInsideMainViewport()
+{
+    if (ImGuiViewportP* Viewport = (ImGuiViewportP*)ImGui::GetMainViewport())
+    {
+        ImGuiIO& IO = ImGui::GetIO();
+        const bool Result = Viewport->GetMainRect().Contains(IO.MousePos);
+        return Result;
+    }
+
+    return false;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

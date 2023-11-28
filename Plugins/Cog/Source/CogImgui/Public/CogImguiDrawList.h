@@ -6,44 +6,39 @@
 #include "Rendering/RenderingCommon.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-class FCogImguiDrawList
+struct FCogImguiDrawList
 {
-public:
+	FCogImguiDrawList() {};
+	
+	FCogImguiDrawList(ImDrawList* Source);
 
-    struct DrawCommand
-    {
-        uint32 NumElements;
-        FSlateRect ClippingRect;
-        CogTextureIndex TextureId;
-    };
+	ImVector<ImDrawVert> VtxBuffer;
+	
+	ImVector<ImDrawIdx> IdxBuffer;
+	
+	ImVector<ImDrawCmd> CmdBuffer;
 
-    // Get the number of draw commands in this list.
-    FORCEINLINE int NumCommands() const { return ImGuiCommandBuffer.Size; }
+	ImDrawListFlags Flags = ImDrawListFlags_None;
+};
 
-    // Get the draw command by number.
-    // @param CommandNb - Number of draw command
-    // @param Transform - Transform to apply to clipping rectangle
-    // @returns Draw command data
-    DrawCommand GetCommand(int CommandCount, const FTransform2D& Transform) const;
+//--------------------------------------------------------------------------------------------------------------------------
+struct FCogImguiDrawData
+{
+	FCogImguiDrawData() {};
+	
+	FCogImguiDrawData(const ImDrawData* Source);
 
-    // Transform and copy vertex data to target buffer (old data in the target buffer are replaced).
-    // @param OutVertexBuffer - Destination buffer
-    // @param Transform - Transform to apply to all vertices
-    void CopyVertexData(TArray<FSlateVertex>& OutVertexBuffer, const FTransform2D& Transform) const;
+	bool bValid = false;
 
-    // Transform and copy index data to target buffer (old data in the target buffer are replaced).
-    // Internal index buffer contains enough data to match the sum of NumElements from all draw commands.
-    // @param OutIndexBuffer - Destination buffer
-    // @param StartIndex - Start copying source data starting from this index
-    // @param NumElements - How many elements we want to copy
-    void CopyIndexData(TArray<SlateIndex>& OutIndexBuffer, const int32 StartIndex, const int32 NumElements) const;
+	int32 TotalIdxCount = 0;
+	
+	int32 TotalVtxCount = 0;
 
-    // Transfers data from ImGui source list to this object. Leaves source cleared.
-    void TransferDrawData(ImDrawList& Src);
+	TArray<FCogImguiDrawList> DrawLists;
 
-private:
+	FVector2f DisplayPos = FVector2f::ZeroVector;
 
-    ImVector<ImDrawCmd> ImGuiCommandBuffer;
-    ImVector<ImDrawIdx> ImGuiIndexBuffer;
-    ImVector<ImDrawVert> ImGuiVertexBuffer;
+	FVector2f DisplaySize = FVector2f::ZeroVector;
+
+	FVector2f FrameBufferScale = FVector2f::ZeroVector;
 };

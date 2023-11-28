@@ -2,6 +2,7 @@
 
 #include "CogDebugDraw.h"
 #include "CogDebugSettings.h"
+#include "CogWindow_Settings.h"
 #include "CogWindowManager.h"
 #include "CogWindowWidgets.h"
 #include "Engine/World.h"
@@ -75,7 +76,7 @@ void FCogWindow::Render(float DeltaTime)
             ImGui::PopStyleVar(1);
         }
 
-        if (GetOwner()->GetShowHelp())
+        if (GetOwner()->GetSettingsWindow()->GetSettingsConfig()->bShowHelp)
         {
             if (ImGui::IsItemHovered())
             {
