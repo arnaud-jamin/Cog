@@ -2,9 +2,9 @@
 
 #include "CoreMinimal.h"
 #include "Engine/Texture2D.h" 
+#include "imgui.h"
 #include "Templates/SharedPointer.h"
 #include "UObject/StrongObjectPtr.h"
-#include "imgui.h"
 
 class FCogImguiContext;
 class IInputProcessor;
@@ -57,17 +57,7 @@ private:
 
 	void DrawDebug();
 
-	void TryGiveMouseCaptureBackToGame();
-
-	void TryReleaseGameMouseCapture();
-
 	void BuildFont();
-
-	void ReturnFocus();
-
-	void TickFocus();
-
-	void TakeFocus();
 
 	ULocalPlayer* GetLocalPlayer() const;
 
@@ -122,4 +112,6 @@ private:
 	float DpiScale = 1.f;
 
 	bool bRefreshDPIScale = false;
+
+	bool IsThrottleDisabled = false;
 };

@@ -25,12 +25,12 @@ void FCogWindow_Settings::Initialize()
 
     FCogImguiContext& Context = GetOwner()->GetContext();
     Context.SetEnableInput(Config->bEnableInput);
-    Context.SetShareMouse(Config->bShareMouse);
+    //Context.SetShareMouse(Config->bShareMouse);
 
-    FCogImguiHelper::SetFlags(IO.ConfigFlags, ImGuiConfigFlags_NavEnableKeyboard, Config->bNavEnableKeyboard);
-    FCogImguiHelper::SetFlags(IO.ConfigFlags, ImGuiConfigFlags_NavEnableGamepad, Config->bNavEnableGamepad);
-    FCogImguiHelper::SetFlags(IO.ConfigFlags, ImGuiConfigFlags_NavNoCaptureKeyboard, Config->bNavNoCaptureInput);
-    FCogImguiHelper::SetFlags(IO.ConfigFlags, ImGuiConfigFlags_NoMouseCursorChange, Config->bNoMouseCursorChange);
+    //FCogImguiHelper::SetFlags(IO.ConfigFlags, ImGuiConfigFlags_NavEnableKeyboard, Config->bNavEnableKeyboard);
+    //FCogImguiHelper::SetFlags(IO.ConfigFlags, ImGuiConfigFlags_NavEnableGamepad, Config->bNavEnableGamepad);
+    //FCogImguiHelper::SetFlags(IO.ConfigFlags, ImGuiConfigFlags_NavNoCaptureKeyboard, Config->bNavNoCaptureInput);
+    //FCogImguiHelper::SetFlags(IO.ConfigFlags, ImGuiConfigFlags_NoMouseCursorChange, Config->bNoMouseCursorChange);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -38,15 +38,15 @@ void FCogWindow_Settings::PreSaveConfig()
 {
     Super::PreSaveConfig();
 
-    ImGuiIO& IO = ImGui::GetIO();
-    Config->bNavEnableKeyboard = IO.ConfigFlags & ImGuiConfigFlags_NavEnableKeyboard;
-    Config->bNavEnableGamepad = IO.ConfigFlags & ImGuiConfigFlags_NavEnableGamepad;
-    Config->bNavNoCaptureInput = IO.ConfigFlags & ImGuiConfigFlags_NavNoCaptureKeyboard;
-    Config->bNoMouseCursorChange = IO.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange;
+    //ImGuiIO& IO = ImGui::GetIO();
+    //Config->bNavEnableKeyboard = IO.ConfigFlags & ImGuiConfigFlags_NavEnableKeyboard;
+    //Config->bNavEnableGamepad = IO.ConfigFlags & ImGuiConfigFlags_NavEnableGamepad;
+    //Config->bNavNoCaptureInput = IO.ConfigFlags & ImGuiConfigFlags_NavNoCaptureKeyboard;
+    //Config->bNoMouseCursorChange = IO.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange;
 
     const FCogImguiContext& Context = GetOwner()->GetContext();
     Config->bEnableInput = Context.GetEnableInput();
-    Config->bShareMouse = Context.GetShareMouse();
+    //Config->bShareMouse = Context.GetShareMouse();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -86,8 +86,6 @@ void FCogWindow_Settings::RenderContent()
         ImGui::PopStyleColor();
     }
 
-    ImGui::Separator();
-
     FCogWindowWidgets::SetNextItemToShortWidth();
     ImGui::SliderFloat("DPI Scale", &Config->DPIScale, 0.5f, 2.0f, "%.1f");
     if (ImGui::IsItemDeactivatedAfterEdit())
@@ -103,11 +101,14 @@ void FCogWindow_Settings::RenderContent()
         ImGui::EndTooltip();
     }
 
-    ImGui::Separator();
-
     if (ImGui::Checkbox("Enable Viewports", &Config->bEnableViewports))
     {
         FCogImguiHelper::SetFlags(IO.ConfigFlags, ImGuiConfigFlags_ViewportsEnable, Config->bEnableViewports);
+    }
+
+    if (ImGui::IsItemHovered())
+    {
+        ImGui::SetTooltip("Cog imgui viewport integration in Unreal is still experimental");
     }
 
     ImGui::Checkbox("Compact Mode", &Config->bCompactMode);
@@ -116,18 +117,16 @@ void FCogWindow_Settings::RenderContent()
 
     ImGui::Checkbox("Show Window Help", &Config->bShowHelp);
     
-    ImGui::Separator();
+    //bool bShareMouse = Context.GetShareMouse();
+    //if (ImGui::Checkbox("Share Mouse", &bShareMouse))
+    //{
+    //    Context.SetShareMouse(bShareMouse);
+    //}
 
-    bool bShareMouse = Context.GetShareMouse();
-    if (ImGui::Checkbox("Share Mouse", &bShareMouse))
-    {
-        Context.SetShareMouse(bShareMouse);
-    }
-
-    ImGui::CheckboxFlags("Keyboard Navigation", &IO.ConfigFlags, ImGuiConfigFlags_NavEnableKeyboard);
-    ImGui::CheckboxFlags("Gamepad Navigation", &IO.ConfigFlags, ImGuiConfigFlags_NavEnableGamepad);
-    ImGui::CheckboxFlags("Navigation No Capture", &IO.ConfigFlags, ImGuiConfigFlags_NavNoCaptureKeyboard);
-    ImGui::CheckboxFlags("No Mouse Cursor Change", &IO.ConfigFlags, ImGuiConfigFlags_NoMouseCursorChange);
+    //ImGui::CheckboxFlags("Keyboard Navigation", &IO.ConfigFlags, ImGuiConfigFlags_NavEnableKeyboard);
+    //ImGui::CheckboxFlags("Gamepad Navigation", &IO.ConfigFlags, ImGuiConfigFlags_NavEnableGamepad);
+    //ImGui::CheckboxFlags("Navigation No Capture", &IO.ConfigFlags, ImGuiConfigFlags_NavNoCaptureKeyboard);
+    //ImGui::CheckboxFlags("No Mouse Cursor Change", &IO.ConfigFlags, ImGuiConfigFlags_NoMouseCursorChange);
 
     ImGui::Separator();
 

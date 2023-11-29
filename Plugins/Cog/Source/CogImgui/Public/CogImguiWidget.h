@@ -26,6 +26,8 @@ public:
 
     ~SCogImguiWidget();
 
+    virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
+
     virtual int32 OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyClippingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& WidgetStyle, bool bParentEnabled) const override;
 
     virtual bool SupportsKeyboardFocus() const override { return true; }
@@ -53,11 +55,7 @@ protected:
 
     FReply HandleKeyEvent(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent);
 
-    void TickFocus();
-
-	void TakeFocus();
-
-    void ReturnFocus();
+    void RefreshVisibility();
 
     TObjectPtr<FCogImguiContext> Context = nullptr;
 

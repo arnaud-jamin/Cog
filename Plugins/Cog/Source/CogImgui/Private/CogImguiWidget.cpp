@@ -3,7 +3,6 @@
 #include "CogImguiInputHelper.h"
 #include "CogImguiModule.h"
 #include "CogImguiWidget.h"
-
 #include "CogImGuiContext.h"
 #include "imgui.h"
 #include "SlateOptMacros.h"
@@ -14,8 +13,7 @@ void SCogImguiWidget::Construct(const FArguments& InArgs)
 {
     Context = InArgs._Context;
 
-    //SetVisibility(EVisibility::SelfHitTestInvisible);
-    SetVisibility(EVisibility::Visible);
+    RefreshVisibility();
 }
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
@@ -28,6 +26,13 @@ SCogImguiWidget::~SCogImguiWidget()
 void SCogImguiWidget::SetDrawData(const ImDrawData* InDrawData)
 {
     DrawData = FCogImguiDrawData(InDrawData);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void SCogImguiWidget::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime)
+{
+    Super::Tick(AllottedGeometry, InCurrentTime, InDeltaTime);
+    RefreshVisibility();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -104,21 +109,6 @@ FVector2D SCogImguiWidget::ComputeDesiredSize(float Scale) const
     return FVector2D::ZeroVector;
 }
 
-////--------------------------------------------------------------------------------------------------------------------------
-//FReply SCogImguiWidget::OnFocusReceived(const FGeometry& MyGeometry, const FFocusEvent& FocusEvent)
-//{
-//    if (bEnableInput == false)
-//    {
-//        return FReply::Unhandled();
-//    }
-//
-//    Super::OnFocusReceived(MyGeometry, FocusEvent);
-//
-//    FSlateApplication::Get().ResetToDefaultPointerInputSettings();
-//
-//    return FReply::Handled();
-//}
-
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiWidget::OnKeyChar(const FGeometry& MyGeometry, const FCharacterEvent& CharacterEvent)
 {
@@ -189,13 +179,7 @@ FReply SCogImguiWidget::OnAnalogValueChanged(const FGeometry& MyGeometry, const 
 
     	return FReply::Unhandled();
     }
-    else
-    {
-        //if (bShareKeyboard)
-        //{
-        //    return FReply::Unhandled();
-        //}
-    }
+
     return FReply::Handled();
 }
 
@@ -272,83 +256,15 @@ FReply SCogImguiWidget::OnFocusReceived(const FGeometry& MyGeometry, const FFocu
     return Super::OnFocusReceived(MyGeometry, FocusEvent);
 }
 
-
 //--------------------------------------------------------------------------------------------------------------------------
-//void SCogImguiWidget::TickFocus()
-//{
-//    FCogImguiModule& Module = FCogImguiModule::Get();
-//
-//    const bool bShouldEnableInput = Module.GetEnableInput();
-//    if (bEnableInput != bShouldEnableInput)
-//    {
-//        bEnableInput = bShouldEnableInput;
-//
-//        if (bEnableInput)
-//        {
-//            TakeFocus();
-//        }
-//        else
-//        {
-//            ReturnFocus();
-//        }
-//    }
-//    else if (bEnableInput)
-//    {
-//        const auto& ViewportWidget = GameViewport->GetGameViewportWidget();
-//        if (!HasKeyboardFocus() && !IsConsoleOpened() && (ViewportWidget->HasKeyboardFocus() || ViewportWidget->HasFocusedDescendants()))
-//        {
-//            TakeFocus();
-//        }
-//    }
-//}
-//
-//
-////--------------------------------------------------------------------------------------------------------------------------
-//void SCogImguiWidget::TakeFocus()
-//{
-//    FSlateApplication& SlateApplication = FSlateApplication::Get();
-//
-//    PreviousUserFocusedWidget = SlateApplication.GetUserFocusedWidget(SlateApplication.GetUserIndexForKeyboard());
-//
-//    if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
-//    {
-//        TSharedRef<SWidget> FocusWidget = SharedThis(this);
-//        LocalPlayer->GetSlateOperations().CaptureMouse(FocusWidget);
-//        LocalPlayer->GetSlateOperations().SetUserFocus(FocusWidget);
-//    }
-//    else
-//    {
-//        SlateApplication.SetKeyboardFocus(SharedThis(this));
-//    }
-//}
-//
-////--------------------------------------------------------------------------------------------------------------------------
-//void SCogImguiWidget::ReturnFocus()
-//{
-//    if (HasKeyboardFocus())
-//    {
-//        auto FocusWidgetPtr = PreviousUserFocusedWidget.IsValid()
-//            ? PreviousUserFocusedWidget.Pin()
-//            : GameViewport->GetGameViewportWidget();
-//
-//        if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
-//        {
-//            auto FocusWidgetRef = FocusWidgetPtr.ToSharedRef();
-//
-//            if (FocusWidgetPtr == GameViewport->GetGameViewportWidget())
-//            {
-//                LocalPlayer->GetSlateOperations().CaptureMouse(FocusWidgetRef);
-//            }
-//
-//            LocalPlayer->GetSlateOperations().SetUserFocus(FocusWidgetRef);
-//        }
-//        else
-//        {
-//            FSlateApplication& SlateApplication = FSlateApplication::Get();
-//            SlateApplication.ResetToDefaultPointerInputSettings();
-//            SlateApplication.SetUserFocus(SlateApplication.GetUserIndexForKeyboard(), FocusWidgetPtr);
-//        }
-//    }
-//
-//    PreviousUserFocusedWidget.Reset();
-//}
+void SCogImguiWidget::RefreshVisibility()
+{
+    if (Context->GetEnableInput())
+    {
+        SetVisibility(EVisibility::Visible);
+    }
+    else
+    {
+        SetVisibility(EVisibility::SelfHitTestInvisible);
+    }
+}

@@ -132,6 +132,8 @@ void FCogImguiContext::Shutdown()
         }
     }
 
+    GameViewport->RemoveViewportWidgetContent(MainWidget.ToSharedRef());
+
     if (PlotContext)
     {
         ImPlot::DestroyContext(PlotContext);
@@ -223,7 +225,6 @@ void FCogImguiContext::BeginFrame(float InDeltaTime)
     if (ModifierKeys.IsAltDown() != IO.KeyAlt) { IO.AddKeyEvent(ImGuiMod_Alt, ModifierKeys.IsAltDown()); }
     if (ModifierKeys.IsCommandDown() != IO.KeySuper) { IO.AddKeyEvent(ImGuiMod_Super, ModifierKeys.IsCommandDown()); }
 
-
     //-------------------------------------------------------------------------------------------------------
     // 
     //-------------------------------------------------------------------------------------------------------
@@ -235,8 +236,6 @@ void FCogImguiContext::BeginFrame(float InDeltaTime)
     {
         IO.ConfigFlags |= ImGuiConfigFlags_NoMouse;
     }
-
-    TickFocus();
 
     //-------------------------------------------------------------------------------------------------------
     // 
@@ -579,68 +578,39 @@ void FCogImguiContext::SetEnableInput(bool Value)
 {
     bEnableInput = Value; 
 
-    FSlateThrottleManager::Get().DisableThrottle(bEnableInput);
-
-    if (bEnableInput == false)
+    if (bEnableInput)
     {
-        TryGiveMouseCaptureBackToGame();
+        FSlateThrottleManager::Get().DisableThrottle(true);
+        IsThrottleDisabled = true;
+
+        FSlateApplication& SlateApp = FSlateApplication::Get();
+        
+        if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
+        {
+            LocalPlayer->GetSlateOperations()
+                .ReleaseMouseLock()
+                .ReleaseMouseCapture();
+        }
     }
     else
     {
+        if (IsThrottleDisabled)
+        {
+            FSlateThrottleManager::Get().DisableThrottle(false);
+        }
+
+        if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
+        {
+            LocalPlayer->GetSlateOperations().CaptureMouse(GameViewport->GetGameViewportWidget().ToSharedRef());
+        }
     }
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::SetShareMouse(bool Value)
 {
-    bShareMouse = Value; 
-
-    if (bEnableInput == false)
-    {
-        TryGiveMouseCaptureBackToGame();
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogImguiContext::TryReleaseGameMouseCapture()
-{
-    if (bShareMouse)
-    {
-        return;
-    }
-
-    if (TSharedPtr<FSlateUser> User = FSlateApplication::Get().GetCursorUser())
-    {
-        if (User->HasCursorCapture())
-        {
-            PreviousMouseCaptor = User->GetCursorCaptor();
-        }
-    }
-
-    if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
-    {
-        LocalPlayer->GetSlateOperations()
-            .ReleaseMouseLock()
-            .ReleaseMouseCapture();
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogImguiContext::TryGiveMouseCaptureBackToGame()
-{
-    if (PreviousMouseCaptor.IsValid() == false)
-    {
-        return;
-    }
- 
-    TSharedRef<SWidget> PreviousMouseCaptorRef = PreviousMouseCaptor.Pin().ToSharedRef();
-
-    if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
-    {
-        LocalPlayer->GetSlateOperations().CaptureMouse(PreviousMouseCaptorRef);
-    }
-
-    PreviousMouseCaptor.Reset();
+    bShareMouse = Value;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -742,81 +712,4 @@ ULocalPlayer* FCogImguiContext::GetLocalPlayer() const
 
     ULocalPlayer* LocalPlayer = World->GetFirstLocalPlayerFromController();
     return LocalPlayer;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogImguiContext::TickFocus()
-{
-    const bool bShouldEnableInput = bEnableInput;
-    if (bEnableInput != bShouldEnableInput)
-    {
-        bEnableInput = bShouldEnableInput;
-
-        if (bEnableInput)
-        {
-            TakeFocus();
-        }
-        else
-        {
-            ReturnFocus();
-        }
-    }
-    else if (bEnableInput)
-    {
-        const auto& ViewportWidget = GameViewport->GetGameViewportWidget();
-        if (!MainWidget->HasKeyboardFocus() && !IsConsoleOpened() && (ViewportWidget->HasKeyboardFocus() || ViewportWidget->HasFocusedDescendants()))
-        {
-            TakeFocus();
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogImguiContext::TakeFocus()
-{
-    FSlateApplication& SlateApplication = FSlateApplication::Get();
-
-    PreviousMouseCaptor = SlateApplication.GetUserFocusedWidget(SlateApplication.GetUserIndexForKeyboard());
-
-    if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
-    {
-        TSharedRef<SWidget> FocusWidget = MainWidget->AsShared();
-        LocalPlayer->GetSlateOperations().CaptureMouse(FocusWidget);
-        LocalPlayer->GetSlateOperations().SetUserFocus(FocusWidget);
-    }
-    else
-    {
-        SlateApplication.SetKeyboardFocus(MainWidget->AsShared());
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogImguiContext::ReturnFocus()
-{
-    //if (MainWidget->HasKeyboardFocus())
-    //{
-    //    auto FocusWidgetPtr = PreviousMouseCaptor.IsValid()
-    //        ? PreviousMouseCaptor.Pin()
-    //        : GameViewport->GetGameViewportWidget();
-
-    //    if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
-    //    {
-    //        auto FocusWidgetRef = FocusWidgetPtr.ToSharedRef();
-
-    //        if (FocusWidgetPtr == GameViewport->GetGameViewportWidget())
-    //        {
-    //            LocalPlayer->GetSlateOperations().CaptureMouse(FocusWidgetRef);
-    //        }
-
-    //        LocalPlayer->GetSlateOperations().SetUserFocus(FocusWidgetRef);
-    //    }
-    //    else
-    //    {
-    //        FSlateApplication& SlateApplication = FSlateApplication::Get();
-    //        SlateApplication.ResetToDefaultPointerInputSettings();
-    //        SlateApplication.SetUserFocus(SlateApplication.GetUserIndexForKeyboard(), FocusWidgetPtr);
-    //    }
-    //}
-
-    //PreviousMouseCaptor.Reset();
 }

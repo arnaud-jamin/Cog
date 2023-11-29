@@ -85,7 +85,7 @@ void UCogWindowManager::InitializeInternal()
         TEXT("Save the layout. Cog.SaveLayout <Index>"),
         FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { if (Args.Num() > 0) { SaveLayout(FCString::Atoi(*Args[0])); }}), 
         ECVF_Cheat));
-    
+
     IsInitialized = true;
 }
 
