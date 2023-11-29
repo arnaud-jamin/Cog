@@ -4,8 +4,6 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BTCompositeNode.h"
 #include "BehaviorTree/BTNode.h"
-#include "BehaviorTree/Tasks/BTTask_BlueprintBase.h"
-#include "BehaviorTree/Tasks/BTTask_Wait.h"
 #include "BrainComponent.h"
 #include "CogAIModule.h"
 #include "CogDebugDraw.h"
@@ -13,7 +11,7 @@
 #include "CogWindowWidgets.h"
 #include "GameFramework/Pawn.h"
 #include "imgui_internal.h"
-
+#include "Navigation/PathFollowingComponent.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAIWindow_BehaviorTree::Initialize()

@@ -7,6 +7,7 @@
 class UEnum;
 class FEnumProperty;
 struct FCogImGuiKeyInfo;
+struct FKeyBind;
 
 class COGWINDOW_API FCogWindowWidgets
 {

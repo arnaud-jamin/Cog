@@ -3,7 +3,6 @@
 #include "CogDebugDrawImGui.h"
 #include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
-#include "CogImguiModule.h"
 #include "CogWindow_Layouts.h"
 #include "CogWindow_Settings.h"
 #include "CogWindow_Spacing.h"
@@ -11,6 +10,7 @@
 #include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
 #include "Engine/Engine.h"
+#include "GameFramework/PlayerInput.h"
 #include "HAL/IConsoleManager.h"
 #include "imgui_internal.h"
 
