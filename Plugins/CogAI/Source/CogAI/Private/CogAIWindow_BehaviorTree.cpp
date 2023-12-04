@@ -10,6 +10,7 @@
 #include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
 #include "GameFramework/Pawn.h"
+#include <Navigation/PathFollowingComponent.h>
 #include "imgui_internal.h"
 #include "Navigation/PathFollowingComponent.h"
 

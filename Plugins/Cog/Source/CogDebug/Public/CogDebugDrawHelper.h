@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 
-namespace EDrawDebugTrace { enum Type; }
+namespace EDrawDebugTrace { enum Type : int; }
 
 class COGDEBUG_API FCogDebugDrawHelper
 {
