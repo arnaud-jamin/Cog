@@ -152,9 +152,11 @@ void UCogWindowManager::Tick(float DeltaTime)
         Window->GameTick(DeltaTime);
     }
 
-    Context.BeginFrame(DeltaTime);
-    Render(DeltaTime);
-    Context.EndFrame();
+    if (Context.BeginFrame(DeltaTime))
+    {
+        Render(DeltaTime);
+        Context.EndFrame();
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

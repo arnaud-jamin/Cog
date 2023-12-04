@@ -25,6 +25,7 @@ struct COGIMGUI_API FImGuiViewportData
 class COGIMGUI_API FCogImguiContext : public TSharedFromThis<FCogImguiContext>
 {
 public:
+
 	void Initialize();
 
 	void Shutdown();
@@ -37,7 +38,7 @@ public:
 
 	void SetShareMouse(bool Value);
 
-	void BeginFrame(float InDeltaTime);
+	bool BeginFrame(float InDeltaTime);
 
 	void EndFrame();
 
@@ -87,6 +88,9 @@ private:
 
 	static void ImGui_RenderWindow(ImGuiViewport* Viewport, void* Data);
 
+	UPROPERTY()
+	UTexture2D* FontAtlasTexture = nullptr;
+
 	TMap<TWeakPtr<SWindow>, ImGuiID> WindowToViewportMap;
 
 	TSharedPtr<IInputProcessor> InputProcessor = nullptr;
@@ -109,9 +113,12 @@ private:
 
 	bool bShareMouse = true;
 
-	float DpiScale = 1.f;
-
 	bool bRefreshDPIScale = false;
 
-	bool IsThrottleDisabled = false;
+	bool bIsThrottleDisabled = false;
+
+	bool bIsFirstFrame = true;
+
+	float DpiScale = 1.f;
+
 };

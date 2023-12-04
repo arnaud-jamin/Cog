@@ -60,6 +60,7 @@ void FCogImguiContext::Initialize()
     IO.ConfigFlags |= ImGuiConfigFlags_NavNoCaptureKeyboard;
     IO.ConfigFlags |= ImGuiConfigFlags_NavEnableSetMousePos;
     IO.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    IO.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
     IO.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
     IO.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
@@ -174,8 +175,19 @@ void FCogImguiContext::OnDisplayMetricsChanged(const FDisplayMetrics& DisplayMet
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogImguiContext::BeginFrame(float InDeltaTime)
+bool FCogImguiContext::BeginFrame(float InDeltaTime)
 {
+    //-------------------------------------------------------------------------------------------------------
+    // Skip the first frame, to let the main widget update its TickSpaceGeometry which is returned by the 
+    // plateform callback ImGui_GetWindowPos. When using viewports Imgui needs to know the main viewport 
+    // absolute position to correctly place the initial imgui windows. 
+    //-------------------------------------------------------------------------------------------------------
+    if (bIsFirstFrame)
+    {
+        bIsFirstFrame = false;
+        return false;
+    }
+
     ImGui::SetCurrentContext(ImGuiContext);
     ImPlot::SetImGuiContext(ImGuiContext);
     ImPlot::SetCurrentContext(PlotContext);
@@ -275,10 +287,11 @@ void FCogImguiContext::BeginFrame(float InDeltaTime)
         NewStyle.ScaleAllSizes(DpiScale);
     }
 
-
     ImGui::NewFrame();
 
     //DrawDebug();
+
+    return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -581,7 +594,7 @@ void FCogImguiContext::SetEnableInput(bool Value)
     if (bEnableInput)
     {
         FSlateThrottleManager::Get().DisableThrottle(true);
-        IsThrottleDisabled = true;
+        bIsThrottleDisabled = true;
 
         FSlateApplication& SlateApp = FSlateApplication::Get();
         
@@ -594,7 +607,7 @@ void FCogImguiContext::SetEnableInput(bool Value)
     }
     else
     {
-        if (IsThrottleDisabled)
+        if (bIsThrottleDisabled)
         {
             FSlateThrottleManager::Get().DisableThrottle(false);
         }
@@ -628,6 +641,12 @@ void FCogImguiContext::SetDPIScale(float Value)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::BuildFont()
 {
+    if (FontAtlasTexture != nullptr)
+    {
+        FontAtlasTexture->RemoveFromRoot();
+        FontAtlasTexture->ConditionalBeginDestroy();
+    }
+
     ImGuiIO& IO = ImGui::GetIO();
     IO.Fonts->Clear();
 
@@ -639,7 +658,7 @@ void FCogImguiContext::BuildFont()
     int32 TextureWidth, TextureHeight, BytesPerPixel;
     IO.Fonts->GetTexDataAsRGBA32(&TextureDataRaw, &TextureWidth, &TextureHeight, &BytesPerPixel);
 
-    UTexture2D* FontAtlasTexture = UTexture2D::CreateTransient(TextureWidth, TextureHeight, PF_R8G8B8A8, TEXT("ImGuiFontAtlas"));
+    FontAtlasTexture = UTexture2D::CreateTransient(TextureWidth, TextureHeight, PF_R8G8B8A8, TEXT("ImGuiFontAtlas"));
     FontAtlasTexture->Filter = TF_Bilinear;
     FontAtlasTexture->AddressX = TA_Wrap;
     FontAtlasTexture->AddressY = TA_Wrap;
