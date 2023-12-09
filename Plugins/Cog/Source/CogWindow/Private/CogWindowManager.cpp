@@ -575,7 +575,7 @@ void UCogWindowManager::SettingsHandler_ReadLine(ImGuiContext* Context, ImGuiSet
 #if PLATFORM_WINDOWS || PLATFORM_MICROSOFT
         if (sscanf_s(Line, "0x%08X", &Id) == 1)
 #else
-		if (sscanf(Line, "0x%08X", &Id) == 1)
+        if (sscanf(Line, "0x%08X", &Id) == 1)
 #endif
         {
             UCogWindowManager* Manager = (UCogWindowManager*)Handler->UserData;
@@ -592,7 +592,7 @@ void UCogWindowManager::SettingsHandler_ReadLine(ImGuiContext* Context, ImGuiSet
 #if PLATFORM_WINDOWS || PLATFORM_MICROSOFT
         if (sscanf_s(Line, "0x%08X %d", &Id, &Visible) == 2)
 #else
-		if (sscanf(Line, "0x%08X %d", &Id, &Visible) == 2)
+        if (sscanf(Line, "0x%08X %d", &Id, &Visible) == 2)
 #endif
         {
             UCogWindowManager* Manager = (UCogWindowManager*)Handler->UserData;

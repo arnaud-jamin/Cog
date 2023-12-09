@@ -213,10 +213,10 @@ void FCogAbilityWindow_Abilities::RenderAbilitiesTable(UAbilitySystemComponent& 
         }
 
         const auto AbilityName = StringCast<ANSICHAR>(*GetAbilityName(Ability));
-		if (Filter.PassFilter(AbilityName.Get()) == false)
-		{
-			continue;
-		}
+        if (Filter.PassFilter(AbilityName.Get()) == false)
+        {
+            continue;
+        }
         
         FitleredAbilities.Add(Spec);
     }

@@ -6,13 +6,13 @@
 #include "UObject/ReflectedTypeAccessors.h"
 #include "UObject/WeakObjectPtrTemplates.h"
 
+class AActor;
 class APawn;
 class APlayerController;
 class UCogWindowConfig;
 class UCogWindowManager;
-class UWorld;
-class AActor;
 class ULocalPlayer;
+class UWorld;
 
 class COGWINDOW_API FCogWindow
 {

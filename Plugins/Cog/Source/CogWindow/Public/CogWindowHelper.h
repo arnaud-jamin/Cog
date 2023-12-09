@@ -1,9 +1,9 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "AssetRegistry/AssetData.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetRegistry/IAssetRegistry.h"
-#include "AssetRegistry/AssetData.h"
+#include "CoreMinimal.h"
 #include "Templates/SubclassOf.h"
 
 

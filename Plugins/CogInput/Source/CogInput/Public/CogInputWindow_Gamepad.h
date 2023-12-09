@@ -8,11 +8,11 @@
 #include "InputCoreTypes.h"
 #include "CogInputWindow_Gamepad.generated.h"
 
-class UEnhancedPlayerInput;
 class UCogInputConfig_Gamepad;
 class UCogInputDataAsset;
-struct ImDrawList;
+class UEnhancedPlayerInput;
 struct FKey;
+struct ImDrawList;
 
 //--------------------------------------------------------------------------------------------------------------------------
 class COGINPUT_API FCogInputWindow_Gamepad : public FCogWindow

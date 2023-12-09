@@ -4,11 +4,11 @@
 #include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
 #include "Engine/LocalPlayer.h"
+#include "Engine/World.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/Pawn.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
-#include "Engine/World.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogInputWindow_Actions::Initialize()

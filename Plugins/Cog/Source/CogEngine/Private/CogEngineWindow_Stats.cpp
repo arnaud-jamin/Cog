@@ -2,12 +2,12 @@
 
 #include "CogWindowWidgets.h"
 #include "Engine/Engine.h"
-#include "Engine/NetDriver.h"
 #include "Engine/NetConnection.h"
-#include "GameFramework/PlayerState.h"
-#include "Net/NetPing.h"
+#include "Engine/NetDriver.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/PlayerController.h"
+#include "GameFramework/PlayerState.h"
+#include "Net/NetPing.h"
 
 ImVec4 StatRedColor(1.0f, 0.4f, 0.3f, 1.0f);
 ImVec4 StatOrangeColor(1.0f, 0.7f, 0.4f, 1.0f);

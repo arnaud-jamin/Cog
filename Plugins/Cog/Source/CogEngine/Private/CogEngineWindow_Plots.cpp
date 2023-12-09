@@ -1,12 +1,12 @@
 #include "CogEngineWindow_Plots.h"
 
-#include "CogImguiHelper.h"
 #include "CogDebugPlot.h"
+#include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
+#include "Engine/World.h"
 #include "imgui.h"
 #include "implot_internal.h"
 #include "Kismet/GameplayStatics.h"
-#include "Engine/World.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Plots::Initialize()

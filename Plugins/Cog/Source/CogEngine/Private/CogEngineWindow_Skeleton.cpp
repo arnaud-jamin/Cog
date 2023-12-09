@@ -4,10 +4,10 @@
 #include "CogWindowWidgets.h"
 #include "Components/LineBatchComponent.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "Engine/SkeletalMesh.h"
-#include "imgui_internal.h"
 #include "DrawDebugHelpers.h"
+#include "Engine/SkeletalMesh.h"
 #include "Engine/World.h"
+#include "imgui_internal.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Skeleton::Initialize()

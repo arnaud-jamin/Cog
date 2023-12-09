@@ -4,13 +4,13 @@
 #include "imgui.h"
 #include "UObject/ReflectedTypeAccessors.h"
 
-class UEnum;
 class FEnumProperty;
+class UEnum;
+class UObject;
+enum class ECheckBoxState : uint8;
 struct FCogImGuiKeyInfo;
 struct FKeyBind;
-class UObject;
 struct FKeyBind;
-enum class ECheckBoxState : uint8;
 
 class COGWINDOW_API FCogWindowWidgets
 {

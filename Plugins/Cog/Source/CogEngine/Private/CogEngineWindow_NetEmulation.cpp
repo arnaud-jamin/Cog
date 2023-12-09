@@ -3,12 +3,12 @@
 #include "CogEngineWindow_Stats.h"
 #include "CogWindowWidgets.h"
 #include "Engine/Engine.h"
-#include "Engine/NetDriver.h"
 #include "Engine/NetConnection.h"
+#include "Engine/NetDriver.h"
 #include "Engine/World.h"
-#include "GameFramework/PlayerState.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/PlayerController.h"
+#include "GameFramework/PlayerState.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_NetEmulation::RenderHelp()

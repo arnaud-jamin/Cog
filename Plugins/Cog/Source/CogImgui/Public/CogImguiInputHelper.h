@@ -4,15 +4,15 @@
 #include "imgui.h"
 #include "GenericPlatform/ICursor.h"
 
-class UPlayerInput;
-struct FCogImGuiKeyInfo;
-struct FKeyBind;
-class UWorld;
-struct FCogImGuiKeyInfo;
-struct FKeyEvent;
 class APlayerController;
-struct FKey;
+class UPlayerInput;
+class UWorld;
 enum class ECheckBoxState : uint8;
+struct FCogImGuiKeyInfo;
+struct FCogImGuiKeyInfo;
+struct FKey;
+struct FKeyBind;
+struct FKeyEvent;
 
 class COGIMGUI_API FCogImguiInputHelper
 {

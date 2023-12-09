@@ -10,12 +10,12 @@ class FCogImguiContext;
 class IInputProcessor;
 class SCogImguiWidget;
 class SCogImguiWidget;
+class SWidget;
 class SWindow;
 class UGameViewportClient;
+class ULocalPlayer;
 struct FDisplayMetrics;
 struct ImPlotContext;
-class SWidget;
-class ULocalPlayer;
 
 struct COGIMGUI_API FImGuiViewportData
 {
