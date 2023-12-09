@@ -1,12 +1,12 @@
 #include "CogSampleLogCategories.h"
 
 #include "AbilitySystemLog.h"
-#include "CogImguiHelper.h"
 #include "CogSampleDefines.h"
 
 #if ENABLE_COG
 #include "CogAIModule.h"
 #include "CogDebugLog.h"
+#include "CogImguiHelper.h"
 #endif //ENABLE_COG
 
 DEFINE_LOG_CATEGORY(LogCogAlways);
