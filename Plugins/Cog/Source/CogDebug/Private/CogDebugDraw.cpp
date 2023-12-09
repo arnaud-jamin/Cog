@@ -9,8 +9,13 @@
 #include "CogDebugSettings.h"
 #include "CogDebugShape.h"
 #include "CogImguiHelper.h"
+#include "Engine/Engine.h"
 #include "Engine/SkeletalMesh.h"
 #include "VisualLogger/VisualLogger.h"
+#include "Engine/World.h"
+#include "DrawDebugHelpers.h"
+#include "ReferenceSkeleton.h"
+#include "Components/SkeletalMeshComponent.h"
 
 #if ENABLE_COG
 

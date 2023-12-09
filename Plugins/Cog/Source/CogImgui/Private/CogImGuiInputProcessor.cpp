@@ -1,4 +1,4 @@
-#include "CogImguiInputProcessor.h"
+#include "CogImGuiInputProcessor.h"
 
 #include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
@@ -6,6 +6,7 @@
 #include "CogImguiContext.h"
 #include "GameFramework/PlayerInput.h"
 #include "imgui.h"
+#include "Framework/Application/SlateApplication.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 FCogImGuiInputProcessor::FCogImGuiInputProcessor(UPlayerInput* InPlayerInput, FCogImguiContext* InContext, SCogImguiWidget* InMainWidget)

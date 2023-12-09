@@ -8,6 +8,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "imgui_internal.h"
 #include "InputMappingContext.h"
+#include "Engine/World.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogInputWindow_Gamepad::Initialize()

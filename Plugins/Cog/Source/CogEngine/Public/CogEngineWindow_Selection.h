@@ -122,7 +122,7 @@ public:
 
         bReapplySelection = true;
         bDisplayActorLabel = true;
-        SelectionName;
+        SelectionName.Reset();
         SelectedClassIndex = 0;
     }
 };

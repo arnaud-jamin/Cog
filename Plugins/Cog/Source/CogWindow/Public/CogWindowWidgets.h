@@ -8,6 +8,9 @@ class UEnum;
 class FEnumProperty;
 struct FCogImGuiKeyInfo;
 struct FKeyBind;
+class UObject;
+struct FKeyBind;
+enum class ECheckBoxState : uint8;
 
 class COGWINDOW_API FCogWindowWidgets
 {

@@ -207,9 +207,9 @@ void FCogAbilityWindow_Attributes::RenderContent()
                                 continue;
                             }
 
-                            const char* AttributeName = TCHAR_TO_ANSI(*Attribute.GetName());
+                            const auto AttributeName = StringCast<ANSICHAR>(*Attribute.GetName());
 
-                            if (Filter.PassFilter(AttributeName) == false)
+                            if (Filter.PassFilter(AttributeName.Get()) == false)
                             {
                                 continue;
                             }
@@ -233,7 +233,7 @@ void FCogAbilityWindow_Attributes::RenderContent()
                             ImGui::TableNextColumn();
                             ImGui::Text("");
                             ImGui::SameLine();
-                            if (ImGui::Selectable(AttributeName, Selected == Index, ImGuiSelectableFlags_SpanAllColumns))
+                            if (ImGui::Selectable(AttributeName.Get(), Selected == Index, ImGuiSelectableFlags_SpanAllColumns))
                             {
                                 Selected = Index;
                             }

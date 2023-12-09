@@ -15,6 +15,7 @@ class UPlayerInput;
 class UWorld;
 struct ImGuiSettingsHandler;
 struct ImGuiTextBuffer;
+struct FKey;
 
 UCLASS(Config = Cog)
 class COGWINDOW_API UCogWindowManager : public UObject

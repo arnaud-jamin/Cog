@@ -9,6 +9,8 @@
 #include "GameplayEffect.h"
 #include "Net/Core/PushModel/PushModel.h"
 #include "Net/UnrealNetwork.h"
+#include "GameFramework/PlayerController.h"
+#include "Engine/World.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 ACogAbilityReplicator* ACogAbilityReplicator::Spawn(APlayerController* Controller)

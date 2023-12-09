@@ -6,6 +6,8 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/SkeletalMesh.h"
 #include "imgui_internal.h"
+#include "DrawDebugHelpers.h"
+#include "Engine/World.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Skeleton::Initialize()
@@ -138,8 +140,8 @@ void FCogEngineWindow_Skeleton::RenderBoneEntry(int32 BoneIndex, bool OpenAllChi
         return;
     }
 
-    const char* BoneName = TCHAR_TO_ANSI(*BoneInfo.Name.ToString());
-    const bool ShowNode = Filter.PassFilter(BoneName);
+    const auto BoneName = StringCast<ANSICHAR>(*BoneInfo.Name.ToString());
+    const bool ShowNode = Filter.PassFilter(BoneName.Get());
     bool OpenChildren = false;
 
     if (ShowNode)
@@ -235,7 +237,7 @@ void FCogEngineWindow_Skeleton::RenderBoneEntry(int32 BoneIndex, bool OpenAllChi
         //------------------------
         ImGui::SameLine();
         ImVec4 NameColor = HasCustomVisiblity ? ImVec4(1.0f, 1.0f, 0.0f, 1.0f) : ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
-        ImGui::TextColored(NameColor, "%s", BoneName);
+        ImGui::TextColored(NameColor, "%s", BoneName.Get());
     }
 
     //------------------------

@@ -1,4 +1,4 @@
-#include "CogImGuiConfig.h"
+#include "CogImguiConfig.h"
 
 THIRD_PARTY_INCLUDES_START
 #include <imgui.cpp>

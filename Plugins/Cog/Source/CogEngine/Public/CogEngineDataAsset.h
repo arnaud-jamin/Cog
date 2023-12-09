@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "Engine/EngineTypes.h"
 #include "CogEngineDataAsset.generated.h"
 
 //--------------------------------------------------------------------------------------------------------------------------

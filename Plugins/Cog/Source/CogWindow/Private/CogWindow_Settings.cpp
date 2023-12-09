@@ -75,14 +75,14 @@ void FCogWindow_Settings::RenderContent()
         Context.SetEnableInput(bEnableInput);
     }
 
-    const char* ShortcutText = TCHAR_TO_ANSI(*FCogImguiInputHelper::CommandToString(PlayerInput, UCogWindowManager::ToggleInputCommand));
-    const float ShortcutWidth = (ShortcutText && ShortcutText[0]) ? ImGui::CalcTextSize(ShortcutText, NULL).x : 0.0f;
+    const auto ShortcutText = StringCast<ANSICHAR>(*FCogImguiInputHelper::CommandToString(PlayerInput, UCogWindowManager::ToggleInputCommand));
+    const float ShortcutWidth = (ShortcutText.Get() != nullptr && ShortcutText.Get()[0]) ? ImGui::CalcTextSize(ShortcutText.Get(), NULL).x : 0.0f;
     if (ShortcutWidth > 0.0f)
     {
         ImGui::SameLine();
         ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x - ShortcutWidth);
         ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
-        ImGui::Text(ShortcutText);
+        ImGui::Text("%s", ShortcutText.Get());
         ImGui::PopStyleColor();
     }
 

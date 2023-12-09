@@ -2,6 +2,8 @@
 
 #include "CoreMinimal.h"
 #include "CogCommon.h"
+#include "UObject/Object.h"
+#include "UObject/ObjectPtr.h"
 
 #ifdef ENABLE_COG
 

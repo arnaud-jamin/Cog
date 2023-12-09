@@ -1,12 +1,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogImguiInputHelper.h"
 #include "imgui.h"
+#include "GenericPlatform/ICursor.h"
 
 class UPlayerInput;
 struct FCogImGuiKeyInfo;
 struct FKeyBind;
+class UWorld;
+struct FCogImGuiKeyInfo;
+struct FKeyEvent;
+class APlayerController;
+struct FKey;
+enum class ECheckBoxState : uint8;
 
 class COGIMGUI_API FCogImguiInputHelper
 {

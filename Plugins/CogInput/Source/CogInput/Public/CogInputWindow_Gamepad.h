@@ -4,12 +4,15 @@
 #include "CogInjectActionInfo.h"
 #include "CogWindow.h"
 #include "CogWindowConfig.h"
+#include "imgui.h"
+#include "InputCoreTypes.h"
 #include "CogInputWindow_Gamepad.generated.h"
 
 class UEnhancedPlayerInput;
 class UCogInputConfig_Gamepad;
 class UCogInputDataAsset;
 struct ImDrawList;
+struct FKey;
 
 //--------------------------------------------------------------------------------------------------------------------------
 class COGINPUT_API FCogInputWindow_Gamepad : public FCogWindow

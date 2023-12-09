@@ -212,11 +212,11 @@ void FCogAbilityWindow_Abilities::RenderAbilitiesTable(UAbilitySystemComponent& 
             continue;
         }
 
-        const char* AbilityName = TCHAR_TO_ANSI(*GetAbilityName(Ability));
-        if (Filter.PassFilter(AbilityName) == false)
-        {
-            continue;
-        }
+        const auto AbilityName = StringCast<ANSICHAR>(*GetAbilityName(Ability));
+		if (Filter.PassFilter(AbilityName.Get()) == false)
+		{
+			continue;
+		}
         
         FitleredAbilities.Add(Spec);
     }

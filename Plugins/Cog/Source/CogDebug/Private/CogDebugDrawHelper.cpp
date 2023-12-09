@@ -2,6 +2,8 @@
 
 #include "Components/LineBatchComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Engine/Engine.h"
+#include "DrawDebugHelpers.h"
 
 namespace 
 {

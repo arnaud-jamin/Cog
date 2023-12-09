@@ -187,8 +187,8 @@ void FCogAbilityWindow_Effects::RenderEffectRow(const UAbilitySystemComponent& A
     const FActiveGameplayEffect& ActiveEffect = *ActiveEffectPtr;
     const UGameplayEffect& Effect = *EffectPtr;
 
-    const char* EffectName = TCHAR_TO_ANSI(*GetEffectName(Effect));
-    if (Filter.PassFilter(EffectName) == false)
+    const auto EffectName = StringCast<ANSICHAR>(*GetEffectName(Effect));
+    if (Filter.PassFilter(EffectName.Get()) == false)
     {
         return;
     }
@@ -203,7 +203,7 @@ void FCogAbilityWindow_Effects::RenderEffectRow(const UAbilitySystemComponent& A
 
     ImGui::PushStyleColor(ImGuiCol_Text, FCogImguiHelper::ToImVec4(AlignmentConfig->GetEffectColor(Asset, Effect)));
 
-    if (ImGui::Selectable(EffectName, Selected == Index, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap | ImGuiSelectableFlags_AllowDoubleClick))
+    if (ImGui::Selectable(EffectName.Get(), Selected == Index, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap | ImGuiSelectableFlags_AllowDoubleClick))
     {
         Selected = Index;
     }

@@ -141,8 +141,8 @@ void FCogAIWindow_Blackboard::RenderContent()
                 continue;
             }
                 
-            const char* KeyName = TCHAR_TO_ANSI(*Key->EntryName.ToString());
-            if (Filter.PassFilter(KeyName) == false)
+            const auto KeyName = StringCast<ANSICHAR>(*Key->EntryName.ToString());
+            if (Filter.PassFilter(KeyName.Get()) == false)
             {
                 continue;
             }
@@ -161,7 +161,7 @@ void FCogAIWindow_Blackboard::RenderContent()
             // Name
             //------------------------
             ImGui::TableNextColumn();
-            ImGui::Text("%s", KeyName);
+            ImGui::Text("%s", KeyName.Get());
 
             //------------------------
             // Value

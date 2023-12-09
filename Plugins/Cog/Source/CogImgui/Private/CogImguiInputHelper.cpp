@@ -13,6 +13,11 @@
 #if WITH_EDITOR
 #include "Kismet2/DebuggerCommands.h"
 #endif //WITH_EDITOR
+#include "Engine/World.h"
+#include "Input/Events.h"
+#include "CogImguiKeyInfo.h"
+#include "Framework/Application/SlateApplication.h"
+#include "GenericPlatform/GenericApplication.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 APlayerController* FCogImguiInputHelper::GetFirstLocalPlayerController(const UWorld& World)

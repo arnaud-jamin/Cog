@@ -4,6 +4,7 @@
 #include "CogWindowWidgets.h"
 #include "GameFramework/PlayerInput.h"
 #include "imgui.h"
+#include "GameFramework/PlayerController.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_CommandBindings::RenderHelp()

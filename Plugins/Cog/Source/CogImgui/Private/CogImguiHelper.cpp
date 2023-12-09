@@ -2,6 +2,8 @@
 
 #include "InputCoreTypes.h"
 #include "imgui_internal.h"
+#include "Misc/Paths.h"
+#include "GenericPlatform/GenericPlatformFile.h"
 
 DEFINE_LOG_CATEGORY(LogCogImGui);
 

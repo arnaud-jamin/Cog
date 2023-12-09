@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "imgui.h"
 #include "Layout/SlateRect.h"
+#include "Rendering/SlateRenderTransform.h"
 
 COGIMGUI_API DECLARE_LOG_CATEGORY_EXTERN(LogCogImGui, Warning, All);
 

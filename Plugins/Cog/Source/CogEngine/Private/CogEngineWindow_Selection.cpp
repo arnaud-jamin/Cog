@@ -13,6 +13,7 @@
 #include "HAL/IConsoleManager.h"
 #include "imgui.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/PrimitiveComponent.h"
 
 FString FCogEngineWindow_Selection::ToggleSelectionModeCommand = TEXT("Cog.ToggleSelectionMode");
 

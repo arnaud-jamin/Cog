@@ -2,12 +2,17 @@
 
 #include "CoreMinimal.h"
 #include "imgui.h"
+#include "Templates/SubclassOf.h"
+#include "UObject/ReflectedTypeAccessors.h"
+#include "UObject/WeakObjectPtrTemplates.h"
 
 class APawn;
 class APlayerController;
 class UCogWindowConfig;
 class UCogWindowManager;
 class UWorld;
+class AActor;
+class ULocalPlayer;
 
 class COGWINDOW_API FCogWindow
 {

@@ -6,7 +6,7 @@
 
 class UCogAbilityDataAsset;
 class UGameplayEffect;
-namespace EGameplayModOp { enum Type; }
+namespace EGameplayModOp { enum Type : int; }
 struct FGameplayTagContainer;
 
 class COGABILITY_API FCogAbilityHelper

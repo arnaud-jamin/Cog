@@ -207,7 +207,7 @@ void FCogAIWindow_BehaviorTree::RenderContent()
 
     if (RootNodeInstanced != nullptr)
     {
-        if (ImGui::CollapsingHeader(TCHAR_TO_ANSI(*GetNameSafe(CurrentTree)), nullptr, ImGuiTreeNodeFlags_DefaultOpen))
+        if (ImGui::CollapsingHeader(StringCast<ANSICHAR>(*GetNameSafe(CurrentTree)).Get(), nullptr, ImGuiTreeNodeFlags_DefaultOpen))
         {
             RenderNode(*BehaviorTreeComponent, const_cast<UBTNode*>(RootNodeInstanced), false);
         }
@@ -217,8 +217,8 @@ void FCogAIWindow_BehaviorTree::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAIWindow_BehaviorTree::RenderNode(UBehaviorTreeComponent& BehaviorTreeComponent, UBTNode* Node, bool OpenAllChildren)
 {
-    const char* NodeName = TCHAR_TO_ANSI(*Node->GetNodeName());
-    const bool ShowNode = Filter.PassFilter(NodeName);
+    const auto NodeName = StringCast<ANSICHAR>(*Node->GetNodeName());
+    const bool ShowNode = Filter.PassFilter(NodeName.Get());
 
     const UBTCompositeNode* CompositeNode = Cast<UBTCompositeNode>(Node);
 
@@ -287,7 +287,7 @@ void FCogAIWindow_BehaviorTree::RenderNode(UBehaviorTreeComponent& BehaviorTreeC
                 ImGui::TableNextColumn();
                 ImGui::TextColored(TextColor, "Name");
                 ImGui::TableNextColumn();
-                ImGui::Text("%s", NodeName);
+                ImGui::Text("%s", NodeName.Get());
 
                 //------------------------
                 // Static Description
@@ -313,7 +313,7 @@ void FCogAIWindow_BehaviorTree::RenderNode(UBehaviorTreeComponent& BehaviorTreeC
                     if (RuntimeValue.Split(TEXT(": "), &Left, &Right))
                     {
                         ImGui::TableNextColumn();
-                        ImGui::TextColored(TextColor, TCHAR_TO_ANSI(*Left));
+                        ImGui::TextColored(TextColor, "%s", TCHAR_TO_ANSI(*Left));
 
                         ImGui::TableNextColumn();
                         ImGui::Text("%s", TCHAR_TO_ANSI(*Right));
@@ -323,7 +323,7 @@ void FCogAIWindow_BehaviorTree::RenderNode(UBehaviorTreeComponent& BehaviorTreeC
                         ImGui::TableNextColumn();
                         ImGui::TextColored(TextColor, "Value");
                         ImGui::TableNextColumn();
-                        ImGui::Text(TCHAR_TO_ANSI(*RuntimeValue));
+                        ImGui::Text("%s", TCHAR_TO_ANSI(*RuntimeValue));
                     }
                 }
 
@@ -356,7 +356,7 @@ void FCogAIWindow_BehaviorTree::RenderNode(UBehaviorTreeComponent& BehaviorTreeC
         //------------------------
         ImGui::SameLine();
         const ImVec4 NameColor = IsActive ? FCogImguiHelper::ToImVec4(Config->ActiveColor) : FCogImguiHelper::ToImVec4(Config->InactiveColor);
-        ImGui::TextColored(NameColor, "%s", NodeName);
+        ImGui::TextColored(NameColor, "%s", NodeName.Get());
     }
 
     //------------------------

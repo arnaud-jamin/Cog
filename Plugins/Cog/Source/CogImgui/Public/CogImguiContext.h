@@ -14,6 +14,8 @@ class SWindow;
 class UGameViewportClient;
 struct FDisplayMetrics;
 struct ImPlotContext;
+class SWidget;
+class ULocalPlayer;
 
 struct COGIMGUI_API FImGuiViewportData
 {

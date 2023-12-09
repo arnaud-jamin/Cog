@@ -1,6 +1,7 @@
-﻿#pragma once
+#pragma once
 
 #include "Framework/Application/IInputProcessor.h"
+#include "CogImguiContext.h"
 
 class FCogImguiContext;
 class SCogImguiWidget;
@@ -42,7 +43,7 @@ protected:
 
 	TObjectPtr<FCogImguiContext> Context = nullptr;
 
-	TObjectPtr<UPlayerInput> PlayerInput = nullptr;
+	TObjectPtr<UPlayerInput> PlayerInput;
 
-	TObjectPtr<SCogImguiWidget> MainWidget = nullptr;
+	TObjectPtr<SCogImguiWidget> MainWidget;
 };

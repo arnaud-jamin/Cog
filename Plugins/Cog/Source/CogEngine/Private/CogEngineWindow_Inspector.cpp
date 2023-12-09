@@ -160,19 +160,19 @@ void FCogEngineWindow_Inspector::RenderMenu()
         //-----------------------------------
         // Current Inspected Object
         //-----------------------------------
-        const char* InspectedObjectName = TCHAR_TO_ANSI(*GetNameSafe(InspectedObject.Get()));
+        const auto InspectedObjectName = StringCast<ANSICHAR>(*GetNameSafe(InspectedObject.Get()));
         ImVec2 Pos = ImGui::GetCursorScreenPos();
         {
             ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
             ImGui::SameLine();
 
-            if (ImGui::Button(InspectedObjectName, ImVec2(FCogWindowWidgets::GetFontWidth() * 20, 0)))
+            if (ImGui::Button(InspectedObjectName.Get(), ImVec2(FCogWindowWidgets::GetFontWidth() * 20, 0)))
             {
                 ImGui::OpenPopup("SelectionPopup");
             }
             if (ImGui::IsItemHovered())
             {
-                ImGui::SetTooltip("Current Inspected Object: %s", InspectedObjectName);
+                ImGui::SetTooltip("Current Inspected Object: %s", InspectedObjectName.Get());
             }
 
             ImGui::PopStyleVar(1);
@@ -180,7 +180,7 @@ void FCogEngineWindow_Inspector::RenderMenu()
 
         if (ImGui::IsItemHovered())
         {
-            ImGui::SetTooltip("%s", InspectedObjectName);
+            ImGui::SetTooltip("%s", InspectedObjectName.Get());
         }
 
         ImGui::PopStyleColor(1);
@@ -784,8 +784,8 @@ bool FCogEngineWindow_Inspector::RenderString(const FStrProperty* StrProperty, u
 
     static char Buffer[256] = "";
 
-    const char* Str = TCHAR_TO_ANSI(*Text);
-    ImStrncpy(Buffer, Str, IM_ARRAYSIZE(Buffer));
+    const auto Str = StringCast<ANSICHAR>(*Text);
+    ImStrncpy(Buffer, Str.Get(), IM_ARRAYSIZE(Buffer));
 
     if (ImGui::InputText("##String", Buffer, IM_ARRAYSIZE(Buffer)))
     {

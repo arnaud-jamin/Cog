@@ -3,6 +3,8 @@
 #include "CogDebugDraw.h"
 #include "CogDebugHelper.h"
 #include "CogImguiHelper.h"
+#include "Engine/Engine.h"
+#include "Engine/World.h"
 
 FCogDebugPlotEvent FCogDebugPlot::DefaultEvent;
 TArray<FCogDebugPlotEntry> FCogDebugPlot::Plots;

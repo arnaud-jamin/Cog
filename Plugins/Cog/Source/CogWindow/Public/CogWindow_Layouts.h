@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 #include "CogWindow.h"
 
+class UPlayerInput;
+
 class COGWINDOW_API FCogWindow_Layouts : public FCogWindow
 {
     typedef FCogWindow Super;

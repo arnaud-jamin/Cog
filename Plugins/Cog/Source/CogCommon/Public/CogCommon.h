@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Templates/IsArrayOrRefOfType.h"
+#include "CogDebugSettings.h"
 
 #ifndef ENABLE_COG
 #define ENABLE_COG !UE_BUILD_SHIPPING
@@ -9,7 +10,6 @@
 
 #if ENABLE_COG
 
-#include "CogDebugSettings.h"
 
 #define IF_COG(expr)            { expr; }
 #define COG_LOG_CATEGORY        FLogCategoryBase

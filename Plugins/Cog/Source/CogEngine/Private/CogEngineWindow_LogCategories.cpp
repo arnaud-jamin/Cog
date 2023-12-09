@@ -4,6 +4,9 @@
 #include "CogDebugSettings.h"
 #include "CogWindowWidgets.h"
 #include "CogDebugLog.h"
+#include "DrawDebugHelpers.h"
+#include "Engine/World.h"
+#include "Engine/Engine.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_LogCategories::Initialize()
@@ -117,8 +120,8 @@ void FCogEngineWindow_LogCategories::RenderContent()
         FLogCategoryBase* Category = CategoryInfo.LogCategory;
 
         ImGui::PushID(Index);
-        const char* CategoryFriendlyName = TCHAR_TO_ANSI(*CategoryInfo.GetDisplayName());
-        const char* CategoryDescription = TCHAR_TO_ANSI(*CategoryInfo.Description);
+        const auto CategoryFriendlyName = StringCast<ANSICHAR>(*CategoryInfo.GetDisplayName());
+        const auto CategoryDescription = StringCast<ANSICHAR>(*CategoryInfo.Description);
 
         if (bShowAllVerbosity == false)
         {
@@ -156,7 +159,7 @@ void FCogEngineWindow_LogCategories::RenderContent()
                 {
                     ImGui::BeginTooltip();
                     ImGui::Separator();
-                    ImGui::Text("%s", CategoryDescription);
+                    ImGui::Text("%s", CategoryDescription.Get());
                     ImGui::Text("Server");
                     ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, IsControlDown ? 1.0f : 0.5f), "Very Verbose   [CTRL]");
                     ImGui::EndTooltip();
@@ -174,7 +177,7 @@ void FCogEngineWindow_LogCategories::RenderContent()
                     ImGui::PushStyleColor(ImGuiCol_CheckMark, IM_COL32(255, 128, 0, 200));
                 }
 
-                if (ImGui::Checkbox(CategoryFriendlyName, &IsActive))
+                if (ImGui::Checkbox(CategoryFriendlyName.Get(), &IsActive))
                 {
                     ELogVerbosity::Type NewVerbosity;
                     if (IsControlDown && Verbosity != ELogVerbosity::VeryVerbose)
@@ -196,7 +199,7 @@ void FCogEngineWindow_LogCategories::RenderContent()
                 if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
                 {
                     ImGui::BeginTooltip();
-                    ImGui::Text("%s", CategoryDescription);
+                    ImGui::Text("%s", CategoryDescription.Get());
                     ImGui::Separator();
                     if (IsClient)
                     {
@@ -231,7 +234,7 @@ void FCogEngineWindow_LogCategories::RenderContent()
                 if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
                 {
                     ImGui::BeginTooltip();
-                    ImGui::Text("%s", CategoryDescription);
+                    ImGui::Text("%s", CategoryDescription.Get());
                     ImGui::Separator();
                     ImGui::Text("Server");
                     ImGui::EndTooltip();
@@ -261,7 +264,7 @@ void FCogEngineWindow_LogCategories::RenderContent()
                 if (IsClient && ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
                 {
                     ImGui::BeginTooltip();
-                    ImGui::Text("%s", CategoryDescription);
+                    ImGui::Text("%s", CategoryDescription.Get());
                     ImGui::Separator();
                     ImGui::Text("Local Client");
                     ImGui::EndTooltip();
@@ -269,7 +272,7 @@ void FCogEngineWindow_LogCategories::RenderContent()
             }
 
             ImGui::SameLine();
-            ImGui::Text("%s", CategoryFriendlyName);
+            ImGui::Text("%s", CategoryFriendlyName.Get());
         }
 
         ImGui::PopID();

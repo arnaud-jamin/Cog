@@ -8,6 +8,7 @@
 #include "GameFramework/Pawn.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
+#include "Engine/World.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogInputWindow_Actions::Initialize()
@@ -116,7 +117,7 @@ void FCogInputWindow_Actions::RenderContent()
         {
             ImGui::PushID(Index);
 
-            const char* ActionName = TCHAR_TO_ANSI(*ActionInfo.Action->GetName());
+            const auto ActionName = StringCast<ANSICHAR>(*ActionInfo.Action->GetName());
 
             FInputActionValue ActionValue = EnhancedInputSubsystem->GetPlayerInput()->GetActionValue(ActionInfo.Action);
 
@@ -126,7 +127,7 @@ void FCogInputWindow_Actions::RenderContent()
                 {
                     ImGui::TableNextRow();
                     ImGui::TableNextColumn();
-                    ImGui::Text("%s", ActionName);
+                    ImGui::Text("%s", ActionName.Get());
 
                     const ImVec4 ActiveColor(1, 0.8f, 0, 1);
                     const ImVec4 InnactiveColor(0.3f, 0.3f, 0.3f, 1);
@@ -148,24 +149,24 @@ void FCogInputWindow_Actions::RenderContent()
                 case EInputActionValueType::Axis1D: 
                 {
                     const float Value = ActionValue.Get<float>();
-                    DrawAxis("%s", ActionName, Value, &ActionInfo.X);
+                    DrawAxis("%s", ActionName.Get(), Value, &ActionInfo.X);
                     break;
                 }
 
                 case EInputActionValueType::Axis2D:
                 {
                     const FVector2D Value = ActionValue.Get<FVector2D>();
-                    DrawAxis("%s X", ActionName, Value.X, &ActionInfo.X);
-                    DrawAxis("%s Y", ActionName, Value.Y, &ActionInfo.Y);
+                    DrawAxis("%s X", ActionName.Get(), Value.X, &ActionInfo.X);
+                    DrawAxis("%s Y", ActionName.Get(), Value.Y, &ActionInfo.Y);
                     break;
                 }
 
                 case EInputActionValueType::Axis3D:
                 {
                     const FVector Value = ActionValue.Get<FVector>();
-                    DrawAxis("%s X", ActionName, Value.X, &ActionInfo.X);
-                    DrawAxis("%s Y", ActionName, Value.Y, &ActionInfo.Y);
-                    DrawAxis("%s Z", ActionName, Value.Z, &ActionInfo.Z);
+                    DrawAxis("%s X", ActionName.Get(), Value.X, &ActionInfo.X);
+                    DrawAxis("%s Y", ActionName.Get(), Value.Y, &ActionInfo.Y);
+                    DrawAxis("%s Z", ActionName.Get(), Value.Z, &ActionInfo.Z);
                     break;
                 }
             }

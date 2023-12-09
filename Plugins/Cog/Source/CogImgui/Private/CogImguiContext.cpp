@@ -1,9 +1,9 @@
-#include "CogImGuiContext.h"
+#include "CogImguiContext.h"
 
 #include "Application/ThrottleManager.h"
 #include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
-#include "CogImguiInputProcessor.h"
+#include "CogImGuiInputProcessor.h"
 #include "CogImguiWidget.h"
 #include "Engine/Console.h"
 #include "Engine/LocalPlayer.h"
@@ -17,6 +17,9 @@
 #include "TextureResource.h"
 #include "Widgets/SViewport.h"
 #include "Widgets/SWindow.h"
+#include "Engine/Engine.h"
+#include "Engine/GameViewportClient.h"
+#include "Engine/World.h"
 
 static UPlayerInput* GetPlayerInput(const UWorld* World);
 
@@ -79,8 +82,8 @@ void FCogImguiContext::Initialize()
     ViewportData->Context = this;
     ViewportData->Widget = MainWidget;
 
-    const char* InitFilenameTemp = TCHAR_TO_ANSI(*FCogImguiHelper::GetIniFilePath("imgui"));
-    ImStrncpy(IniFilename, InitFilenameTemp, IM_ARRAYSIZE(IniFilename));
+    const auto InitFilenameTemp = StringCast<ANSICHAR>(*FCogImguiHelper::GetIniFilePath("imgui"));
+    ImStrncpy(IniFilename, InitFilenameTemp.Get(), IM_ARRAYSIZE(IniFilename));
     IO.IniFilename = IniFilename;
 
     ImGuiPlatformIO& PlatformIO = ImGui::GetPlatformIO();

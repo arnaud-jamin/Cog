@@ -7,6 +7,9 @@
 #include "CogWindowWidgets.h"
 #include "Engine/World.h"
 #include "imgui_internal.h"
+#include "GameFramework/Pawn.h"
+#include "GameFramework/PlayerController.h"
+#include "Engine/LocalPlayer.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogWindow::SetFullName(const FString& InFullName)

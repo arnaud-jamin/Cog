@@ -3,7 +3,7 @@
 #include "CogDebugDrawHelper.h"
 #include "CogDebugSettings.h"
 #include "CogEngineDataAsset.h"
-#include "CogImGuiHelper.h"
+#include "CogImguiHelper.h"
 #include "CogWindowHelper.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -12,6 +12,9 @@
 #include "Components/SphereComponent.h"
 #include "imgui.h"
 #include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
+#include "GameFramework/Pawn.h"
+#include "Engine/World.h"
 
 
 //--------------------------------------------------------------------------------------------------------------------------

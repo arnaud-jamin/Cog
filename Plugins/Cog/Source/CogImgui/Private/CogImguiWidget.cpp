@@ -3,9 +3,11 @@
 #include "CogImguiInputHelper.h"
 #include "CogImguiModule.h"
 #include "CogImguiWidget.h"
-#include "CogImGuiContext.h"
+#include "CogImguiContext.h"
 #include "imgui.h"
 #include "SlateOptMacros.h"
+#include "Engine/GameViewportClient.h"
+#include "Widgets/SWindow.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION

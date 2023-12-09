@@ -2,6 +2,8 @@
 
 #include "CogCommonDebugFilteredActorInterface.h"
 #include "CogDebugReplicator.h"
+#include "Engine/World.h"
+#include "Engine/Engine.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 TWeakObjectPtr<AActor> FCogDebugSettings::Selection;

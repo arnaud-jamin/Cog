@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DataAsset.h"
 #include "CogInputDataAsset.generated.h"
 
 class UInputAction;

@@ -2,7 +2,9 @@
 
 #include "CoreMinimal.h"
 #include "InputCoreTypes.h"
-#include "CogImGuiKeyInfo.generated.h"
+#include "Styling/SlateTypes.h"
+
+#include "CogImguiKeyInfo.generated.h"
 
 USTRUCT()
 struct COGIMGUI_API FCogImGuiKeyInfo

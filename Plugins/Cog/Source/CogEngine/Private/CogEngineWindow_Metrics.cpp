@@ -4,6 +4,7 @@
 #include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
 #include "imgui.h"
+#include "Engine/World.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Metrics::Initialize()

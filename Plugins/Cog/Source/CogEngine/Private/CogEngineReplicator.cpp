@@ -8,6 +8,9 @@
 #include "EngineUtils.h"
 #include "Net/Core/PushModel/PushModel.h"
 #include "Net/UnrealNetwork.h"
+#include "GameFramework/Pawn.h"
+#include "Engine/World.h"
+#include "Engine/EngineTypes.h"
 
 DEFINE_LOG_CATEGORY(LogCogEngine);
 

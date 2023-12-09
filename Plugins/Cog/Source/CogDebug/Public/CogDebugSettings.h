@@ -1,6 +1,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UObject/WeakObjectPtrTemplates.h"
+
+class UObject;
+class AActor;
+class UWorld;
 
 struct COGDEBUG_API FCogDebugSettings
 {

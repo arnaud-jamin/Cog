@@ -1,12 +1,13 @@
 #include "CogWindowWidgets.h"
 
 #include "CogImguiHelper.h"
-#include "CogImGuiKeyInfo.h"
+#include "CogImguiKeyInfo.h"
 #include "CogImguiInputHelper.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "InputCoreTypes.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "GameFramework/PlayerInput.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogWindowWidgets::BeginTableTooltip()
@@ -341,7 +342,7 @@ bool FCogWindowWidgets::ComboboxEnum(const char* Label, UEnum* Enum, int64 Curre
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogWindowWidgets::CheckBoxState(const char* Label, ECheckBoxState& State)
 {
-    const char* TooltipText = nullptr;
+    const char* TooltipText = "Invalid";
     
     int32 Flags = 0;
     ImVec4 ButtonColor = ImGui::GetStyleColorVec4(ImGuiCol_Button);
@@ -385,7 +386,7 @@ bool FCogWindowWidgets::CheckBoxState(const char* Label, ECheckBoxState& State)
 
     if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
     {
-        ImGui::SetTooltip(TooltipText);
+        ImGui::SetTooltip("%s", TooltipText);
     }
 
     if (IsPressed)
@@ -468,8 +469,8 @@ bool FCogWindowWidgets::KeyBind(FKeyBind& KeyBind)
 {
     static char Buffer[256] = "";
 
-    const char* Str = TCHAR_TO_ANSI(*KeyBind.Command);
-    ImStrncpy(Buffer, Str, IM_ARRAYSIZE(Buffer));
+    const auto Str = StringCast<ANSICHAR>(*KeyBind.Command);
+    ImStrncpy(Buffer, Str.Get(), IM_ARRAYSIZE(Buffer));
 
     bool HasChanged = false;
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 15);
@@ -499,7 +500,7 @@ bool FCogWindowWidgets::ButtonWithTooltip(const char* Text, const char* Tooltip)
 
     if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
     {
-        ImGui::SetTooltip(Tooltip);
+        ImGui::SetTooltip("%s", Tooltip);
     }
 
     return IsPressed;
@@ -560,8 +561,8 @@ bool FCogWindowWidgets::MultiChoiceButtonsInt(TArray<int32>& Values, int32& Valu
     {
         int32 ButtonValue = Values[i];
 
-        const char* Text = TCHAR_TO_ANSI(*FString::Printf(TEXT("%d"), ButtonValue));
-        if (MultiChoiceButton(Text, ButtonValue == Value, Size))
+        const auto Text = StringCast<ANSICHAR>(*FString::Printf(TEXT("%d"), ButtonValue));
+        if (MultiChoiceButton(Text.Get(), ButtonValue == Value, Size))
         {
             IsPressed = true;
             Value = ButtonValue;
@@ -593,8 +594,8 @@ bool FCogWindowWidgets::MultiChoiceButtonsFloat(TArray<float>& Values, float& Va
     {
         float ButtonValue = Values[i];
 
-        const char* Text = TCHAR_TO_ANSI(*FString::Printf(TEXT("%g"), ButtonValue).Replace(TEXT("0."), TEXT(".")));
-        if (MultiChoiceButton(Text, ButtonValue == Value, Size))
+        const auto Text = StringCast<ANSICHAR>(*FString::Printf(TEXT("%g"), ButtonValue).Replace(TEXT("0."), TEXT(".")));
+        if (MultiChoiceButton(Text.Get(), ButtonValue == Value, Size))
         {
             IsPressed = true;
             Value = ButtonValue;

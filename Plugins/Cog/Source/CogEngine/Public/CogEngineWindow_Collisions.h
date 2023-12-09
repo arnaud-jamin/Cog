@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "CogWindow.h"
 #include "CogWindowConfig.h"
+#include "Engine/EngineTypes.h"
 #include "CogEngineWindow_Collisions.generated.h"
 
 class UCogEngineConfig_Collisions;

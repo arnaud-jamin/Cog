@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "imgui.h"
+#include "imgui_internal.h"
 
 class COGDEBUG_API FCogDebugDrawImGui
 {

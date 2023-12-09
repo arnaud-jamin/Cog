@@ -1,11 +1,12 @@
 #include "CogEngineWindow_Plots.h"
 
-#include "CogImGuiHelper.h"
+#include "CogImguiHelper.h"
 #include "CogDebugPlot.h"
 #include "CogWindowWidgets.h"
 #include "imgui.h"
 #include "implot_internal.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/World.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Plots::Initialize()
@@ -142,7 +143,7 @@ void FCogEngineWindow_Plots::RenderPlotsList(TArray<FCogDebugPlotEntry*>& Visibl
             {
                 const auto EntryName = StringCast<ANSICHAR>(*Entry.Name.ToString());
                 ImGui::SetDragDropPayload("DragAndDrop", EntryName.Get(), EntryName.Length() + 1);
-                ImGui::Text(EntryName.Get());
+                ImGui::Text("%s", EntryName.Get());
                 ImGui::EndDragDropSource();
             }
 
@@ -246,7 +247,7 @@ void FCogEngineWindow_Plots::RenderPlots(const TArray<FCogDebugPlotEntry*>& Visi
                             ImPlot::SetAxis(Entry.CurrentYAxis);
 
                             ImPlot::SetNextLineStyle(IMPLOT_AUTO_COL);
-                            const char* Label = TCHAR_TO_ANSI(*Entry.Name.ToString());
+                            const auto Label = StringCast<ANSICHAR>(*Entry.Name.ToString());
 
                             //----------------------------------------------------------------
                             // Pause the scrolling if the user drag inside
@@ -271,20 +272,20 @@ void FCogEngineWindow_Plots::RenderPlots(const TArray<FCogDebugPlotEntry*>& Visi
                             const bool IsEventPlot = Entry.Events.Num() > 0;
                             if (IsEventPlot)
                             {
-                                RenderEvents(Entry, Label, PlotMin, PlotMax);
+                                RenderEvents(Entry, Label.Get(), PlotMin, PlotMax);
                             }
                             //-------------------------------------------------------
                             // Plot Values
                             //-------------------------------------------------------
                             else
                             {
-                                RenderValues(Entry, Label);
+                                RenderValues(Entry, Label.Get());
                             }
 
                             //-------------------------------------------------------
                             // Allow legend item labels to be drag and drop sources
                             //-------------------------------------------------------
-                            if (ImPlot::BeginDragDropSourceItem(Label))
+                            if (ImPlot::BeginDragDropSourceItem(Label.Get()))
                             {
                                 const auto EntryName = StringCast<ANSICHAR>(*Entry.Name.ToString());
                                 ImGui::SetDragDropPayload("DragAndDrop", EntryName.Get(), EntryName.Length() + 1);

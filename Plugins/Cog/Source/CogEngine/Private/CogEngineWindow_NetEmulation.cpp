@@ -7,6 +7,8 @@
 #include "Engine/NetConnection.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerState.h"
+#include "GameFramework/Controller.h"
+#include "GameFramework/PlayerController.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_NetEmulation::RenderHelp()

@@ -13,7 +13,7 @@ class UCogAbilityConfig_Alignment;
 class UCogAbilityConfig_Effects;
 class UCogAbilityDataAsset;
 class UGameplayEffect;
-namespace EGameplayModOp { enum Type; };
+namespace EGameplayModOp { enum Type : int; };
 struct FActiveGameplayEffect;
 struct FGameplayModifierInfo;
 struct FModifierSpec;
