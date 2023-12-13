@@ -66,10 +66,10 @@ void FCogInputWindow_Actions::RenderContent()
     }
 
     if(EnhancedInputSubsystem->GetPlayerInput() == nullptr)
-	{
-		ImGui::Text("No Player Input");
-		return;
-	}
+    {
+        ImGui::Text("No Player Input");
+        return;
+    }
     
     if (ImGui::BeginMenuBar())
     {
