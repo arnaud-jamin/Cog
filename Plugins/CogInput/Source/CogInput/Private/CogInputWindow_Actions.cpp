@@ -239,4 +239,4 @@ void FCogInputWindow_Actions::DrawAxis(const char* Format, const char* ActionNam
     ImGui::SetNextItemWidth(-1);
     FCogWindowWidgets::SliderWithReset("##Inject", InjectValue, -1.0f, 1.0f, 0.0f, "%0.2f");
     ImGui::PopID();
-} 
+}
