@@ -64,6 +64,12 @@ void FCogInputWindow_Actions::RenderContent()
         ImGui::Text("No Enhanced Input Subsystem");
         return;
     }
+
+    if(EnhancedInputSubsystem->GetPlayerInput() == nullptr)
+	{
+		ImGui::Text("No Player Input");
+		return;
+	}
     
     if (ImGui::BeginMenuBar())
     {
