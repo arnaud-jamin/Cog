@@ -32,3 +32,4 @@
 
 - CogInput: Add help about usnig CTRL+Drag on the stick to lock them
 
+- CogAbility: Add inputs to level up/down abilities and effects

@@ -449,3 +449,58 @@ void FCogDebugDrawHelper::DrawFrustum(
     DrawDebugLine(World, Verts[2], Verts[6], Color, bPersistentLines, LifeTime, DepthPriority, Thickness);
     DrawDebugLine(World, Verts[3], Verts[7], Color, bPersistentLines, LifeTime, DepthPriority, Thickness);
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogDebugDrawHelper::DrawQuad(const UWorld* World, const FVector& Position, const FQuat& Rotation, const FVector2D& Extents, const FColor& Color, bool bPersistent, float LifeTime, uint8 DepthPriority, const float Thickness)
+{
+    if (GEngine->GetNetMode(World) == NM_DedicatedServer)
+    {
+        return;
+    }
+
+    const FVector U = Rotation.GetAxisZ() * Extents.X;
+    const FVector V = Rotation.GetAxisY() * Extents.Y;
+
+    const FVector V0 = Position + U + V;
+    const FVector V1 = Position + U - V;
+    const FVector V2 = Position - U - V;
+    const FVector V3 = Position - U + V;
+
+    DrawDebugLine(World, V0, V1, Color, bPersistent, LifeTime, DepthPriority, Thickness);
+    DrawDebugLine(World, V1, V2, Color, bPersistent, LifeTime, DepthPriority, Thickness);
+    DrawDebugLine(World, V2, V3, Color, bPersistent, LifeTime, DepthPriority, Thickness);
+    DrawDebugLine(World, V3, V0, Color, bPersistent, LifeTime, DepthPriority, Thickness);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogDebugDrawHelper::DrawSolidQuad(const UWorld* World, const FVector& Position, const FQuat& Rotation, const FVector2D& Extents, const FColor& Color, bool bPersistent, float LifeTime, uint8 DepthPriority)
+{
+    if (GEngine->GetNetMode(World) == NM_DedicatedServer)
+    {
+        return;
+    }
+
+    const FVector U = Rotation.GetAxisZ() * Extents.X;
+    const FVector V = Rotation.GetAxisY() * Extents.Y;
+
+    TArray<FVector> Verts;
+    Verts.AddUninitialized(4);
+    
+    Verts[0] = Position + U + V;
+    Verts[1] = Position - U + V;
+    Verts[2] = Position + U - V;
+    Verts[3] = Position - U - V;
+
+    TArray<int32> Indices;
+    Indices.AddUninitialized(6);
+    
+    Indices[0] = 0; 
+    Indices[1] = 2; 
+    Indices[2] = 1;
+
+    Indices[3] = 1; 
+    Indices[4] = 2; 
+    Indices[5] = 3;
+
+    DrawDebugMesh(World, Verts, Indices, Color, bPersistent, LifeTime, DepthPriority);
+}

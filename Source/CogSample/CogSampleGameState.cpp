@@ -23,7 +23,8 @@
 #include "CogDebugPlot.h"
 #include "CogEngineDataAsset.h"
 #include "CogEngineModule.h"
-#include "CogEngineWindow_Collisions.h"
+#include "CogEngineWindow_CollisionTester.h"
+#include "CogEngineWindow_CollisionViewer.h"
 #include "CogEngineWindow_CommandBindings.h"
 #include "CogEngineWindow_DebugSettings.h"
 #include "CogEngineWindow_ImGui.h"
@@ -128,7 +129,9 @@ void ACogSampleGameState::InitializeCog()
     //---------------------------------------
     // Engine
     //---------------------------------------
-    CogWindowManager->AddWindow<FCogEngineWindow_Collisions>("Engine.Collision");
+    CogWindowManager->AddWindow<FCogEngineWindow_CollisionTester>("Engine.Collision Tester");
+
+    CogWindowManager->AddWindow<FCogEngineWindow_CollisionViewer>("Engine.Collision Viewer");
 
     CogWindowManager->AddWindow<FCogEngineWindow_CommandBindings>("Engine.Command Bindings");
 

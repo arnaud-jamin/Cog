@@ -1,4 +1,4 @@
-#include "CogEngineWindow_Collisions.h"
+#include "CogEngineWindow_CollisionViewer.h"
 
 #include "CogDebugDrawHelper.h"
 #include "CogDebugSettings.h"
@@ -18,7 +18,7 @@
 
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Collisions::Initialize()
+void FCogEngineWindow_CollisionViewer::Initialize()
 {
     Super::Initialize();
 
@@ -26,11 +26,11 @@ void FCogEngineWindow_Collisions::Initialize()
 
     SetAsset(GetAsset<UCogEngineDataAsset>());
 
-    Config = GetConfig<UCogEngineConfig_Collisions>();
+    Config = GetConfig<UCogEngineConfig_CollisionViewer>();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Collisions::RenderHelp()
+void FCogEngineWindow_CollisionViewer::RenderHelp()
 {
     ImGui::Text("This window is used to inspect collisions by performing a collision query with the selected channels. "
         "The query can be configured in the options. "
@@ -40,7 +40,7 @@ void FCogEngineWindow_Collisions::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Collisions::ResetConfig() 
+void FCogEngineWindow_CollisionViewer::ResetConfig() 
 {
     Super::ResetConfig();
 
@@ -48,7 +48,7 @@ void FCogEngineWindow_Collisions::ResetConfig()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Collisions::RenderContent()
+void FCogEngineWindow_CollisionViewer::RenderContent()
 {
     Super::RenderContent();
 
@@ -387,7 +387,7 @@ void FCogEngineWindow_Collisions::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Collisions::SetAsset(const UCogEngineDataAsset* Value)
+void FCogEngineWindow_CollisionViewer::SetAsset(const UCogEngineDataAsset* Value)
 {
     Asset = Value;
 

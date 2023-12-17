@@ -40,4 +40,8 @@ public:
     
     static void DrawHitResult(const UWorld* World, const FHitResult& Hit, const int HitIndex, const EDrawDebugTrace::Type DrawType, const bool ShowHitIndex, const float HitSize, const FLinearColor HitColor, const float DrawDuration, const uint8 DepthPriority = 0); 
 
+    static void DrawQuad(const UWorld* World, const FVector& Position, const FQuat& Rotation, const FVector2D& Extents, const FColor& Color, bool bPersistent = false, float LifeTime = -1, uint8 DepthPriority = 0, const float Thickness = 0.0f);
+
+    static void DrawSolidQuad(const UWorld* World, const FVector& Position, const FQuat& Rotation, const FVector2D& Extents, const FColor& Color, bool bPersistent = false, float LifeTime = -1, uint8 DepthPriority = 0);
+
 };
