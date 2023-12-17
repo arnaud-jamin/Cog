@@ -6,8 +6,6 @@
 #include "Misc/StringBuilder.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-// UCogEngineWindow_OutputLog
-//--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_OutputLog::Initialize()
 {    
     Super::Initialize();
@@ -67,7 +65,7 @@ void FCogEngineWindow_OutputLog::AddLog(const TCHAR* Message, ELogVerbosity::Typ
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_OutputLog::DrawRow(const char* BufferStart, const FLineInfo& LineInfo, bool IsTableShown)
+void FCogEngineWindow_OutputLog::DrawRow(const char* BufferStart, const FLineInfo& LineInfo, bool IsTableShown) const
 {
     ImU32 Color;
     switch (LineInfo.Verbosity)
@@ -175,8 +173,8 @@ void FCogEngineWindow_OutputLog::RenderContent()
         {
             for (int32 i = (int32)ELogVerbosity::Error; i <= (int32)ELogVerbosity::VeryVerbose; ++i)
             {
-                bool IsSelected = i == Config->VerbosityFilter;
-                ELogVerbosity::Type Verbosity = (ELogVerbosity::Type)i;
+	            const bool IsSelected = i == Config->VerbosityFilter;
+	            const ELogVerbosity::Type Verbosity = (ELogVerbosity::Type)i;
 
                 if (ImGui::Selectable(FCogDebugHelper::VerbosityToString(Verbosity), IsSelected))
                 {
@@ -316,7 +314,7 @@ FCogLogOutputDevice::~FCogLogOutputDevice()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogLogOutputDevice::Serialize(const TCHAR* Message, ELogVerbosity::Type Verbosity, const class FName& Category)
+void FCogLogOutputDevice::Serialize(const TCHAR* Message, const ELogVerbosity::Type Verbosity, const FName& Category)
 {
     if (OutputLog != nullptr)
     {

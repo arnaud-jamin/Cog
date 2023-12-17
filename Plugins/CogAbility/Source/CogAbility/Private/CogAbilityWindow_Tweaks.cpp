@@ -1,10 +1,8 @@
 #include "CogAbilityWindow_Tweaks.h"
 
-#include "AbilitySystemComponent.h"
 #include "CogAbilityDataAsset.h"
 #include "CogAbilityReplicator.h"
 #include "CogImguiHelper.h"
-#include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -35,12 +33,14 @@ void FCogAbilityWindow_Tweaks::RenderContent()
 
     if (Asset == nullptr)
     {
+        ImGui::TextDisabled("Invalid Asset");
         return;
     }
 
     ACogAbilityReplicator* Replicator = ACogAbilityReplicator::GetLocalReplicator(*GetWorld());
     if (Replicator == nullptr)
     {
+        ImGui::TextDisabled("Invalid Replicator");
         return;
     }
 
@@ -54,7 +54,7 @@ void FCogAbilityWindow_Tweaks::RenderContent()
         ImGui::EndMenuBar();
     }
 
-    int32 CurrentTweakProfileIndex = Replicator->GetTweakProfileIndex();
+    const int32 CurrentTweakProfileIndex = Replicator->GetTweakProfileIndex();
     FName CurrentProfileName = FName("None");
     if (Asset->TweakProfiles.IsValidIndex(CurrentTweakProfileIndex))
     {
@@ -64,7 +64,7 @@ void FCogAbilityWindow_Tweaks::RenderContent()
     if (ImGui::BeginCombo("Profile", TCHAR_TO_ANSI(*CurrentProfileName.ToString())))
     {
         {
-            bool IsSelected = CurrentTweakProfileIndex == INDEX_NONE;
+	        const bool IsSelected = CurrentTweakProfileIndex == INDEX_NONE;
             if (ImGui::Selectable("None", IsSelected))
             {
                 Replicator->SetTweakProfile(INDEX_NONE);
@@ -74,7 +74,7 @@ void FCogAbilityWindow_Tweaks::RenderContent()
         for (int32 TweakProfileIndex = 0; TweakProfileIndex < Asset->TweakProfiles.Num(); ++TweakProfileIndex)
         {
             const FCogAbilityTweakProfile& TweakProfile = Asset->TweakProfiles[TweakProfileIndex];
-            bool IsSelected = TweakProfileIndex == CurrentTweakProfileIndex;
+            const bool IsSelected = TweakProfileIndex == CurrentTweakProfileIndex;
 
             if (ImGui::Selectable(TCHAR_TO_ANSI(*TweakProfile.Name.ToString()), IsSelected))
             {

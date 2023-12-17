@@ -2,8 +2,6 @@
 
 #include "CogImguiContext.h"
 #include "CogImguiInputHelper.h"
-#include "CogImguiModule.h"
-#include "CogImguiWidget.h"
 #include "Engine/GameViewportClient.h"
 #include "imgui.h"
 #include "SlateOptMacros.h"

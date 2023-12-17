@@ -1,13 +1,10 @@
 #include "CogAbilityWindow_Cheats.h"
 
-#include "AbilitySystemGlobals.h"
 #include "CogAbilityConfig_Alignment.h"
 #include "CogAbilityDataAsset.h"
 #include "CogAbilityReplicator.h"
 #include "CogCommonAllegianceActorInterface.h"
-#include "CogDebugDraw.h"
 #include "CogImguiHelper.h"
-#include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
 #include "EngineUtils.h"
 #include "GameFramework/Character.h"
@@ -129,20 +126,20 @@ void FCogAbilityWindow_Cheats::RenderContent()
 
     if (Config == nullptr)
     {
-        ImGui::Text("Invalid Config");
+        ImGui::TextDisabled("Invalid Config");
         return;
     }
 
     AActor* SelectedActor = GetSelection();
     if (SelectedActor == nullptr)
     {
-        ImGui::Text("Invalid Selection");
+        ImGui::TextDisabled("Invalid Selection");
         return;
     }
 
     if (Asset == nullptr)
     {
-        ImGui::Text("Invalid Asset");
+        ImGui::TextDisabled("Invalid Asset");
         return;
     }
 

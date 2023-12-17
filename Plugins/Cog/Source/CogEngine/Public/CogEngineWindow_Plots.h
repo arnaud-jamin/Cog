@@ -25,20 +25,20 @@ protected:
     virtual void RenderTick(float DeltaTime) override;
 
     virtual void RenderContent() override;
-    
-    void RenderPlotsList(TArray<FCogDebugPlotEntry*>& VisiblePlots);
 
-    void RenderPlots(const TArray<FCogDebugPlotEntry*>& VisiblePlots);
+    static void RenderPlotsList(TArray<FCogDebugPlotEntry*>& VisiblePlots);
+
+    void RenderPlots(const TArray<FCogDebugPlotEntry*>& VisiblePlots) const;
 
     void RenderMenu();
 
-    void RenderTimeMarker();
+    void RenderTimeMarker() const;
 
-    void RenderValues(FCogDebugPlotEntry& Entry, const char* Label);
+    static void RenderValues(FCogDebugPlotEntry& Entry, const char* Label);
 
-    void RenderEvents(FCogDebugPlotEntry& Entry, const char* Label, const ImVec2& PlotMin, const ImVec2& PlotMax);
+    void RenderEvents(FCogDebugPlotEntry& Entry, const char* Label, const ImVec2& PlotMin, const ImVec2& PlotMax) const;
 
-    void RenderEventTooltip(const FCogDebugPlotEvent* HoveredEvent, FCogDebugPlotEntry& Entry);
+    static void RenderEventTooltip(const FCogDebugPlotEvent* HoveredEvent, FCogDebugPlotEntry& Entry);
 
     TObjectPtr<UCogEngineConfig_Plots> Config = nullptr;
 

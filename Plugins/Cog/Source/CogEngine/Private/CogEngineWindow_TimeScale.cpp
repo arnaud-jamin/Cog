@@ -34,19 +34,13 @@ void FCogEngineWindow_TimeScale::RenderContent()
 {
     Super::RenderContent();
 
-    UWorld* World = GetWorld();
-    if (World == nullptr)
-    {
-        return;
-    }
-
-    ACogEngineReplicator* Replicator = ACogEngineReplicator::GetLocalReplicator(*World);
+    ACogEngineReplicator* Replicator = ACogEngineReplicator::GetLocalReplicator(*GetWorld());
     if (Replicator == nullptr)
     {
+        ImGui::TextDisabled("Invalid Replicator");
         return;
     }
 
-  
     float Value = Replicator->GetTimeDilation();
     if (FCogWindowWidgets::MultiChoiceButtonsFloat(TimingScales, Value, ImVec2(3.5f * FCogWindowWidgets::GetFontWidth(), 0)))
     {

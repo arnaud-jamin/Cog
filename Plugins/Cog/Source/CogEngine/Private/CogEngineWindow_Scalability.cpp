@@ -1,14 +1,11 @@
 #include "CogEngineWindow_Scalability.h"
 
 #include "imgui.h"
-#include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
 #include "Engine/Engine.h"
 #include "Scalability.h"
 
-
 #define SCALABILITY_NUM_LEVELS 5
-
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Scalability::RenderHelp()
@@ -24,7 +21,7 @@ void FCogEngineWindow_Scalability::RenderContent()
     Super::RenderContent();
 
     Scalability::FQualityLevels Levels = Scalability::GetQualityLevels();
-    FString CurrentQualityName = Scalability::GetQualityLevelText(Levels.GetMinQualityLevel(), SCALABILITY_NUM_LEVELS).ToString();
+    const FString CurrentQualityName = Scalability::GetQualityLevelText(Levels.GetMinQualityLevel(), SCALABILITY_NUM_LEVELS).ToString();
     FCogWindowWidgets::SetNextItemToShortWidth();
     if (ImGui::BeginCombo("Scalability", TCHAR_TO_ANSI(*CurrentQualityName)))
     {

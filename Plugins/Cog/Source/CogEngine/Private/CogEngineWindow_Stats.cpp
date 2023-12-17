@@ -7,7 +7,6 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerState.h"
-#include "Net/NetPing.h"
 
 ImVec4 StatRedColor(1.0f, 0.4f, 0.3f, 1.0f);
 ImVec4 StatOrangeColor(1.0f, 0.7f, 0.4f, 1.0f);
@@ -49,7 +48,7 @@ void FCogEngineWindow_Stats::RenderContent()
             ImGui::TextColored(GetPingColor(Ping), "%0.0fms", Ping);
         }
 
-        if (UNetConnection* Connection = PlayerController->GetNetConnection())
+        if (const UNetConnection* Connection = PlayerController->GetNetConnection())
         {
             const float OutPacketLost = Connection->GetOutLossPercentage().GetAvgLossPercentage() * 100.0f;
             ImGui::Text("Packet Loss Out ");
@@ -65,12 +64,12 @@ void FCogEngineWindow_Stats::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-float FCogEngineWindow_Stats::GetMainMenuWidgetWidth(int32 WidgetIndex, float MaxWidth)
+float FCogEngineWindow_Stats::GetMainMenuWidgetWidth(const int32 SubWidgetIndex, float MaxWidth)
 {
     const APlayerController* PlayerController = GetLocalPlayerController();
     const UNetConnection* Connection = PlayerController != nullptr ? PlayerController->GetNetConnection() : nullptr;
 
-    switch (WidgetIndex)
+    switch (SubWidgetIndex)
     {
         case 0: return FCogWindowWidgets::GetFontWidth() * 8;
         case 1: return Connection != nullptr ? FCogWindowWidgets::GetFontWidth() * 7 : 0.0f;
@@ -81,9 +80,9 @@ float FCogEngineWindow_Stats::GetMainMenuWidgetWidth(int32 WidgetIndex, float Ma
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Stats::RenderMainMenuWidget(int32 WidgetIndex, float Width)
+void FCogEngineWindow_Stats::RenderMainMenuWidget(const int32 SubWidgetIndex, const float Width)
 {
-    switch (WidgetIndex)
+    switch (SubWidgetIndex)
     {
         case 0: RenderMainMenuWidgetFramerate(Width); break;
         case 1: RenderMainMenuWidgetPing(Width); break;
@@ -92,10 +91,10 @@ void FCogEngineWindow_Stats::RenderMainMenuWidget(int32 WidgetIndex, float Width
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Stats::RenderMainMenuWidgetFramerate(float Width)
+void FCogEngineWindow_Stats::RenderMainMenuWidgetFramerate(const float Width)
 {
     extern ENGINE_API float GAverageFPS;
-    int32 Fps = (int32)GAverageFPS;
+    const int32 Fps = (int32)GAverageFPS;
 
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
     ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
@@ -129,7 +128,7 @@ void FCogEngineWindow_Stats::RenderMainMenuWidgetFramerate(float Width)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Stats::RenderMainMenuWidgetPing(float Width)
+void FCogEngineWindow_Stats::RenderMainMenuWidgetPing(const float Width)
 {
     const APlayerController* PlayerController = GetLocalPlayerController();
     const APlayerState* PlayerState = PlayerController != nullptr ? PlayerController->GetPlayerState<APlayerState>() : nullptr;
@@ -164,7 +163,7 @@ void FCogEngineWindow_Stats::RenderMainMenuWidgetPing(float Width)
             ImGui::Text("Ping");
             ImGui::SameLine();
 
-            FNamedNetDriver* SelectedNetDriver = &WorldContext.ActiveNetDrivers[0];
+            const FNamedNetDriver* SelectedNetDriver = &WorldContext.ActiveNetDrivers[0];
             FPacketSimulationSettings Settings = SelectedNetDriver->NetDriver->PacketSimulationSettings;
             TArray<int32> Values{ 0, 50, 100, 200, 500, 1000 };
             if (FCogWindowWidgets::MultiChoiceButtonsInt(Values, Settings.PktIncomingLagMin, ImVec2(4.5f * FCogWindowWidgets::GetFontWidth(), 0)))
@@ -178,10 +177,10 @@ void FCogEngineWindow_Stats::RenderMainMenuWidgetPing(float Width)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Stats::RenderMainMenuWidgetPacketLoss(float Width)
+void FCogEngineWindow_Stats::RenderMainMenuWidgetPacketLoss(const float Width)
 {
     const APlayerController* PlayerController = GetLocalPlayerController();
-    UNetConnection* Connection = PlayerController != nullptr ? PlayerController->GetNetConnection() : nullptr;
+    const UNetConnection* Connection = PlayerController != nullptr ? PlayerController->GetNetConnection() : nullptr;
     if (Connection == nullptr)
     {
         return;
@@ -216,7 +215,7 @@ void FCogEngineWindow_Stats::RenderMainMenuWidgetPacketLoss(float Width)
             ImGui::Text("Packet Loss");
             ImGui::SameLine();
 
-            FNamedNetDriver* SelectedNetDriver = &WorldContext.ActiveNetDrivers[0];
+            const FNamedNetDriver* SelectedNetDriver = &WorldContext.ActiveNetDrivers[0];
             FPacketSimulationSettings Settings = SelectedNetDriver->NetDriver->PacketSimulationSettings;
 
             TArray<int32> Values{ 0, 5, 10, 20, 30, 40, 50 };
@@ -232,7 +231,7 @@ void FCogEngineWindow_Stats::RenderMainMenuWidgetPacketLoss(float Width)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ImVec4 FCogEngineWindow_Stats::GetFpsColor(float Value, float Good /*= 50.0f*/, float Medium /*= 30.0f*/)
+ImVec4 FCogEngineWindow_Stats::GetFpsColor(const float Value, const float Good /*= 50.0f*/, const float Medium /*= 30.0f*/)
 {
     if (Value > Good)
     {
@@ -248,7 +247,7 @@ ImVec4 FCogEngineWindow_Stats::GetFpsColor(float Value, float Good /*= 50.0f*/, 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ImVec4 FCogEngineWindow_Stats::GetPingColor(float Value, float Good /*= 100.0f*/, float Medium /*= 200.0f*/)
+ImVec4 FCogEngineWindow_Stats::GetPingColor(const float Value, const float Good /*= 100.0f*/, const float Medium /*= 200.0f*/)
 {
     if (Value > Medium)
     {
@@ -264,7 +263,7 @@ ImVec4 FCogEngineWindow_Stats::GetPingColor(float Value, float Good /*= 100.0f*/
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ImVec4 FCogEngineWindow_Stats::GetPacketLossColor(float Value, float Good /*= 10.0f*/, float Medium /*= 20.0f*/)
+ImVec4 FCogEngineWindow_Stats::GetPacketLossColor(const float Value, const float Good /*= 10.0f*/, const float Medium /*= 20.0f*/)
 {
     if (Value > Medium)
     {
