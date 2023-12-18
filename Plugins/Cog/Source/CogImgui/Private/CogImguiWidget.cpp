@@ -37,12 +37,12 @@ void SCogImguiWidget::Tick(const FGeometry& AllottedGeometry, const double InCur
 
 //--------------------------------------------------------------------------------------------------------------------------
 int32 SCogImguiWidget::OnPaint(
-    const FPaintArgs& Args, 
-    const FGeometry& AllottedGeometry, 
+    const FPaintArgs& Args,
+    const FGeometry& AllottedGeometry,
     const FSlateRect& MyClippingRect,
-    FSlateWindowElementList& OutDrawElements, 
-    int32 LayerId, 
-    const FWidgetStyle& WidgetStyle, 
+    FSlateWindowElementList& OutDrawElements,
+    int32 LayerId,
+    const FWidgetStyle& WidgetStyle,
     bool bParentEnabled) const
 {
 
@@ -122,17 +122,17 @@ FReply SCogImguiWidget::OnKeyChar(const FGeometry& MyGeometry, const FCharacterE
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiWidget::OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent)
 {
-    return HandleKeyEvent(MyGeometry, KeyEvent);
+    return HandleKeyEvent(MyGeometry, KeyEvent, true);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiWidget::OnKeyUp(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent)
 {
-    return HandleKeyEvent(MyGeometry, KeyEvent);
+    return HandleKeyEvent(MyGeometry, KeyEvent, false);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FReply SCogImguiWidget::HandleKeyEvent(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent)
+FReply SCogImguiWidget::HandleKeyEvent(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent, bool Down)
 {
     if (Context->GetEnableInput() == false)
     {
@@ -152,8 +152,9 @@ FReply SCogImguiWidget::HandleKeyEvent(const FGeometry& MyGeometry, const FKeyEv
         {
             return FReply::Unhandled();
         }
+
         ImGuiIO& IO = ImGui::GetIO();
-        IO.AddKeyEvent(FCogImguiInputHelper::ToImKey(KeyEvent.GetKey()), false);
+        IO.AddKeyEvent(FCogImguiInputHelper::ToImKey(KeyEvent.GetKey()), Down);
         IO.AddKeyEvent(ImGuiMod_Ctrl, KeyEvent.IsControlDown());
         IO.AddKeyEvent(ImGuiMod_Shift, KeyEvent.IsShiftDown());
         IO.AddKeyEvent(ImGuiMod_Alt, KeyEvent.IsAltDown());
@@ -177,7 +178,7 @@ FReply SCogImguiWidget::OnAnalogValueChanged(const FGeometry& MyGeometry, const 
         //    return FReply::Unhandled();
         //}
 
-    	return FReply::Unhandled();
+        return FReply::Unhandled();
     }
 
     return FReply::Handled();
