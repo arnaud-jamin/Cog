@@ -326,7 +326,7 @@ void FCogImguiContext::ImGui_CreateWindow(ImGuiViewport* Viewport)
         return;
     }
 
-    FCogImguiContext* Context = ParentViewportData->Context;
+    FCogImguiContext* Context = ParentViewportData->Context.Get();
 
     const bool bTooltipWindow = (Viewport->Flags & ImGuiViewportFlags_TopMost);
     const bool bPopupWindow = (Viewport->Flags & ImGuiViewportFlags_NoTaskBarIcon);
