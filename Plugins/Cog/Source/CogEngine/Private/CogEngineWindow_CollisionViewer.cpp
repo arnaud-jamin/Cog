@@ -292,7 +292,7 @@ void FCogEngineWindow_CollisionViewer::RenderContent()
                 if (AlreadyDrawnActors.Contains(Actor) == false)
                 {
                     FColor TextColor = Color.WithAlpha(255);
-                    DrawDebugString(World, Actor->GetActorLocation(), GetNameSafe(Actor->GetClass()), nullptr, FColor::White, 0.0f, FCogDebugSettings::TextShadow, FCogDebugSettings::TextSize);
+                    DrawDebugString(World, Actor->GetActorLocation(), GetNameSafe(Actor->GetClass()), nullptr, FColor::White, 0.0f, FCogDebugSettings::Data.TextShadow, FCogDebugSettings::Data.TextSize);
                     AlreadyDrawnActors.Add(Actor);
                 }
             }

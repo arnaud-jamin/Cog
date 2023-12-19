@@ -612,3 +612,24 @@ bool FCogWindowWidgets::MultiChoiceButtonsFloat(TArray<float>& Values, float& Va
 
     return IsPressed;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::DragFVector(const char* Label, FVector& Vector, float Speed, float Min, float Max, const char* Format, ImGuiSliderFlags Flags)
+{
+    return ImGui::DragScalarN(Label, ImGuiDataType_Double, &Vector.X, 3, Speed, &Min, &Max, Format, Flags);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::DragFVector2D(const char* Label, FVector2D& Vector, float Speed, float Min, float Max, const char* Format, ImGuiSliderFlags Flags)
+{
+    return ImGui::DragScalarN(Label, ImGuiDataType_Double, &Vector.X, 2, Speed, &Min, &Max, Format, Flags);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::ColorEdit4(const char* Label, FColor& Color, ImGuiColorEditFlags Flags)
+{
+    FLinearColor Linear(Color);
+	const bool Result = ImGui::ColorEdit4(Label, &Linear.R, Flags);
+    Color = Linear.ToFColor(true);
+    return Result;
+}

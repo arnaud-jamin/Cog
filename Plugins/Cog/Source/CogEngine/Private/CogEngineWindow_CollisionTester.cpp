@@ -4,13 +4,9 @@
 #include "CogDebugSettings.h"
 #include "CogEngineDataAsset.h"
 #include "CogImGuiHelper.h"
-#include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
-#include "Components/BoxComponent.h"
-#include "Components/CapsuleComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "Components/SceneComponent.h"
-#include "Components/SphereComponent.h"
 #include "imgui.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -242,24 +238,24 @@ void FCogEngineWindow_CollisionTester::RenderContent()
             case ECogEngine_CollisionQueryShape::Sphere:
             {
                 FCogWindowWidgets::SetNextItemToShortWidth();
-                ImGui::DragFloat("Sphere Radius", &Config->SphereRadius, 0.1f, 0, 100.0f, "%.1f");
+                ImGui::DragFloat("Sphere Radius", &Config->ShapeExtent.X, 0.1f, 0, 100.0f, "%.1f");
                 break;
             }
 
             case ECogEngine_CollisionQueryShape::Box:
             {
                 FCogWindowWidgets::SetNextItemToShortWidth();
-                ImGui::DragFloat3("Box Extent", &Config->BoxExtent.X, 0.1f, 0, 100.0f, "%.1f");
+                ImGui::DragFloat3("Box Extent", &Config->ShapeExtent.X, 0.1f, 0, 100.0f, "%.1f");
                 break;
             }
 
             case ECogEngine_CollisionQueryShape::Capsule:
             {
                 FCogWindowWidgets::SetNextItemToShortWidth();
-                ImGui::DragFloat("Capsule Radius", &Config->CapsuleRadius, 0.1f, 0, 100.0f, "%.1f");
+                ImGui::DragFloat("Capsule Radius", &Config->ShapeExtent.X, 0.1f, 0, 100.0f, "%.1f");
 
                 FCogWindowWidgets::SetNextItemToShortWidth();
-                ImGui::DragFloat("Capsule Half Height", &Config->CapsuleHalfHeight, 0.1f, 0, 100.0f, "%.1f");
+                ImGui::DragFloat("Capsule Half Height", &Config->ShapeExtent.Z, 0.1f, 0, 100.0f, "%.1f");
                 break;
             }
         }
@@ -343,9 +339,9 @@ void FCogEngineWindow_CollisionTester::Query()
     {
         switch (Config->Shape)
         {
-            case ECogEngine_CollisionQueryShape::Sphere:    QueryShape.SetSphere(Config->SphereRadius); break;
-            case ECogEngine_CollisionQueryShape::Capsule:   QueryShape.SetCapsule(Config->CapsuleRadius, Config->CapsuleHalfHeight); break;
-            case ECogEngine_CollisionQueryShape::Box:       QueryShape.SetBox(Config->BoxExtent); break;
+            case ECogEngine_CollisionQueryShape::Sphere:    QueryShape.SetSphere(Config->ShapeExtent.X); break;
+            case ECogEngine_CollisionQueryShape::Capsule:   QueryShape.SetCapsule(Config->ShapeExtent.X, Config->ShapeExtent.Z); break;
+            case ECogEngine_CollisionQueryShape::Box:       QueryShape.SetBox(Config->ShapeExtent); break;
         }
     }
 
@@ -519,7 +515,7 @@ void FCogEngineWindow_CollisionTester::Query()
             GetWorld(),
             QueryStart,
             QueryEnd,
-            FCogDebugSettings::ArrowSize,
+            FCogDebugSettings::Data.ArrowSize,
             Color,
             false,
             0.0f,
@@ -577,7 +573,7 @@ void FCogEngineWindow_CollisionTester::Query()
                 GetWorld(),
                 Hit.Location,
                 Hit.Location + Hit.Normal * 20.0f,
-                FCogDebugSettings::ArrowSize,
+                FCogDebugSettings::Data.ArrowSize,
                 FLinearColor(Config->NormalColor).ToFColor(true),
                 false,
                 0.0f,
@@ -591,7 +587,7 @@ void FCogEngineWindow_CollisionTester::Query()
                 GetWorld(),
                 Hit.ImpactPoint,
                 Hit.ImpactPoint + Hit.ImpactNormal * 20.0f,
-                FCogDebugSettings::ArrowSize,
+                FCogDebugSettings::Data.ArrowSize,
                 FLinearColor(Config->ImpactNormalColor).ToFColor(true),
                 false,
                 0.0f,
@@ -605,10 +601,20 @@ void FCogEngineWindow_CollisionTester::Query()
         }
     }
 
-    FTransform Transform1(QueryRotation, QueryStart, FVector::OneVector);
-    DrawTransformGizmos(GetWorld(), Transform1);
-    FTransform Transform2(QueryRotation, QueryEnd, FVector::OneVector);
-    DrawTransformGizmos(GetWorld(), Transform2);
+    if (const APlayerController* LocalPlayerController = GetLocalPlayerController())
+    {
+        FVector ScaleStart(Config->ShapeExtent);
+        FTransform TransformStart(QueryRotation, QueryStart, ScaleStart);
+        GizmoStart.Draw(*LocalPlayerController, TransformStart);
+        Config->LocationStart = FVector3f(TransformStart.GetLocation());
+        Config->ShapeExtent = FVector3f(TransformStart.GetScale3D());
+
+        FVector ScaleEnd(Config->ShapeExtent);
+        FTransform TransformEnd(QueryRotation, QueryEnd, ScaleEnd);
+        GizmoEnd.Draw(*LocalPlayerController, TransformEnd);
+        Config->LocationEnd = FVector3f(TransformEnd.GetLocation());
+        Config->ShapeExtent = FVector3f(TransformEnd.GetScale3D());
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -638,7 +644,7 @@ void FCogEngineWindow_CollisionTester::DrawPrimitive(const UPrimitiveComponent* 
             if (AlreadyDrawnActors.Contains(Actor) == false)
             {
                 FColor TextColor = Color.WithAlpha(255);
-                DrawDebugString(GetWorld(), Actor->GetActorLocation(), GetNameSafe(Actor->GetClass()), nullptr, FColor::White, 0.0f, FCogDebugSettings::TextShadow, FCogDebugSettings::TextSize);
+                DrawDebugString(GetWorld(), Actor->GetActorLocation(), GetNameSafe(Actor->GetClass()), nullptr, FColor::White, 0.0f, FCogDebugSettings::Data.TextShadow, FCogDebugSettings::Data.TextSize);
                 AlreadyDrawnActors.Add(Actor);
             }
         }
@@ -693,7 +699,7 @@ void FCogEngineWindow_CollisionTester::DrawShape(const FCollisionShape& Shape, c
     case ECollisionShape::Sphere:
     {
         //--------------------------------------------------
-        // see UCapsuleComponent::GetScaledCapsuleRadius()
+        // see USphereComponent::GetScaledSphereRadius()
         //--------------------------------------------------
         const float RadiusScale = FMath::Min(Scale.X, FMath::Min(Scale.Y, Scale.Z));
         const float Radius = Shape.Sphere.Radius * RadiusScale;
@@ -756,200 +762,5 @@ void FCogEngineWindow_CollisionTester::SetAsset(const UCogEngineDataAsset* Value
         FChannel& Channel = Channels[(uint8)AssetChannel.Channel];
         Channel.IsValid = true;
         Channel.Color = AssetChannel.Color.ToFColor(true);
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-static void FindSegmentPointDistance(const FVector2D& Segment1, const FVector2D& Segment2, const FVector2D& Point, FVector2D& Projection, float& Time, float& Distance)
-{
-    const float DistSquared = FVector2D::DistSquared(Segment1, Segment2);
-    if (FMath::IsNearlyZero(DistSquared))
-    {
-        Time = 0.0f;
-        Projection = Segment1;
-        Distance = FVector2D::Distance(Point, Segment1);
-    }
-    else
-    {
-        Time = FMath::Max(0.0f, FMath::Min(1.0f, FVector2D::DotProduct(Point - Segment1, Segment2 - Segment1) / DistSquared));
-        Projection = Segment1 + Time * (Segment2 - Segment1);
-        Distance = FVector2D::Distance(Point, Projection);
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-static float FindSegmentPointDistance2(const FVector2D& Segment1, const FVector2D& Segment2, const FVector2D& Point)
-{
-    FVector2D Projection;
-    float Time, Distance;
-    FindSegmentPointDistance(Segment1, Segment2, Point, Projection, Time, Distance);
-    return Distance;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_CollisionTester::DrawTransformGizmos(const UWorld* InWorld, FTransform& InTransform)
-{
-    APlayerController* PlayerController = GetLocalPlayerController();
-    if (PlayerController == nullptr)
-    {
-        return;
-    }
-
-    const ImGuiViewport* Viewport = ImGui::GetMainViewport();
-    if (Viewport == nullptr)
-    {
-        return;
-    }
-
-    const uint8 ZLow = 0;
-    const uint8 ZHigh = 100;
-    const float ThicknessZLow = 1.0f;
-    const float ThicknessZHigh = 0.0f;
-    const float AxisLength = 50.0f;
-    const float PlaneOffset = 25.0f;
-    const FVector2D PlaneExtent(10.0f, 10.0f);
-    const FVector BoxExtent(2.0f, 2.0f, 2.0f);
-    const float MaxMouseDistance = 5.0f;
-    const float RotationRadius = 15.0f;
-    const int32 RotationSegments = 32;
-    
-    const FColor AxisColorsZHigh [] = { FColor(255, 50, 50, 255), FColor(50, 255, 50, 255), FColor(50, 50, 255, 255), FColor(255, 255, 255, 255) };
-    const FColor AxisColorsZLow  [] = { FColor(128, 0, 0, 255), FColor(0, 128, 0, 255), FColor(0, 0, 128, 255), FColor(128, 128, 128, 255) };
-
-    const FColor SelectionColor = FColor(255, 255, 0, 255);
-
-    const FVector Center = InTransform.GetTranslation();
-    const FQuat RotX = InTransform.GetRotation();
-    const FQuat RotY = RotX * FQuat(FVector(0.0f, 0.0f, 1.0f), UE_HALF_PI);
-    const FQuat RotZ = RotX * FQuat(FVector(0.0f, 1.0f, 0.0f), UE_HALF_PI);
-    
-    const FVector UnitAxisX = RotX.GetAxisX();
-    const FVector UnitAxisY = RotX.GetAxisY();
-    const FVector UnitAxisZ = RotX.GetAxisZ();
-
-    const FVector AxisX = Center + UnitAxisX * AxisLength;
-    const FVector AxisY = Center + UnitAxisY * AxisLength;
-    const FVector AxisZ = Center + UnitAxisZ * AxisLength;
-
-    const FVector PlaneXY = Center + ((UnitAxisX + UnitAxisY) * PlaneOffset);
-    const FVector PlaneXZ = Center + ((UnitAxisX + UnitAxisZ) * PlaneOffset);
-    const FVector PlaneYZ = Center + ((UnitAxisY + UnitAxisZ) * PlaneOffset);
-
-    const ImVec2 ImMousePos = ImGui::GetMousePos() - Viewport->Pos;
-    const FVector2D MousePos = FCogImguiHelper::ToFVector2D(ImMousePos);
-
-    FVector2D ScreenGizmoCenter;
-    if (UGameplayStatics::ProjectWorldToScreen(PlayerController, Center, ScreenGizmoCenter) == false)
-    {
-        return;
-    }
-
-    FCogEngine_GizmoElement GizmoElements[ECogEngine_GizmoElementType::MAX];
-
-    GizmoElements[(int32)ECogEngine_GizmoElementType::MoveX]    = FCogEngine_GizmoElement { ECogEngine_GizmoType::MoveAxis,     ECogEngine_GizmoAxis::X, FQuat::Identity, AxisX };
-    GizmoElements[(int32)ECogEngine_GizmoElementType::MoveY]    = FCogEngine_GizmoElement { ECogEngine_GizmoType::MoveAxis,     ECogEngine_GizmoAxis::Y, FQuat::Identity, AxisY };
-    GizmoElements[(int32)ECogEngine_GizmoElementType::MoveZ]    = FCogEngine_GizmoElement { ECogEngine_GizmoType::MoveAxis,     ECogEngine_GizmoAxis::Z, FQuat::Identity, AxisZ };
-    GizmoElements[(int32)ECogEngine_GizmoElementType::MoveXY]   = FCogEngine_GizmoElement { ECogEngine_GizmoType::MovePlane,    ECogEngine_GizmoAxis::Z, RotZ, PlaneXY };
-    GizmoElements[(int32)ECogEngine_GizmoElementType::MoveXZ]   = FCogEngine_GizmoElement { ECogEngine_GizmoType::MovePlane,    ECogEngine_GizmoAxis::Y, RotY, PlaneXZ };
-    GizmoElements[(int32)ECogEngine_GizmoElementType::MoveYZ]   = FCogEngine_GizmoElement { ECogEngine_GizmoType::MovePlane,    ECogEngine_GizmoAxis::X, RotX, PlaneYZ };
-    GizmoElements[(int32)ECogEngine_GizmoElementType::RotateX]  = FCogEngine_GizmoElement { ECogEngine_GizmoType::Rotate,       ECogEngine_GizmoAxis::X, RotX, AxisX };
-    GizmoElements[(int32)ECogEngine_GizmoElementType::RotateY]  = FCogEngine_GizmoElement { ECogEngine_GizmoType::Rotate,       ECogEngine_GizmoAxis::Y, RotY, AxisY };
-    GizmoElements[(int32)ECogEngine_GizmoElementType::RotateZ]  = FCogEngine_GizmoElement { ECogEngine_GizmoType::Rotate,       ECogEngine_GizmoAxis::Z, RotZ, AxisZ };
-    GizmoElements[(int32)ECogEngine_GizmoElementType::ScaleXYZ] = FCogEngine_GizmoElement { ECogEngine_GizmoType::ScaleUniform, ECogEngine_GizmoAxis::MAX, RotX, Center };
-    GizmoElements[(int32)ECogEngine_GizmoElementType::ScaleX]   = FCogEngine_GizmoElement { ECogEngine_GizmoType::ScaleAxis,    ECogEngine_GizmoAxis::X, RotX, AxisX };
-    GizmoElements[(int32)ECogEngine_GizmoElementType::ScaleY]   = FCogEngine_GizmoElement { ECogEngine_GizmoType::ScaleAxis,    ECogEngine_GizmoAxis::Y, RotY, AxisY };
-    GizmoElements[(int32)ECogEngine_GizmoElementType::ScaleZ]   = FCogEngine_GizmoElement { ECogEngine_GizmoType::ScaleAxis,    ECogEngine_GizmoAxis::Z, RotZ, AxisZ };
-
-    float MinDistanceToMouse = FLT_MAX;
-    ECogEngine_GizmoElementType ClosestGizmoElementType = ECogEngine_GizmoElementType::MAX;
-    for (uint8 i = (uint8)ECogEngine_GizmoElementType::MoveX; i < (uint8)ECogEngine_GizmoElementType::MAX; ++i)
-    {
-        FCogEngine_GizmoElement& Elm = GizmoElements[i];
-        float DistanceToMouse = FLT_MAX;
-
-        switch (Elm.Type)
-        {
-            case ECogEngine_GizmoType::MoveAxis:
-            {
-                FVector2D ScreenElementLocation;
-                UGameplayStatics::ProjectWorldToScreen(PlayerController, Elm.Location, ScreenElementLocation);
-                DistanceToMouse = FindSegmentPointDistance2(ScreenGizmoCenter, ScreenElementLocation, MousePos);
-                break;
-            }
-
-            case ECogEngine_GizmoType::MovePlane:
-            {
-                //DistanceToMouse = 
-                break;
-            }
-        }
-
-        if (DistanceToMouse < MaxMouseDistance && DistanceToMouse < MinDistanceToMouse)
-        {
-            ClosestGizmoElementType = (ECogEngine_GizmoElementType)i;
-            MinDistanceToMouse = DistanceToMouse;
-        }
-    }
-
-    for (uint8 i = (uint8)ECogEngine_GizmoElementType::MoveX; i < (uint8)ECogEngine_GizmoElementType::MAX; ++i)
-    {
-        const FCogEngine_GizmoElement& Elm = GizmoElements[i];
-        const bool IsClosestToMouse = i == (uint8)ClosestGizmoElementType;
-
-        switch (Elm.Type)
-        {
-            case ECogEngine_GizmoType::MoveAxis:
-            {
-                DrawDebugLine(InWorld, Center, Elm.Location, IsClosestToMouse ? SelectionColor : AxisColorsZLow[(uint8)Elm.Axis], false, 0.0f, ZLow, ThicknessZLow);
-                DrawDebugLine(InWorld, Center, Elm.Location, IsClosestToMouse ? SelectionColor : AxisColorsZHigh[(uint8)Elm.Axis], false, 0.0f, ZHigh, ThicknessZHigh);
-                break;
-            }
-
-            case ECogEngine_GizmoType::MovePlane:
-            {
-                FCogDebugDrawHelper::DrawQuad(InWorld, Elm.Location, Elm.Rotation, PlaneExtent, IsClosestToMouse ? SelectionColor : AxisColorsZLow[(uint8)Elm.Axis], false, 0.0f, ZLow, ThicknessZLow);
-                FCogDebugDrawHelper::DrawQuad(InWorld, Elm.Location, Elm.Rotation, PlaneExtent, IsClosestToMouse ? SelectionColor : AxisColorsZLow[(uint8)Elm.Axis], false, 0.0f, ZHigh, ThicknessZHigh);
-                FCogDebugDrawHelper::DrawSolidQuad(InWorld, Elm.Location, Elm.Rotation, PlaneExtent, IsClosestToMouse ? SelectionColor : AxisColorsZHigh[(uint8)Elm.Axis], false, 0.0f, ZHigh);
-                break;
-            }
-
-            case ECogEngine_GizmoType::Rotate:
-            {
-                //FRotationTranslationMatrix Matrix(FRotator(Elm.Rotation), Elm.Location);
-                //DrawDebugCircle(InWorld, Matrix, RotationRadius, RotationSegments, IsClosestToMouse ? SelectionColor : AxisColorsZLow[(uint8)Elm.Axis], false, 0.0f, ZLow, ThicknessZLow, false);
-                //DrawDebugCircle(InWorld, Matrix, RotationRadius, RotationSegments, IsClosestToMouse ? SelectionColor : AxisColorsZLow[(uint8)Elm.Axis], false, 0.0f, ZHigh, ThicknessZHigh, false);
-                break;
-            }
-
-            case ECogEngine_GizmoType::ScaleUniform:
-            case ECogEngine_GizmoType::ScaleAxis:
-            {
-                DrawDebugBox(InWorld, Elm.Location, BoxExtent, Elm.Rotation, IsClosestToMouse ? SelectionColor : AxisColorsZLow[(uint8)Elm.Axis], false, 0.0f, ZLow, ThicknessZLow);
-                DrawDebugBox(InWorld, Elm.Location, BoxExtent, Elm.Rotation, IsClosestToMouse ? SelectionColor : AxisColorsZHigh[(uint8)Elm.Axis], false, 0.0f, ZHigh, ThicknessZHigh);
-                DrawDebugSolidBox(InWorld, Elm.Location, BoxExtent, Elm.Rotation, IsClosestToMouse ? SelectionColor : AxisColorsZLow[(uint8)Elm.Axis], false, 0.0f, ZHigh);
-                break;
-            }
-        }
-    }
-
-
-    if (ImGui::IsMouseDown(ImGuiMouseButton_Left))
-    {
-        IsDragging = ClosestGizmoElementType != ECogEngine_GizmoElementType::MAX;
-        StartTransform = InTransform;
-    }
-    else if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
-    {
-        IsDragging = false;
-    }
-
-    if (IsDragging)
-    {
-        if (ImGui::IsMouseDragging(ImGuiMouseButton_Left, 4.0f))
-        {
-            ImVec2 Delta = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left);
-            FVector WorldOrigin, WorldDirection;
-            UGameplayStatics::DeprojectScreenToWorld(PlayerController, MousePos, WorldOrigin, WorldDirection);
-        }
     }
 }

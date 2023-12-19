@@ -321,7 +321,7 @@ void FCogEngineWindow_Skeleton::DrawSkeleton()
 
             if (ShowNames || BoneInfo.ShowName || IsHovered)
             {
-                ::DrawDebugString(World, BoneLocation, BoneInfo.Name.ToString(), nullptr, IsHovered ? FColor::Red : FColor::White, 0.0f, true, FCogDebugSettings::TextSize);
+                ::DrawDebugString(World, BoneLocation, BoneInfo.Name.ToString(), nullptr, IsHovered ? FColor::Red : FColor::White, 0.0f, true, FCogDebugSettings::Data.TextSize);
             }
 
             if (ShowAxes || BoneInfo.ShowAxes)
@@ -330,7 +330,7 @@ void FCogEngineWindow_Skeleton::DrawSkeleton()
                     World,
                     BoneLocation,
                     BoneRotation,
-                    10.0f * FCogDebugSettings::AxesScale,
+                    10.0f * FCogDebugSettings::Data.AxesScale,
                     false,
                     0.0f,
                     1,
@@ -345,7 +345,7 @@ void FCogEngineWindow_Skeleton::DrawSkeleton()
                         World,
                         BoneLocation,
                         BoneLocation + ParentBodyInstance->GetUnrealWorldVelocity() * World->GetDeltaSeconds(),
-                        FCogDebugSettings::ArrowSize,
+                        FCogDebugSettings::Data.ArrowSize,
                         FCogDebugSettings::ModulateDebugColor(World, FColor::Cyan),
                         FCogDebugSettings::GetDebugPersistent(true),
                         FCogDebugSettings::GetDebugDuration(true),

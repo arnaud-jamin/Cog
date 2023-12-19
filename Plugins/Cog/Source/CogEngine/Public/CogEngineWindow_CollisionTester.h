@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogDebugGizmo.h"
 #include "CogWindow.h"
 #include "CogWindowConfig.h"
 #include "Engine/HitResult.h"
@@ -57,57 +58,6 @@ enum class ECogEngine_CollisionQueryShape : uint8
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
-UENUM()
-enum class ECogEngine_GizmoType : uint8
-{
-    MoveAxis,
-    MovePlane,
-    Rotate,
-    ScaleAxis,
-    ScaleUniform,
-    MAX,
-};
-
-//--------------------------------------------------------------------------------------------------------------------------
-UENUM()
-enum class ECogEngine_GizmoAxis : uint8
-{
-    X,
-    Y,
-    Z,
-    MAX,
-};
-
-//--------------------------------------------------------------------------------------------------------------------------
-UENUM()
-enum class ECogEngine_GizmoElementType : uint8
-{
-    MoveX,
-    MoveY,
-    MoveZ,
-    MoveXY,
-    MoveXZ,
-    MoveYZ,
-    RotateX,
-    RotateY,
-    RotateZ,
-    ScaleXYZ,
-    ScaleX,
-    ScaleY,
-    ScaleZ,
-    MAX,
-};
-
-//--------------------------------------------------------------------------------------------------------------------------
-struct FCogEngine_GizmoElement
-{
-    ECogEngine_GizmoType Type;
-    ECogEngine_GizmoAxis Axis;
-    FQuat Rotation;
-    FVector Location;
-};
-
-//--------------------------------------------------------------------------------------------------------------------------
 class COGENGINE_API FCogEngineWindow_CollisionTester : public FCogWindow
 {
     typedef FCogWindow Super;
@@ -132,7 +82,6 @@ protected:
 
     void DrawShape(const FCollisionShape& Shape, const FVector& Location, const FQuat& Rotation, const FVector& Scale, const FColor& Color, bool DrawSolid) const;
 
-    void DrawTransformGizmos(const UWorld* InWorld, FTransform& InTransform);
 
     struct FChannel
     {
@@ -151,6 +100,9 @@ protected:
     TSet<const UPrimitiveComponent*> AlreadyDrawnComponents;
 
     bool IsDragging = false;
+
+    FCogDebug_Gizmo GizmoStart;
+    FCogDebug_Gizmo GizmoEnd;
 
     FTransform StartTransform;
 
@@ -175,6 +127,9 @@ public:
 
     UPROPERTY(Config)
     FRotator3f Rotation;
+
+    UPROPERTY(Config)
+    FRotator3f Scale;
 
     UPROPERTY(Config)
     ECogEngine_CollisionQueryType Type;
@@ -204,16 +159,7 @@ public:
     int32 ProfileIndex;
 
     UPROPERTY(Config)
-    float SphereRadius;
-
-    UPROPERTY(Config)
-    FVector3f BoxExtent;
-
-    UPROPERTY(Config)
-    float CapsuleRadius;
-
-    UPROPERTY(Config)
-    float CapsuleHalfHeight;
+    FVector3f ShapeExtent;
 
     UPROPERTY(Config)
     int QueryTypeOld;
@@ -272,10 +218,7 @@ public:
         Shape = ECogEngine_CollisionQueryShape::Sphere;
         MultiHits = false;
         TraceComplex = false;
-        SphereRadius = 50.0f;
-        BoxExtent = FVector3f(50.0f, 50.0f, 50.0f);
-        CapsuleRadius = 50.0f;
-        CapsuleHalfHeight = 50.0f;
+        ShapeExtent = FVector3f(50.0f, 50.0f, 50.0f);
 
         ObjectTypesToQuery = 0;
         ProfileIndex = 0;

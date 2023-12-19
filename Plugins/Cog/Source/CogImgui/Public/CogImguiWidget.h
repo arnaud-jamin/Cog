@@ -53,7 +53,7 @@ public:
 
 protected:
 
-    FReply HandleKeyEvent(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent);
+    FReply HandleKeyEvent(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent, bool Down);
 
     void RefreshVisibility();
 

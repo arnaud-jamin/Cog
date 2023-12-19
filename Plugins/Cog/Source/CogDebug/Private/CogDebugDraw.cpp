@@ -33,7 +33,7 @@ void FCogDebugDraw::String2D(const FLogCategoryBase& LogCategory, const UObject*
         FCogImguiHelper::ToImU32(Color),
         true,
         FCogDebugSettings::GetDebugDuration(Persistent),
-        FCogDebugSettings::Fade2D);
+        FCogDebugSettings::Data.Fade2D);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ void FCogDebugDraw::Segment2D(const FLogCategoryBase& LogCategory, const UObject
         FCogImguiHelper::ToImU32(Color),
         FCogDebugSettings::GetDebugThickness(0),
         FCogDebugSettings::GetDebugDuration(Persistent),
-        FCogDebugSettings::Fade2D);
+        FCogDebugSettings::Data.Fade2D);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -68,7 +68,7 @@ void FCogDebugDraw::Circle2D(const FLogCategoryBase& LogCategory, const UObject*
         FCogDebugSettings::GetDebugSegments(),
         FCogDebugSettings::GetDebugThickness(0),
         FCogDebugSettings::GetDebugDuration(Persistent),
-        FCogDebugSettings::Fade2D);
+        FCogDebugSettings::Data.Fade2D);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -87,7 +87,7 @@ void FCogDebugDraw::Rect2D(const FLogCategoryBase& LogCategory, const UObject* W
         0.0f,
         FCogDebugSettings::GetDebugThickness(0),
         FCogDebugSettings::GetDebugDuration(Persistent),
-        FCogDebugSettings::Fade2D);
+        FCogDebugSettings::Data.Fade2D);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -114,8 +114,8 @@ void FCogDebugDraw::String(const FLogCategoryBase& LogCategory, const UObject* W
         nullptr,
         NewColor,
         FCogDebugSettings::GetDebugTextDuration(Persistent),
-        FCogDebugSettings::TextShadow,
-        FCogDebugSettings::TextSize);
+        FCogDebugSettings::Data.TextShadow,
+        FCogDebugSettings::Data.TextSize);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -142,7 +142,7 @@ void FCogDebugDraw::Point(const FLogCategoryBase& LogCategory, const UObject* Wo
         FCogDebugSettings::GetDebugDuration(Persistent),
         FCogDebugSettings::GetDebugDepthPriority(DepthPriority));
 
-    ReplicateShape(WorldContextObject, FCogDebugShape::MakePoint(Location, Size, NewColor, Persistent, FCogDebugSettings::DepthPriority));
+    ReplicateShape(WorldContextObject, FCogDebugShape::MakePoint(Location, Size, NewColor, Persistent, FCogDebugSettings::Data.DepthPriority));
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -235,14 +235,14 @@ void FCogDebugDraw::Arrow(const FLogCategoryBase& LogCategory, const UObject* Wo
         World,
         SegmentStart,
         SegmentEnd,
-        FCogDebugSettings::ArrowSize,
+        FCogDebugSettings::Data.ArrowSize,
         NewColor,
         FCogDebugSettings::GetDebugPersistent(Persistent),
         FCogDebugSettings::GetDebugDuration(Persistent),
         FCogDebugSettings::GetDebugDepthPriority(DepthPriority),
         FCogDebugSettings::GetDebugThickness(0));
 
-    ReplicateShape(WorldContextObject, FCogDebugShape::MakeArrow(SegmentStart, SegmentEnd, FCogDebugSettings::ArrowSize, NewColor, 0.0f, Persistent, DepthPriority));
+    ReplicateShape(WorldContextObject, FCogDebugShape::MakeArrow(SegmentStart, SegmentEnd, FCogDebugSettings::Data.ArrowSize, NewColor, 0.0f, Persistent, DepthPriority));
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -268,13 +268,13 @@ void FCogDebugDraw::Axis(const FLogCategoryBase& LogCategory, const UObject* Wor
         World,
         AxisLoc,
         AxisRot,
-        Scale * FCogDebugSettings::AxesScale,
+        Scale * FCogDebugSettings::Data.AxesScale,
         FCogDebugSettings::GetDebugPersistent(Persistent),
         FCogDebugSettings::GetDebugDuration(Persistent),
         FCogDebugSettings::GetDebugDepthPriority(DepthPriority),
         FCogDebugSettings::GetDebugThickness(0));
 
-    ReplicateShape(WorldContextObject, FCogDebugShape::MakeAxes(AxisLoc, AxisRot, FCogDebugSettings::ArrowSize, FColor::Red, 0.0f, Persistent, DepthPriority));
+    ReplicateShape(WorldContextObject, FCogDebugShape::MakeAxes(AxisLoc, AxisRot, FCogDebugSettings::Data.ArrowSize, FColor::Red, 0.0f, Persistent, DepthPriority));
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

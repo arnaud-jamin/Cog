@@ -7,65 +7,12 @@
 
 //--------------------------------------------------------------------------------------------------------------------------
 TWeakObjectPtr<AActor> FCogDebugSettings::Selection;
-bool FCogDebugSettings::bIsFilteringBySelection = true;
-bool FCogDebugSettings::Persistent = false;
-bool FCogDebugSettings::TextShadow = true;
-bool FCogDebugSettings::Fade2D = true;
-float FCogDebugSettings::Duration = 3.0f;
-int FCogDebugSettings::DepthPriority = 0;
-int FCogDebugSettings::Segments = 12;
-float FCogDebugSettings::Thickness = 0.0f;
-float FCogDebugSettings::ServerThickness = 2.0f;
-float FCogDebugSettings::ServerColorMultiplier = 0.8f;
-float FCogDebugSettings::ArrowSize = 10.0f;
-float FCogDebugSettings::AxesScale = 1.0f;
-float FCogDebugSettings::GradientColorIntensity = 0.0f;
-float FCogDebugSettings::GradientColorSpeed = 2.0f;
-float FCogDebugSettings::TextSize = 1.0f;
-TArray<FString> FCogDebugSettings::SecondaryBoneWildcards = 
-{ 
-    "interaction", 
-    "center_of_mass", 
-    "ik_*", 
-    "index_*", 
-    "middle_*",  
-    "pinky_*", 
-    "ring_*", 
-    "thumb_*", 
-    "wrist_*", 
-    "*_bck_*",
-    "*_fwd_*",
-    "*_in_*",
-    "*_out_*",
-    "*_pec_*",
-    "*_scap_*",
-    "*_bicep_*",
-    "*_tricep_*",
-    "*ankle*",
-    "*knee*", 
-    "*corrective*",
-    "*twist*",
-    "*latissimus*",
-};
+FCogDebugData FCogDebugSettings::Data = FCogDebugData();
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugSettings::Reset()
 {
-    bIsFilteringBySelection = true;
-    Persistent = false;
-    TextShadow = true;
-    Fade2D = true;
-    Duration = 3.0f;
-    DepthPriority = 0;
-    Segments = 12;
-    Thickness = 0.0f;
-    ServerThickness = 2.0f;
-    ServerColorMultiplier = 0.8f;
-    ArrowSize = 10.0f;
-    AxesScale = 1.0f;
-    GradientColorIntensity = 0.0f;
-    GradientColorSpeed = 2.0f;
-    TextSize = 1.0f;
+    Data = FCogDebugData();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -82,7 +29,7 @@ bool FCogDebugSettings::IsDebugActiveForObject(const UObject* WorldContextObject
         return true;
     }
 
-    bool Result = IsDebugActiveForObject_Internal(WorldContextObject, Selection.Get(), bIsFilteringBySelection);
+    bool Result = IsDebugActiveForObject_Internal(WorldContextObject, Selection.Get(), Data.bIsFilteringBySelection);
 
     return Result;
 }
@@ -160,13 +107,13 @@ void FCogDebugSettings::SetSelection(UWorld* World, AActor* Value)
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogDebugSettings::GetIsFilteringBySelection()
 {
-    return bIsFilteringBySelection;
+    return Data.bIsFilteringBySelection;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugSettings::SetIsFilteringBySelection(UWorld* World, bool Value)
 {
-    bIsFilteringBySelection = Value;
+    Data.bIsFilteringBySelection = Value;
 
     if (World != nullptr && World->GetNetMode() == NM_Client)
     {
@@ -180,13 +127,13 @@ void FCogDebugSettings::SetIsFilteringBySelection(UWorld* World, bool Value)
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogDebugSettings::GetDebugPersistent(bool bPersistent)
 {
-    return Persistent && bPersistent;
+    return Data.Persistent && bPersistent;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 float FCogDebugSettings::GetDebugDuration(bool bPersistent)
 {
-    return bPersistent == false ? 0.0f : Duration;
+    return bPersistent == false ? 0.0f : Data.Duration;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -194,7 +141,7 @@ float FCogDebugSettings::GetDebugTextDuration(bool bPersistent)
 {
     if (bPersistent)
     {
-        return Persistent ? 100 : Duration;
+        return Data.Persistent ? 100 : Data.Duration;
     }
     else
     {
@@ -205,31 +152,31 @@ float FCogDebugSettings::GetDebugTextDuration(bool bPersistent)
 //--------------------------------------------------------------------------------------------------------------------------
 int FCogDebugSettings::GetDebugSegments()
 {
-    return Segments;
+    return Data.Segments;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 int FCogDebugSettings::GetCircleSegments()
 {
-    return (Segments * 2) + 2; // because DrawDebugCircle does Segments = FMath::Max((Segments - 2) / 2, 4) for some reason
+    return (Data.Segments * 2) + 2; // because DrawDebugCircle does Segments = FMath::Max((Segments - 2) / 2, 4) for some reason
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 float FCogDebugSettings::GetDebugThickness(float InThickness)
 {
-    return (Thickness + InThickness);
+    return (Data.Thickness + InThickness);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 float FCogDebugSettings::GetDebugServerThickness(float InThickness)
 {
-    return (ServerThickness + InThickness);
+    return (Data.ServerThickness + InThickness);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 uint8 FCogDebugSettings::GetDebugDepthPriority(float InDepthPriority)
 {
-    return (DepthPriority + InDepthPriority);
+    return (Data.DepthPriority + InDepthPriority);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -252,8 +199,8 @@ FColor FCogDebugSettings::ModulateDebugColor(const UWorld* World, const FColor& 
 
     ComplementaryColor = ComplementaryColor.HSVToLinearRGB();
 
-    const FLinearColor GradientColor = FLinearColor::LerpUsingHSV(FLinearColor(Color), ComplementaryColor, FMath::Cos(GradientColorSpeed * Time));
-    const FLinearColor FBlendColor = BaseColor * (1.0f - FCogDebugSettings::GradientColorIntensity) + GradientColor * GradientColorIntensity;
+    const FLinearColor GradientColor = FLinearColor::LerpUsingHSV(FLinearColor(Color), ComplementaryColor, FMath::Cos(Data.GradientColorSpeed * Time));
+    const FLinearColor FBlendColor = BaseColor * (1.0f - Data.GradientColorIntensity) + GradientColor * Data.GradientColorIntensity;
     return FBlendColor.ToFColor(true);
 }
 
@@ -262,9 +209,9 @@ FColor FCogDebugSettings::ModulateDebugColor(const UWorld* World, const FColor& 
 FColor FCogDebugSettings::ModulateServerColor(const FColor& Color)
 {
     FColor ServerColor(
-        Color.R * ServerColorMultiplier,
-        Color.G * ServerColorMultiplier,
-        Color.B * ServerColorMultiplier,
+        Color.R * Data.ServerColorMultiplier,
+        Color.G * Data.ServerColorMultiplier,
+        Color.B * Data.ServerColorMultiplier,
         Color.A);
 
     return ServerColor;
@@ -275,7 +222,7 @@ bool FCogDebugSettings::IsSecondarySkeletonBone(FName BoneName)
 {
     FString BoneString = BoneName.ToString().ToLower();
 
-    for (const FString& Wildcard : SecondaryBoneWildcards)
+    for (const FString& Wildcard : Data.SecondaryBoneWildcards)
     {
         if (BoneString.MatchesWildcard(Wildcard))
         {
