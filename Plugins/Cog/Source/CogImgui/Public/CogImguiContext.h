@@ -20,7 +20,7 @@ struct ImPlotContext;
 struct COGIMGUI_API FImGuiViewportData
 {
 	TWeakPtr<SWindow> Window = nullptr;
-	TObjectPtr<FCogImguiContext> Context = nullptr;
+	FCogImguiContext* Context = nullptr;
 	TWeakPtr<SCogImguiWidget> Widget = nullptr;
 };
 

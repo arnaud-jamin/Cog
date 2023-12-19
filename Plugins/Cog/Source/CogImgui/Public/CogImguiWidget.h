@@ -57,7 +57,7 @@ protected:
 
     void RefreshVisibility();
 
-    TObjectPtr<FCogImguiContext> Context = nullptr;
+    FCogImguiContext* Context = nullptr;
 
     TSharedPtr<SWindow> Window = nullptr;
 
