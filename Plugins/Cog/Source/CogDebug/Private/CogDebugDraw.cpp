@@ -2,9 +2,7 @@
 
 #include "CogDebugDrawHelper.h"
 #include "CogDebugDrawImGui.h"
-#include "CogDebugHelper.h"
 #include "CogDebugLog.h"
-#include "CogDebugModule.h"
 #include "CogDebugReplicator.h"
 #include "CogDebugSettings.h"
 #include "CogDebugShape.h"
@@ -20,7 +18,7 @@
 #if ENABLE_COG
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::String2D(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FString& Text, const FVector2D& Location, const FColor& Color, bool Persistent)
+void FCogDebugDraw::String2D(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FString& Text, const FVector2D& Location, const FColor& Color, const bool Persistent)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
@@ -37,7 +35,7 @@ void FCogDebugDraw::String2D(const FLogCategoryBase& LogCategory, const UObject*
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Segment2D(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector2D& SegmentStart, const FVector2D& SegmentEnd, const FColor& Color, bool Persistent)
+void FCogDebugDraw::Segment2D(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector2D& SegmentStart, const FVector2D& SegmentEnd, const FColor& Color, const bool Persistent)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
@@ -54,7 +52,7 @@ void FCogDebugDraw::Segment2D(const FLogCategoryBase& LogCategory, const UObject
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Circle2D(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector2D& Location, float Radius, const FColor& Color, bool Persistent)
+void FCogDebugDraw::Circle2D(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector2D& Location, const float Radius, const FColor& Color, const bool Persistent)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
@@ -73,7 +71,7 @@ void FCogDebugDraw::Circle2D(const FLogCategoryBase& LogCategory, const UObject*
 
 //--------------------------------------------------------------------------------------------------------------------------
 
-void FCogDebugDraw::Rect2D(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector2D& Min, const FVector2D& Max, const FColor& Color, bool Persistent)
+void FCogDebugDraw::Rect2D(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector2D& Min, const FVector2D& Max, const FColor& Color, const bool Persistent)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
@@ -98,7 +96,7 @@ void FCogDebugDraw::String(const FLogCategoryBase& LogCategory, const UObject* W
         return;
     }
 
-    UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+    const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
     if (World == nullptr)
     {
         return;
@@ -126,7 +124,7 @@ void FCogDebugDraw::Point(const FLogCategoryBase& LogCategory, const UObject* Wo
         return;
     }
 
-    UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+    const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
     if (World == nullptr)
     {
         return;
@@ -153,7 +151,7 @@ void FCogDebugDraw::Segment(const FLogCategoryBase& LogCategory, const UObject* 
         return;
     }
 
-    UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+    const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
     if (World == nullptr)
     {
         return;
@@ -183,7 +181,7 @@ void FCogDebugDraw::Bone(const FLogCategoryBase& LogCategory, const UObject* Wor
         return;
     }
 
-    UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+    const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
     if (World == nullptr)
     {
         return;
@@ -222,7 +220,7 @@ void FCogDebugDraw::Arrow(const FLogCategoryBase& LogCategory, const UObject* Wo
         return;
     }
 
-    UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+    const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
     if (World == nullptr)
     {
         return;
@@ -246,20 +244,20 @@ void FCogDebugDraw::Arrow(const FLogCategoryBase& LogCategory, const UObject* Wo
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Axis(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& AxisLoc, const FRotator& AxisRot, float Scale, const bool Persistent, const uint8 DepthPriority)
+void FCogDebugDraw::Axis(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& AxisLoc, const FRotator& AxisRot, const float Scale, const bool Persistent, const uint8 DepthPriority)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
         return;
     }
 
-    UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+    const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
     if (World == nullptr)
     {
         return;
     }
 
-    FRotationMatrix R(AxisRot);
+    const FRotationMatrix R(AxisRot);
     UE_VLOG_ARROW(WorldContextObject, LogCategory, Verbose, AxisLoc, AxisLoc + R.GetScaledAxis(EAxis::X) * Scale, FColor::Red, TEXT_EMPTY);
     UE_VLOG_ARROW(WorldContextObject, LogCategory, Verbose, AxisLoc, AxisLoc + R.GetScaledAxis(EAxis::Y) * Scale, FColor::Green, TEXT_EMPTY);
     UE_VLOG_ARROW(WorldContextObject, LogCategory, Verbose, AxisLoc, AxisLoc + R.GetScaledAxis(EAxis::Z) * Scale, FColor::Blue, TEXT_EMPTY);
@@ -285,7 +283,7 @@ void FCogDebugDraw::Circle(const FLogCategoryBase& LogCategory, const UObject* W
         return;
     }
 
-    UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+    const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
     if (World == nullptr)
     {
         return;
@@ -312,14 +310,14 @@ void FCogDebugDraw::Circle(const FLogCategoryBase& LogCategory, const UObject* W
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::CircleArc(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FMatrix& Matrix, float InnerRadius, float OuterRadius, float Angle, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
+void FCogDebugDraw::CircleArc(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FMatrix& Matrix, const float InnerRadius, const float OuterRadius, const float Angle, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
         return;
     }
 
-    UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+    const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
     if (World == nullptr)
     {
         return;
@@ -353,7 +351,7 @@ void FCogDebugDraw::FlatCapsule(const FLogCategoryBase& LogCategory, const UObje
         return;
     }
 
-    UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+    const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
     if (World == nullptr)
     {
         return;
@@ -379,14 +377,14 @@ void FCogDebugDraw::FlatCapsule(const FLogCategoryBase& LogCategory, const UObje
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Sphere(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& Location, float Radius, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
+void FCogDebugDraw::Sphere(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& Location, const float Radius, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
         return;
     }
 
-    UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+    const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
     if (World == nullptr)
     {
         return;
@@ -417,7 +415,7 @@ void FCogDebugDraw::Box(const FLogCategoryBase& LogCategory, const UObject* Worl
         return;
     }
 
-    UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+    const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
     if (World == nullptr)
     {
         return;
@@ -448,7 +446,7 @@ void FCogDebugDraw::SolidBox(const FLogCategoryBase& LogCategory, const UObject*
         return;
     }
 
-    UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+    const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
     if (World == nullptr)
     {
         return;
@@ -476,14 +474,14 @@ void FCogDebugDraw::SolidBox(const FLogCategoryBase& LogCategory, const UObject*
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Frustrum(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FMatrix& Matrix, const float Angle, const float AspectRatio, const float NearPlane, const float FarPlane, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
+void FCogDebugDraw::Frustum(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FMatrix& Matrix, const float Angle, const float AspectRatio, const float NearPlane, const float FarPlane, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
         return;
     }
 
-    UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+    const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
     if (World == nullptr)
     {
         return;
@@ -515,7 +513,7 @@ void FCogDebugDraw::Capsule(const FLogCategoryBase& LogCategory, const UObject* 
         return;
     }
 
-    UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+    const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
     if (World == nullptr)
     {
         return;
@@ -540,29 +538,29 @@ void FCogDebugDraw::Capsule(const FLogCategoryBase& LogCategory, const UObject* 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Points(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const TArray<FVector>& Points, float Radius, const FColor& StartColor, const FColor& EndColor, const bool Persistent, const uint8 DepthPriority)
+void FCogDebugDraw::Points(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const TArray<FVector>& Points, const float Radius, const FColor& StartColor, const FColor& EndColor, const bool Persistent, const uint8 DepthPriority)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory))
     {
-        int32 index = 0;
+        int32 Index = 0;
         for (const FVector& Point : Points)
         {
-            const FLinearColor Color = FLinearColor::LerpUsingHSV(FLinearColor(StartColor), FLinearColor(EndColor), Points.Num() <= 1 ? 0.0f : index / (float)(Points.Num() - 1));
+            const FLinearColor Color = FLinearColor::LerpUsingHSV(FLinearColor(StartColor), FLinearColor(EndColor), Points.Num() <= 1 ? 0.0f : Index / (float)(Points.Num() - 1));
             Sphere(LogCategory, WorldContextObject, Point, Radius, Color.ToFColor(true), Persistent, DepthPriority);
-            index++;
+            Index++;
         }
     }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Path(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const TArray<FVector>& Points, float PointSize, const FColor& StartColor, const FColor& EndColor, const bool Persistent, const uint8 DepthPriority)
+void FCogDebugDraw::Path(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const TArray<FVector>& Points, const float PointSize, const FColor& StartColor, const FColor& EndColor, const bool Persistent, const uint8 DepthPriority)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
         return;
     }
 
-    UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+    const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
     if (World == nullptr)
     {
         return;
@@ -594,7 +592,7 @@ void FCogDebugDraw::Path(const FLogCategoryBase& LogCategory, const UObject* Wor
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Skeleton(const FLogCategoryBase& LogCategory, const USkeletalMeshComponent* Skeleton, const FColor& Color, bool DrawSecondaryBones, uint8 DepthPriority)
+void FCogDebugDraw::Skeleton(const FLogCategoryBase& LogCategory, const USkeletalMeshComponent* Skeleton, const FColor& Color, const bool DrawSecondaryBones, const uint8 DepthPriority)
 {
     if (Skeleton == nullptr)
     {
@@ -614,7 +612,7 @@ void FCogDebugDraw::Skeleton(const FLogCategoryBase& LogCategory, const USkeleta
     {
         if (DrawSecondaryBones == false)
         {
-            FName BoneName = ReferenceSkeleton.GetBoneName(BoneIndex);
+	        const FName BoneName = ReferenceSkeleton.GetBoneName(BoneIndex);
             if (FCogDebugSettings::IsSecondarySkeletonBone(BoneName))
             {
                 continue;

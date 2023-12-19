@@ -71,14 +71,14 @@ void ACogDebugReplicator::BeginPlay()
 {
     Super::BeginPlay();
 
-    UWorld* World = GetWorld();
+    const UWorld* World = GetWorld();
     check(World);
     const ENetMode NetMode = World->GetNetMode();
     bHasAuthority = NetMode != NM_Client;
 
     OwnerPlayerController = Cast<APlayerController>(GetOwner());
 
-    if (OwnerPlayerController->IsLocalController())
+    if (OwnerPlayerController != nullptr && OwnerPlayerController->IsLocalController())
     {
         Server_RequestAllCategoriesVerbosity();
         Server_SetSelection(FCogDebugSettings::GetSelection());
@@ -122,10 +122,10 @@ void ACogDebugReplicator::Server_SetCategoryVerbosity_Implementation(FName LogCa
 {
 #if !UE_BUILD_SHIPPING
 
-    ENetMode NetMode = GetWorld()->GetNetMode();
+	const ENetMode NetMode = GetWorld()->GetNetMode();
     if (NetMode == NM_DedicatedServer || NetMode == NM_ListenServer)
     {
-        if (FCogDebugLogCategoryInfo* LogCategoryInfo = FCogDebugLog::FindLogCategoryInfo(LogCategoryName))
+        if (const FCogDebugLogCategoryInfo* LogCategoryInfo = FCogDebugLog::FindLogCategoryInfo(LogCategoryName))
         {
             LogCategoryInfo->LogCategory->SetVerbosity((ELogVerbosity::Type)Verbosity);
 
@@ -175,13 +175,13 @@ void ACogDebugReplicator::Server_RequestAllCategoriesVerbosity_Implementation()
 {
 #if !UE_BUILD_SHIPPING
 
-    ENetMode NetMode = GetWorld()->GetNetMode();
+	const ENetMode NetMode = GetWorld()->GetNetMode();
     if (NetMode == NM_DedicatedServer || NetMode == NM_ListenServer)
     {
         TArray<FCogServerCategoryData> CategoriesData;
         for (auto& Entry : FCogDebugLog::GetLogCategories())
         {
-            FCogDebugLogCategoryInfo& CategoryInfo = Entry.Value;
+	        const FCogDebugLogCategoryInfo& CategoryInfo = Entry.Value;
             if (CategoryInfo.LogCategory != nullptr)
             {
                 CategoriesData.Add(
@@ -227,7 +227,7 @@ public:
 
     virtual bool IsStateEqual(INetDeltaBaseState* OtherState) override
     {
-        FCogReplicatorNetState* Other = static_cast<FCogReplicatorNetState*>(OtherState);
+	    const FCogReplicatorNetState* Other = static_cast<FCogReplicatorNetState*>(OtherState);
         return (ShapesRepCounter == Other->ShapesRepCounter);
     }
 
@@ -252,7 +252,7 @@ bool FCogReplicatorNetPack::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms
             return false;
         }
 
-        FCogReplicatorNetState* OldState = static_cast<FCogReplicatorNetState*>(DeltaParms.OldState);
+        const FCogReplicatorNetState* OldState = static_cast<FCogReplicatorNetState*>(DeltaParms.OldState);
         FCogReplicatorNetState* NewState = new FCogReplicatorNetState();
         check(DeltaParms.NewState);
         *DeltaParms.NewState = TSharedPtr<INetDeltaBaseState>(NewState);

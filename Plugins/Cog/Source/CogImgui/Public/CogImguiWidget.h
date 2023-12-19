@@ -19,7 +19,7 @@ class COGIMGUI_API SCogImguiWidget : public SLeafWidget
 public:
 
     SLATE_BEGIN_ARGS(SCogImguiWidget) {}
-    SLATE_ARGUMENT(FCogImguiContext*, Context)
+        SLATE_ARGUMENT(FCogImguiContext*, Context)
     SLATE_END_ARGS()
 
     void Construct(const FArguments& InArgs);
@@ -53,7 +53,7 @@ public:
 
 protected:
 
-    FReply HandleKeyEvent(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent);
+    FReply HandleKeyEvent(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent, bool Down);
 
     void RefreshVisibility();
 

@@ -6,10 +6,8 @@
 #include "CogAbilityHelper.h"
 #include "CogAbilityReplicator.h"
 #include "CogImguiHelper.h"
-#include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
 #include "imgui.h"
-#include "imgui_internal.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Abilities::Initialize()
@@ -103,12 +101,14 @@ void FCogAbilityWindow_Abilities::RenderContent()
     AActor* Selection = GetSelection();
     if (Selection == nullptr)
     {
+        ImGui::TextDisabled("Invalid selection");
         return;
     }
 
     UAbilitySystemComponent* AbilitySystemComponent = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Selection, true);
     if (AbilitySystemComponent == nullptr)
     {
+        ImGui::TextDisabled("Selection has no ability system component");
         return;
     }
 

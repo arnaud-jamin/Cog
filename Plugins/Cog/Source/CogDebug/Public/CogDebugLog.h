@@ -36,23 +36,23 @@ struct COGDEBUG_API FCogDebugLog
 
     static void SetLogCategoryActive(FLogCategoryBase& LogCategory, bool Value);
 
-    static FLogCategoryBase* FindLogCategory(FName LogCategory);
+    static FLogCategoryBase* FindLogCategory(FName CategoryName);
 
-    static FCogDebugLogCategoryInfo* FindLogCategoryInfo(FName LogCategory);
+    static FCogDebugLogCategoryInfo* FindLogCategoryInfo(FName CategoryName);
 
     static TMap<FName, FCogDebugLogCategoryInfo>& GetLogCategories() { return LogCategories; }
 
-    static void SetServerVerbosityActive(UWorld& World, FName LogCategory, bool Value);
+    static void SetServerVerbosityActive(UWorld& World, FName CategoryName, bool Value);
 
-    static bool IsServerVerbosityActive(FName LogCategory);
+    static bool IsServerVerbosityActive(FName CategoryName);
 
-    static ELogVerbosity::Type GetServerVerbosity(FName LogCategory);
+    static ELogVerbosity::Type GetServerVerbosity(FName CategoryName);
 
-    static void SetServerVerbosity(UWorld& World, FName LogCategory, ELogVerbosity::Type Verbosity);
+    static void SetServerVerbosity(UWorld& World, FName CategoryName, ELogVerbosity::Type Verbosity);
 
-    static void OnServerVerbosityChanged(FName LogCategory, ELogVerbosity::Type Verbosity);
+    static void OnServerVerbosityChanged(FName CategoryName, ELogVerbosity::Type Verbosity);
 
-    static void DeactivateAllLogCateories(UWorld& World);
+    static void DeactivateAllLogCategories(UWorld& World);
 
 private:
 

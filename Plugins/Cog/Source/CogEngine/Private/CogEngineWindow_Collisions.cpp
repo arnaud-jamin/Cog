@@ -4,7 +4,6 @@
 #include "CogDebugSettings.h"
 #include "CogEngineDataAsset.h"
 #include "CogImguiHelper.h"
-#include "CogWindowHelper.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/PrimitiveComponent.h"

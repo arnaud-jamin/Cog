@@ -21,7 +21,7 @@ public:
     //----------------------------------------------------------------------------------------------------------------------
     static const UObject* GetFirstAssetByClass(const TSubclassOf<UObject> AssetClass)
     {
-        IAssetRegistry& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry")).Get();
+	    const IAssetRegistry& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry")).Get();
 
         TArray<FAssetData> Assets;
         AssetRegistry.GetAssetsByClass(AssetClass->GetClassPathName(), Assets, true);
@@ -30,7 +30,7 @@ public:
             return nullptr;
         }
 
-        UObject* Asset = Assets[0].GetAsset();
+	    const UObject* Asset = Assets[0].GetAsset();
         return Asset;
     }
 };

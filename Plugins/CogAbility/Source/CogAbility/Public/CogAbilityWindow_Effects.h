@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "ActiveGameplayEffectHandle.h"
-#include "GameplayTagContainer.h"
 #include "CogWindow.h"
 #include "CogWindowConfig.h"
 #include "imgui.h"

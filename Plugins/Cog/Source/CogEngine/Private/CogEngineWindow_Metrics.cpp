@@ -1,7 +1,6 @@
 #include "CogEngineWindow_Metrics.h"
 
 #include "CogDebugMetric.h"
-#include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
 #include "imgui.h"
 #include "Engine/World.h"
@@ -63,9 +62,7 @@ void FCogEngineWindow_Metrics::RenderContent()
     {
         if (ImGui::BeginMenu("Options"))
         {
-            bool bSettingModified = false;
-
-            FCogWindowWidgets::PushStyleCompact();
+	        FCogWindowWidgets::PushStyleCompact();
             ImGui::DragFloat("Auto Restart Delay", &FCogDebugMetric::RestartDelaySetting, 0.1f, 0.0f, FLT_MAX, "%0.1f");
             FCogWindowWidgets::PopStyleCompact();
 

@@ -9,7 +9,7 @@ FColor FCogDebugHelper::GetAutoColor(FName Name, const FColor& UserColor)
     }
     else
     {
-        uint32 Hash = GetTypeHash(Name.ToString());
+	    const uint32 Hash = GetTypeHash(Name.ToString());
         FMath::RandInit(Hash);
 
         const uint8 Hue = (uint8)(FMath::FRand() * 255);
@@ -41,7 +41,7 @@ const char* FCogDebugHelper::VerbosityToString(ELogVerbosity::Type Verbosity)
 //--------------------------------------------------------------------------------------------------------------------------
 FString FCogDebugHelper::ShortenEnumName(FString EnumNameString)
 {
-    int32 ScopeIndex = EnumNameString.Find(TEXT("::"), ESearchCase::CaseSensitive);
+	const int32 ScopeIndex = EnumNameString.Find(TEXT("::"), ESearchCase::CaseSensitive);
     if (ScopeIndex != INDEX_NONE)
     {
         return EnumNameString.Mid(ScopeIndex + 2);

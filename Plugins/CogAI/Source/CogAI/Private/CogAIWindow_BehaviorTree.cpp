@@ -127,7 +127,7 @@ void FCogAIWindow_BehaviorTree::RenderContent()
 
     if (Config == nullptr)
     {
-        ImGui::TextDisabled("No Config");
+        ImGui::TextDisabled("Invalid Config");
         return;
     }
 
@@ -148,35 +148,35 @@ void FCogAIWindow_BehaviorTree::RenderContent()
     AActor* Selection = GetSelection();
     if (Selection == nullptr)
     {
-        ImGui::TextDisabled("No Selection");
+        ImGui::TextDisabled("Invalid Selection");
         return;
     }
 
     APawn* Pawn = Cast<APawn>(Selection);
     if (Pawn == nullptr)
     {
-        ImGui::TextDisabled("Not a pawn");
+        ImGui::TextDisabled("Selection is not a pawn");
         return;
     }
 
     AAIController* AIController = Cast<AAIController>(Pawn->Controller);
     if (AIController == nullptr)
     {
-        ImGui::TextDisabled("No AIController");
+        ImGui::TextDisabled("Selection has no AIController");
         return;
     }
 
     UBehaviorTreeComponent* BehaviorTreeComponent = Cast<UBehaviorTreeComponent>(AIController->GetBrainComponent());
     if (BehaviorTreeComponent == nullptr)
     {
-        ImGui::TextDisabled("No BrainComponent");
+        ImGui::TextDisabled("Selection has no BrainComponent");
         return;
     }
 
     UBehaviorTree* CurrentTree = BehaviorTreeComponent->GetCurrentTree();
     if (CurrentTree == nullptr)
     {
-        ImGui::TextDisabled("No Current Tree");
+        ImGui::TextDisabled("Selection has no current BehaviorTree");
         return;
     }
 

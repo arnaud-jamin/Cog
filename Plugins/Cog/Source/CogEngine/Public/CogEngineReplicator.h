@@ -22,9 +22,9 @@ public:
 
     static ACogEngineReplicator* Spawn(APlayerController* Controller);
 
-    static ACogEngineReplicator* GetLocalReplicator(UWorld& World);
+    static ACogEngineReplicator* GetLocalReplicator(const UWorld& World);
 
-    static void GetRemoteReplicators(UWorld& World, TArray<ACogEngineReplicator*>& Replicators);
+    static void GetRemoteReplicators(const UWorld& World, TArray<ACogEngineReplicator*>& Replicators);
 
     virtual void BeginPlay() override;
 
@@ -53,7 +53,7 @@ protected:
     void Server_SetTimeDilation(float Value);
 
     UFUNCTION()
-    void OnRep_TimeDilation();
+    void OnRep_TimeDilation() const;
 
     TObjectPtr<APlayerController> OwnerPlayerController;
 
