@@ -6,7 +6,6 @@
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "InputCoreTypes.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/PlayerInput.h"
 
 //--------------------------------------------------------------------------------------------------------------------------

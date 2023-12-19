@@ -30,9 +30,9 @@ ACogEngineReplicator* ACogEngineReplicator::Spawn(APlayerController* Controller)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ACogEngineReplicator* ACogEngineReplicator::GetLocalReplicator(UWorld& World)
+ACogEngineReplicator* ACogEngineReplicator::GetLocalReplicator(const UWorld& World)
 {
-    for (TActorIterator<ACogEngineReplicator> It(&World, ACogEngineReplicator::StaticClass()); It; ++It)
+    for (TActorIterator<ACogEngineReplicator> It(&World, StaticClass()); It; ++It)
     {
         ACogEngineReplicator* Replicator = *It;
         return Replicator;
@@ -42,9 +42,9 @@ ACogEngineReplicator* ACogEngineReplicator::GetLocalReplicator(UWorld& World)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogEngineReplicator::GetRemoteReplicators(UWorld& World, TArray<ACogEngineReplicator*>& Replicators)
+void ACogEngineReplicator::GetRemoteReplicators(const UWorld& World, TArray<ACogEngineReplicator*>& Replicators)
 {
-    for (TActorIterator<ACogEngineReplicator> It(&World, ACogEngineReplicator::StaticClass()); It; ++It)
+    for (TActorIterator<ACogEngineReplicator> It(&World, StaticClass()); It; ++It)
     {
         ACogEngineReplicator* Replicator = Cast<ACogEngineReplicator>(*It);
         Replicators.Add(Replicator);
@@ -73,7 +73,7 @@ void ACogEngineReplicator::BeginPlay()
 
     Super::BeginPlay();
 
-    UWorld* World = GetWorld();
+    const UWorld* World = GetWorld();
     check(World);
     const ENetMode NetMode = World->GetNetMode();
     bHasAuthority = NetMode != NM_Client;
@@ -114,7 +114,7 @@ void ACogEngineReplicator::Server_Spawn_Implementation(const FCogEngineSpawnEntr
     else
     {
         FTransform Transform(FTransform::Identity);
-        if (APawn* Pawn = GetPlayerController()->GetPawn())
+        if (const APawn* Pawn = GetPlayerController()->GetPawn())
         {
             Transform = Pawn->GetTransform();
             Transform.SetLocation(Transform.GetLocation() + Transform.GetUnitAxis(EAxis::X) * 200.0f);
@@ -165,11 +165,11 @@ void ACogEngineReplicator::Server_SetTimeDilation_Implementation(float Value)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogEngineReplicator::OnRep_TimeDilation()
+void ACogEngineReplicator::OnRep_TimeDilation() const
 {
 #if !UE_BUILD_SHIPPING
 
-    UWorld* World = GetWorld();
+	const UWorld* World = GetWorld();
     if (World == nullptr)
         return;
 

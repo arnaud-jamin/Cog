@@ -30,6 +30,6 @@ public:
     static void Log(const UObject* WorldContextObject, FCogLogCategory LogCategory, ECogLogVerbosity Verbosity = ECogLogVerbosity::Verbose, const FString& Text = FString(""));
 
     UFUNCTION(BlueprintPure, meta = (DevelopmentOnly, WorldContext = "WorldContextObject"))
-    static bool IsLogActive(const UObject* WorldContextObject, FCogLogCategory LogCategory);
+    static bool IsLogActive(const UObject* WorldContextObject, const FCogLogCategory LogCategory);
 
 };

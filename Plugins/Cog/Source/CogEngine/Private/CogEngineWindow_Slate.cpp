@@ -31,7 +31,7 @@ void FCogEngineWindow_Slate::RenderContent()
     ImGui::SetNextItemWidth(-1);
     if (ImGui::BeginCombo("##User", TCHAR_TO_ANSI(*FString::Printf(TEXT("%d"), SelectedUserIndex))))
     {
-        SlateApp.ForEachUser([this](FSlateUser& User)
+        SlateApp.ForEachUser([this](const FSlateUser& User)
         {
             if (ImGui::Selectable(TCHAR_TO_ANSI(*FString::Printf(TEXT("%d"), SelectedUserIndex)), false))
             {
@@ -41,7 +41,7 @@ void FCogEngineWindow_Slate::RenderContent()
         ImGui::EndCombo();
     }
 
-    if (TSharedPtr<FSlateUser> User = SlateApp.GetUser(SelectedUserIndex))
+    if (const TSharedPtr<FSlateUser> User = SlateApp.GetUser(SelectedUserIndex))
     {
         RenderUser(*User.Get());
     }
@@ -54,7 +54,7 @@ void FCogEngineWindow_Slate::RenderUser(FSlateUser& User)
 
     if (ImGui::BeginTable("SlateUser", 2, ImGuiTableFlags_Borders))
     {
-        const ImVec4 LabelColor(1.0f, 1.0f, 1.0f, 0.5f);
+	    constexpr ImVec4 LabelColor(1.0f, 1.0f, 1.0f, 0.5f);
 
         ImGui::TableSetupColumn("Property");
         ImGui::TableSetupColumn("Value");
@@ -68,7 +68,7 @@ void FCogEngineWindow_Slate::RenderUser(FSlateUser& User)
         ImGui::TextColored(LabelColor, "Focused Widget");
         ImGui::TableNextColumn();
         FString FocusedWidgetText = "None";
-        if (TSharedPtr<SWidget> FocusedWidget = User.GetFocusedWidget())
+        if (const TSharedPtr<SWidget> FocusedWidget = User.GetFocusedWidget())
         {
             FocusedWidgetText = FocusedWidget->ToString();
         }
@@ -81,12 +81,12 @@ void FCogEngineWindow_Slate::RenderUser(FSlateUser& User)
         ImGui::TableNextColumn();
         ImGui::TextColored(LabelColor, "Cursor Captor");
         ImGui::TableNextColumn();
-        FString CursorCaptoreWidgetText = "None";
-        if (TSharedPtr<SWidget> CursorCaptoreWidget = User.GetCursorCaptor())
+        FString CursorCaptorWidgetText = "None";
+        if (const TSharedPtr<SWidget> CursorCaptorWidget = User.GetCursorCaptor())
         {
-            CursorCaptoreWidgetText = CursorCaptoreWidget->ToString();
+            CursorCaptorWidgetText = CursorCaptorWidget->ToString();
         }
-        ImGui::Text("%s", TCHAR_TO_ANSI(*CursorCaptoreWidgetText));
+        ImGui::Text("%s", TCHAR_TO_ANSI(*CursorCaptorWidgetText));
 
         //------------------------
         // Cursor Position

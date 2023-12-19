@@ -2,11 +2,9 @@
 
 #include "CogImGuiInputProcessor.h"
 #include "CogImguiKeyInfo.h"
-#include "CogImguiModule.h"
 #include "Engine/World.h"
 #include "Framework/Application/SlateApplication.h"
 #include "Framework/Commands/UICommandInfo.h"
-#include "GameFramework/GameUserSettings.h"
 #include "GameFramework/InputSettings.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerInput.h"

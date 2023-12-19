@@ -35,9 +35,10 @@ void FCogAbilityWindow_Tags::RenderContent()
 
     RenderMenu();
 
-    UAbilitySystemComponent* AbilitySystemComponent = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetSelection(), true);
+    const UAbilitySystemComponent* AbilitySystemComponent = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetSelection(), true);
     if (AbilitySystemComponent == nullptr)
     {
+        ImGui::TextDisabled("Selection has no ability system component");
         return;
     }
 

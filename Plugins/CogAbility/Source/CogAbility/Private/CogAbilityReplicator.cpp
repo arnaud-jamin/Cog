@@ -236,12 +236,17 @@ void ACogAbilityReplicator::Server_ResetAllTweaks_Implementation()
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogAbilityReplicator::OnAnyActorSpawned(AActor* Actor)
 {
+    if (AbilityAsset == nullptr)
+    {
+        return;
+    }
+
     if (AbilityAsset->ActorRootClass != nullptr && Actor->GetClass()->IsChildOf(AbilityAsset->ActorRootClass) == false)
     {
         return;
     }
 
-    int32 TweakCategoryIndex = FindTweakCategoryFromActor(Actor);
+    const int32 TweakCategoryIndex = FindTweakCategoryFromActor(Actor);
     if (TweakCategoryIndex == INDEX_NONE)
     {
         return;

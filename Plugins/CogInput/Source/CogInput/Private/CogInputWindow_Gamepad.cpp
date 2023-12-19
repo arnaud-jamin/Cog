@@ -2,7 +2,6 @@
 
 #include "CogImguiHelper.h"
 #include "CogInputDataAsset.h"
-#include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/World.h"
@@ -190,13 +189,13 @@ void FCogInputWindow_Gamepad::RenderStick(const FKey& Key2D, const FKey& KeyBool
     ImGui::SetCursorScreenPos(ButtonPosition);
     if (ImGui::InvisibleButton("", ButtonSize))
     {
-        if (ActionInfo2D->bIsMouseDraggingStick == false)
+        if (ActionInfo2D != nullptr && ActionInfo2D->bIsMouseDraggingStick == false)
         {
             OnButtonClicked(ActionInfoBool);
         }
     }
 
-    if (ActionInfo2D->Action != nullptr)
+    if (ActionInfo2D != nullptr && ActionInfo2D->Action != nullptr)
     {
         if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
         {
@@ -268,36 +267,30 @@ void FCogInputWindow_Gamepad::RenderContent()
 {
     Super::RenderContent();
 
-    if (GetWorld() == nullptr)
-    {
-        ImGui::Text("No World");
-        return;
-    }
-
-    ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
+    const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
     if (LocalPlayer == nullptr)
     {
-        ImGui::Text("No Local Player");
+        ImGui::TextDisabled("No Local Player");
         return;
     }
 
-    UEnhancedInputLocalPlayerSubsystem* EnhancedInputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
+    const UEnhancedInputLocalPlayerSubsystem* EnhancedInputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
     if (EnhancedInputSubsystem == nullptr)
     {
-        ImGui::Text("No Enhanced Input Subsystem");
+        ImGui::TextDisabled("No Enhanced Input Subsystem");
         return;
     }
     
     Input = EnhancedInputSubsystem->GetPlayerInput();
     if (Input == nullptr)
     {
-        ImGui::Text("No Player Input");
+        ImGui::TextDisabled("No Player Input");
         return;
     }
 
     if (Asset == nullptr)
     {
-        ImGui::Text("No Input Asset");
+        ImGui::TextDisabled("Invalid Asset");
     }
     else
     {
@@ -345,22 +338,22 @@ void FCogInputWindow_Gamepad::RenderContent()
     }
 
 
-    const float AspectRatio = 0.55f;
-    const float StickAmplitude = 0.04f;
-    const float StickRadius = 0.08f;
-    const float StickBaseRadius = 0.1f;
-    const float GamepadRound = 0.15f;
-    const float HandleWidth = 0.26f;
-    const ImVec2 DPadButtonSize(0.08f, 0.08f);
-    const float DpadButtonDistance = 0.075f;
-    const float DpadButtonRounding = 0.1f;
-    const ImVec2 SpecialButtonSize(0.08f, 0.04f);
-    const float SpecialButtonRound = 0.05f;
-    const float SpecialButtonDistance = 0.15f;
-    const float TriggerRound = 0.02f;
-    const ImVec2 TriggerButtonSize(0.08f, 0.05f);
-    const float BumperRound = 0.02f;
-    const ImVec2 BumperButtonSize(0.2f, 0.04f);
+    constexpr float AspectRatio = 0.55f;
+    constexpr float StickAmplitude = 0.04f;
+    constexpr float StickRadius = 0.08f;
+    constexpr float StickBaseRadius = 0.1f;
+    constexpr float GamepadRound = 0.15f;
+    constexpr float HandleWidth = 0.26f;
+    constexpr ImVec2 DPadButtonSize(0.08f, 0.08f);
+    constexpr float DpadButtonDistance = 0.075f;
+    constexpr float DpadButtonRounding = 0.1f;
+    constexpr ImVec2 SpecialButtonSize(0.08f, 0.04f);
+    constexpr float SpecialButtonRound = 0.05f;
+    constexpr float SpecialButtonDistance = 0.15f;
+    constexpr float TriggerRound = 0.02f;
+    constexpr ImVec2 TriggerButtonSize(0.08f, 0.05f);
+    constexpr float BumperRound = 0.02f;
+    constexpr ImVec2 BumperButtonSize(0.2f, 0.04f);
 
     const ImVec2 ContentMin = ImGui::GetCursorScreenPos();
     const ImVec2 ContentSize = ImGui::GetContentRegionAvail();
@@ -382,8 +375,8 @@ void FCogInputWindow_Gamepad::RenderContent()
 
     DrawList->PushClipRect(ContentMin, ContentMax, true);
 
-    const ImVec2 LS_Pos(0.35f, 0.7f);
-    const ImVec2 RS_Pos(0.65f, 0.7f);
+    constexpr ImVec2 LS_Pos(0.35f, 0.7f);
+    constexpr ImVec2 RS_Pos(0.65f, 0.7f);
 
     //------------------------------
     // Triggers
@@ -426,7 +419,7 @@ void FCogInputWindow_Gamepad::RenderContent()
     //------------------------------
     // DPad Buttons
     //------------------------------
-    const ImVec2 DPad_Pos(0.15f, 0.44f);
+    constexpr ImVec2 DPad_Pos(0.15f, 0.44f);
     RenderButton(EKeys::Gamepad_DPad_Up,      DPad_Pos + ImVec2(0.0f, -DpadButtonDistance / AspectRatio), DPadButtonSize, ImVec2(0.5f, 0.5f), DpadButtonRounding);
     RenderButton(EKeys::Gamepad_DPad_Down,    DPad_Pos + ImVec2(0.0f, DpadButtonDistance / AspectRatio),  DPadButtonSize, ImVec2(0.5f, 0.5f), DpadButtonRounding);
     RenderButton(EKeys::Gamepad_DPad_Left,    DPad_Pos + ImVec2(-DpadButtonDistance, 0.0f), DPadButtonSize, ImVec2(0.5f, 0.5f), DpadButtonRounding);
@@ -435,7 +428,7 @@ void FCogInputWindow_Gamepad::RenderContent()
     //------------------------------
     // Face Buttons
     //------------------------------
-    const ImVec2 Face_Pos(1.0f - 0.15f, 0.44f);
+    constexpr ImVec2 Face_Pos(1.0f - 0.15f, 0.44f);
     RenderButton(EKeys::Gamepad_FaceButton_Top,       Face_Pos + ImVec2(0.0f, -DpadButtonDistance / AspectRatio), DPadButtonSize, ImVec2(0.5f, 0.5f), DpadButtonRounding);
     RenderButton(EKeys::Gamepad_FaceButton_Bottom,    Face_Pos + ImVec2(0.0f, DpadButtonDistance / AspectRatio),  DPadButtonSize, ImVec2(0.5f, 0.5f), DpadButtonRounding);
     RenderButton(EKeys::Gamepad_FaceButton_Left,      Face_Pos + ImVec2(-DpadButtonDistance, 0.0f), DPadButtonSize, ImVec2(0.5f, 0.5f), DpadButtonRounding);
@@ -460,7 +453,7 @@ void FCogInputWindow_Gamepad::RenderTick(float DeltaSeconds)
         return;
     }
 
-    ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
+    const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
     if (LocalPlayer == nullptr)
     {
         return;
@@ -473,7 +466,7 @@ void FCogInputWindow_Gamepad::RenderTick(float DeltaSeconds)
     }
 
     bool IsTimeToRepeat = false;
-    float WorldTime = GetWorld()->GetTimeSeconds();
+    const float WorldTime = GetWorld()->GetTimeSeconds();
     if (RepeatTime < WorldTime)
     {
         RepeatTime = WorldTime + Config->RepeatPeriod;

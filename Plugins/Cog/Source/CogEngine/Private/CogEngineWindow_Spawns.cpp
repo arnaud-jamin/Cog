@@ -3,7 +3,6 @@
 #include "CogEngineDataAsset.h"
 #include "CogEngineReplicator.h"
 #include "CogImguiHelper.h"
-#include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -31,27 +30,40 @@ void FCogEngineWindow_Spawns::RenderContent()
 
     if (Asset == nullptr)
     {
+        ImGui::TextDisabled("Invalid Asset");
+        return;
+    }
+
+    ACogEngineReplicator* Replicator = ACogEngineReplicator::GetLocalReplicator(*GetWorld());
+    if (Replicator == nullptr)
+    {
+        ImGui::TextDisabled("Invalid Replicator");
+        return;
+    }
+
+    if (Asset->SpawnGroups.Num() == 0)
+    {
+        ImGui::TextDisabled("No spawn group have been defined");
         return;
     }
 
     for (const FCogEngineSpawnGroup& SpawnGroup : Asset->SpawnGroups)
     {
-        RenderSpawnGroup(SpawnGroup);
+        RenderSpawnGroup(*Replicator, SpawnGroup);
     }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Spawns::RenderSpawnGroup(const FCogEngineSpawnGroup& SpawnGroup)
+void FCogEngineWindow_Spawns::RenderSpawnGroup(ACogEngineReplicator& Replicator, const FCogEngineSpawnGroup& SpawnGroup)
 {
-    int32 GroupIndex = 0;
-
-    ImGui::PushStyleColor(ImGuiCol_Header,          IM_COL32(66, 66, 66, 79));
+	ImGui::PushStyleColor(ImGuiCol_Header,          IM_COL32(66, 66, 66, 79));
     ImGui::PushStyleColor(ImGuiCol_HeaderHovered,   IM_COL32(62, 62, 62, 204));
     ImGui::PushStyleColor(ImGuiCol_HeaderActive,    IM_COL32(86, 86, 86, 255));
 
     if (ImGui::CollapsingHeader(TCHAR_TO_ANSI(*SpawnGroup.Name), ImGuiTreeNodeFlags_DefaultOpen))
     {
-        ImGui::PushID(GroupIndex);
+	    int32 GroupIndex = 0;
+	    ImGui::PushID(GroupIndex);
 
         const bool PushColor = (SpawnGroup.Color != FColor::Transparent);
         if (PushColor)
@@ -64,7 +76,7 @@ void FCogEngineWindow_Spawns::RenderSpawnGroup(const FCogEngineSpawnGroup& Spawn
 
         for (const FCogEngineSpawnEntry& SpawnEntry : SpawnGroup.Spawns)
         {
-            if (RenderSpawnAsset(SpawnEntry, SelectedAssetIndex == GroupIndex))
+            if (RenderSpawnAsset(Replicator, SpawnEntry, SelectedAssetIndex == GroupIndex))
             {
                 SelectedAssetIndex = AssetIndex;
             }
@@ -85,7 +97,7 @@ void FCogEngineWindow_Spawns::RenderSpawnGroup(const FCogEngineSpawnGroup& Spawn
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogEngineWindow_Spawns::RenderSpawnAsset(const FCogEngineSpawnEntry& SpawnEntry, bool IsLastSelected)
+bool FCogEngineWindow_Spawns::RenderSpawnAsset(ACogEngineReplicator& Replicator, const FCogEngineSpawnEntry& SpawnEntry, bool IsLastSelected)
 {
     bool IsPressed = false;
 
@@ -104,10 +116,8 @@ bool FCogEngineWindow_Spawns::RenderSpawnAsset(const FCogEngineSpawnEntry& Spawn
 
     if (ImGui::Button(TCHAR_TO_ANSI(*EntryName), ImVec2(-1, 0)))
     {
-        if (ACogEngineReplicator* Replicator = ACogEngineReplicator::GetLocalReplicator(*GetWorld()))
-        {
-            Replicator->Server_Spawn(SpawnEntry);
-        }
+        IsPressed = true;
+		Replicator.Server_Spawn(SpawnEntry);
     }
 
     ImGui::PopStyleVar(1);

@@ -90,7 +90,7 @@ void FCogEngineWindow_Inspector::RenderContent()
         return;
     }
 
-    FCogEngineInspectorApplyFunction ApplyFunction = FindObjectApplyFunction(InspectedObject.Get());
+    const FCogEngineInspectorApplyFunction ApplyFunction = FindObjectApplyFunction(InspectedObject.Get());
 
     ImGui::BeginChild("Inspector", ImVec2(-1, ApplyFunction != nullptr ? -ImGui::GetFrameHeightWithSpacing() : -1), false);
 
@@ -135,7 +135,7 @@ void FCogEngineWindow_Inspector::RenderMenu()
         int32 NewHistoryIndex = INDEX_NONE;
 
         //-----------------------------------
-        // Backward / Foward
+        // Backward / Forward
         //-----------------------------------
         {
             if (ImGui::ArrowButton("##Backward", ImGuiDir_Left))
@@ -147,7 +147,7 @@ void FCogEngineWindow_Inspector::RenderMenu()
                 ImGui::SetTooltip("Backward");
             }
 
-            if (ImGui::ArrowButton("##Foward", ImGuiDir_Right))
+            if (ImGui::ArrowButton("##Forward", ImGuiDir_Right))
             {
                 NewHistoryIndex = FMath::Min(History.Num(), HistoryIndex + 1);
             }
@@ -161,7 +161,7 @@ void FCogEngineWindow_Inspector::RenderMenu()
         // Current Inspected Object
         //-----------------------------------
         const auto InspectedObjectName = StringCast<ANSICHAR>(*GetNameSafe(InspectedObject.Get()));
-        ImVec2 Pos = ImGui::GetCursorScreenPos();
+        const ImVec2 Pos = ImGui::GetCursorScreenPos();
         {
             ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
             ImGui::SameLine();
@@ -906,7 +906,7 @@ bool FCogEngineWindow_Inspector::RenderClass(const FClassProperty* ClassProperty
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogEngineWindow_Inspector::RenderInterface(const FInterfaceProperty* InterfaceProperty)
 {
-    UClass* Class = InterfaceProperty->InterfaceClass;
+	const UClass* Class = InterfaceProperty->InterfaceClass;
     if (Class == nullptr)
     {
         ImGui::BeginDisabled();
@@ -927,7 +927,7 @@ bool FCogEngineWindow_Inspector::RenderInterface(const FInterfaceProperty* Inter
 bool FCogEngineWindow_Inspector::RenderArray(const FArrayProperty* ArrayProperty, uint8* PointerToValue, bool ShowChildren)
 {
     FScriptArrayHelper Helper(ArrayProperty, PointerToValue);
-    int32 Num = Helper.Num();
+    const int32 Num = Helper.Num();
 
     ImGui::BeginDisabled();
     ImGui::Text("%s [%d]", TCHAR_TO_ANSI(*ArrayProperty->Inner->GetClass()->GetName()), Num);
@@ -963,8 +963,8 @@ bool FCogEngineWindow_Inspector::HasPropertyAnyChildren(const FProperty* Propert
     }
     else if (const FArrayProperty* ArrayProperty = CastField<FArrayProperty>(Property))
     {
-        FScriptArrayHelper Helper(ArrayProperty, PointerToValue);
-        int32 Num = Helper.Num();
+	    const FScriptArrayHelper Helper(ArrayProperty, PointerToValue);
+        const int32 Num = Helper.Num();
         if (Num == 0)
         {
             return false;
@@ -978,7 +978,7 @@ bool FCogEngineWindow_Inspector::HasPropertyAnyChildren(const FProperty* Propert
     }
     else if (const FObjectProperty* ObjectProperty = CastField<FObjectProperty>(Property))
     {
-        UObject* ReferencedObject = ObjectProperty->GetObjectPropertyValue(PointerToValue);
+	    const UObject* ReferencedObject = ObjectProperty->GetObjectPropertyValue(PointerToValue);
         if (ReferencedObject == nullptr)
         {
             return false;

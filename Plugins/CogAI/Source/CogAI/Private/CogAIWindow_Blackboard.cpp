@@ -54,42 +54,42 @@ void FCogAIWindow_Blackboard::RenderContent()
     AActor* Selection = GetSelection();
     if (Selection == nullptr)
     {
-        ImGui::TextDisabled("No Selection");
+        ImGui::TextDisabled("Invalid Selection");
         return;
     }
 
     APawn* Pawn = Cast<APawn>(Selection);
     if (Pawn == nullptr)
     {
-        ImGui::TextDisabled("Not a pawn");
+        ImGui::TextDisabled("Selection is not a pawn");
         return;
     }
 
     AAIController* AIController = Cast<AAIController>(Pawn->Controller);
     if (AIController == nullptr)
     {
-        ImGui::TextDisabled("No AIController");
+        ImGui::TextDisabled("Selection has no AIController");
         return;
     }
 
     UBrainComponent* BehaviorTree = AIController->GetBrainComponent();
     if (BehaviorTree == nullptr)
     {
-        ImGui::TextDisabled("No BrainComponent");
+        ImGui::TextDisabled("Selection has no BrainComponent");
         return;
     }
 
     UBlackboardComponent* Blackboard = BehaviorTree->GetBlackboardComponent();
     if (Blackboard == nullptr)
     {
-        ImGui::TextDisabled("No BlackboardComponent");
+        ImGui::TextDisabled("Selection has no BlackboardComponent");
         return;
     }
 
     UBlackboardData* BlackboardAsset = Blackboard->GetBlackboardAsset();
     if (BlackboardAsset == nullptr)
     {
-        ImGui::TextDisabled("No BlackboardAsset");
+        ImGui::TextDisabled("Selection has no BlackboardAsset");
         return;
     }
 

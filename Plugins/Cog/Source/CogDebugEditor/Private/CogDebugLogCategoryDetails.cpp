@@ -4,13 +4,8 @@
 #include "CogDebugLog.h"
 #include "DetailWidgetRow.h"
 #include "Editor.h"
-#include "IPropertyUtilities.h"
-#include "Misc/TextFilter.h"
 #include "PropertyHandle.h"
 #include "SCogDebugLogCategoryWidget.h"
-#include "SlateOptMacros.h"
-#include "Widgets/Input/SSearchBox.h"
-#include "Widgets/Layout/SSeparator.h"
 
 #define LOCTEXT_NAMESPACE "AttributeDetailsCustomization"
 

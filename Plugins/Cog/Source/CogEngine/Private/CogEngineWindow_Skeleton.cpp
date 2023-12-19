@@ -2,7 +2,6 @@
 
 #include "CogDebugSettings.h"
 #include "CogWindowWidgets.h"
-#include "Components/LineBatchComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/SkeletalMesh.h"
