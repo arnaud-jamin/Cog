@@ -5,13 +5,13 @@
 
 #if ENABLE_COG
 
-#include "CogDebugSettings.h"
+#include "CogDebug.h"
 
 #define COG_LOG_ABILITY(Verbosity, Ability, Format, ...)                                                                    \
     if (Ability != nullptr)                                                                                                 \
     {                                                                                                                       \
         AActor* Actor = Ability->GetAvatarActorFromActorInfo();                                                             \
-        if (FCogDebugSettings::IsDebugActiveForObject(Actor) || (int32)Verbosity <= (int32)ELogVerbosity::Warning)          \
+        if (FCogDebug::IsDebugActiveForObject(Actor) || (int32)Verbosity <= (int32)ELogVerbosity::Warning)          \
         {                                                                                                                   \
             COG_LOG(LogCogAbility, Verbosity, TEXT("%s - %s - %s - %s"),                                                    \
                 *GetNameSafe(Actor),                                                                                        \

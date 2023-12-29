@@ -14,16 +14,6 @@ struct FCollisionShape;
 
 //--------------------------------------------------------------------------------------------------------------------------
 UENUM()
-enum class ECogEngine_CollisionQueryPlacement : uint8
-{
-    Selection,
-    View,
-    Cursor,
-    Transform,
-};
-
-//--------------------------------------------------------------------------------------------------------------------------
-UENUM()
 enum class ECogEngine_CollisionQueryType : uint8
 {
     Overlap,
@@ -57,6 +47,9 @@ enum class ECogEngine_CollisionQueryShape : uint8
     Capsule,
 };
 
+
+enum class ECogDebug_GizmoTransformSpace : uint8;
+
 //--------------------------------------------------------------------------------------------------------------------------
 class COGENGINE_API FCogEngineWindow_CollisionTester : public FCogWindow
 {
@@ -69,6 +62,7 @@ public:
 protected:
 
     virtual void ResetConfig() override;
+    void DoWork(const UCollisionProfile* CollisionProfile);
 
     virtual void RenderHelp() override;
 
@@ -117,19 +111,16 @@ class UCogEngineConfig_CollisionTester : public UCogWindowConfig
 public:
 
     UPROPERTY(Config)
-    ECogEngine_CollisionQueryPlacement Placement;
+    FVector LocationStart;
 
     UPROPERTY(Config)
-    FVector3f LocationStart;
+    FVector LocationEnd;
 
     UPROPERTY(Config)
-    FVector3f LocationEnd;
+    FRotator Rotation;
 
     UPROPERTY(Config)
-    FRotator3f Rotation;
-
-    UPROPERTY(Config)
-    FRotator3f Scale;
+    FVector Scale;
 
     UPROPERTY(Config)
     ECogEngine_CollisionQueryType Type;
@@ -153,19 +144,13 @@ public:
     FName Profile;
 
     UPROPERTY(Config)
-    int32 Channel;
+    TEnumAsByte<ECollisionChannel> Channel;
 
     UPROPERTY(Config)
     int32 ProfileIndex;
 
     UPROPERTY(Config)
-    FVector3f ShapeExtent;
-
-    UPROPERTY(Config)
-    int QueryTypeOld;
-
-    UPROPERTY(Config)
-    float QueryLength;
+    FVector ShapeExtent;
 
     UPROPERTY(Config)
     bool DrawHitLocations;
@@ -212,18 +197,16 @@ public:
     {
         Super::Reset();
 
-        Placement = ECogEngine_CollisionQueryPlacement::Selection;
         Type = ECogEngine_CollisionQueryType::LineTrace;
         By = ECogEngine_CollisionQueryBy::Channel;
-        Shape = ECogEngine_CollisionQueryShape::Sphere;
+        Channel = ECC_WorldStatic;
         MultiHits = false;
         TraceComplex = false;
-        ShapeExtent = FVector3f(50.0f, 50.0f, 50.0f);
+        Shape = ECogEngine_CollisionQueryShape::Sphere;
+        ShapeExtent = FVector(50.0f, 50.0f, 50.0f);
 
         ObjectTypesToQuery = 0;
         ProfileIndex = 0;
-        QueryTypeOld = 0;
-        QueryLength = 5000.0f;
         DrawHitLocations = true;
         DrawHitImpactPoints = true;
         DrawHitShapes = true;

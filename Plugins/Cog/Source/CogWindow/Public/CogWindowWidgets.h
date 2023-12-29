@@ -20,12 +20,6 @@ public:
 
     static void EndTableTooltip();
 
-    static bool DragFVector(const char* Label, FVector& Vector, float Speed = 1.0f, float Min = 0.0f, float Max = 0.0f, const char* Format = "%.3f", ImGuiSliderFlags Flags = 0);
-
-    static bool DragFVector2D(const char* Label, FVector2D& Vector, float Speed = 1.0f, float Min = 0.0f, float Max = 0.0f, const char* Format = "%.3f", ImGuiSliderFlags Flags = 0);
-
-    static bool ColorEdit4(const char* Label, FColor& Color, ImGuiColorEditFlags Flags = 0);
-
     static void ProgressBarCentered(float Fraction, const ImVec2& Size, const char* Overlay);
 
     static bool ToggleMenuButton(bool* Value, const char* Text, const ImVec4& TrueColor);
@@ -85,6 +79,9 @@ public:
     static bool ButtonWithTooltip(const char* Text, const char* Tooltip);
 
     static bool DeleteArrayItemButton();
+
+    static bool ComboCollisionChannel(const char* Label, ECollisionChannel& Channel);
+
 
 };
 

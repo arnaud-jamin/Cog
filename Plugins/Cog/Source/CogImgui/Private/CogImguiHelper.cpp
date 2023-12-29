@@ -146,3 +146,36 @@ void FCogImguiHelper::SetFlags(int32& Value, int32 Flags, bool EnableFlags)
         Value &= ~Flags;
     }
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogImguiHelper::DragDouble(const char* Label, double* Value, float Speed, double Min, double Max, const char* Format, ImGuiSliderFlags Flags)
+{
+    return ImGui::DragScalar(Label, ImGuiDataType_Double, Value, Speed, &Min, &Max, Format, Flags);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogImguiHelper::DragFVector(const char* Label, FVector& Vector, float Speed, double Min, double Max, const char* Format, ImGuiSliderFlags Flags)
+{
+    return ImGui::DragScalarN(Label, ImGuiDataType_Double, &Vector.X, 3, Speed, &Min, &Max, Format, Flags);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogImguiHelper::DragFRotator(const char* Label, FRotator& Rotator, float Speed, double Min, double Max, const char* Format, ImGuiSliderFlags Flags)
+{
+    return ImGui::DragScalarN(Label, ImGuiDataType_Double, &Rotator.Pitch, 3, Speed, &Min, &Max, Format, Flags);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogImguiHelper::DragFVector2D(const char* Label, FVector2D& Vector, float Speed, double Min, double Max, const char* Format, ImGuiSliderFlags Flags)
+{
+    return ImGui::DragScalarN(Label, ImGuiDataType_Double, &Vector.X, 2, Speed, &Min, &Max, Format, Flags);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogImguiHelper::ColorEdit4(const char* Label, FColor& Color, ImGuiColorEditFlags Flags)
+{
+    FLinearColor Linear(Color);
+    const bool Result = ImGui::ColorEdit4(Label, &Linear.R, Flags);
+    Color = Linear.ToFColor(true);
+    return Result;
+}

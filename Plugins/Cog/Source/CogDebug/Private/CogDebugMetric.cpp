@@ -1,6 +1,6 @@
 #include "CogDebugMetric.h"
 
-#include "CogDebugSettings.h"
+#include "CogDebug.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 float FCogDebugMetric::MaxDurationSetting = 0.0f;
@@ -13,7 +13,7 @@ TMap<FName, FCogDebugMetricEntry> FCogDebugMetric::Metrics;
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugMetric::AddMetric(const FCogDebugMetricParams& Params)
 {
-    if (FCogDebugSettings::IsDebugActiveForObject(Params.WorldContextObject) == false)
+    if (FCogDebug::IsDebugActiveForObject(Params.WorldContextObject) == false)
     {
         return;
     }

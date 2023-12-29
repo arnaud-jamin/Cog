@@ -12,6 +12,8 @@ class COGDEBUG_API FCogDebugDrawHelper
 {
 public:
 
+    static void DrawArc(const UWorld* InWorld, const FMatrix& Matrix, const float InnterRadius, const float OuterRadius, const float AngleStart, const float AngleEnd, const int32 Segments, const FColor& Color, const bool bPersistentLines = false, const float LifeTime = -1.f, const uint8 DepthPriority = 0U, const float Thickness = 0.0f);
+
     static void DrawArc(const UWorld* InWorld, const FMatrix& Matrix, const float InnterRadius, const float OuterRadius, const float ArcAngle, const int32 Segments, const FColor& Color, const bool bPersistentLines = false, const float LifeTime = -1.f, const uint8 DepthPriority = 0U, const float Thickness = 0.0f);
 
     static void DrawSphere(const UWorld* InWorld, const FVector& Center, const float Radius, const int32 Segments, const FColor& Color, const bool bPersistentLines = false, const float LifeTime = -1.f, const uint8 DepthPriority = 0U, const float Thickness = 0.0f);

@@ -81,8 +81,8 @@ void ACogDebugReplicator::BeginPlay()
     if (OwnerPlayerController->IsLocalController())
     {
         Server_RequestAllCategoriesVerbosity();
-        Server_SetSelection(FCogDebugSettings::GetSelection());
-        Server_SetIsFilteringBySelection(FCogDebugSettings::GetIsFilteringBySelection());
+        Server_SetSelection(FCogDebug::GetSelection());
+        Server_SetIsFilteringBySelection(FCogDebug::GetIsFilteringBySelection());
     }
 }
 

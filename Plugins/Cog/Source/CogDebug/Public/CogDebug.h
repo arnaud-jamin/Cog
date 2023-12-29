@@ -2,14 +2,14 @@
 
 #include "CoreMinimal.h"
 #include "UObject/WeakObjectPtrTemplates.h"
-#include "CogDebugSettings.generated.h"
+#include "CogDebug.generated.h"
 
 class UObject;
 class AActor;
 class UWorld;
 
 USTRUCT()
-struct FCogDebugData
+struct FCogDebugSettings
 {
     GENERATED_BODY()
 
@@ -77,7 +77,10 @@ struct FCogDebugData
     float GizmoThicknessZHigh = 0.0f;
 
     UPROPERTY(Config)
-    float GizmoMouseMaxDistance = 5.0f;
+    float GizmoCursorDraggingThreshold = 4.0f;
+
+    UPROPERTY(Config)
+    float GizmoCursorSelectionThreshold = 10.0f;
 
     UPROPERTY(Config)
     float GizmoPlaneOffset = 25.0f;
@@ -98,7 +101,16 @@ struct FCogDebugData
     float GizmoRotationRadius = 15.0f;
 
     UPROPERTY(Config)
-    int GizmoRotationSegments = 32;
+    int GizmoRotationSegments = 12;
+
+    UPROPERTY(Config)
+    float GizmoGroundRaycastLength = 100000.0f;
+
+    UPROPERTY(Config)
+    TEnumAsByte<ECollisionChannel> GizmoGroundRaycastChannel = ECollisionChannel::ECC_WorldStatic;
+
+	UPROPERTY(Config)
+    float GizmoGroundRaycastCircleRadius = 10.f;
 
     UPROPERTY(Config)
     FColor GizmoAxisColorsZHighX = FColor(255, 50, 50, 255);
@@ -137,6 +149,12 @@ struct FCogDebugData
     FColor GizmoAxisColorsSelectionW = FColor(255, 255, 0, 255);
 
     UPROPERTY(Config)
+    FColor GizmoGroundRaycastColor = FColor(128, 128, 128, 255);
+
+    UPROPERTY(Config)
+    FColor GizmoGroundRaycastCircleColor = FColor(128, 128, 128, 255);
+
+    UPROPERTY(Config)
     TArray<FString> SecondaryBoneWildcards = {
     "interaction",
     "center_of_mass",
@@ -163,7 +181,7 @@ struct FCogDebugData
     };
 };
 
-struct COGDEBUG_API FCogDebugSettings
+struct COGDEBUG_API FCogDebug
 {
 public:
 
@@ -204,7 +222,7 @@ public:
 
     static void Reset();
 
-    static FCogDebugData Data;
+    static FCogDebugSettings Settings;
 
 private:
 

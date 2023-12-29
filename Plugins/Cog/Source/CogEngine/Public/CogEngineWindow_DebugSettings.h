@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogDebugSettings.h"
+#include "CogDebug.h"
 #include "CogWindow.h"
 #include "CogWindowConfig.h"
 #include "CogEngineWindow_DebugSettings.generated.h"
@@ -39,7 +39,7 @@ class UCogEngineConfig_DebugSettings : public UCogWindowConfig
 public:
 
     UPROPERTY(Config)
-    FCogDebugData Data;
+    FCogDebugSettings Data;
 
     UPROPERTY(Config)
     bool bShowAdvancedSettings = false;
@@ -47,7 +47,7 @@ public:
     virtual void Reset() override
     {
         Super::Reset();
-        Data = FCogDebugData();
+        Data = FCogDebugSettings();
         bShowAdvancedSettings = false;
     }
 };

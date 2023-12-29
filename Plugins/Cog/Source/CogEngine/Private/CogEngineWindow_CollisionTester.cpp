@@ -1,14 +1,13 @@
 #include "CogEngineWindow_CollisionTester.h"
 
 #include "CogDebugDrawHelper.h"
-#include "CogDebugSettings.h"
+#include "CogDebug.h"
 #include "CogEngineDataAsset.h"
 #include "CogImGuiHelper.h"
 #include "CogWindowWidgets.h"
 #include "Components/PrimitiveComponent.h"
 #include "Components/SceneComponent.h"
 #include "imgui.h"
-#include "Kismet/GameplayStatics.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_CollisionTester::Initialize()
@@ -25,11 +24,7 @@ void FCogEngineWindow_CollisionTester::Initialize()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_CollisionTester::RenderHelp()
 {
-    ImGui::Text("This window is used to inspect collisions by performing a collision query with the selected channels. "
-        "The query can be configured in the options. "
-        "The displayed collision channels can be configured in the '%s' data asset. "
-        , TCHAR_TO_ANSI(*GetNameSafe(Asset.Get()))
-    );
+    ImGui::Text("This window is used to test a collision query.");
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -85,35 +80,6 @@ void FCogEngineWindow_CollisionTester::RenderContent()
     }
 
     FCogWindowWidgets::SetNextItemToShortWidth();
-    FCogWindowWidgets::ComboboxEnum("Placement", Config->Placement);
-
-    if (Config->Placement == ECogEngine_CollisionQueryPlacement::Selection)
-    {
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragFloat3("Location", &Config->LocationStart.X, 1.0f, 0.0f, 0.0f, "%.1f");
-
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragFloat3("Rotation", &Config->Rotation.Pitch, 1.0f, 0.0f, 0.0f, "%.1f");
-    }
-    else if (Config->Placement == ECogEngine_CollisionQueryPlacement::Transform)
-    {
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragFloat3("Start Location", &Config->LocationStart.X, 1.0f, 0.0f, 0.0f, "%.1f");
-
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragFloat3("End Location", &Config->LocationEnd.X, 1.0f, 0.0f, 0.0f, "%.1f");
-
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragFloat3("Rotation", &Config->Rotation.Pitch, 1.0f, 0.0f, 0.0f, "%.1f");
-    }
-
-    if (Config->Type == ECogEngine_CollisionQueryType::LineTrace || Config->Type == ECogEngine_CollisionQueryType::Sweep)
-    {
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::SliderFloat("Distance", &Config->QueryLength, 0.0f, 20000.0f, "%0.f");
-    }
-
-    FCogWindowWidgets::SetNextItemToShortWidth();
     FCogWindowWidgets::ComboboxEnum("Type", Config->Type);
 
     FCogWindowWidgets::SetNextItemToShortWidth();
@@ -124,31 +90,11 @@ void FCogEngineWindow_CollisionTester::RenderContent()
     //-------------------------------------------------
     if (Config->By == ECogEngine_CollisionQueryBy::Channel)
     {
-        const FName SelectedChannelName = CollisionProfile->ReturnChannelNameFromContainerIndex(Config->Channel);
-
         FCogWindowWidgets::SetNextItemToShortWidth();
-        if (ImGui::BeginCombo("Channel", TCHAR_TO_ANSI(*SelectedChannelName.ToString()), ImGuiComboFlags_HeightLarge))
+        ECollisionChannel Channel = Config->Channel.GetValue();
+        if (FCogWindowWidgets::ComboCollisionChannel("Channel", Channel))
         {
-            for (int32 ChannelIndex = 0; ChannelIndex < (int32)ECC_MAX; ++ChannelIndex)
-            {
-                const FChannel& Channel = Channels[ChannelIndex];
-                if (Channel.IsValid == false)
-                {
-                    continue;
-                }
-
-                ImGui::PushID(ChannelIndex);
-
-                const FName ChannelName = CollisionProfile->ReturnChannelNameFromContainerIndex(ChannelIndex);
-
-                if (ImGui::Selectable(TCHAR_TO_ANSI(*ChannelName.ToString())))
-                {
-                    Config->Channel = ChannelIndex;
-                }
-
-                ImGui::PopID();
-            }
-            ImGui::EndCombo();
+            Config->Channel = Channel;
         }
     }
     //-------------------------------------------------
@@ -225,9 +171,14 @@ void FCogEngineWindow_CollisionTester::RenderContent()
         }
     }
 
+    ImGui::Checkbox("Multi", &Config->MultiHits);
+    ImGui::Checkbox("Complex", &Config->TraceComplex);
+
     //-------------------------------------------------
     // Shape
     //-------------------------------------------------
+    ImGui::Separator();
+
     if (Config->Type != ECogEngine_CollisionQueryType::LineTrace)
     {
         FCogWindowWidgets::SetNextItemToShortWidth();
@@ -238,32 +189,28 @@ void FCogEngineWindow_CollisionTester::RenderContent()
             case ECogEngine_CollisionQueryShape::Sphere:
             {
                 FCogWindowWidgets::SetNextItemToShortWidth();
-                ImGui::DragFloat("Sphere Radius", &Config->ShapeExtent.X, 0.1f, 0, 100.0f, "%.1f");
+                FCogImguiHelper::DragDouble("Sphere Radius", &Config->ShapeExtent.X, 0.1f, 0, FLT_MAX, "%.1f");
                 break;
             }
 
             case ECogEngine_CollisionQueryShape::Box:
             {
                 FCogWindowWidgets::SetNextItemToShortWidth();
-                ImGui::DragFloat3("Box Extent", &Config->ShapeExtent.X, 0.1f, 0, 100.0f, "%.1f");
+                FCogImguiHelper::DragFVector("Box Extent", Config->ShapeExtent, 0.1f, 0, FLT_MAX, "%.1f");
                 break;
             }
 
             case ECogEngine_CollisionQueryShape::Capsule:
             {
                 FCogWindowWidgets::SetNextItemToShortWidth();
-                ImGui::DragFloat("Capsule Radius", &Config->ShapeExtent.X, 0.1f, 0, 100.0f, "%.1f");
+                FCogImguiHelper::DragDouble("Capsule Radius", &Config->ShapeExtent.X, 0.1f, 0, FLT_MAX, "%.1f");
 
                 FCogWindowWidgets::SetNextItemToShortWidth();
-                ImGui::DragFloat("Capsule Half Height", &Config->ShapeExtent.Z, 0.1f, 0, 100.0f, "%.1f");
+                FCogImguiHelper::DragDouble("Capsule Half Height", &Config->ShapeExtent.Z, 0.1f, 0, FLT_MAX, "%.1f");
                 break;
             }
         }
-
     }
-
-    ImGui::Checkbox("Multi", &Config->MultiHits);
-    ImGui::Checkbox("Complex", &Config->TraceComplex);
 
     Query();
 }
@@ -280,54 +227,13 @@ void FCogEngineWindow_CollisionTester::Query()
         return;
     }
 
-    FVector QueryStart = FVector::ZeroVector;
-    FVector QueryEnd = FVector::ZeroVector;
-    FQuat QueryRotation = FQuat::Identity;
+    FVector QueryStart = Config->LocationStart;
+    FVector QueryEnd = Config->LocationEnd;
+    FQuat QueryRotation = FQuat(Config->Rotation);
     TArray<FHitResult> Hits;
     TArray<FOverlapResult> Overlaps;
     bool HasHits = false;
-
-    switch (Config->Placement)
-    {
-        case ECogEngine_CollisionQueryPlacement::Selection:
-        {
-            if (const AActor* Selection = GetSelection())
-            {
-                QueryStart = Selection->GetActorLocation() + FVector(Config->LocationStart);
-                QueryRotation = Selection->GetActorQuat() * FQuat(FRotator(Config->Rotation));
-                QueryEnd = QueryStart + Selection->GetActorQuat().GetForwardVector() * Config->QueryLength;
-            }
-
-            break;
-        }
-
-        case ECogEngine_CollisionQueryPlacement::View:
-        {
-            FRotator Rotation;
-            PlayerController->GetPlayerViewPoint(QueryStart, Rotation);
-            QueryRotation = FQuat(Rotation);
-            QueryEnd = QueryStart + QueryRotation.GetForwardVector() * Config->QueryLength;
-            break;
-        }
-
-        case ECogEngine_CollisionQueryPlacement::Cursor:
-        {
-            FVector Direction;
-            const ImGuiViewport* Viewport = ImGui::GetMainViewport();
-            const ImVec2 ViewportPos = Viewport != nullptr ? Viewport->Pos : ImVec2(0, 0);
-            UGameplayStatics::DeprojectScreenToWorld(PlayerController, FCogImguiHelper::ToFVector2D(ImGui::GetMousePos() - ViewportPos), QueryStart, Direction);
-            QueryEnd = QueryStart + Direction * Config->QueryLength;
-            break;
-        }
-
-        case ECogEngine_CollisionQueryPlacement::Transform:
-        {
-            QueryStart = FVector(Config->LocationStart);
-            QueryEnd = FVector(Config->LocationEnd);
-            QueryRotation = FQuat(FRotator(Config->Rotation));
-            break;
-        }
-    }
+    
 
     static const FName TraceTag(TEXT("FCogWindow_Collision"));
     FCollisionQueryParams QueryParams(TraceTag, SCENE_QUERY_STAT_ONLY(CogHitDetection), Config->TraceComplex);
@@ -341,7 +247,7 @@ void FCogEngineWindow_CollisionTester::Query()
         {
             case ECogEngine_CollisionQueryShape::Sphere:    QueryShape.SetSphere(Config->ShapeExtent.X); break;
             case ECogEngine_CollisionQueryShape::Capsule:   QueryShape.SetCapsule(Config->ShapeExtent.X, Config->ShapeExtent.Z); break;
-            case ECogEngine_CollisionQueryShape::Box:       QueryShape.SetBox(Config->ShapeExtent); break;
+            case ECogEngine_CollisionQueryShape::Box:       QueryShape.SetBox(FVector3f(Config->ShapeExtent)); break;
         }
     }
 
@@ -515,12 +421,12 @@ void FCogEngineWindow_CollisionTester::Query()
             GetWorld(),
             QueryStart,
             QueryEnd,
-            FCogDebugSettings::Data.ArrowSize,
+            FCogDebug::Settings.ArrowSize,
             Color,
             false,
             0.0f,
-            FCogDebugSettings::GetDebugDepthPriority(0),
-            FCogDebugSettings::GetDebugThickness(0.0f));
+            FCogDebug::GetDebugDepthPriority(0),
+            FCogDebug::GetDebugThickness(0.0f));
     }
 
     if (bIsUsingShape)
@@ -547,7 +453,7 @@ void FCogEngineWindow_CollisionTester::Query()
                 Color,
                 false,
                 0.0f,
-                FCogDebugSettings::GetDebugDepthPriority(0));
+                FCogDebug::GetDebugDepthPriority(0));
         }
 
         if (Config->DrawHitImpactPoints)
@@ -559,7 +465,7 @@ void FCogEngineWindow_CollisionTester::Query()
                 Color,
                 false,
                 0.0f,
-                FCogDebugSettings::GetDebugDepthPriority(0));
+                FCogDebug::GetDebugDepthPriority(0));
         }
 
         if (bIsUsingShape && Config->DrawHitShapes)
@@ -573,12 +479,12 @@ void FCogEngineWindow_CollisionTester::Query()
                 GetWorld(),
                 Hit.Location,
                 Hit.Location + Hit.Normal * 20.0f,
-                FCogDebugSettings::Data.ArrowSize,
+                FCogDebug::Settings.ArrowSize,
                 FLinearColor(Config->NormalColor).ToFColor(true),
                 false,
                 0.0f,
-                FCogDebugSettings::GetDebugDepthPriority(0),
-                FCogDebugSettings::GetDebugThickness(0.0f));
+                FCogDebug::GetDebugDepthPriority(0),
+                FCogDebug::GetDebugThickness(0.0f));
         }
 
         if (Config->DrawHitImpactNormals)
@@ -587,12 +493,12 @@ void FCogEngineWindow_CollisionTester::Query()
                 GetWorld(),
                 Hit.ImpactPoint,
                 Hit.ImpactPoint + Hit.ImpactNormal * 20.0f,
-                FCogDebugSettings::Data.ArrowSize,
+                FCogDebug::Settings.ArrowSize,
                 FLinearColor(Config->ImpactNormalColor).ToFColor(true),
                 false,
                 0.0f,
-                FCogDebugSettings::GetDebugDepthPriority(0),
-                FCogDebugSettings::GetDebugThickness(0.0f));
+                FCogDebug::GetDebugDepthPriority(0),
+                FCogDebug::GetDebugThickness(0.0f));
         }
 
         if (Config->DrawHitPrimitives)
@@ -605,15 +511,17 @@ void FCogEngineWindow_CollisionTester::Query()
     {
         FVector ScaleStart(Config->ShapeExtent);
         FTransform TransformStart(QueryRotation, QueryStart, ScaleStart);
-        GizmoStart.Draw(*LocalPlayerController, TransformStart);
-        Config->LocationStart = FVector3f(TransformStart.GetLocation());
-        Config->ShapeExtent = FVector3f(TransformStart.GetScale3D());
+        GizmoStart.Draw("Query Start", *LocalPlayerController, TransformStart);
+        Config->LocationStart = TransformStart.GetLocation();
+        Config->Rotation = FRotator(TransformStart.GetRotation());
+        Config->ShapeExtent = TransformStart.GetScale3D();
 
-        FVector ScaleEnd(Config->ShapeExtent);
-        FTransform TransformEnd(QueryRotation, QueryEnd, ScaleEnd);
-        GizmoEnd.Draw(*LocalPlayerController, TransformEnd);
-        Config->LocationEnd = FVector3f(TransformEnd.GetLocation());
-        Config->ShapeExtent = FVector3f(TransformEnd.GetScale3D());
+        if (Config->Type != ECogEngine_CollisionQueryType::Overlap)
+        {
+            FTransform TransformEnd(FRotator::ZeroRotator, QueryEnd, FVector::OneVector);
+            GizmoEnd.Draw("Query End", *LocalPlayerController, TransformEnd, ECogDebug_GizmoFlags::NoRotation | ECogDebug_GizmoFlags::NoScale);
+            Config->LocationEnd = TransformEnd.GetLocation();
+        }
     }
 }
 
@@ -644,7 +552,7 @@ void FCogEngineWindow_CollisionTester::DrawPrimitive(const UPrimitiveComponent* 
             if (AlreadyDrawnActors.Contains(Actor) == false)
             {
                 FColor TextColor = Color.WithAlpha(255);
-                DrawDebugString(GetWorld(), Actor->GetActorLocation(), GetNameSafe(Actor->GetClass()), nullptr, FColor::White, 0.0f, FCogDebugSettings::Data.TextShadow, FCogDebugSettings::Data.TextSize);
+                DrawDebugString(GetWorld(), Actor->GetActorLocation(), GetNameSafe(Actor->GetClass()), nullptr, FColor::White, 0.0f, FCogDebug::Settings.TextShadow, FCogDebug::Settings.TextSize);
                 AlreadyDrawnActors.Add(Actor);
             }
         }
@@ -679,7 +587,7 @@ void FCogEngineWindow_CollisionTester::DrawShape(const FCollisionShape& Shape, c
                 Color,
                 false,
                 0.0f,
-                FCogDebugSettings::GetDebugDepthPriority(0));
+                FCogDebug::GetDebugDepthPriority(0));
         }
 
         DrawDebugBox(
@@ -690,8 +598,8 @@ void FCogEngineWindow_CollisionTester::DrawShape(const FCollisionShape& Shape, c
             Color,
             false,
             0.0f,
-            FCogDebugSettings::GetDebugDepthPriority(0),
-            FCogDebugSettings::GetDebugThickness(0.0f));
+            FCogDebug::GetDebugDepthPriority(0),
+            FCogDebug::GetDebugThickness(0.0f));
 
         break;
     }
@@ -708,12 +616,12 @@ void FCogEngineWindow_CollisionTester::DrawShape(const FCollisionShape& Shape, c
             GetWorld(),
             Location,
             Radius,
-            FCogDebugSettings::GetCircleSegments(),
+            FCogDebug::GetCircleSegments(),
             Color,
             false,
             0.0f,
-            FCogDebugSettings::GetDebugDepthPriority(0),
-            FCogDebugSettings::GetDebugThickness(0.0f));
+            FCogDebug::GetDebugDepthPriority(0),
+            FCogDebug::GetDebugThickness(0.0f));
         break;
     }
 
@@ -734,8 +642,8 @@ void FCogEngineWindow_CollisionTester::DrawShape(const FCollisionShape& Shape, c
             Color,
             false,
             0.0f,
-            FCogDebugSettings::GetDebugDepthPriority(0),
-            FCogDebugSettings::GetDebugThickness(0.0f));
+            FCogDebug::GetDebugDepthPriority(0),
+            FCogDebug::GetDebugThickness(0.0f));
         break;
     }
     }

@@ -26,7 +26,8 @@ void FCogDebugDrawHelper::DrawArc(
     const FMatrix& Matrix,
     float InnerRadius,
     float OuterRadius,
-    float Angle,
+    float AngleStart,
+    float AngleEnd,
     int32 Segments,
     const FColor& Color,
     bool bPersistentLines,
@@ -46,60 +47,75 @@ void FCogDebugDrawHelper::DrawArc(
     }
 
     const float LineLifeTime = GetLineLifeTime(LineBatcher, LifeTime, bPersistentLines);
-
-    const float AngleRad = FMath::DegreesToRadians(Angle);
+    const float AngleStartRad = FMath::DegreesToRadians(AngleStart);
+    const float AngleEndRad = FMath::DegreesToRadians(AngleEnd);
     const FVector Center = Matrix.GetOrigin();
-    const FVector Direction = Matrix.GetUnitAxis(EAxis::Z);
 
     // Need at least 4 segments
     Segments = FMath::Max(Segments, 4);
 
-    FVector AxisY, AxisZ;
-    FVector DirectionNorm = Direction.GetSafeNormal();
-    DirectionNorm.FindBestAxisVectors(AxisZ, AxisY);
+    const FVector AxisY = Matrix.GetScaledAxis(EAxis::Y);
+    const FVector AxisZ = Matrix.GetScaledAxis(EAxis::Z);
 
     TArray<FBatchedLine> Lines;
     Lines.Empty(Segments * 2 + 2);
 
     if (InnerRadius != OuterRadius)
     {
-        FVector P0 = Center + InnerRadius * (AxisY * -FMath::Sin(-AngleRad) + DirectionNorm * FMath::Cos(-AngleRad));
-        FVector P1 = Center + OuterRadius * (AxisY * -FMath::Sin(-AngleRad) + DirectionNorm * FMath::Cos(-AngleRad));
+	    const FVector P0 = Center + InnerRadius * (AxisZ * FMath::Sin(AngleStartRad) + AxisY * FMath::Cos(AngleStartRad));
+	    const FVector P1 = Center + OuterRadius * (AxisZ * FMath::Sin(AngleStartRad) + AxisY * FMath::Cos(AngleStartRad));
         Lines.Emplace(FBatchedLine(P0, P1, Color, LineLifeTime, Thickness, DepthPriority));
 
-        FVector P2 = Center + InnerRadius * (AxisY * -FMath::Sin(AngleRad) + DirectionNorm * FMath::Cos(AngleRad));
-        FVector P3 = Center + OuterRadius * (AxisY * -FMath::Sin(AngleRad) + DirectionNorm * FMath::Cos(AngleRad));
+	    const FVector P2 = Center + InnerRadius * (AxisZ * FMath::Sin(AngleEndRad) + AxisY * FMath::Cos(AngleEndRad));
+	    const FVector P3 = Center + OuterRadius * (AxisZ * FMath::Sin(AngleEndRad) + AxisY * FMath::Cos(AngleEndRad));
         Lines.Emplace(FBatchedLine(P2, P3, Color, LineLifeTime, Thickness, DepthPriority));
     }
 
-    float CurrentAngle = -AngleRad;
-    const float AngleStep = AngleRad / float(Segments) * 2.f;
-    FVector PrevVertex = Center + OuterRadius * (AxisY * -FMath::Sin(CurrentAngle) + DirectionNorm * FMath::Cos(CurrentAngle));
+    float CurrentAngle = AngleStartRad;
+    const float AngleStep = (AngleEndRad - AngleStartRad) / float(Segments);
+    FVector PrevVertex = Center + OuterRadius * (AxisZ * FMath::Sin(CurrentAngle) + AxisY * FMath::Cos(CurrentAngle));
     int32 Count = Segments;
     while (Count--)
     {
         CurrentAngle += AngleStep;
-        FVector NextVertex = Center + OuterRadius * (AxisY * -FMath::Sin(CurrentAngle) + DirectionNorm * FMath::Cos(CurrentAngle));
+        const FVector NextVertex = Center + OuterRadius * (AxisZ * FMath::Sin(CurrentAngle) + AxisY * FMath::Cos(CurrentAngle));
         Lines.Emplace(FBatchedLine(PrevVertex, NextVertex, Color, LineLifeTime, Thickness, DepthPriority));
         PrevVertex = NextVertex;
     }
 
     if (InnerRadius != 0.0f)
     {
-        CurrentAngle = -AngleRad;
-        PrevVertex = Center + InnerRadius * (AxisY * -FMath::Sin(CurrentAngle) + DirectionNorm * FMath::Cos(CurrentAngle));
+        CurrentAngle = AngleStartRad;
+        PrevVertex = Center + InnerRadius * (AxisZ * FMath::Sin(CurrentAngle) + AxisY * FMath::Cos(CurrentAngle));
 
         Count = Segments;
         while (Segments--)
         {
             CurrentAngle += AngleStep;
-            FVector NextVertex = Center + InnerRadius * (AxisY * -FMath::Sin(CurrentAngle) + DirectionNorm * FMath::Cos(CurrentAngle));
+            const FVector NextVertex = Center + InnerRadius * (AxisZ * FMath::Sin(CurrentAngle) + AxisY * FMath::Cos(CurrentAngle));
             Lines.Emplace(FBatchedLine(PrevVertex, NextVertex, Color, LineLifeTime, Thickness, DepthPriority));
             PrevVertex = NextVertex;
         }
     }
 
     LineBatcher->DrawLines(Lines);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogDebugDrawHelper::DrawArc(
+    const UWorld* InWorld,
+    const FMatrix& Matrix,
+    float InnerRadius,
+    float OuterRadius,
+    float Angle,
+    int32 Segments,
+    const FColor& Color,
+    bool bPersistentLines,
+    float LifeTime,
+    uint8 DepthPriority,
+    float Thickness)
+{
+    DrawArc(InWorld, Matrix, InnerRadius, OuterRadius, -Angle / 2.0f, Angle / 2.0f, Segments, Color, bPersistentLines, LifeTime, DepthPriority, Thickness);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

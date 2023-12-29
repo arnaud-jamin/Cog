@@ -1,7 +1,7 @@
 #include "CogWindow.h"
 
 #include "CogDebugDraw.h"
-#include "CogDebugSettings.h"
+#include "CogDebug.h"
 #include "CogWindow_Settings.h"
 #include "CogWindowManager.h"
 #include "CogWindowWidgets.h"
@@ -137,7 +137,7 @@ void FCogWindow::RenderHelp()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogWindow::RenderTick(float DeltaTime)
 {
-    SetSelection(FCogDebugSettings::GetSelection());
+    SetSelection(FCogDebug::GetSelection());
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

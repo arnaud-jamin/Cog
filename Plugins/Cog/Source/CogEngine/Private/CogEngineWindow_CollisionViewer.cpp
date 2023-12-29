@@ -1,7 +1,7 @@
 #include "CogEngineWindow_CollisionViewer.h"
 
 #include "CogDebugDrawHelper.h"
-#include "CogDebugSettings.h"
+#include "CogDebug.h"
 #include "CogEngineDataAsset.h"
 #include "CogImguiHelper.h"
 #include "CogWindowHelper.h"
@@ -260,7 +260,7 @@ void FCogEngineWindow_CollisionViewer::RenderContent()
 
     if (Config->ShowQuery)
     {
-        FCogDebugDrawHelper::DrawCapsuleCastMulti(World, QueryStart, QueryEnd, FQuat::Identity, 0.0f, QueryRadius, EDrawDebugTrace::ForOneFrame, false, QueryHits, FLinearColor::White, FLinearColor::Red, FCogDebugSettings::GetDebugDuration(true));
+        FCogDebugDrawHelper::DrawCapsuleCastMulti(World, QueryStart, QueryEnd, FQuat::Identity, 0.0f, QueryRadius, EDrawDebugTrace::ForOneFrame, false, QueryHits, FLinearColor::White, FLinearColor::Red, FCogDebug::GetDebugDuration(true));
     }
 
     TSet<const AActor*> AlreadyDrawnActors;
@@ -292,7 +292,7 @@ void FCogEngineWindow_CollisionViewer::RenderContent()
                 if (AlreadyDrawnActors.Contains(Actor) == false)
                 {
                     FColor TextColor = Color.WithAlpha(255);
-                    DrawDebugString(World, Actor->GetActorLocation(), GetNameSafe(Actor->GetClass()), nullptr, FColor::White, 0.0f, FCogDebugSettings::Data.TextShadow, FCogDebugSettings::Data.TextSize);
+                    DrawDebugString(World, Actor->GetActorLocation(), GetNameSafe(Actor->GetClass()), nullptr, FColor::White, 0.0f, FCogDebug::Settings.TextShadow, FCogDebug::Settings.TextSize);
                     AlreadyDrawnActors.Add(Actor);
                 }
             }
@@ -331,7 +331,7 @@ void FCogEngineWindow_CollisionViewer::RenderContent()
                     Color,
                     false,
                     0.0f,
-                    FCogDebugSettings::GetDebugDepthPriority(0));
+                    FCogDebug::GetDebugDepthPriority(0));
 
                 DrawDebugBox(
                     World,
@@ -341,8 +341,8 @@ void FCogEngineWindow_CollisionViewer::RenderContent()
                     Color,
                     false,
                     0.0f,
-                    FCogDebugSettings::GetDebugDepthPriority(0),
-                    FCogDebugSettings::GetDebugThickness(0.0f));
+                    FCogDebug::GetDebugDepthPriority(0),
+                    FCogDebug::GetDebugThickness(0.0f));
 
                 break;
             }
@@ -355,12 +355,12 @@ void FCogEngineWindow_CollisionViewer::RenderContent()
                         World,
                         SphereComponent->GetComponentLocation(),
                         SphereComponent->GetScaledSphereRadius(),
-                        FCogDebugSettings::GetCircleSegments(),
+                        FCogDebug::GetCircleSegments(),
                         Color,
                         false, 
                         0.0f, 
-                        FCogDebugSettings::GetDebugDepthPriority(0),
-                        FCogDebugSettings::GetDebugThickness(0.0f));
+                        FCogDebug::GetDebugDepthPriority(0),
+                        FCogDebug::GetDebugThickness(0.0f));
                 }
                 break;
             }
@@ -377,8 +377,8 @@ void FCogEngineWindow_CollisionViewer::RenderContent()
                     Color, 
                     false, 
                     0.0f, 
-                    FCogDebugSettings::GetDebugDepthPriority(0),
-                    FCogDebugSettings::GetDebugThickness(0.0f));
+                    FCogDebug::GetDebugDepthPriority(0),
+                    FCogDebug::GetDebugThickness(0.0f));
                 }
                 break;
             }

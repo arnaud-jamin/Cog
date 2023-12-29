@@ -82,7 +82,7 @@ void FCogEngineWindow_Plots::RenderMenu()
     {
         if (ImGui::BeginMenu("Options"))
         {
-            if (ImGui::MenuItem("Clear Data"))
+            if (ImGui::MenuItem("Clear Settings"))
             {
                 FCogDebugPlot::Clear();
             }

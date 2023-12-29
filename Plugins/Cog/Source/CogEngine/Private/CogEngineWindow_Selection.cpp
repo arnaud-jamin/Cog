@@ -1,7 +1,7 @@
 #include "CogEngineWindow_Selection.h"
 
 #include "CogDebugDraw.h"
-#include "CogDebugSettings.h"
+#include "CogDebug.h"
 #include "CogEngineReplicator.h"
 #include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
@@ -170,7 +170,7 @@ void FCogEngineWindow_Selection::RenderTick(float DeltaTime)
 {
     Super::RenderTick(DeltaTime);
 
-    if (FCogDebugSettings::GetSelection() == nullptr)
+    if (FCogDebug::GetSelection() == nullptr)
     {
         SetGlobalSelection(GetLocalPlayerPawn());
     }
@@ -265,7 +265,7 @@ bool FCogEngineWindow_Selection::DrawSelectionCombo()
 
             ImGui::PushStyleColor(ImGuiCol_Text, Actor == LocalPlayerPawn ? IM_COL32(255, 255, 0, 255) : IM_COL32(255, 255, 255, 255));
 
-            bool bIsSelected = Actor == FCogDebugSettings::GetSelection();
+            bool bIsSelected = Actor == FCogDebug::GetSelection();
             if (ImGui::Selectable(TCHAR_TO_ANSI(*GetActorName(*Actor)), bIsSelected))
             {
                 SetGlobalSelection(Actor);
@@ -417,7 +417,7 @@ void FCogEngineWindow_Selection::TickSelectionMode()
         // Prioritize another actor than the selected actor unless we only touch the selected actor.
         //--------------------------------------------------------------------------------------------------------
         TArray<AActor*> IgnoreList;
-        IgnoreList.Add(FCogDebugSettings::GetSelection());
+        IgnoreList.Add(FCogDebug::GetSelection());
 
         FHitResult HitResult;
         for (int i = 0; i < 2; ++i)
@@ -616,7 +616,7 @@ void FCogEngineWindow_Selection::RenderMainMenuWidget(int32 SubWidgetIndex, floa
             ImGui::EndPopup();
         }
 
-        AActor* GlobalSelection = FCogDebugSettings::GetSelection();
+        AActor* GlobalSelection = FCogDebug::GetSelection();
 
         //-----------------------------------
         // Selection
@@ -668,7 +668,7 @@ void FCogEngineWindow_Selection::RenderMainMenuWidget(int32 SubWidgetIndex, floa
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Selection::SetGlobalSelection(AActor* Value) const
 {
-    FCogDebugSettings::SetSelection(GetWorld(), Value);
+    FCogDebug::SetSelection(GetWorld(), Value);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

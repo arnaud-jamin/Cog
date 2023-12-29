@@ -4,6 +4,22 @@
 #include "CogDebugGizmo.generated.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
+UENUM(Flags)
+enum class ECogDebug_GizmoFlags : uint8
+{
+    None                    = 0,
+    NoTranslationAxis       = 1 << 0,
+    NoTranslationPlane      = 1 << 1,
+    NoRotation              = 1 << 2,
+    NoScaleAxis             = 1 << 3,
+    NoScaleUniform          = 1 << 4,
+
+    NoTranslation           = NoTranslationAxis | NoTranslationPlane,
+    NoScale                 = NoScaleAxis | NoScaleUniform,
+};
+ENUM_CLASS_FLAGS(ECogDebug_GizmoFlags);
+
+//--------------------------------------------------------------------------------------------------------------------------
 UENUM()
 enum class ECogDebug_GizmoType : uint8
 {
@@ -59,9 +75,10 @@ struct FCogDebug_GizmoElement
 //--------------------------------------------------------------------------------------------------------------------------
 struct COGDEBUG_API FCogDebug_Gizmo
 {
-    void Draw(const APlayerController& InPlayerController, FTransform& InOutTransform);
+    void Draw(const char* Id, const APlayerController& InPlayerController, FTransform& InOutTransform, ECogDebug_GizmoFlags Flags = ECogDebug_GizmoFlags::None);
 
+    bool UseLocalSpace = false;
     ECogDebug_GizmoElementType DraggedElementType = ECogDebug_GizmoElementType::MAX;
     FVector2D CursorOffset = FVector2D::ZeroVector;
-    FVector InitialScale = FVector::OneVector;
+    FTransform InitialTransform = FTransform::Identity;
 };

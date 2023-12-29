@@ -31,11 +31,11 @@ void FCogDebugShape::DrawPoint(UWorld* World) const
         DrawDebugPoint(
             World,
             ShapeData[0],
-            FCogDebugSettings::GetDebugServerThickness(Thickness),
-            FCogDebugSettings::ModulateServerColor(Color),
-            FCogDebugSettings::GetDebugPersistent(bPersistent),
-            FCogDebugSettings::GetDebugDuration(bPersistent),
-            FCogDebugSettings::GetDebugDepthPriority(DepthPriority));
+            FCogDebug::GetDebugServerThickness(Thickness),
+            FCogDebug::ModulateServerColor(Color),
+            FCogDebug::GetDebugPersistent(bPersistent),
+            FCogDebug::GetDebugDuration(bPersistent),
+            FCogDebug::GetDebugDepthPriority(DepthPriority));
     }
 
 #endif //ENABLE_COG
@@ -70,11 +70,11 @@ void FCogDebugShape::DrawSegment(UWorld* World) const
             World,
             ShapeData[0],
             ShapeData[1],
-            FCogDebugSettings::ModulateServerColor(Color),
-            FCogDebugSettings::GetDebugPersistent(bPersistent),
-            FCogDebugSettings::GetDebugDuration(bPersistent),
-            FCogDebugSettings::GetDebugDepthPriority(DepthPriority),
-            FCogDebugSettings::GetDebugServerThickness(Thickness));
+            FCogDebug::ModulateServerColor(Color),
+            FCogDebug::GetDebugPersistent(bPersistent),
+            FCogDebug::GetDebugDuration(bPersistent),
+            FCogDebug::GetDebugDepthPriority(DepthPriority),
+            FCogDebug::GetDebugServerThickness(Thickness));
     }
 
 #endif //ENABLE_COG
@@ -111,11 +111,11 @@ void FCogDebugShape::DrawArrow(UWorld* World) const
             ShapeData[0],
             ShapeData[1],
             ShapeData[2].X,
-            FCogDebugSettings::ModulateServerColor(Color),
-            FCogDebugSettings::GetDebugPersistent(bPersistent),
-            FCogDebugSettings::GetDebugDuration(bPersistent),
-            FCogDebugSettings::GetDebugDepthPriority(DepthPriority),
-            FCogDebugSettings::GetDebugServerThickness(Thickness));
+            FCogDebug::ModulateServerColor(Color),
+            FCogDebug::GetDebugPersistent(bPersistent),
+            FCogDebug::GetDebugDuration(bPersistent),
+            FCogDebug::GetDebugDepthPriority(DepthPriority),
+            FCogDebug::GetDebugServerThickness(Thickness));
     }
 
 #endif //ENABLE_COG
@@ -152,10 +152,10 @@ void FCogDebugShape::DrawAxes(UWorld* World) const
             ShapeData[0],
             FRotator(ShapeData[1].X, ShapeData[1].Y, ShapeData[1].Z),
             ShapeData[2].X,
-            FCogDebugSettings::GetDebugPersistent(bPersistent),
-            FCogDebugSettings::GetDebugDuration(bPersistent),
-            FCogDebugSettings::GetDebugDepthPriority(DepthPriority),
-            FCogDebugSettings::GetDebugServerThickness(Thickness));
+            FCogDebug::GetDebugPersistent(bPersistent),
+            FCogDebug::GetDebugDuration(bPersistent),
+            FCogDebug::GetDebugDepthPriority(DepthPriority),
+            FCogDebug::GetDebugServerThickness(Thickness));
     }
 
 #endif //ENABLE_COG
@@ -192,11 +192,11 @@ void FCogDebugShape::DrawBox(UWorld* World) const
             ShapeData[0],
             ShapeData[1],
             FQuat(FRotator(ShapeData[2].X, ShapeData[2].Y, ShapeData[2].Z)),
-            FCogDebugSettings::ModulateServerColor(Color),
-            FCogDebugSettings::GetDebugPersistent(bPersistent),
-            FCogDebugSettings::GetDebugDuration(bPersistent),
-            FCogDebugSettings::GetDebugDepthPriority(DepthPriority),
-            FCogDebugSettings::GetDebugServerThickness(Thickness));
+            FCogDebug::ModulateServerColor(Color),
+            FCogDebug::GetDebugPersistent(bPersistent),
+            FCogDebug::GetDebugDuration(bPersistent),
+            FCogDebug::GetDebugDepthPriority(DepthPriority),
+            FCogDebug::GetDebugServerThickness(Thickness));
     }
 
 #endif //ENABLE_COG
@@ -231,10 +231,10 @@ void FCogDebugShape::DrawSolidBox(UWorld* World) const
             ShapeData[0],
             ShapeData[1],
             FQuat(FRotator(ShapeData[1].X, ShapeData[1].Y, ShapeData[1].Z)),
-            FCogDebugSettings::ModulateServerColor(Color),
-            FCogDebugSettings::GetDebugPersistent(bPersistent),
-            FCogDebugSettings::GetDebugDuration(bPersistent),
-            FCogDebugSettings::GetDebugDepthPriority(DepthPriority));
+            FCogDebug::ModulateServerColor(Color),
+            FCogDebug::GetDebugPersistent(bPersistent),
+            FCogDebug::GetDebugDuration(bPersistent),
+            FCogDebug::GetDebugDepthPriority(DepthPriority));
     }
 
 #endif //ENABLE_COG
@@ -274,12 +274,12 @@ void FCogDebugShape::DrawCone(UWorld* World) const
             ShapeData[2].X,
             DefaultConeAngle,
             DefaultConeAngle,
-            FCogDebugSettings::GetCircleSegments(),
-            FCogDebugSettings::ModulateServerColor(Color),
-            FCogDebugSettings::GetDebugPersistent(bPersistent),
-            FCogDebugSettings::GetDebugDuration(bPersistent),
-            FCogDebugSettings::GetDebugDepthPriority(DepthPriority),
-            FCogDebugSettings::GetDebugServerThickness(Thickness));
+            FCogDebug::GetCircleSegments(),
+            FCogDebug::ModulateServerColor(Color),
+            FCogDebug::GetDebugPersistent(bPersistent),
+            FCogDebug::GetDebugDuration(bPersistent),
+            FCogDebug::GetDebugDepthPriority(DepthPriority),
+            FCogDebug::GetDebugServerThickness(Thickness));
     }
 
 #endif //ENABLE_COG
@@ -314,12 +314,12 @@ void FCogDebugShape::DrawCylinder(UWorld* World) const
             ShapeData[0] - FVector(0, 0, ShapeData[1].Z),
             ShapeData[0] + FVector(0, 0, ShapeData[1].Z),
             ShapeData[1].X,
-            FCogDebugSettings::GetCircleSegments(),
-            FCogDebugSettings::ModulateServerColor(Color),
-            FCogDebugSettings::GetDebugPersistent(bPersistent),
-            FCogDebugSettings::GetDebugDuration(bPersistent),
-            FCogDebugSettings::GetDebugDepthPriority(DepthPriority),
-            FCogDebugSettings::GetDebugServerThickness(Thickness));
+            FCogDebug::GetCircleSegments(),
+            FCogDebug::ModulateServerColor(Color),
+            FCogDebug::GetDebugPersistent(bPersistent),
+            FCogDebug::GetDebugDuration(bPersistent),
+            FCogDebug::GetDebugDepthPriority(DepthPriority),
+            FCogDebug::GetDebugServerThickness(Thickness));
     }
 
 #endif //ENABLE_COG
@@ -355,12 +355,12 @@ void FCogDebugShape::DrawCicle(UWorld* World) const
             World,
             FRotationTranslationMatrix(FRotator(ShapeData[1].X, ShapeData[1].Y, ShapeData[1].Z), ShapeData[0]),
             ShapeData[2].X,
-            FCogDebugSettings::GetCircleSegments(),
-            FCogDebugSettings::ModulateServerColor(Color),
-            FCogDebugSettings::GetDebugPersistent(bPersistent),
-            FCogDebugSettings::GetDebugDuration(bPersistent),
-            FCogDebugSettings::GetDebugDepthPriority(DepthPriority),
-            FCogDebugSettings::GetDebugServerThickness(Thickness),
+            FCogDebug::GetCircleSegments(),
+            FCogDebug::ModulateServerColor(Color),
+            FCogDebug::GetDebugPersistent(bPersistent),
+            FCogDebug::GetDebugDuration(bPersistent),
+            FCogDebug::GetDebugDepthPriority(DepthPriority),
+            FCogDebug::GetDebugServerThickness(Thickness),
             false);
     }
 
@@ -399,12 +399,12 @@ void FCogDebugShape::DrawCicleArc(UWorld* World) const
             ShapeData[2].X,
             ShapeData[2].Y,
             ShapeData[2].Z,
-            FCogDebugSettings::GetDebugSegments(),
-            FCogDebugSettings::ModulateServerColor(Color),
-            FCogDebugSettings::GetDebugPersistent(bPersistent),
-            FCogDebugSettings::GetDebugDuration(bPersistent),
-            FCogDebugSettings::GetDebugDepthPriority(DepthPriority),
-            FCogDebugSettings::GetDebugServerThickness(Thickness));
+            FCogDebug::GetDebugSegments(),
+            FCogDebug::ModulateServerColor(Color),
+            FCogDebug::GetDebugPersistent(bPersistent),
+            FCogDebug::GetDebugDuration(bPersistent),
+            FCogDebug::GetDebugDepthPriority(DepthPriority),
+            FCogDebug::GetDebugServerThickness(Thickness));
     }
 
 #endif //ENABLE_COG
@@ -442,11 +442,11 @@ void FCogDebugShape::DrawCapsule(UWorld* World) const
             ShapeData[1].Y,
             ShapeData[1].X,
             FQuat::MakeFromEuler(ShapeData[2]),
-            FCogDebugSettings::ModulateServerColor(Color),
-            FCogDebugSettings::GetDebugPersistent(bPersistent),
-            FCogDebugSettings::GetDebugDuration(bPersistent),
-            FCogDebugSettings::GetDebugDepthPriority(DepthPriority),
-            FCogDebugSettings::GetDebugServerThickness(Thickness));
+            FCogDebug::ModulateServerColor(Color),
+            FCogDebug::GetDebugPersistent(bPersistent),
+            FCogDebug::GetDebugDuration(bPersistent),
+            FCogDebug::GetDebugDepthPriority(DepthPriority),
+            FCogDebug::GetDebugServerThickness(Thickness));
     }
 
 #endif //ENABLE_COG
@@ -484,12 +484,12 @@ void FCogDebugShape::DrawFlatCapsule(UWorld* World) const
             FVector2D(ShapeData[1].X, ShapeData[1].Y),
             ShapeData[2].X,
             ShapeData[2].Y,
-            FCogDebugSettings::GetCircleSegments(),
-            FCogDebugSettings::ModulateServerColor(Color),
-            FCogDebugSettings::GetDebugPersistent(bPersistent),
-            FCogDebugSettings::GetDebugDuration(bPersistent),
-            FCogDebugSettings::GetDebugDepthPriority(DepthPriority),
-            FCogDebugSettings::GetDebugServerThickness(Thickness));
+            FCogDebug::GetCircleSegments(),
+            FCogDebug::ModulateServerColor(Color),
+            FCogDebug::GetDebugPersistent(bPersistent),
+            FCogDebug::GetDebugDuration(bPersistent),
+            FCogDebug::GetDebugDepthPriority(DepthPriority),
+            FCogDebug::GetDebugServerThickness(Thickness));
     }
 
 #endif //ENABLE_COG
@@ -524,20 +524,20 @@ void FCogDebugShape::DrawBone(UWorld* World) const
             World,
             ShapeData[0],
             ShapeData[1],
-            FCogDebugSettings::ModulateServerColor(Color),
-            FCogDebugSettings::GetDebugPersistent(bPersistent),
-            FCogDebugSettings::GetDebugDuration(bPersistent),
-            FCogDebugSettings::GetDebugDepthPriority(DepthPriority),
-            FCogDebugSettings::GetDebugServerThickness(Thickness));
+            FCogDebug::ModulateServerColor(Color),
+            FCogDebug::GetDebugPersistent(bPersistent),
+            FCogDebug::GetDebugDuration(bPersistent),
+            FCogDebug::GetDebugDepthPriority(DepthPriority),
+            FCogDebug::GetDebugServerThickness(Thickness));
 
         DrawDebugPoint(
             World,
             ShapeData[0],
-            FCogDebugSettings::GetDebugServerThickness(Thickness) + 4.0f,
-            FCogDebugSettings::ModulateServerColor(Color),
-            FCogDebugSettings::GetDebugPersistent(bPersistent),
-            FCogDebugSettings::GetDebugDuration(bPersistent),
-            FCogDebugSettings::GetDebugDepthPriority(DepthPriority));
+            FCogDebug::GetDebugServerThickness(Thickness) + 4.0f,
+            FCogDebug::ModulateServerColor(Color),
+            FCogDebug::GetDebugPersistent(bPersistent),
+            FCogDebug::GetDebugDuration(bPersistent),
+            FCogDebug::GetDebugDepthPriority(DepthPriority));
     }
 
 #endif //ENABLE_COG
@@ -578,10 +578,10 @@ void FCogDebugShape::DrawPolygon(UWorld* World) const
             World,
             ShapeData,
             Indices,
-            FCogDebugSettings::ModulateServerColor(Color),
-            FCogDebugSettings::GetDebugPersistent(bPersistent),
-            FCogDebugSettings::GetDebugDuration(bPersistent),
-            FCogDebugSettings::GetDebugDepthPriority(DepthPriority));
+            FCogDebug::ModulateServerColor(Color),
+            FCogDebug::GetDebugPersistent(bPersistent),
+            FCogDebug::GetDebugDuration(bPersistent),
+            FCogDebug::GetDebugDepthPriority(DepthPriority));
     }
 
 #endif //ENABLE_COG

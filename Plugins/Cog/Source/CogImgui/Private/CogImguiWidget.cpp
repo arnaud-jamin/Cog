@@ -124,17 +124,17 @@ FReply SCogImguiWidget::OnKeyChar(const FGeometry& MyGeometry, const FCharacterE
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiWidget::OnKeyDown(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent)
 {
-    return HandleKeyEvent(MyGeometry, KeyEvent, true);
+    return HandleKeyEvent(KeyEvent, true);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiWidget::OnKeyUp(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent)
 {
-    return HandleKeyEvent(MyGeometry, KeyEvent, false);
+    return HandleKeyEvent(KeyEvent, false);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FReply SCogImguiWidget::HandleKeyEvent(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent, bool Down)
+FReply SCogImguiWidget::HandleKeyEvent(const FKeyEvent& KeyEvent, bool Down)
 {
     if (Context->GetEnableInput() == false)
     {
@@ -189,31 +189,34 @@ FReply SCogImguiWidget::OnAnalogValueChanged(const FGeometry& MyGeometry, const 
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiWidget::OnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
-    if (Context->GetEnableInput() == false)
-    {
-        UE_LOG(LogCogImGui, VeryVerbose, TEXT("SCogImguiWidget::OnMouseButtonDown | %s | Unhandled | EnableInput == false"), Window.IsValid() ? *Window->GetTitle().ToString() : *FString("None"));
-        return FReply::Unhandled();
-    }
-    const uint32 MouseButton = FCogImguiInputHelper::ToImGuiMouseButton(MouseEvent.GetEffectingButton());
-    ImGui::GetIO().AddMouseSourceEvent(ImGuiMouseSource_Mouse);
-    ImGui::GetIO().AddMouseButtonEvent(MouseButton, true);
+    return HandleMouseButtonEvent(MouseEvent, true);
+}
 
-    UE_LOG(LogCogImGui, VeryVerbose, TEXT("SCogImguiWidget::OnMouseButtonDown | Window:%s | Handled"), Window.IsValid() ? *Window->GetTitle().ToString() : *FString("None"));
-    return FReply::Handled();
+//--------------------------------------------------------------------------------------------------------------------------
+FReply SCogImguiWidget::OnMouseButtonDoubleClick(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
+{
+    return HandleMouseButtonEvent(MouseEvent, true);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiWidget::OnMouseButtonUp(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
+    return HandleMouseButtonEvent(MouseEvent, false);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FReply SCogImguiWidget::HandleMouseButtonEvent(const FPointerEvent& MouseEvent, bool Down)
+{
     if (Context->GetEnableInput() == false)
     {
-        UE_LOG(LogCogImGui, VeryVerbose, TEXT("SCogImguiWidget::OnMouseButtonUp | Window:%s | Unhandled | EnableInput == false"), Window.IsValid() ? *Window->GetTitle().ToString() : *FString("None"));
+        UE_LOG(LogCogImGui, VeryVerbose, TEXT("SCogImguiWidget::HandleMouseButtonEvent | %s | Unhandled | EnableInput == false | Down:%d"), Window.IsValid() ? *Window->GetTitle().ToString() : *FString("None"), Down);
         return FReply::Unhandled();
     }
     const uint32 MouseButton = FCogImguiInputHelper::ToImGuiMouseButton(MouseEvent.GetEffectingButton());
     ImGui::GetIO().AddMouseSourceEvent(ImGuiMouseSource_Mouse);
-    ImGui::GetIO().AddMouseButtonEvent(MouseButton, false);
-    UE_LOG(LogCogImGui, VeryVerbose, TEXT("SCogImguiWidget::OnMouseButtonUp | Window:%s | Handled"), Window.IsValid() ? *Window->GetTitle().ToString() : *FString("None"));
+    ImGui::GetIO().AddMouseButtonEvent(MouseButton, Down);
+
+    UE_LOG(LogCogImGui, VeryVerbose, TEXT("SCogImguiWidget::HandleMouseButtonEvent | Window:%s | Handled | Down:%d"), Window.IsValid() ? *Window->GetTitle().ToString() : *FString("None"), Down);
     return FReply::Handled();
 }
 

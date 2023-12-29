@@ -1,6 +1,6 @@
 #include "CogEngineWindow_Skeleton.h"
 
-#include "CogDebugSettings.h"
+#include "CogDebug.h"
 #include "CogWindowWidgets.h"
 #include "Components/LineBatchComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -80,7 +80,7 @@ void FCogEngineWindow_Skeleton::RefreshSkeleton()
         CurrentBoneInfo.Name = ReferenceSkeleton.GetBoneName(BoneIndex);
         const FTransform Transform = ComponentSpaceTransforms[BoneIndex] * WorldTransform;
         CurrentBoneInfo.LastLocation = Transform.GetLocation();
-        CurrentBoneInfo.IsSecondaryBone = FCogDebugSettings::IsSecondarySkeletonBone(CurrentBoneInfo.Name);
+        CurrentBoneInfo.IsSecondaryBone = FCogDebug::IsSecondarySkeletonBone(CurrentBoneInfo.Name);
         CurrentBoneInfo.ShowBone = !(HideSecondaryBones && CurrentBoneInfo.IsSecondaryBone);
 
         const int32 ParentIndex = ReferenceSkeleton.GetParentIndex(BoneIndex);
@@ -315,13 +315,13 @@ void FCogEngineWindow_Skeleton::DrawSkeleton()
 
             if (ShowBones)
             {
-                ::DrawDebugLine(World, ParentLocation, BoneLocation, IsHovered ? FColor::Red : FColor::White, false, 0.0f, 1, FCogDebugSettings::GetDebugThickness(IsHovered ? 0.5f : 0.0f));
-                ::DrawDebugPoint(World, BoneLocation, FCogDebugSettings::GetDebugThickness(IsHovered ? 6.0f : 4.0f), IsHovered ? FColor::Red : FColor::White, false, 0.0f, 1);
+                ::DrawDebugLine(World, ParentLocation, BoneLocation, IsHovered ? FColor::Red : FColor::White, false, 0.0f, 1, FCogDebug::GetDebugThickness(IsHovered ? 0.5f : 0.0f));
+                ::DrawDebugPoint(World, BoneLocation, FCogDebug::GetDebugThickness(IsHovered ? 6.0f : 4.0f), IsHovered ? FColor::Red : FColor::White, false, 0.0f, 1);
             }
 
             if (ShowNames || BoneInfo.ShowName || IsHovered)
             {
-                ::DrawDebugString(World, BoneLocation, BoneInfo.Name.ToString(), nullptr, IsHovered ? FColor::Red : FColor::White, 0.0f, true, FCogDebugSettings::Data.TextSize);
+                ::DrawDebugString(World, BoneLocation, BoneInfo.Name.ToString(), nullptr, IsHovered ? FColor::Red : FColor::White, 0.0f, true, FCogDebug::Settings.TextSize);
             }
 
             if (ShowAxes || BoneInfo.ShowAxes)
@@ -330,11 +330,11 @@ void FCogEngineWindow_Skeleton::DrawSkeleton()
                     World,
                     BoneLocation,
                     BoneRotation,
-                    10.0f * FCogDebugSettings::Data.AxesScale,
+                    10.0f * FCogDebug::Settings.AxesScale,
                     false,
                     0.0f,
                     1,
-                    FCogDebugSettings::GetDebugThickness(0.0f));
+                    FCogDebug::GetDebugThickness(0.0f));
             }
 
             if (ShowVelocities || BoneInfo.ShowLocalVelocity)
@@ -345,35 +345,35 @@ void FCogEngineWindow_Skeleton::DrawSkeleton()
                         World,
                         BoneLocation,
                         BoneLocation + ParentBodyInstance->GetUnrealWorldVelocity() * World->GetDeltaSeconds(),
-                        FCogDebugSettings::Data.ArrowSize,
-                        FCogDebugSettings::ModulateDebugColor(World, FColor::Cyan),
-                        FCogDebugSettings::GetDebugPersistent(true),
-                        FCogDebugSettings::GetDebugDuration(true),
+                        FCogDebug::Settings.ArrowSize,
+                        FCogDebug::ModulateDebugColor(World, FColor::Cyan),
+                        FCogDebug::GetDebugPersistent(true),
+                        FCogDebug::GetDebugDuration(true),
                         0,
-                        FCogDebugSettings::GetDebugThickness(0.0f));
+                        FCogDebug::GetDebugThickness(0.0f));
                 }
             }
 
             if (ShowTrajectories || BoneInfo.ShowTrajectory)
             {
-                const FColor Color = FCogDebugSettings::ModulateDebugColor(World, FColor::Yellow);
+                const FColor Color = FCogDebug::ModulateDebugColor(World, FColor::Yellow);
                 DrawDebugLine(
                     World,
                     BoneInfo.LastLocation,
                     BoneLocation,
                     Color,
-                    FCogDebugSettings::GetDebugPersistent(true),
-                    FCogDebugSettings::GetDebugDuration(true),
+                    FCogDebug::GetDebugPersistent(true),
+                    FCogDebug::GetDebugDuration(true),
                     0,
-                    FCogDebugSettings::GetDebugThickness(0.0f));
+                    FCogDebug::GetDebugThickness(0.0f));
 
                 DrawDebugPoint(
                     World,
                     BoneLocation,
-                    FCogDebugSettings::GetDebugThickness(2.0f),
+                    FCogDebug::GetDebugThickness(2.0f),
                     Color,
-                    FCogDebugSettings::GetDebugPersistent(true),
-                    FCogDebugSettings::GetDebugDuration(true),
+                    FCogDebug::GetDebugPersistent(true),
+                    FCogDebug::GetDebugDuration(true),
                     0);
             }
 
