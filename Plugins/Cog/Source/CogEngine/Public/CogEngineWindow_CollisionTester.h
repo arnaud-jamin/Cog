@@ -23,10 +23,11 @@ enum class ECogEngine_CollisionQueryType : uint8
 
 //--------------------------------------------------------------------------------------------------------------------------
 UENUM()
-enum class ECogEngine_CollisionQueryCount : uint8
+enum class ECogEngine_CollisionQueryMode : uint8
 {
     Single,
     Multi,
+    Test,
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -62,7 +63,6 @@ public:
 protected:
 
     virtual void ResetConfig() override;
-    void DoWork(const UCollisionProfile* CollisionProfile);
 
     virtual void RenderHelp() override;
 
@@ -126,22 +126,19 @@ public:
     ECogEngine_CollisionQueryType Type;
 
     UPROPERTY(Config)
+    ECogEngine_CollisionQueryMode Mode;
+
+    UPROPERTY(Config)
     ECogEngine_CollisionQueryBy By;
 
     UPROPERTY(Config)
     ECogEngine_CollisionQueryShape Shape;
 
     UPROPERTY(Config)
-    bool MultiHits;
-
-    UPROPERTY(Config)
     bool TraceComplex;
 
     UPROPERTY(Config)
     int32 ObjectTypesToQuery;
-
-    UPROPERTY(Config)
-    FName Profile;
 
     UPROPERTY(Config)
     TEnumAsByte<ECollisionChannel> Channel;
@@ -199,8 +196,8 @@ public:
 
         Type = ECogEngine_CollisionQueryType::LineTrace;
         By = ECogEngine_CollisionQueryBy::Channel;
+        Mode = ECogEngine_CollisionQueryMode::Multi;
         Channel = ECC_WorldStatic;
-        MultiHits = false;
         TraceComplex = false;
         Shape = ECogEngine_CollisionQueryShape::Sphere;
         ShapeExtent = FVector(50.0f, 50.0f, 50.0f);

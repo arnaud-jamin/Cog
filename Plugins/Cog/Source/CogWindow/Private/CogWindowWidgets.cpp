@@ -648,3 +648,42 @@ bool FCogWindowWidgets::ComboCollisionChannel(const char* Label, ECollisionChann
 
     return Result;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::CollisionProfileChannel(const UCollisionProfile& CollisionProfile, const int32 ChannelIndex, int32& Channels)
+{
+    bool Result = false;
+
+    bool IsCollisionActive = (Channels & ECC_TO_BITFIELD(ChannelIndex)) > 0;
+    const FName ChannelName = CollisionProfile.ReturnChannelNameFromContainerIndex(ChannelIndex);
+    if (ImGui::Checkbox(TCHAR_TO_ANSI(*ChannelName.ToString()), &IsCollisionActive))
+    {
+        Result = true;
+
+        if (IsCollisionActive)
+        {
+            Channels |= ECC_TO_BITFIELD(ChannelIndex);
+        }
+        else
+        {
+            Channels &= ~ECC_TO_BITFIELD(ChannelIndex);
+        }
+    }
+
+	return Result;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::CollisionProfileChannels(const UCollisionProfile& CollisionProfile, int32& Channels)
+{
+    bool Result = false;
+
+    for (int32 ChannelIndex = 0; ChannelIndex < (int32)ECC_MAX; ++ChannelIndex)
+    {
+        ImGui::PushID(ChannelIndex);
+        Result |= CollisionProfileChannel(CollisionProfile, ChannelIndex, Channels);
+        ImGui::PopID();
+    }
+
+    return Result;
+}

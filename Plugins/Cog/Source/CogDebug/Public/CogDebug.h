@@ -110,7 +110,7 @@ struct FCogDebugSettings
     TEnumAsByte<ECollisionChannel> GizmoGroundRaycastChannel = ECollisionChannel::ECC_WorldStatic;
 
 	UPROPERTY(Config)
-    float GizmoGroundRaycastCircleRadius = 10.f;
+    float GizmoGroundRaycastCircleRadius = 5.0f;
 
     UPROPERTY(Config)
     FColor GizmoAxisColorsZHighX = FColor(255, 50, 50, 255);
