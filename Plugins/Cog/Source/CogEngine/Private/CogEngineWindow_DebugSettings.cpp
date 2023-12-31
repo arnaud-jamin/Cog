@@ -173,10 +173,9 @@ void FCogEngineWindow_DebugSettings::RenderContent()
         ImGui::SetTooltip("The size of the debug texts.");
     }
 
-    if (Config->bShowAdvancedSettings)
-    {
-        ImGui::SeparatorText("Gizmo");
-    }
+    ImGui::SeparatorText("Gizmo");
+
+    ImGui::Checkbox("Gizmo Use Local Space", &Settings.GizmoUseLocalSpace);
 
     FCogWindowWidgets::SetNextItemToShortWidth();
     ImGui::DragFloat("Gizmo Scale", &Settings.GizmoScale, 0.1f, 0.1f, 10.0f, "%.1f");
@@ -187,9 +186,6 @@ void FCogEngineWindow_DebugSettings::RenderContent()
 
     if (Config->bShowAdvancedSettings)
     {
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragFloat("Gizmo Axis Length", &Settings.GizmoAxisLength, 0.1f, 0.1f, 500.0f, "%.1f");
-
         FCogWindowWidgets::SetNextItemToShortWidth();
         ImGui::DragInt("Gizmo Z Low", &Settings.GizmoZLow, 0.5f, 0, 1000);
 
@@ -206,10 +202,43 @@ void FCogEngineWindow_DebugSettings::RenderContent()
         ImGui::DragFloat("Gizmo Mouse Max Distance", &Settings.GizmoCursorSelectionThreshold, 0.1f, 0.0f, 50.0f, "%.1f");
 
         FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragFloat("Gizmo Plane Offset", &Settings.GizmoPlaneOffset, 0.1f, 0.0f, 500.0f, "%.1f");
+        ImGui::Checkbox("Gizmo Translation Snap Enable", &Settings.GizmoTranslationSnapEnable);
 
         FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragFloat("Gizmo Plane Extent", &Settings.GizmoPlaneExtent, 0.1f, 0.0f, 100.0f, "%.1f");
+        ImGui::DragFloat("Gizmo Translation Snap", &Settings.GizmoTranslationSnap, 0.1f, 0.0f, 1000.0f, "%.1f");
+
+        FCogWindowWidgets::SetNextItemToShortWidth();
+        ImGui::DragFloat("Gizmo Translation Axis Length", &Settings.GizmoTranslationAxisLength, 0.1f, 0.1f, 500.0f, "%.1f");
+
+        FCogWindowWidgets::SetNextItemToShortWidth();
+        ImGui::DragFloat("Gizmo Translation Plane Offset", &Settings.GizmoTranslationPlaneOffset, 0.1f, 0.0f, 500.0f, "%.1f");
+
+        FCogWindowWidgets::SetNextItemToShortWidth();
+        ImGui::DragFloat("Gizmo Translation Plane Extent", &Settings.GizmoTranslationPlaneExtent, 0.1f, 0.0f, 100.0f, "%.1f");
+
+        FCogWindowWidgets::SetNextItemToShortWidth();
+        ImGui::Checkbox("Gizmo Rotation Snap Enable", &Settings.GizmoRotationSnapEnable);
+
+        FCogWindowWidgets::SetNextItemToShortWidth();
+        ImGui::DragFloat("Gizmo Rotation Snap", &Settings.GizmoRotationSnap, 0.1f, 0.0f, 360.0f, "%.1f");
+
+        FCogWindowWidgets::SetNextItemToShortWidth();
+        ImGui::DragFloat("Gizmo Rotation Speed", &Settings.GizmoRotationSpeed, 0.01f, 0.01f, 100.0f, "%.2f");
+
+        FCogWindowWidgets::SetNextItemToShortWidth();
+        ImGui::DragFloat("Gizmo Rotation Radius", &Settings.GizmoRotationRadius, 0.1f, 0.1f, 500.0f, "%.1f");
+
+        FCogWindowWidgets::SetNextItemToShortWidth();
+        ImGui::DragInt("Gizmo Rotation Segments", &Settings.GizmoRotationSegments, 0.5f, 2, 12);
+
+        FCogWindowWidgets::SetNextItemToShortWidth();
+        ImGui::Checkbox("Gizmo Scale Snap Enable", &Settings.GizmoScaleSnapEnable);
+
+        FCogWindowWidgets::SetNextItemToShortWidth();
+        ImGui::DragFloat("Gizmo Scale Snap", &Settings.GizmoScaleSnap, 0.1f, 0.0f, 10.0f, "%.1f");
+
+        FCogWindowWidgets::SetNextItemToShortWidth();
+        ImGui::DragFloat("Gizmo Scale Box Offset", &Settings.GizmoScaleBoxOffset, 0.0f, 0.0f, 500.0f, "%.1f");
 
         FCogWindowWidgets::SetNextItemToShortWidth();
         ImGui::DragFloat("Gizmo Scale Box Extent", &Settings.GizmoScaleBoxExtent, 0.1f, 0.0f, 100.0f, "%.1f");
@@ -219,12 +248,6 @@ void FCogEngineWindow_DebugSettings::RenderContent()
 
         FCogWindowWidgets::SetNextItemToShortWidth();
         ImGui::DragFloat("Gizmo Scale Min", &Settings.GizmoScaleMin, 0.001f, 0.001f, 1.0f, "%.3f");
-
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragFloat("Gizmo Rotation Radius", &Settings.GizmoRotationRadius, 0.1f, 0.1f, 500.0f, "%.1f");
-
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragInt("Gizmo Rotation Segments", &Settings.GizmoRotationSegments, 0.5f, 2, 12);
 
         FCogWindowWidgets::SetNextItemToShortWidth();
         ImGui::DragFloat("Gizmo Ground Raycast Length", &Settings.GizmoGroundRaycastLength, 10.0f, 0.0f, 1000000.0f, "%.0f");
@@ -253,6 +276,8 @@ void FCogEngineWindow_DebugSettings::RenderContent()
         FCogImguiHelper::ColorEdit4("Gizmo Axis Colors Selection Y", Settings.GizmoAxisColorsSelectionY, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
         FCogImguiHelper::ColorEdit4("Gizmo Axis Colors Selection Z", Settings.GizmoAxisColorsSelectionZ, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
         FCogImguiHelper::ColorEdit4("Gizmo Axis Colors Selection W", Settings.GizmoAxisColorsSelectionW, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+
+        FCogImguiHelper::ColorEdit4("Gizmo Text Color", Settings.GizmoTextColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
 
         FCogImguiHelper::ColorEdit4("Gizmo Ground Raycast Color", Settings.GizmoGroundRaycastColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
         FCogImguiHelper::ColorEdit4("Gizmo Ground Raycast Circle Color", Settings.GizmoGroundRaycastCircleColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);

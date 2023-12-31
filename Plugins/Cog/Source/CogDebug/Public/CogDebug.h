@@ -62,7 +62,7 @@ struct FCogDebugSettings
     float GizmoScale = 1.0f;
 
     UPROPERTY(Config)
-    float GizmoAxisLength = 50.0f;
+    bool GizmoUseLocalSpace = false;
 
     UPROPERTY(Config)
     int GizmoZLow = 0;
@@ -83,10 +83,43 @@ struct FCogDebugSettings
     float GizmoCursorSelectionThreshold = 10.0f;
 
     UPROPERTY(Config)
-    float GizmoPlaneOffset = 25.0f;
+    float GizmoTranslationAxisLength = 50.0f;
 
     UPROPERTY(Config)
-    float GizmoPlaneExtent = 5.0f;
+    bool GizmoTranslationSnapEnable = true;
+
+    UPROPERTY(Config)
+    float GizmoTranslationSnap = 10.0f;
+
+    UPROPERTY(Config)
+    float GizmoTranslationPlaneOffset = 25.0f;
+
+    UPROPERTY(Config)
+    float GizmoTranslationPlaneExtent = 5.0f;
+
+    UPROPERTY(Config)
+    bool GizmoRotationSnapEnable = true;
+
+    UPROPERTY(Config)
+    float GizmoRotationSnap = 10.0f;
+
+    UPROPERTY(Config)
+    float GizmoRotationSpeed = 0.01f;
+
+    UPROPERTY(Config)
+    float GizmoRotationRadius = 15.0f;
+
+    UPROPERTY(Config)
+    int GizmoRotationSegments = 12;
+
+    UPROPERTY(Config)
+    bool GizmoScaleSnapEnable = true;
+
+    UPROPERTY(Config)
+    float GizmoScaleSnap = 1.0f;
+
+    UPROPERTY(Config)
+    float GizmoScaleBoxOffset = 50.0f;
 
     UPROPERTY(Config)
     float GizmoScaleBoxExtent = 2.0f;
@@ -96,12 +129,6 @@ struct FCogDebugSettings
 
     UPROPERTY(Config)
     float GizmoScaleMin = 0.001f;
-
-    UPROPERTY(Config)
-    float GizmoRotationRadius = 15.0f;
-
-    UPROPERTY(Config)
-    int GizmoRotationSegments = 12;
 
     UPROPERTY(Config)
     float GizmoGroundRaycastLength = 100000.0f;
@@ -153,6 +180,9 @@ struct FCogDebugSettings
 
     UPROPERTY(Config)
     FColor GizmoGroundRaycastCircleColor = FColor(128, 128, 128, 255);
+
+    UPROPERTY(Config)
+    FColor GizmoTextColor = FColor(255, 255, 255, 255);
 
     UPROPERTY(Config)
     TArray<FString> SecondaryBoneWildcards = {

@@ -153,19 +153,6 @@ void FCogDebugDrawImGui::AddCircleFilled(const ImVec2& Center, float Radius, ImU
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDrawImGui::AddText(const ImVec2& Pos, const FString& Text, ImU32 Color, bool AddShadow /*= false*/, float Duration/* = 0.0f*/, bool FadeColor /*= false*/)
 {
-    if (AddShadow)
-    {
-        FText ShadowTextElement;
-        ShadowTextElement.Pos = Pos + ImVec2(1, 1);
-        ShadowTextElement.Text = Text;
-        float Alpha = ImGui::ColorConvertU32ToFloat4(Color).w; // Keep original Alpha and set to black
-        ShadowTextElement.Color = ImGui::ColorConvertFloat4ToU32(ImVec4(0, 0, 0, Alpha));
-        ShadowTextElement.Time = ImGui::GetCurrentContext()->Time;
-        ShadowTextElement.Duration = Duration;
-        ShadowTextElement.FadeColor = FadeColor;
-        Texts.Add_GetRef(ShadowTextElement);
-    }
-
     FText TextElement;
     TextElement.Pos = Pos;
     TextElement.Text = Text;
@@ -174,6 +161,19 @@ void FCogDebugDrawImGui::AddText(const ImVec2& Pos, const FString& Text, ImU32 C
     TextElement.Duration = Duration;
     TextElement.FadeColor = FadeColor;
     Texts.Add_GetRef(TextElement);
+
+    if (AddShadow)
+    {
+        FText ShadowTextElement;
+        ShadowTextElement.Pos = Pos + ImVec2(1, 1);
+        ShadowTextElement.Text = Text;
+        const float Alpha = ImGui::ColorConvertU32ToFloat4(Color).w; // Keep original Alpha and set to black
+        ShadowTextElement.Color = ImGui::ColorConvertFloat4ToU32(ImVec4(0, 0, 0, Alpha));
+        ShadowTextElement.Time = ImGui::GetCurrentContext()->Time;
+        ShadowTextElement.Duration = Duration;
+        ShadowTextElement.FadeColor = FadeColor;
+        Texts.Add_GetRef(ShadowTextElement);
+    }
 }
 
 

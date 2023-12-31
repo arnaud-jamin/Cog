@@ -77,7 +77,6 @@ struct COGDEBUG_API FCogDebug_Gizmo
 {
     void Draw(const char* Id, const APlayerController& InPlayerController, FTransform& InOutTransform, ECogDebug_GizmoFlags Flags = ECogDebug_GizmoFlags::None);
 
-    bool UseLocalSpace = false;
     ECogDebug_GizmoElementType DraggedElementType = ECogDebug_GizmoElementType::MAX;
     FVector2D CursorOffset = FVector2D::ZeroVector;
     FTransform InitialTransform = FTransform::Identity;

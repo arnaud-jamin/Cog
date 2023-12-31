@@ -160,9 +160,59 @@ bool FCogImguiHelper::DragFVector(const char* Label, FVector& Vector, float Spee
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+bool FCogImguiHelper::DragFVector(const char* Label, FVector& Vector, const FVector& ResetVector, float Speed, double Min, double Max, const char* Format, ImGuiSliderFlags Flags)
+{
+    bool Result = ImGui::DragScalarN(Label, ImGuiDataType_Double, &Vector.X, 3, Speed, &Min, &Max, Format, Flags);
+
+    if (ImGui::BeginPopupContextItem(Label))
+    {
+        if (ImGui::Button("Reset"))
+        {
+            Vector = ResetVector;
+            Result = true;
+
+            if (ImGuiWindow* Window = GetCurrentWindow())
+            {
+                const ImGuiID ID = Window->GetID(Label);
+                ImGui::MarkItemEdited(ID);
+            }
+        }
+
+        ImGui::EndPopup();
+    }
+
+    return Result;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 bool FCogImguiHelper::DragFRotator(const char* Label, FRotator& Rotator, float Speed, double Min, double Max, const char* Format, ImGuiSliderFlags Flags)
 {
     return ImGui::DragScalarN(Label, ImGuiDataType_Double, &Rotator.Pitch, 3, Speed, &Min, &Max, Format, Flags);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogImguiHelper::DragFRotator(const char* Label, FRotator& Rotator, const FRotator& ResetRotator, float Speed, double Min, double Max, const char* Format, ImGuiSliderFlags Flags)
+{
+    bool Result = ImGui::DragScalarN(Label, ImGuiDataType_Double, &Rotator.Pitch, 3, Speed, &Min, &Max, Format, Flags);
+
+    if (ImGui::BeginPopupContextItem(Label))
+    {
+        if (ImGui::Button("Reset"))
+        {
+            Rotator = ResetRotator;
+            Result = true;
+
+            if (ImGuiWindow* Window = GetCurrentWindow())
+            {
+                const ImGuiID ID = Window->GetID(Label);
+                ImGui::MarkItemEdited(ID);
+            }
+        }
+
+        ImGui::EndPopup();
+    }
+
+    return Result;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
