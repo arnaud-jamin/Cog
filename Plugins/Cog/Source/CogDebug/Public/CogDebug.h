@@ -89,7 +89,7 @@ struct FCogDebugSettings
     bool GizmoTranslationSnapEnable = true;
 
     UPROPERTY(Config)
-    float GizmoTranslationSnap = 10.0f;
+    float GizmoTranslationSnapValue = 10.0f;
 
     UPROPERTY(Config)
     float GizmoTranslationPlaneOffset = 25.0f;
@@ -101,7 +101,7 @@ struct FCogDebugSettings
     bool GizmoRotationSnapEnable = true;
 
     UPROPERTY(Config)
-    float GizmoRotationSnap = 10.0f;
+    float GizmoRotationSnapValue = 10.0f;
 
     UPROPERTY(Config)
     float GizmoRotationSpeed = 0.01f;
@@ -116,7 +116,7 @@ struct FCogDebugSettings
     bool GizmoScaleSnapEnable = true;
 
     UPROPERTY(Config)
-    float GizmoScaleSnap = 1.0f;
+    float GizmoScaleSnapValue = 1.0f;
 
     UPROPERTY(Config)
     float GizmoScaleBoxOffset = 50.0f;

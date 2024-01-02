@@ -23,15 +23,15 @@ public class CogEngine : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
+                "CogDebug",
             }
-            );
+		);
 			
 		
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
 				"CogCommon",
-                "CogDebug",
                 "CogImgui",
                 "CogWindow",
 				"Core",

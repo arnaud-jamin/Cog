@@ -205,7 +205,7 @@ void FCogEngineWindow_DebugSettings::RenderContent()
         ImGui::Checkbox("Gizmo Translation Snap Enable", &Settings.GizmoTranslationSnapEnable);
 
         FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragFloat("Gizmo Translation Snap", &Settings.GizmoTranslationSnap, 0.1f, 0.0f, 1000.0f, "%.1f");
+        ImGui::DragFloat("Gizmo Translation Snap", &Settings.GizmoTranslationSnapValue, 0.1f, 0.0f, 1000.0f, "%.1f");
 
         FCogWindowWidgets::SetNextItemToShortWidth();
         ImGui::DragFloat("Gizmo Translation Axis Length", &Settings.GizmoTranslationAxisLength, 0.1f, 0.1f, 500.0f, "%.1f");
@@ -220,7 +220,7 @@ void FCogEngineWindow_DebugSettings::RenderContent()
         ImGui::Checkbox("Gizmo Rotation Snap Enable", &Settings.GizmoRotationSnapEnable);
 
         FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragFloat("Gizmo Rotation Snap", &Settings.GizmoRotationSnap, 0.1f, 0.0f, 360.0f, "%.1f");
+        ImGui::DragFloat("Gizmo Rotation Snap", &Settings.GizmoRotationSnapValue, 0.1f, 0.0f, 360.0f, "%.1f");
 
         FCogWindowWidgets::SetNextItemToShortWidth();
         ImGui::DragFloat("Gizmo Rotation Speed", &Settings.GizmoRotationSpeed, 0.01f, 0.01f, 100.0f, "%.2f");
@@ -235,7 +235,7 @@ void FCogEngineWindow_DebugSettings::RenderContent()
         ImGui::Checkbox("Gizmo Scale Snap Enable", &Settings.GizmoScaleSnapEnable);
 
         FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragFloat("Gizmo Scale Snap", &Settings.GizmoScaleSnap, 0.1f, 0.0f, 10.0f, "%.1f");
+        ImGui::DragFloat("Gizmo Scale Snap", &Settings.GizmoScaleSnapValue, 0.1f, 0.0f, 10.0f, "%.1f");
 
         FCogWindowWidgets::SetNextItemToShortWidth();
         ImGui::DragFloat("Gizmo Scale Box Offset", &Settings.GizmoScaleBoxOffset, 0.0f, 0.0f, 500.0f, "%.1f");

@@ -75,7 +75,7 @@ struct FCogDebug_GizmoElement
 //--------------------------------------------------------------------------------------------------------------------------
 struct COGDEBUG_API FCogDebug_Gizmo
 {
-    void Draw(const char* Id, const APlayerController& InPlayerController, FTransform& InOutTransform, ECogDebug_GizmoFlags Flags = ECogDebug_GizmoFlags::None);
+    bool Draw(const char* Id, const APlayerController& InPlayerController, FTransform& InOutTransform, ECogDebug_GizmoFlags Flags = ECogDebug_GizmoFlags::None);
 
     ECogDebug_GizmoElementType DraggedElementType = ECogDebug_GizmoElementType::MAX;
     FVector2D CursorOffset = FVector2D::ZeroVector;

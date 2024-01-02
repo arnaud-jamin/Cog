@@ -41,6 +41,7 @@
 #include "CogEngineWindow_Spawns.h"
 #include "CogEngineWindow_Stats.h"
 #include "CogEngineWindow_TimeScale.h"
+#include "CogEngineWindow_Transform.h"
 #include "CogImguiModule.h"
 #include "CogInputDataAsset.h"
 #include "CogInputWindow_Actions.h"
@@ -173,6 +174,8 @@ void ACogSampleGameState::InitializeCog()
     FCogEngineWindow_Stats* StatsWindow = CogWindowManager->AddWindow<FCogEngineWindow_Stats>("Engine.Stats");
 
     CogWindowManager->AddWindow<FCogEngineWindow_TimeScale>("Engine.Time Scale");
+
+    CogWindowManager->AddWindow<FCogEngineWindow_Transform>("Engine.Transform");
 
     //---------------------------------------
     // Abilities

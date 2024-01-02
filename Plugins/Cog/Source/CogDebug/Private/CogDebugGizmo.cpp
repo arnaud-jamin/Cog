@@ -1,17 +1,12 @@
 #include "CogDebugGizmo.h"
 
 #include "CogDebug.h"
-#include "CogDebugDraw.h"
 #include "CogDebugDrawHelper.h"
-#include "CogDebugDrawImGui.h"
 #include "CogImGuiHelper.h"
-#include "CogWindowWidgets.h"
-#include "CogWindowWidgets.h"
 #include "Components/PrimitiveComponent.h"
 #include "Components/SceneComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "imgui.h"
-#include "../../ThirdParty/ImGui/imgui.h"
 #include "Kismet/GameplayStatics.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -163,7 +158,7 @@ void DrawGizmoText(const ImVec2& Position, ImU32 Color, const char* Text)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool AddTransformComponent(const char* Label, double* Value, double Reset)
+bool RenderComponent(const char* Label, double* Value, double Reset)
 {
     ImGui::TableNextColumn();
 	ImGui::PushItemWidth(-1);
@@ -178,7 +173,7 @@ bool AddTransformComponent(const char* Label, double* Value, double Reset)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void AddTransformSnap(bool* SnapEnable, float* Snap)
+void RenderSnap(bool* SnapEnable, float* Snap)
 {
     ImGui::TableNextColumn();
     ImGui::PushItemWidth(-1);
@@ -192,14 +187,14 @@ void AddTransformSnap(bool* SnapEnable, float* Snap)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerController, FTransform& InOutTransform, ECogDebug_GizmoFlags Flags)
+bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerController, FTransform& InOutTransform, ECogDebug_GizmoFlags Flags)
 {
     UWorld* World = InPlayerController.GetWorld();
 
     const ImGuiViewport* Viewport = ImGui::GetMainViewport();
     if (Viewport == nullptr)
     {
-        return;
+        return false;
     }
 
     const FVector GizmoCenter = InOutTransform.GetTranslation();
@@ -210,10 +205,13 @@ void FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
         if (DraggedElementType != ECogDebug_GizmoElementType::MAX)
         {
             InOutTransform = InitialTransform;
+            return true;
         }
 
-        return;
+        return false;
     }
+
+    bool Result = false;
 
     const ImGuiIO& IO = ImGui::GetIO();
     FCogDebugSettings& Settings = FCogDebug::Settings;
@@ -420,9 +418,10 @@ void FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
                 {
                     const FVector CursorOnLine = GetMouseCursorOnLine(InPlayerController, InitialTransform.GetTranslation(), DraggedElement.Direction, MousePos - CursorOffset);
                     const float Delta = FVector::DotProduct(DraggedElement.Direction, CursorOnLine - InitialTransform.GetTranslation());
-                    const float SnappedDelta = FMath::GridSnap(Delta, Settings.GizmoTranslationSnapEnable ? Settings.GizmoTranslationSnap : 0.0f);
+                    const float SnappedDelta = FMath::GridSnap(Delta, Settings.GizmoTranslationSnapEnable ? Settings.GizmoTranslationSnapValue : 0.0f);
                     const FVector NewLocation = InitialTransform.GetTranslation() + DraggedElement.Direction * SnappedDelta;
                     InOutTransform.SetLocation(NewLocation);
+                    Result = true;
 
                     const FString Text = FString::Printf(TEXT("%0.1f"), SnappedDelta);
                     DrawGizmoText(FCogImguiHelper::ToImVec2(Center2D), FCogImguiHelper::ToImU32(Settings.GizmoTextColor), StringCast<ANSICHAR>(*Text).Get());
@@ -446,12 +445,13 @@ void FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
                     const FVector V = DraggedElement.Rotation.GetAxisY();
                     const float DeltaU = FVector::DotProduct(U, CursorOnPlane - InitialTransform.GetTranslation());
                     const float DeltaV = FVector::DotProduct(V, CursorOnPlane - InitialTransform.GetTranslation());
-                    const float SnappedDeltaU = FMath::GridSnap(DeltaU, Settings.GizmoTranslationSnapEnable ? Settings.GizmoTranslationSnap : 0.0f);
-                    const float SnappedDeltaV = FMath::GridSnap(DeltaV, Settings.GizmoTranslationSnapEnable ? Settings.GizmoTranslationSnap : 0.0f);
+                    const float SnappedDeltaU = FMath::GridSnap(DeltaU, Settings.GizmoTranslationSnapEnable ? Settings.GizmoTranslationSnapValue : 0.0f);
+                    const float SnappedDeltaV = FMath::GridSnap(DeltaV, Settings.GizmoTranslationSnapEnable ? Settings.GizmoTranslationSnapValue : 0.0f);
                     const FVector WorldDeltaU = U * SnappedDeltaU;
                     const FVector WorldDeltaV = V * SnappedDeltaV;
                     const FVector NewLocation = InitialTransform.GetTranslation() + WorldDeltaU + WorldDeltaV;
                     InOutTransform.SetLocation(NewLocation);
+                    Result = true;
 
                     const FString Text = FString::Printf(TEXT("%0.1f  %0.1f"), SnappedDeltaU, SnappedDeltaV);
                     DrawGizmoText(FCogImguiHelper::ToImVec2(Center2D), FCogImguiHelper::ToImU32(Settings.GizmoTextColor), StringCast<ANSICHAR>(*Text).Get());
@@ -468,10 +468,11 @@ void FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
                     const FVector2D DragDelta = FCogImguiHelper::ToFVector2D(ImGui::GetMouseDragDelta(ImGuiMouseButton_Left));
                     const float DragAmount = DragDelta.X - DragDelta.Y;
                     const float NormalizedAngle = FRotator::NormalizeAxis(DragAmount * Settings.GizmoRotationSpeed);
-                    const float SnappedAngle = FMath::GridSnap(NormalizedAngle, Settings.GizmoRotationSnapEnable ? Settings.GizmoRotationSnap : 0.0f);
+                    const float SnappedAngle = FMath::GridSnap(NormalizedAngle, Settings.GizmoRotationSnapEnable ? Settings.GizmoRotationSnapValue : 0.0f);
                     const FQuat RotDelta(-DraggedElement.Axis, FMath::DegreesToRadians(SnappedAngle));
 					const FQuat NewRot = (Settings.GizmoUseLocalSpace) ? InitialTransform.GetRotation() * RotDelta : RotDelta * InitialTransform.GetRotation();
                     InOutTransform.SetRotation(NewRot);
+                    Result = true;
 
                     const FString Text = FString::Printf(TEXT("%0.1f"), SnappedAngle);
                     DrawGizmoText(FCogImguiHelper::ToImVec2(Center2D), FCogImguiHelper::ToImU32(Settings.GizmoTextColor), StringCast<ANSICHAR>(*Text).Get());
@@ -484,9 +485,10 @@ void FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
                     const FVector Point = GetMouseCursorOnLine(InPlayerController, GizmoCenter, DraggedElement.Direction, MousePos - CursorOffset);
                     const float Sign = FMath::Sign(FVector::DotProduct(DraggedElement.Direction, Point - GizmoCenter));
                     const float Delta = (Point - GizmoCenter).Length() * Sign;
-                    const float SnappedDelta = FMath::GridSnap(Delta, Settings.GizmoScaleSnapEnable ? Settings.GizmoScaleSnap : 0.0f);
+                    const float SnappedDelta = FMath::GridSnap(Delta, Settings.GizmoScaleSnapEnable ? Settings.GizmoScaleSnapValue : 0.0f);
                     const FVector NewScale = VectorMax(InitialTransform.GetScale3D() + (DraggedElement.Axis * SnappedDelta * Settings.GizmoScaleSpeed), Settings.GizmoScaleMin);
                     InOutTransform.SetScale3D(NewScale);
+                    Result = true;
 
                     const FString Text = FString::Printf(TEXT("%0.1f"), SnappedDelta);
                     DrawGizmoText(FCogImguiHelper::ToImVec2(Center2D), FCogImguiHelper::ToImU32(Settings.GizmoTextColor), StringCast<ANSICHAR>(*Text).Get());
@@ -498,9 +500,10 @@ void FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
                 {
                     const FVector2D DragDelta = FCogImguiHelper::ToFVector2D(ImGui::GetMouseDragDelta(ImGuiMouseButton_Left));
                     const float Delta = DragDelta.X - DragDelta.Y;
-                    const float SnappedDelta = FMath::GridSnap(Delta, Settings.GizmoScaleSnapEnable ? Settings.GizmoScaleSnap : 0.0f);
+                    const float SnappedDelta = FMath::GridSnap(Delta, Settings.GizmoScaleSnapEnable ? Settings.GizmoScaleSnapValue : 0.0f);
                     const FVector NewScale = VectorMax(InitialTransform.GetScale3D() + (DraggedElement.Axis * SnappedDelta * Settings.GizmoScaleSpeed), Settings.GizmoScaleMin);
                     InOutTransform.SetScale3D(NewScale);
+                    Result = true;
 
                     const FString Text = FString::Printf(TEXT("%0.1f"), SnappedDelta);
                     DrawGizmoText(FCogImguiHelper::ToImVec2(Center2D), FCogImguiHelper::ToImU32(Settings.GizmoTextColor), StringCast<ANSICHAR>(*Text).Get());
@@ -522,69 +525,70 @@ void FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
             CursorOffset = MousePos - Center2D;
             InitialTransform = InOutTransform;
         }
-        else if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
-        {
-            ImGui::OpenPopup(Id);
-        }
+        //else if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+        //{
+        //    ImGui::OpenPopup(Id);
+        //}
     }
 
-    if (ImGui::BeginPopup(Id))
-    {
-        FVector Translation = InOutTransform.GetTranslation();
-        FRotator Rotation = InOutTransform.GetRotation().Rotator();
-        FVector Scale = InOutTransform.GetScale3D();
+    //if (ImGui::BeginPopup(Id))
+    //{
+    //    FVector Translation = InOutTransform.GetTranslation();
+    //    FRotator Rotation = InOutTransform.GetRotation().Rotator();
+    //    FVector Scale = InOutTransform.GetScale3D();
 
-        ImGui::Checkbox("Local Space", &Settings.GizmoUseLocalSpace);
+    //    ImGui::Checkbox("Local Space", &Settings.GizmoUseLocalSpace);
 
-        ImGui::Separator();
+    //    ImGui::Separator();
 
-        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(1.0f, 1.0f));
+    //    ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(1.0f, 1.0f));
 
-        if (ImGui::BeginTable("Pools", 6, ImGuiTableFlags_SizingFixedFit))
-        {
-            ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFontSize() * 5);
-            ImGui::TableSetupColumn("X", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFontSize() * 4);
-            ImGui::TableSetupColumn("Y", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFontSize() * 4);
-            ImGui::TableSetupColumn("Z", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFontSize() * 4);
-            ImGui::TableSetupColumn("SnapEnable", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFontSize() * 4);
-            ImGui::TableSetupColumn("Snap", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFontSize() * 3);
+    //    if (ImGui::BeginTable("Pools", 6, ImGuiTableFlags_SizingFixedFit))
+    //    {
+    //        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFontSize() * 5);
+    //        ImGui::TableSetupColumn("X", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFontSize() * 4);
+    //        ImGui::TableSetupColumn("Y", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFontSize() * 4);
+    //        ImGui::TableSetupColumn("Z", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFontSize() * 4);
+    //        ImGui::TableSetupColumn("SnapEnable", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFontSize() * 4);
+    //        ImGui::TableSetupColumn("Snap", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFontSize() * 3);
 
-            ImGui::PushID("Location");
-            ImGui::TableNextRow();
-            ImGui::TableNextColumn();
-            ImGui::Text("Location");
-            if (AddTransformComponent("##X", &Translation.X, 0.0)) { InOutTransform.SetTranslation(Translation); }
-            if (AddTransformComponent("##Y", &Translation.Y, 0.0)) { InOutTransform.SetTranslation(Translation); }
-            if (AddTransformComponent("##Z", &Translation.Z, 0.0)) { InOutTransform.SetTranslation(Translation); }
-            AddTransformSnap(&Settings.GizmoTranslationSnapEnable, &Settings.GizmoTranslationSnap);
-            ImGui::PopID();
+    //        ImGui::PushID("Location");
+    //        ImGui::TableNextRow();
+    //        ImGui::TableNextColumn();
+    //        ImGui::Text("Location");
+    //        if (RenderComponent("##X", &Translation.X, 0.0)) { InOutTransform.SetTranslation(Translation); }
+    //        if (RenderComponent("##Y", &Translation.Y, 0.0)) { InOutTransform.SetTranslation(Translation); }
+    //        if (RenderComponent("##Z", &Translation.Z, 0.0)) { InOutTransform.SetTranslation(Translation); }
+    //        RenderSnap(&Settings.GizmoTranslationSnapEnable, &Settings.GizmoTranslationSnapValue);
+    //        ImGui::PopID();
 
-            ImGui::PushID("Rotation");
-            ImGui::TableNextRow();
-            ImGui::TableNextColumn();
-            ImGui::Text("Rotation");
-            if (AddTransformComponent("##X", &Rotation.Yaw, 0.0))   { InOutTransform.SetRotation(Rotation.Quaternion()); }
-            if (AddTransformComponent("##Y", &Rotation.Pitch, 0.0)) { InOutTransform.SetRotation(Rotation.Quaternion()); }
-            if (AddTransformComponent("##Z", &Rotation.Roll, 0.0))  { InOutTransform.SetRotation(Rotation.Quaternion()); }
-            AddTransformSnap(&Settings.GizmoRotationSnapEnable, &Settings.GizmoRotationSnap);
-            ImGui::PopID();
+    //        ImGui::PushID("Rotation");
+    //        ImGui::TableNextRow();
+    //        ImGui::TableNextColumn();
+    //        ImGui::Text("Rotation");
+    //        if (RenderComponent("##X", &Rotation.Yaw, 0.0))   { InOutTransform.SetRotation(Rotation.Quaternion()); }
+    //        if (RenderComponent("##Y", &Rotation.Pitch, 0.0)) { InOutTransform.SetRotation(Rotation.Quaternion()); }
+    //        if (RenderComponent("##Z", &Rotation.Roll, 0.0))  { InOutTransform.SetRotation(Rotation.Quaternion()); }
+    //        RenderSnap(&Settings.GizmoRotationSnapEnable, &Settings.GizmoRotationSnapValue);
+    //        ImGui::PopID();
 
-            ImGui::PushID("Scale");
-            ImGui::TableNextRow();
-            ImGui::TableNextColumn();
-            ImGui::Text("Scale");
-            if (AddTransformComponent("##X", &Scale.X, 0.0)) { InOutTransform.SetScale3D(Scale); }
-            if (AddTransformComponent("##Y", &Scale.Y, 0.0)) { InOutTransform.SetScale3D(Scale); }
-            if (AddTransformComponent("##Z", &Scale.Z, 0.0)) { InOutTransform.SetScale3D(Scale); }
-            AddTransformSnap(&Settings.GizmoScaleSnapEnable, &Settings.GizmoScaleSnap);
-            ImGui::PopID();
+    //        ImGui::PushID("Scale");
+    //        ImGui::TableNextRow();
+    //        ImGui::TableNextColumn();
+    //        ImGui::Text("Scale");
+    //        if (RenderComponent("##X", &Scale.X, 0.0)) { InOutTransform.SetScale3D(Scale); }
+    //        if (RenderComponent("##Y", &Scale.Y, 0.0)) { InOutTransform.SetScale3D(Scale); }
+    //        if (RenderComponent("##Z", &Scale.Z, 0.0)) { InOutTransform.SetScale3D(Scale); }
+    //        RenderSnap(&Settings.GizmoScaleSnapEnable, &Settings.GizmoScaleSnapValue);
+    //        ImGui::PopID();
 
-            ImGui::EndTable();
-        }
+    //        ImGui::EndTable();
+    //    }
 
-        ImGui::PopStyleVar();
+    //    ImGui::PopStyleVar();
 
-        ImGui::EndPopup();
-    }
+    //    ImGui::EndPopup();
+    //}
 
+    return Result;
 }

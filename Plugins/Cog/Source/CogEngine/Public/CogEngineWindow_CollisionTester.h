@@ -5,49 +5,13 @@
 #include "CogWindow.h"
 #include "CogWindowConfig.h"
 #include "Engine/HitResult.h"
+#include "CogEngineCollisionTester.h"
 #include "CogEngineWindow_CollisionTester.generated.h"
 
 class UCogEngineConfig_CollisionViewer;
 class UCogEngineDataAsset;
 class UPrimitiveComponent;
 struct FCollisionShape;
-
-//--------------------------------------------------------------------------------------------------------------------------
-UENUM()
-enum class ECogEngine_CollisionQueryType : uint8
-{
-    Overlap,
-    LineTrace,
-    Sweep,
-};
-
-//--------------------------------------------------------------------------------------------------------------------------
-UENUM()
-enum class ECogEngine_CollisionQueryMode : uint8
-{
-    Single,
-    Multi,
-    Test,
-};
-
-//--------------------------------------------------------------------------------------------------------------------------
-UENUM()
-enum class ECogEngine_CollisionQueryBy : uint8
-{
-    Channel,
-    ObjectType,
-    Profile,
-};
-
-//--------------------------------------------------------------------------------------------------------------------------
-UENUM()
-enum class ECogEngine_CollisionQueryShape : uint8
-{
-    Sphere,
-    Box,
-    Capsule,
-};
-
 
 enum class ECogDebug_GizmoTransformSpace : uint8;
 
@@ -70,13 +34,6 @@ protected:
 
     virtual void SetAsset(const UCogEngineDataAsset* Value);
 
-    void Query();
-
-    void DrawPrimitive(const UPrimitiveComponent* PrimitiveComponent);
-
-    void DrawShape(const FCollisionShape& Shape, const FVector& Location, const FQuat& Rotation, const FVector& Scale, const FColor& Color, bool DrawSolid) const;
-
-
     struct FChannel
     {
         bool IsValid = false;
@@ -89,17 +46,7 @@ protected:
 
     TObjectPtr<UCogEngineConfig_CollisionTester> Config = nullptr;
 
-    TSet<const AActor*> AlreadyDrawnActors;
-
-    TSet<const UPrimitiveComponent*> AlreadyDrawnComponents;
-
-    bool IsDragging = false;
-
-    FCogDebug_Gizmo GizmoStart;
-    FCogDebug_Gizmo GizmoEnd;
-
-    FTransform StartTransform;
-
+    FCogDebug_Gizmo EndGizmo;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
