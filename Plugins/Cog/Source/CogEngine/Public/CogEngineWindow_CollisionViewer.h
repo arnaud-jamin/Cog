@@ -26,17 +26,11 @@ protected:
 
     virtual void RenderContent() override;
 
-    virtual void SetAsset(const UCogEngineDataAsset* Value);
-
     struct FChannel
     {
         bool IsValid = false;
         FColor Color;
     };
-
-    FChannel Channels[ECC_MAX];
-
-    TObjectPtr<const UCogEngineDataAsset> Asset = nullptr;
 
     TObjectPtr<UCogEngineConfig_CollisionViewer> Config = nullptr;
 };
@@ -70,9 +64,6 @@ public:
     UPROPERTY(Config)
     bool ShowActorsNames = false;
 
-    UPROPERTY(Config)
-    bool ShowQuery = false;
-
     virtual void Reset() override
     {
         Super::Reset();
@@ -84,6 +75,5 @@ public:
         QueryThickness = 0.0f;
         UseComplexCollisions = false;
         ShowActorsNames = false;
-        ShowQuery = false;
     }
 };

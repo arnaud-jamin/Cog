@@ -1,6 +1,7 @@
 #include "CogDebug.h"
 
 #include "CogCommonDebugFilteredActorInterface.h"
+#include "CogDebugDrawHelper.h"
 #include "CogDebugReplicator.h"
 #include "Engine/World.h"
 #include "Engine/Engine.h"
@@ -231,4 +232,80 @@ bool FCogDebug::IsSecondarySkeletonBone(FName BoneName)
     }
 
     return false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogDebug::GetDebugChannelColors(FColor ChannelColors[ECC_MAX])
+{
+    ChannelColors[ECC_WorldStatic]            = Settings.ChannelColorWorldStatic;
+    ChannelColors[ECC_WorldDynamic]           = Settings.ChannelColorWorldDynamic;
+    ChannelColors[ECC_Pawn]                   = Settings.ChannelColorPawn;
+    ChannelColors[ECC_Visibility]             = Settings.ChannelColorVisibility;
+    ChannelColors[ECC_Camera]                 = Settings.ChannelColorCamera;
+    ChannelColors[ECC_PhysicsBody]            = Settings.ChannelColorPhysicsBody;
+    ChannelColors[ECC_Vehicle]                = Settings.ChannelColorVehicle;
+    ChannelColors[ECC_Destructible]           = Settings.ChannelColorDestructible;
+    ChannelColors[ECC_EngineTraceChannel1]    = Settings.ChannelColorEngineTraceChannel1;
+    ChannelColors[ECC_EngineTraceChannel2]    = Settings.ChannelColorEngineTraceChannel2;
+    ChannelColors[ECC_EngineTraceChannel3]    = Settings.ChannelColorEngineTraceChannel3;
+    ChannelColors[ECC_EngineTraceChannel4]    = Settings.ChannelColorEngineTraceChannel4;
+    ChannelColors[ECC_EngineTraceChannel5]    = Settings.ChannelColorEngineTraceChannel5;
+    ChannelColors[ECC_EngineTraceChannel6]    = Settings.ChannelColorEngineTraceChannel6;
+    ChannelColors[ECC_GameTraceChannel1]      = Settings.ChannelColorGameTraceChannel1;
+    ChannelColors[ECC_GameTraceChannel2]      = Settings.ChannelColorGameTraceChannel2;
+    ChannelColors[ECC_GameTraceChannel3]      = Settings.ChannelColorGameTraceChannel3;
+    ChannelColors[ECC_GameTraceChannel4]      = Settings.ChannelColorGameTraceChannel4;
+    ChannelColors[ECC_GameTraceChannel5]      = Settings.ChannelColorGameTraceChannel5;
+    ChannelColors[ECC_GameTraceChannel6]      = Settings.ChannelColorGameTraceChannel6;
+    ChannelColors[ECC_GameTraceChannel7]      = Settings.ChannelColorGameTraceChannel7;
+    ChannelColors[ECC_GameTraceChannel8]      = Settings.ChannelColorGameTraceChannel8;
+    ChannelColors[ECC_GameTraceChannel9]      = Settings.ChannelColorGameTraceChannel9;
+    ChannelColors[ECC_GameTraceChannel10]     = Settings.ChannelColorGameTraceChannel10;
+    ChannelColors[ECC_GameTraceChannel11]     = Settings.ChannelColorGameTraceChannel11;
+    ChannelColors[ECC_GameTraceChannel12]     = Settings.ChannelColorGameTraceChannel12;
+    ChannelColors[ECC_GameTraceChannel13]     = Settings.ChannelColorGameTraceChannel13;
+    ChannelColors[ECC_GameTraceChannel14]     = Settings.ChannelColorGameTraceChannel14;
+    ChannelColors[ECC_GameTraceChannel15]     = Settings.ChannelColorGameTraceChannel15;
+    ChannelColors[ECC_GameTraceChannel16]     = Settings.ChannelColorGameTraceChannel16;
+    ChannelColors[ECC_GameTraceChannel17]     = Settings.ChannelColorGameTraceChannel17;
+    ChannelColors[ECC_GameTraceChannel18]     = Settings.ChannelColorGameTraceChannel18;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogDebug::GetDebugDrawOverlapSettings(FCogDebugDrawOverlapParams& Params)
+{
+    Params.HitColor = Settings.CollisionQueryHitColor;
+    Params.NoHitColor = Settings.CollisionQueryNoHitColor;
+    Params.DrawHitPrimitives = Settings.CollisionQueryDrawHitPrimitives;
+    Params.DrawHitPrimitiveActorsName = Settings.CollisionQueryDrawHitPrimitiveActorsName;
+    Params.HitPrimitiveActorsNameShadow = Settings.CollisionQueryHitPrimitiveActorsNameShadow;
+    Params.HitPrimitiveActorsNameSize = Settings.CollisionQueryHitPrimitiveActorsNameSize;
+    Params.Persistent = false;
+    Params.LifeTime = 0.0f;
+    Params.DepthPriority = Settings.DepthPriority;
+    Params.Thickness = Settings.Thickness;
+
+	GetDebugChannelColors(Params.ChannelColors);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogDebug::GetDebugDrawLineTraceSettings(FCogDebugDrawLineTraceParams& Params)
+{
+    GetDebugDrawOverlapSettings(Params);
+
+    Params.DrawHitLocation = Settings.CollisionQueryDrawHitLocation;
+    Params.DrawHitImpactPoints = Settings.CollisionQueryDrawHitImpactPoints;
+    Params.DrawHitNormals = Settings.CollisionQueryDrawHitNormals;
+    Params.DrawHitImpactNormals = Settings.CollisionQueryDrawHitImpactNormals;
+    Params.HitPointSize = Settings.CollisionQueryHitPointSize;
+    Params.NormalColor = Settings.CollisionQueryNormalColor;
+    Params.ImpactNormalColor = Settings.CollisionQueryImpactNormalColor;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogDebug::GetDebugDrawSweepSettings(FCogDebugDrawSweepParams& Params)
+{
+    GetDebugDrawLineTraceSettings(Params);
+
+    Params.DrawHitShapes = Settings.CollisionQueryDrawHitShapes;
 }

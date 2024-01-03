@@ -41,13 +41,9 @@ public:
     UPROPERTY(Config)
     FCogDebugSettings Data;
 
-    UPROPERTY(Config)
-    bool bShowAdvancedSettings = false;
-
     virtual void Reset() override
     {
         Super::Reset();
         Data = FCogDebugSettings();
-        bShowAdvancedSettings = false;
     }
 };

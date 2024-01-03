@@ -4,6 +4,9 @@
 #include "UObject/WeakObjectPtrTemplates.h"
 #include "CogDebug.generated.h"
 
+struct FCogDebugDrawSweepParams;
+struct FCogDebugDrawLineTraceParams;
+struct FCogDebugDrawOverlapParams;
 class UObject;
 class AActor;
 class UWorld;
@@ -86,34 +89,34 @@ struct FCogDebugSettings
     float GizmoTranslationAxisLength = 50.0f;
 
     UPROPERTY(Config)
-    bool GizmoTranslationSnapEnable = true;
+    bool GizmoTranslationSnapEnable = false;
 
     UPROPERTY(Config)
     float GizmoTranslationSnapValue = 10.0f;
 
     UPROPERTY(Config)
-    float GizmoTranslationPlaneOffset = 25.0f;
+    float GizmoTranslationPlaneOffset = 18.0f;
 
     UPROPERTY(Config)
     float GizmoTranslationPlaneExtent = 5.0f;
 
     UPROPERTY(Config)
-    bool GizmoRotationSnapEnable = true;
+    bool GizmoRotationSnapEnable = false;
 
     UPROPERTY(Config)
     float GizmoRotationSnapValue = 10.0f;
 
     UPROPERTY(Config)
-    float GizmoRotationSpeed = 0.01f;
+    float GizmoRotationSpeed = 1.0f;
 
     UPROPERTY(Config)
-    float GizmoRotationRadius = 15.0f;
+    float GizmoRotationRadius = 40.0f;
 
     UPROPERTY(Config)
-    int GizmoRotationSegments = 12;
+    int GizmoRotationSegments = 8;
 
     UPROPERTY(Config)
-    bool GizmoScaleSnapEnable = true;
+    bool GizmoScaleSnapEnable = false;
 
     UPROPERTY(Config)
     float GizmoScaleSnapValue = 1.0f;
@@ -125,7 +128,7 @@ struct FCogDebugSettings
     float GizmoScaleBoxExtent = 2.0f;
 
     UPROPERTY(Config)
-    float GizmoScaleSpeed = 0.5f;
+    float GizmoScaleSpeed = 0.01f;
 
     UPROPERTY(Config)
     float GizmoScaleMin = 0.001f;
@@ -136,7 +139,7 @@ struct FCogDebugSettings
     UPROPERTY(Config)
     TEnumAsByte<ECollisionChannel> GizmoGroundRaycastChannel = ECollisionChannel::ECC_WorldStatic;
 
-	UPROPERTY(Config)
+    UPROPERTY(Config)
     float GizmoGroundRaycastCircleRadius = 5.0f;
 
     UPROPERTY(Config)
@@ -183,6 +186,144 @@ struct FCogDebugSettings
 
     UPROPERTY(Config)
     FColor GizmoTextColor = FColor(255, 255, 255, 255);
+
+    UPROPERTY(Config)
+    FColor CollisionQueryHitColor = FColor::Green;
+
+    UPROPERTY(Config)
+    FColor CollisionQueryNoHitColor = FColor::Red;
+
+    UPROPERTY(Config)
+    bool CollisionQueryDrawHitPrimitives = true;
+
+    UPROPERTY(Config)
+    bool CollisionQueryDrawHitPrimitiveActorsName = false;
+
+    UPROPERTY(Config)
+    bool CollisionQueryHitPrimitiveActorsNameShadow = true;
+
+    UPROPERTY(Config)
+    float CollisionQueryHitPrimitiveActorsNameSize = 1.0f;
+
+    UPROPERTY(Config)
+    bool CollisionQueryDrawHitLocation = true;
+
+    UPROPERTY(Config)
+    bool CollisionQueryDrawHitImpactPoints = true;
+
+    UPROPERTY(Config)
+    bool CollisionQueryDrawHitNormals = true;
+
+    UPROPERTY(Config)
+    bool CollisionQueryDrawHitImpactNormals = true;
+
+    UPROPERTY(Config)
+    float CollisionQueryHitPointSize = 5.0f;
+
+    UPROPERTY(Config)
+    FColor CollisionQueryNormalColor = FColor::Yellow;
+
+    UPROPERTY(Config)
+    FColor CollisionQueryImpactNormalColor = FColor::Cyan;
+
+    UPROPERTY(Config)
+    bool CollisionQueryDrawHitShapes = true;
+
+    UPROPERTY(Config)
+    FColor ChannelColorWorldStatic = FColor(255, 0, 0, 5);
+
+    UPROPERTY(Config)
+    FColor ChannelColorWorldDynamic = FColor(255, 0, 188, 5);
+
+    UPROPERTY(Config)
+    FColor ChannelColorPawn = FColor(105, 0, 255, 5);
+
+    UPROPERTY(Config)
+    FColor ChannelColorVisibility = FColor(0, 15, 255, 5);
+
+    UPROPERTY(Config)
+    FColor ChannelColorCamera = FColor(0, 105, 255, 5);
+
+    UPROPERTY(Config)
+    FColor ChannelColorPhysicsBody = FColor(0, 255, 208, 5);
+
+    UPROPERTY(Config)
+    FColor ChannelColorVehicle = FColor(52, 255, 0, 5);
+
+    UPROPERTY(Config)
+    FColor ChannelColorDestructible = FColor(255, 255, 0, 0);
+
+    UPROPERTY(Config)
+    FColor ChannelColorEngineTraceChannel1 = FColor(0, 0, 0, 0);
+
+    UPROPERTY(Config)
+    FColor ChannelColorEngineTraceChannel2 = FColor(0, 0, 0, 0);
+
+    UPROPERTY(Config)
+    FColor ChannelColorEngineTraceChannel3 = FColor(0, 0, 0, 0);
+
+    UPROPERTY(Config)
+    FColor ChannelColorEngineTraceChannel4 = FColor(0, 0, 0, 0);
+
+    UPROPERTY(Config)
+    FColor ChannelColorEngineTraceChannel5 = FColor(0, 0, 0, 0);
+
+    UPROPERTY(Config)
+    FColor ChannelColorEngineTraceChannel6 = FColor(0, 0, 0, 0);
+
+    UPROPERTY(Config)
+    FColor ChannelColorGameTraceChannel1 = FColor(255, 105, 0, 5);
+
+	UPROPERTY(Config)
+    FColor ChannelColorGameTraceChannel2 = FColor(255, 30, 0, 5);
+
+    UPROPERTY(Config)
+    FColor ChannelColorGameTraceChannel3 = FColor(0, 0, 0, 0);
+
+    UPROPERTY(Config)
+    FColor ChannelColorGameTraceChannel4 = FColor(0, 0, 0, 0);
+
+    UPROPERTY(Config)
+    FColor ChannelColorGameTraceChannel5 = FColor(0, 0, 0, 0);
+
+    UPROPERTY(Config)
+    FColor ChannelColorGameTraceChannel6 = FColor(0, 0, 0, 0);
+
+    UPROPERTY(Config)
+    FColor ChannelColorGameTraceChannel7 = FColor(0, 0, 0, 0);
+
+    UPROPERTY(Config)
+    FColor ChannelColorGameTraceChannel8 = FColor(0, 0, 0, 0);
+
+    UPROPERTY(Config)
+    FColor ChannelColorGameTraceChannel9 = FColor(0, 0, 0, 0);
+
+    UPROPERTY(Config)
+    FColor ChannelColorGameTraceChannel10 = FColor(0, 0, 0, 0);
+
+    UPROPERTY(Config)
+    FColor ChannelColorGameTraceChannel11 = FColor(0, 0, 0, 0);
+
+    UPROPERTY(Config)
+    FColor ChannelColorGameTraceChannel12 = FColor(0, 0, 0, 0);
+
+    UPROPERTY(Config)
+    FColor ChannelColorGameTraceChannel13 = FColor(0, 0, 0, 0);
+
+    UPROPERTY(Config)
+    FColor ChannelColorGameTraceChannel14 = FColor(0, 0, 0, 0);
+
+    UPROPERTY(Config)
+    FColor ChannelColorGameTraceChannel15 = FColor(0, 0, 0, 0);
+
+    UPROPERTY(Config)
+    FColor ChannelColorGameTraceChannel16 = FColor(0, 0, 0, 0);
+
+    UPROPERTY(Config)
+    FColor ChannelColorGameTraceChannel17 = FColor(0, 0, 0, 0);
+
+    UPROPERTY(Config)
+    FColor ChannelColorGameTraceChannel18 = FColor(0, 0, 0, 0);
 
     UPROPERTY(Config)
     TArray<FString> SecondaryBoneWildcards = {
@@ -251,6 +392,14 @@ public:
     static bool IsSecondarySkeletonBone(FName BoneName);
 
     static void Reset();
+
+    static void GetDebugChannelColors(FColor ChannelColors[ECC_MAX]);
+
+    static void GetDebugDrawOverlapSettings(FCogDebugDrawOverlapParams& Params);
+
+    static void GetDebugDrawLineTraceSettings(FCogDebugDrawLineTraceParams& Params);
+
+    static void GetDebugDrawSweepSettings(FCogDebugDrawSweepParams& Params);
 
     static FCogDebugSettings Settings;
 

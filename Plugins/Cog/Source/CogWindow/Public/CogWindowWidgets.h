@@ -82,9 +82,9 @@ public:
 
     static bool ComboCollisionChannel(const char* Label, ECollisionChannel& Channel);
 
-    static bool CollisionProfileChannel(const UCollisionProfile& CollisionProfile, int32 ChannelIndex, int32& Channels);
+    static bool CollisionProfileChannel(const UCollisionProfile& CollisionProfile, int32 ChannelIndex, FColor& ChannelColor, int32& Channels);
 
-    static bool CollisionProfileChannels(const UCollisionProfile& CollisionProfile, int32& Channels);
+    static bool CollisionProfileChannels(int32& Channels);
 
 };
 

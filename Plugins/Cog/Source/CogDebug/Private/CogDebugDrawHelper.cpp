@@ -1,9 +1,11 @@
 #include "CogDebugDrawHelper.h"
 
+#include "CogDebug.h"
 #include "Components/LineBatchComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Engine/Engine.h"
 #include "DrawDebugHelpers.h"
+#include "Components/BoxComponent.h"
 
 namespace 
 {
@@ -162,237 +164,6 @@ void FCogDebugDrawHelper::DrawFlatCapsule(
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDrawHelper::DrawRaycastSingle(
-    const UWorld* World,
-    const FVector& Start,
-    const FVector& End,
-    const EDrawDebugTrace::Type DrawType,
-    const bool bHit,
-    const FHitResult& Hit,
-    const float HitSize,
-    const FLinearColor DrawColor,
-    const FLinearColor DrawHitColor,
-    const float DrawDuration,
-    const uint8 DepthPriority /*= 0*/
-)
-{
-    if (DrawType != EDrawDebugTrace::None)
-    {
-        bool DrawPersistent = DrawType == EDrawDebugTrace::Persistent;
-        float DrawTime = (DrawType == EDrawDebugTrace::ForDuration) ? DrawDuration : 0.f;
-
-        if (bHit && Hit.bBlockingHit)
-        {
-            ::DrawDebugLine(World, Start, Hit.ImpactPoint, DrawColor.ToFColor(true), DrawPersistent, DrawTime);
-            ::DrawDebugLine(World, Hit.ImpactPoint, End, DrawHitColor.ToFColor(true), DrawPersistent, DrawTime);
-
-            DrawHitResult(World, Hit, 0, DrawType, false, HitSize, DrawHitColor, DrawTime, DepthPriority);
-        }
-        else
-        {
-            ::DrawDebugLine(World, Start, End, DrawColor.ToFColor(true), DrawPersistent, DrawTime);
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDrawHelper::DrawSphereOverlapMulti(
-    const UWorld* World,
-    const FVector& Position,
-    const float Radius,
-    const EDrawDebugTrace::Type DrawType,
-    const bool bOverlap,
-    const TArray<AActor*>& OutActors,
-    const FLinearColor DrawColor,
-    const FLinearColor DrawHitColor,
-    const float DrawDuration /*= 0*/
-)
-{
-    if (DrawType == EDrawDebugTrace::None)
-        return;
-
-    const bool DrawPersistent = DrawType == EDrawDebugTrace::Persistent;
-    const float DrawTime = (DrawType == EDrawDebugTrace::ForDuration) ? DrawDuration : 0.f;
-
-    DrawSphereOverlapSingle(World, Position, Radius, DrawColor.ToFColor(true), DrawPersistent, DrawTime);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDrawHelper::DrawSphereOverlapSingle(
-    const UWorld* World,
-    const FVector& Position,
-    const float Radius,
-    const FColor& DrawColor,
-    const bool DrawPersistent,
-    const float DrawTime /*= -1.f*/,
-    const uint8 DepthPriority /*= 0*/
-)
-{
-    ::DrawDebugSphere(World, Position, Radius, 16, DrawColor, DrawPersistent, DrawTime, DepthPriority);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDrawHelper::DrawCapsuleCastMulti(const UWorld* World, const FVector& Start, const FVector& End, const FQuat& Rotation, const float HalfHeight, const float Radius, const EDrawDebugTrace::Type DrawType, const bool bHit, const TArray<FHitResult>& OutHits, const FLinearColor DrawColor, const FLinearColor DrawHitColor, const float DrawDuration /*= 0*/)
-{
-    if (DrawType == EDrawDebugTrace::None)
-        return;
-
-    const bool DrawPersistent = DrawType == EDrawDebugTrace::Persistent;
-    const float DrawTime = (DrawType == EDrawDebugTrace::ForDuration) ? DrawDuration : 0.f;
-
-    if (bHit && OutHits.Last().bBlockingHit)
-    {
-        FVector const BlockingHitPoint = OutHits.Last().Location;
-
-        DrawCapsuleCastSingle(World, Start, BlockingHitPoint, Rotation, HalfHeight, Radius, DrawHitColor.ToFColor(true), DrawPersistent, DrawTime);
-        DrawCapsuleCastSingle(World, Start, End, Rotation, HalfHeight, Radius, DrawColor.ToFColor(true), DrawPersistent, DrawTime);
-    }
-    else
-    {
-        DrawCapsuleCastSingle(World, Start, End, Rotation, HalfHeight, Radius, DrawColor.ToFColor(true), DrawPersistent, DrawTime);
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDrawHelper::DrawCapsuleCastSingle(const UWorld* World, const FVector& Start, const FVector& End, const FQuat& Rotation, const float HalfHeight, const float Radius, const FColor& DrawColor, const bool DrawPersistent, const float DrawDuration /*= -1.f*/, const uint8 DepthPriority /*= 0*/)
-{
-    ::DrawDebugCapsule(World, Start, HalfHeight, Radius, Rotation, DrawColor, DrawPersistent, DrawDuration, DepthPriority);
-    ::DrawDebugLine(World, Start, End, DrawColor, DrawPersistent, DrawDuration, DepthPriority, 0.5f);
-    ::DrawDebugCapsule(World, End, HalfHeight, Radius, Rotation, DrawColor, DrawPersistent, DrawDuration, DepthPriority);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDrawHelper::DrawSphereCastMulti(
-    const UWorld* World,
-    const FVector& Start,
-    const FVector& End,
-    const float Radius,
-    const EDrawDebugTrace::Type DrawType,
-    const bool bHit,
-    const TArray<FHitResult>& OutHits,
-    const FLinearColor DrawColor,
-    const FLinearColor DrawHitColor,
-    const float DrawDuration /*= 0*/
-)
-{
-    if (DrawType == EDrawDebugTrace::None)
-        return;
-
-    const bool DrawPersistent = DrawType == EDrawDebugTrace::Persistent;
-    const float DrawTime = (DrawType == EDrawDebugTrace::ForDuration) ? DrawDuration : 0.f;
-
-    if (bHit && OutHits.Last().bBlockingHit)
-    {
-        FVector const BlockingHitPoint = OutHits.Last().Location;
-        DrawSphereCastSingle(World, Start, BlockingHitPoint, Radius, DrawColor.ToFColor(true), DrawPersistent, DrawTime);
-        DrawSphereCastSingle(World, BlockingHitPoint, End, Radius, DrawHitColor.ToFColor(true), DrawPersistent, DrawTime);
-    }
-    else
-    {
-        DrawSphereCastSingle(World, Start, End, Radius, DrawColor.ToFColor(true), DrawPersistent, DrawTime);
-    }
-}
-
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDrawHelper::DrawSphereCastSingle(
-    const UWorld* World,
-    const FVector& Start,
-    const FVector& End,
-    const float Radius,
-    const FColor& DrawColor,
-    const bool DrawPersistent,
-    const float DrawDuration /*= -1.f*/,
-    const uint8 DepthPriority /*= 0*/
-)
-{
-    FVector const TraceVec = End - Start;
-    float const Dist = TraceVec.Size();
-
-    FVector const Center = Start + TraceVec * 0.5f;
-    float const HalfHeight = (Dist * 0.5f) + Radius;
-
-    FQuat const CapsuleRot = FRotationMatrix::MakeFromZ(TraceVec).ToQuat();
-    ::DrawDebugCapsule(World, Center, HalfHeight, Radius, CapsuleRot, DrawColor, DrawPersistent, DrawDuration, DepthPriority);
-}
-
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDrawHelper::DrawHitResults(
-    const UWorld* World,
-    const TArray<FHitResult>& OutHits,
-    const EDrawDebugTrace::Type DrawType,
-    const bool ShowHitIndex,
-    const float HitSize,
-    const FLinearColor HitColor,
-    const float DrawDuration,
-    const uint8 DepthPriority /*= 0*/
-)
-{
-    if (DrawType == EDrawDebugTrace::None)
-        return;
-
-    for (int32 i = 0; i < OutHits.Num(); ++i)
-    {
-        DrawHitResult(World, OutHits[i], i, DrawType, ShowHitIndex, HitSize, HitColor, DrawDuration, DepthPriority);
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDrawHelper::DrawHitResultsDiscarded(
-    const UWorld* World,
-    const TArray<FHitResult>& AllHits,
-    const TArray<FHitResult>& KeptHits,
-    const EDrawDebugTrace::Type DrawType,
-    const float HitSize,
-    const FLinearColor DrawColor,
-    const float DrawDuration,
-    const uint8 DepthPriority /*= 0*/
-)
-{
-    if (DrawType == EDrawDebugTrace::None)
-        return;
-
-    for (int32 i = 0; i < AllHits.Num(); ++i)
-    {
-        const FHitResult& PhysicHit = AllHits[i];
-        if (!KeptHits.ContainsByPredicate([&](const FHitResult& Hit)
-            {
-                return Hit.GetActor() == PhysicHit.GetActor() && Hit.Component == PhysicHit.Component && Hit.Distance == PhysicHit.Distance;
-            }))
-        {
-            DrawHitResult(World, PhysicHit, i, DrawType, false, HitSize, DrawColor, DrawDuration, DepthPriority);
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDrawHelper::DrawHitResult(
-    const UWorld* World,
-    const FHitResult& Hit,
-    const int HitIndex,
-    const EDrawDebugTrace::Type DrawType,
-    const bool ShowHitIndex,
-    const float HitSize,
-    const FLinearColor HitColor,
-    const float DrawDuration,
-    const uint8 DepthPriority /*= 0*/
-)
-{
-    if (DrawType == EDrawDebugTrace::None)
-        return;
-
-    const bool DrawPersistent = DrawType == EDrawDebugTrace::Persistent;
-    const float DrawTime = (DrawType == EDrawDebugTrace::ForDuration) ? DrawDuration : 0.f;
-
-    ::DrawDebugSphere(World, Hit.ImpactPoint, HitSize, 12, HitColor.ToFColor(true), DrawPersistent, DrawTime, DepthPriority);
-    if (ShowHitIndex)
-    {
-        ::DrawDebugString(World, Hit.ImpactPoint, FString::Printf(TEXT("%d"), HitIndex), nullptr, HitColor.ToFColor(true), DrawTime, true, 1.0f);
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDrawHelper::DrawFrustum(
     const UWorld* World,
     const FMatrix& Matrix,
@@ -406,9 +177,9 @@ void FCogDebugDrawHelper::DrawFrustum(
     const uint8 DepthPriority, 
     const float Thickness)
 {
-    FVector Direction(1, 0, 0);
-    FVector LeftVector(0, 1, 0);
-    FVector UpVector(0, 0, 1);
+	const FVector Direction(1, 0, 0);
+	const FVector LeftVector(0, 1, 0);
+	const FVector UpVector(0, 0, 1);
 
     FVector Verts[8];
 
@@ -519,4 +290,347 @@ void FCogDebugDrawHelper::DrawSolidQuad(const UWorld* World, const FVector& Posi
     Indices[5] = 3;
 
     DrawDebugMesh(World, Verts, Indices, Color, bPersistent, LifeTime, DepthPriority);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogDebugDrawHelper::DrawHitResult(
+    const UWorld* World, 
+    const FHitResult& HitResult,
+    const FCogDebugDrawLineTraceParams& Settings)
+{
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogDebugDrawHelper::DrawHitResults(
+    const UWorld* World,
+    const TArray<FHitResult>& HitResults,
+    const FCogDebugDrawLineTraceParams& Settings)
+{
+    TSet<const UPrimitiveComponent*> AlreadyDrawnPrimitives;
+    TSet<const AActor*> AlreadyDrawnActors;
+
+    for (const FHitResult& HitResult : HitResults)
+    {
+        const FColor& HitColor = Settings.HitColor;
+
+        if (Settings.DrawHitLocation)
+        {
+            DrawDebugPoint(
+                World,
+                HitResult.Location,
+                Settings.HitPointSize,
+                HitColor,
+                Settings.Persistent,
+                Settings.LifeTime,
+                Settings.DepthPriority);
+        }
+
+        if (Settings.DrawHitImpactPoints)
+        {
+            DrawDebugPoint(
+                World,
+                HitResult.ImpactPoint,
+                Settings.HitPointSize,
+                HitColor,
+                Settings.Persistent,
+                Settings.LifeTime,
+                Settings.DepthPriority);
+        }
+
+        if (Settings.DrawHitNormals)
+        {
+            DrawDebugDirectionalArrow(
+                World,
+                HitResult.Location,
+                HitResult.Location + HitResult.Normal * 20.0f,
+                FCogDebug::Settings.ArrowSize,
+                Settings.NormalColor,
+                Settings.Persistent,
+                Settings.LifeTime,
+                Settings.DepthPriority,
+                Settings.Thickness);
+        }
+
+        if (Settings.DrawHitImpactNormals)
+        {
+            DrawDebugDirectionalArrow(
+                World,
+                HitResult.ImpactPoint,
+                HitResult.ImpactPoint + HitResult.ImpactNormal * 20.0f,
+                FCogDebug::Settings.ArrowSize,
+                Settings.ImpactNormalColor,
+                Settings.Persistent,
+                Settings.LifeTime,
+                Settings.DepthPriority,
+                Settings.Thickness);
+        }
+
+        if (Settings.DrawHitPrimitives)
+        {
+            const UPrimitiveComponent* PrimitiveComponent = HitResult.GetComponent();
+            if (PrimitiveComponent == nullptr)
+            {
+                continue;
+            }
+
+            if (AlreadyDrawnPrimitives.Contains(PrimitiveComponent))
+            {
+                continue;
+            }
+
+            AlreadyDrawnPrimitives.Add(PrimitiveComponent);
+            const ECollisionChannel CollisionObjectType = PrimitiveComponent->GetCollisionObjectType();
+            const FColor PrimitiveColor = Settings.ChannelColors[CollisionObjectType];
+            DrawPrimitiveComponent(*PrimitiveComponent, PrimitiveColor, Settings.Persistent, Settings.LifeTime, Settings.DepthPriority, Settings.Thickness);
+
+            if (Settings.DrawHitPrimitiveActorsName)
+            {
+                const AActor* Actor = PrimitiveComponent->GetOwner();
+                if (Actor == nullptr)
+                {
+                    continue;
+                }
+
+                if (AlreadyDrawnActors.Contains(Actor))
+                {
+                    continue;
+                }
+
+                AlreadyDrawnActors.Add(Actor);
+                const FColor TextColor = PrimitiveColor.WithAlpha(255);
+                DrawDebugString(World, Actor->GetActorLocation(), GetNameSafe(Actor->GetClass()), nullptr, TextColor, 0.0f, Settings.HitPrimitiveActorsNameShadow, Settings.HitPrimitiveActorsNameSize);
+            }
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogDebugDrawHelper::DrawLineTrace(
+    const UWorld* World,
+    const FVector& Start,
+    const FVector& End,
+    const bool HasHits,
+    TArray<FHitResult>& HitResults,
+    const FCogDebugDrawLineTraceParams& Settings
+)
+{
+    DrawDebugDirectionalArrow(
+        World,
+        Start,
+        End,
+        FCogDebug::Settings.ArrowSize,
+        HasHits ? Settings.HitColor : Settings.NoHitColor,
+        false,
+        0.0f,
+        FCogDebug::GetDebugDepthPriority(0),
+        FCogDebug::GetDebugThickness(0.0f));
+
+    DrawHitResults(World, HitResults, Settings);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogDebugDrawHelper::DrawSweep(
+    const UWorld* World,
+    const FCollisionShape& Shape,
+    const FVector& Start,
+    const FVector& End,
+    const FQuat& Rotation,
+    const bool HasHits,
+    TArray<FHitResult>& HitResults,
+    const FCogDebugDrawSweepParams& Settings
+)
+{
+    const FColor Color = HasHits ? Settings.HitColor : Settings.NoHitColor;
+
+    DrawDebugDirectionalArrow(
+        World,
+        Start,
+        End,
+        FCogDebug::Settings.ArrowSize,
+        Color,
+        false,
+        0.0f,
+        FCogDebug::GetDebugDepthPriority(0),
+        FCogDebug::GetDebugThickness(0.0f));
+
+	DrawShape(World, Shape, Start, Rotation, FVector::OneVector, Color, Settings.Persistent, Settings.LifeTime, Settings.DepthPriority, Settings.Thickness);
+
+	DrawHitResults(World, HitResults, Settings);
+
+    for (const FHitResult& Hit : HitResults)
+    {
+        if (Settings.DrawHitShapes)
+        {
+            DrawShape(World, Shape, Hit.Location, Rotation, FVector::OneVector, Color, Settings.Persistent, Settings.LifeTime, Settings.DepthPriority, Settings.Thickness);
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogDebugDrawHelper::DrawOverlap(
+    const UWorld* World,
+    const FCollisionShape& Shape,
+    const FVector& Location,
+    const FQuat& Rotation,
+    TArray<FOverlapResult>& OverlapResults,
+    const FCogDebugDrawOverlapParams& Settings
+)
+{
+    const FColor Color = OverlapResults.Num() > 0 ? Settings.HitColor : Settings.NoHitColor;
+    DrawShape(World, Shape, Location, Rotation, FVector::OneVector, Color, Settings.Persistent, Settings.LifeTime, Settings.DepthPriority, Settings.Thickness);
+
+    if (Settings.DrawHitPrimitives)
+    {
+	    for (const FOverlapResult& OverlapResult : OverlapResults)
+	    {
+	        if (const UPrimitiveComponent* PrimitiveComponent = OverlapResult.GetComponent())
+	        {
+	            const ECollisionChannel CollisionObjectType = PrimitiveComponent->GetCollisionObjectType();
+	            const FColor PrimitiveColor = Settings.ChannelColors[CollisionObjectType];
+	            DrawPrimitiveComponent(*PrimitiveComponent, PrimitiveColor, Settings.Persistent, Settings.LifeTime, Settings.DepthPriority, Settings.Thickness);
+	        }
+	    }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogDebugDrawHelper::DrawPrimitiveComponent(
+    const UPrimitiveComponent& PrimitiveComponent, 
+    const FColor& Color, 
+    const bool Persistent, 
+    const float LifeTime, 
+    const uint8 DepthPriority, 
+    const float Thickness)
+{
+    const UWorld* World = PrimitiveComponent.GetWorld();
+    if (World == nullptr)
+    {
+        return;
+    }
+
+    const UBoxComponent* BoxComponent = Cast<UBoxComponent>(&PrimitiveComponent);;
+    const FCollisionShape Shape = PrimitiveComponent.GetCollisionShape();
+
+    if (Shape.ShapeType == ECollisionShape::Box && BoxComponent == nullptr)
+    {
+        FVector Location;
+        FVector Extent;
+        PrimitiveComponent.Bounds.GetBox().GetCenterAndExtents(Location, Extent);
+
+        // TODO: this adds padding to prevent Z fight. Maybe add this as a parameter.
+    	Extent += FVector::OneVector;
+
+        DrawDebugSolidBox(
+            World,
+            Location,
+            Extent,
+            FQuat::Identity,
+            Color,
+            Persistent,
+            LifeTime,
+            DepthPriority);
+
+        DrawDebugBox(
+            World,
+            Location,
+            Extent,
+            FQuat::Identity,
+            Color,
+            Persistent,
+            LifeTime,
+            DepthPriority,
+            Thickness);
+    }
+    else
+    {
+        const FVector Location = PrimitiveComponent.GetComponentLocation();
+        const FQuat Rotation = PrimitiveComponent.GetComponentQuat();
+        const FVector Scale = PrimitiveComponent.GetComponentScale();
+        DrawShape(World, Shape, Location, Rotation, Scale, Color, Persistent, LifeTime, DepthPriority, Thickness);
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogDebugDrawHelper::DrawShape(
+    const UWorld* World, 
+    const FCollisionShape& InShape, 
+    const FVector& Location, 
+    const FQuat& Rotation, 
+    const FVector& Scale, 
+    const FColor& Color, 
+    const bool Persistent, 
+    const float LifeTime, 
+    const uint8 DepthPriority, 
+    const float Thickness)
+{
+    switch (InShape.ShapeType)
+    {
+	    case ECollisionShape::Box:
+	    {
+	        //--------------------------------------------------
+	        // see UBoxComponent::GetScaledBoxExtent()
+	        //--------------------------------------------------
+	        const FVector HalfExtent(InShape.Box.HalfExtentX * Scale.X, InShape.Box.HalfExtentY * Scale.Y, InShape.Box.HalfExtentZ * Scale.Z);
+
+	        DrawDebugBox(
+	            World,
+	            Location,
+	            HalfExtent,
+	            Rotation,
+	            Color,
+	            Persistent,
+	            LifeTime,
+	            DepthPriority,
+	            Thickness);
+
+	        break;
+	    }
+
+	    case ECollisionShape::Sphere:
+	    {
+	        //--------------------------------------------------
+	        // see USphereComponent::GetScaledSphereRadius()
+	        //--------------------------------------------------
+	        const float RadiusScale = FMath::Min(Scale.X, FMath::Min(Scale.Y, Scale.Z));
+	        const float Radius = InShape.Sphere.Radius * RadiusScale;
+
+	        DrawSphere(
+	            World,
+	            Location,
+	            Radius,
+	            FCogDebug::GetCircleSegments(),
+	            Color,
+	            Persistent,
+	            LifeTime,
+	            DepthPriority,
+	            Thickness);
+	        break;
+	    }
+
+	    case ECollisionShape::Capsule:
+	    {
+	        //--------------------------------------------------
+	        // see UCapsuleComponent::GetScaledCapsuleRadius()
+	        //--------------------------------------------------
+	        const float Radius = InShape.Capsule.Radius * FMath::Min(Scale.X, Scale.Y);
+	        const float HalfHeight = InShape.Capsule.HalfHeight * UE_REAL_TO_FLOAT(Scale.Z);
+
+	        DrawDebugCapsule(
+	            World,
+	            Location,
+	            HalfHeight,
+	            Radius,
+	            Rotation,
+	            Color,
+	            Persistent,
+	            LifeTime,
+	            DepthPriority,
+	            Thickness);
+	        break;
+	    }
+
+    	default: 
+            break;
+    }
 }

@@ -9,7 +9,6 @@
 #include "CogEngineWindow_CollisionTester.generated.h"
 
 class UCogEngineConfig_CollisionViewer;
-class UCogEngineDataAsset;
 class UPrimitiveComponent;
 struct FCollisionShape;
 
@@ -32,8 +31,6 @@ protected:
 
     virtual void RenderContent() override;
 
-    virtual void SetAsset(const UCogEngineDataAsset* Value);
-
     struct FChannel
     {
         bool IsValid = false;
@@ -41,8 +38,6 @@ protected:
     };
 
     FChannel Channels[ECC_MAX];
-
-    TObjectPtr<const UCogEngineDataAsset> Asset = nullptr;
 
     TObjectPtr<UCogEngineConfig_CollisionTester> Config = nullptr;
 
@@ -96,42 +91,6 @@ public:
     UPROPERTY(Config)
     FVector ShapeExtent;
 
-    UPROPERTY(Config)
-    bool DrawHitLocations;
-
-    UPROPERTY(Config)
-    bool DrawHitImpactPoints;
-
-    UPROPERTY(Config)
-    bool DrawHitShapes;
-
-    UPROPERTY(Config)
-    bool DrawHitNormals;
-
-    UPROPERTY(Config)
-    bool DrawHitImpactNormals;
-
-    UPROPERTY(Config)
-    bool DrawHitPrimitives;
-
-    UPROPERTY(Config)
-    bool DrawHitActorsNames;
-
-    UPROPERTY(Config)
-    float HitPointSize;
-
-    UPROPERTY(Config)
-    FVector4f NoHitColor;
-
-    UPROPERTY(Config)
-    FVector4f HitColor;
-
-    UPROPERTY(Config)
-    FVector4f NormalColor;
-
-    UPROPERTY(Config)
-    FVector4f ImpactNormalColor;
-
     UCogEngineConfig_CollisionTester()
     {
         Reset();
@@ -151,17 +110,5 @@ public:
 
         ObjectTypesToQuery = 0;
         ProfileIndex = 0;
-        DrawHitLocations = true;
-        DrawHitImpactPoints = true;
-        DrawHitShapes = true;
-        DrawHitNormals = true;
-        DrawHitImpactNormals = true;
-        DrawHitPrimitives = true;
-        DrawHitActorsNames = false;
-        HitPointSize = 10.0f;
-        NoHitColor = FVector4f(1.0f, 0.0f, 0.0f, 1.0f);
-        HitColor = FVector4f(0.0f, 1.0f, 0.0f, 1.0f);
-        NormalColor = FVector4f(0.0f, 1.0f, 0.0f, 1.0f);
-        ImpactNormalColor = FVector4f(0.0f, 1.0f, 0.0f, 1.0f);
     }
 };

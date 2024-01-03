@@ -1,7 +1,6 @@
 #include "CogEngineWindow_CollisionTester.h"
 
 #include "CogDebug.h"
-#include "CogEngineDataAsset.h"
 #include "CogImGuiHelper.h"
 #include "CogWindowWidgets.h"
 #include "Components/PrimitiveComponent.h"
@@ -14,8 +13,6 @@ void FCogEngineWindow_CollisionTester::Initialize()
     Super::Initialize();
 
     bHasMenu = true;
-
-    SetAsset(GetAsset<UCogEngineDataAsset>());
 
     Config = GetConfig<UCogEngineConfig_CollisionTester>();
 }
@@ -35,116 +32,79 @@ void FCogEngineWindow_CollisionTester::ResetConfig()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool RenderCollisionProfileChannels(const UCollisionProfile& CollisionProfileChannels, int32& Channels, const TArray<FCogCollisionChannel>& ChannelsConfig)
-{
-    bool Result = false;
-
-    for (const FCogCollisionChannel& ChannelConfig : ChannelsConfig)
-    {
-	    const ECollisionChannel Channel = ChannelConfig.Channel.GetValue();
-        ImGui::PushID(Channel);
-
-        ImColor Color = FCogImguiHelper::ToImColor(ChannelConfig.Color);
-        ImGui::ColorEdit4("Color", (float*)&Color.Value, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
-        ImGui::SameLine();
-
-        bool IsCollisionActive = (Channels & ECC_TO_BITFIELD(Channel)) > 0;
-        const FName ChannelName = CollisionProfileChannels.ReturnChannelNameFromContainerIndex(Channel);
-        if (ImGui::Checkbox(TCHAR_TO_ANSI(*ChannelName.ToString()), &IsCollisionActive))
-        {
-            Result = true;
-
-            if (IsCollisionActive)
-            {
-                Channels |= ECC_TO_BITFIELD(Channel);
-            }
-            else
-            {
-                Channels &= ~ECC_TO_BITFIELD(Channel);
-            }
-        }
-
-        ImGui::PopID();
-    }
-
-    return Result;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-bool RenderComboCollisionChannel(const char* Label, const UCollisionProfile& CollisionProfile, ECollisionChannel& SelectedChannel, const TArray<FCogCollisionChannel>& ChannelsConfig)
-{
-    const FName SelectedChannelName = CollisionProfile.ReturnChannelNameFromContainerIndex(SelectedChannel);
-
-    bool Result = false;
-    if (ImGui::BeginCombo(Label, TCHAR_TO_ANSI(*SelectedChannelName.ToString()), ImGuiComboFlags_HeightLarge))
-    {
-        for (const FCogCollisionChannel& ChannelConfig : ChannelsConfig)
-        {
-            const ECollisionChannel Channel = ChannelConfig.Channel.GetValue();
-            ImGui::PushID(Channel);
-
-            const FName ChannelName = CollisionProfile.ReturnChannelNameFromContainerIndex(Channel);
-
-            ImColor Color = FCogImguiHelper::ToImColor(ChannelConfig.Color);
-            ImGui::ColorEdit4("Color", (float*)&Color.Value, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
-            ImGui::SameLine();
-
-            if (ImGui::Selectable(TCHAR_TO_ANSI(*ChannelName.ToString())))
-            {
-                SelectedChannel = Channel;
-                Result = true;
-            }
-
-            ImGui::PopID();
-        }
-        ImGui::EndCombo();
-    }
-
-    return Result;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_CollisionTester::RenderContent()
 {
     Super::RenderContent();
+
+    ACogEngineCollisionTester* CollisionTester = Cast<ACogEngineCollisionTester>(GetSelection());
 
     //-------------------------------------------------
     // Menu
     //-------------------------------------------------
     if (ImGui::BeginMenuBar())
     {
-        if (ImGui::BeginMenu("Options"))
+        ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(0, 0, 0, 0));
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
+
+        if (ImGui::ArrowButton("SelectPrev", ImGuiDir_Left))
         {
-            ImGui::Checkbox("Draw Hit Locations", &Config->DrawHitLocations);
-            ImGui::Checkbox("Draw Hit Impact Points", &Config->DrawHitImpactPoints);
-            ImGui::Checkbox("Draw Hit Shapes", &Config->DrawHitShapes);
-            ImGui::Checkbox("Draw Hit Normal", &Config->DrawHitNormals);
-            ImGui::Checkbox("Draw Hit Impact Normal", &Config->DrawHitImpactNormals);
-            ImGui::Checkbox("Draw Hit Primitives", &Config->DrawHitPrimitives);
-            ImGui::Checkbox("Draw Hit Actors Names", &Config->DrawHitActorsNames);
+        }
+        if (ImGui::BeginItemTooltip())
+        {
+            ImGui::SetTooltip("Select previous collision tester");
+            ImGui::EndTooltip();
+        }
 
-            FCogWindowWidgets::SetNextItemToShortWidth();
-            ImGui::SliderFloat("Hit Point Size", &Config->HitPointSize, 0.0f, 20.0f, "%0.f");
+        ImGui::SameLine();
+        if (ImGui::ArrowButton("SelectNext", ImGuiDir_Right))
+        {
+        }
+        if (ImGui::BeginItemTooltip())
+        {
+            ImGui::SetTooltip("Select next collision tester");
+            ImGui::EndTooltip();
+        }
 
-            ImGui::ColorEdit4("No Hit Color", (float*)&Config->NoHitColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-            ImGui::ColorEdit4("Hit Color", (float*)&Config->HitColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-            ImGui::ColorEdit4("Normal Color", (float*)&Config->NormalColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-            ImGui::ColorEdit4("Impact Normal Color", (float*)&Config->ImpactNormalColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        ImGui::PopStyleColor(1);
+        ImGui::PopStyleVar(1);
 
-            ImGui::EndMenu();
+
+        if (ImGui::MenuItem("Spawn"))
+        {
+            const FActorSpawnParameters SpawnInfo;
+            const FTransform Transform = GetSelection() ? GetSelection()->GetActorTransform() : FTransform::Identity;
+            ACogEngineCollisionTester* Actor = GetWorld()->SpawnActor<ACogEngineCollisionTester>(ACogEngineCollisionTester::StaticClass(), Transform, SpawnInfo);
+            FCogDebug::SetSelection(GetWorld(), Actor);
+        }
+        if (ImGui::BeginItemTooltip())
+        {
+            ImGui::SetTooltip("Spawn a new collision tester");
+            ImGui::EndTooltip();
+        }
+
+        const bool Disable = CollisionTester == nullptr;
+        if (Disable)
+        {
+            ImGui::BeginDisabled();
+        }
+        if (ImGui::MenuItem("Delete"))
+        {
+            GetWorld()->DestroyActor(CollisionTester);
+            CollisionTester = nullptr;
+        }
+        if (ImGui::BeginItemTooltip())
+        {
+            ImGui::SetTooltip("Delete selected collision tester");
+            ImGui::EndTooltip();
+        }
+        if (Disable)
+        {
+            ImGui::EndDisabled();
         }
 
         ImGui::EndMenuBar();
     }
 
-    if (ImGui::Button("Spawn Collision Tester", ImVec2(-1, 0)))
-    {
-	    const FActorSpawnParameters SpawnInfo;
-        ACogEngineCollisionTester* Actor = GetWorld()->SpawnActor<ACogEngineCollisionTester>(SpawnInfo);
-        FCogDebug::SetSelection(GetWorld(), Actor);
-    }
-
-    ACogEngineCollisionTester* CollisionTester = Cast<ACogEngineCollisionTester>(GetSelection());
     if (CollisionTester == nullptr)
     {
         ImGui::TextDisabled("Spawn or select a Collision Tester actor");
@@ -183,7 +143,7 @@ void FCogEngineWindow_CollisionTester::RenderContent()
     {
         FCogWindowWidgets::SetNextItemToShortWidth();
         ECollisionChannel Channel = CollisionTester->Channel.GetValue();
-        if (RenderComboCollisionChannel("Channel", *CollisionProfile, Channel, Asset->Channels))
+        if (FCogWindowWidgets::ComboCollisionChannel("Channel", Channel))
         {
             CollisionTester->Channel = Channel;
         }
@@ -241,24 +201,24 @@ void FCogEngineWindow_CollisionTester::RenderContent()
         case ECogEngine_CollisionQueryShape::Sphere:
         {
             FCogWindowWidgets::SetNextItemToShortWidth();
-            FCogImguiHelper::DragDouble("Sphere Radius", &CollisionTester->ShapeExtent.X, 0.1f, 0, FLT_MAX, "%.1f");
+            FCogImguiHelper::DragDouble("Sphere Radius", &CollisionTester->ShapeExtent.X, 1.0f, 0, FLT_MAX, "%.1f");
             break;
         }
 
         case ECogEngine_CollisionQueryShape::Box:
         {
             FCogWindowWidgets::SetNextItemToShortWidth();
-            FCogImguiHelper::DragFVector("Box Extent", CollisionTester->ShapeExtent, 0.1f, 0, FLT_MAX, "%.1f");
+            FCogImguiHelper::DragFVector("Box Extent", CollisionTester->ShapeExtent, 1.0f, 0, FLT_MAX, "%.1f");
             break;
         }
 
         case ECogEngine_CollisionQueryShape::Capsule:
         {
             FCogWindowWidgets::SetNextItemToShortWidth();
-            FCogImguiHelper::DragDouble("Capsule Radius", &CollisionTester->ShapeExtent.X, 0.1f, 0, FLT_MAX, "%.1f");
+            FCogImguiHelper::DragDouble("Capsule Radius", &CollisionTester->ShapeExtent.X, 1.0f, 0, FLT_MAX, "%.1f");
 
             FCogWindowWidgets::SetNextItemToShortWidth();
-            FCogImguiHelper::DragDouble("Capsule Half Height", &CollisionTester->ShapeExtent.Z, 0.1f, 0, FLT_MAX, "%.1f");
+            FCogImguiHelper::DragDouble("Capsule Half Height", &CollisionTester->ShapeExtent.Z, 1.0f, 0, FLT_MAX, "%.1f");
             break;
         }
         }
@@ -272,34 +232,11 @@ void FCogEngineWindow_CollisionTester::RenderContent()
     if (CollisionTester->By == ECogEngine_CollisionQueryBy::Profile)
     {
         ImGui::BeginDisabled();
-        RenderCollisionProfileChannels(*CollisionProfile, CollisionTester->ObjectTypesToQuery, Asset->Channels);
+        FCogWindowWidgets::CollisionProfileChannels(CollisionTester->ObjectTypesToQuery);
         ImGui::EndDisabled();
     }
     else if (CollisionTester->By == ECogEngine_CollisionQueryBy::ObjectType)
     {
-        RenderCollisionProfileChannels(*CollisionProfile, CollisionTester->ObjectTypesToQuery, Asset->Channels);
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_CollisionTester::SetAsset(const UCogEngineDataAsset* Value)
-{
-    Asset = Value;
-
-    if (Asset == nullptr)
-    {
-        return;
-    }
-
-    for (FChannel& Channel : Channels)
-    {
-        Channel.IsValid = false;
-    }
-
-    for (const FCogCollisionChannel& AssetChannel : Asset->Channels)
-    {
-        FChannel& Channel = Channels[(uint8)AssetChannel.Channel];
-        Channel.IsValid = true;
-        Channel.Color = AssetChannel.Color.ToFColor(true);
+        FCogWindowWidgets::CollisionProfileChannels(CollisionTester->ObjectTypesToQuery);
     }
 }

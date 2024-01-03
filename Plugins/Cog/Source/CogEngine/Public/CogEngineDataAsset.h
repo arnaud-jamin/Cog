@@ -7,19 +7,6 @@
 
 //--------------------------------------------------------------------------------------------------------------------------
 USTRUCT()
-struct COGENGINE_API FCogCollisionChannel
-{
-    GENERATED_BODY()
-
-    UPROPERTY(EditAnywhere)
-    TEnumAsByte<ECollisionChannel> Channel = ECC_WorldStatic;
-
-    UPROPERTY(EditAnywhere)
-    FLinearColor Color = FLinearColor(0.5f, 0.5f, 0.5f, 1.0f);
-};
-
-//--------------------------------------------------------------------------------------------------------------------------
-USTRUCT()
 struct COGENGINE_API FCogEngineSpawnEntry
 {
     GENERATED_BODY()
@@ -59,7 +46,4 @@ public:
 
     UPROPERTY(Category = "Spawns", EditAnywhere, meta = (TitleProperty = "Name"))
     TArray<FCogEngineSpawnGroup> SpawnGroups;
-
-    UPROPERTY(Category = "Collisions", EditAnywhere, meta = (TitleProperty = "Channel"))
-    TArray<FCogCollisionChannel> Channels;
 };

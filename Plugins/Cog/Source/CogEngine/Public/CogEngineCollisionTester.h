@@ -4,11 +4,6 @@
 #include "Engine/HitResult.h"
 #include "CogEngineCollisionTester.generated.h"
 
-class UCogEngineEditAnywhere_CollisionViewer;
-class UCogEngineDataAsset;
-class UPrimitiveComponent;
-struct FCollisionShape;
-
 //--------------------------------------------------------------------------------------------------------------------------
 UENUM()
 enum class ECogEngine_CollisionQueryType : uint8
@@ -52,15 +47,14 @@ class COGENGINE_API ACogEngineCollisionTester : public AActor
     GENERATED_BODY()
 
 public:
+
     ACogEngineCollisionTester(const FObjectInitializer& ObjectInitializer);
 
     virtual void Tick(float DeltaSeconds) override;
+
     virtual bool ShouldTickIfViewportsOnly() const override;
 
-    void Query();
-    void DrawPrimitive(const UPrimitiveComponent* PrimitiveComponent);
-    void DrawShape(const FCollisionShape& Shape, const FVector& InLocation, const FQuat& InRotation, const FVector& InScale,
-                   const FColor& InColor, bool InDrawSolid) const;
+    void Query() const;
 
     UPROPERTY(EditAnywhere)
     bool TickInEditor = false;
@@ -90,7 +84,7 @@ public:
     int32 ProfileIndex = 0;
 
     UPROPERTY(EditAnywhere)
-    FVector ShapeExtent = FVector::One();
+    FVector ShapeExtent = FVector(100, 100, 100);
 
     UPROPERTY(EditAnywhere)
     bool DrawHitLocations = true;
@@ -127,10 +121,6 @@ public:
 
     UPROPERTY(EditAnywhere)
     FColor ImpactNormalColor = FColor::Cyan;
-
-    TSet<const AActor*> AlreadyDrawnActors;
-
-    TSet<const UPrimitiveComponent*> AlreadyDrawnComponents;
 
     UPROPERTY(EditAnywhere)
     USceneComponent* StartComponent = nullptr;
