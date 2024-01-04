@@ -1,5 +1,6 @@
 #include "CogWindowWidgets.h"
 
+#include "CogDebug.h"
 #include "CogImguiHelper.h"
 #include "CogImguiKeyInfo.h"
 #include "CogImguiInputHelper.h"
@@ -610,4 +611,109 @@ bool FCogWindowWidgets::MultiChoiceButtonsFloat(TArray<float>& Values, float& Va
     ImGui::PopStyleVar(3);
 
     return IsPressed;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::ComboCollisionChannel(const char* Label, ECollisionChannel& Channel)
+{
+    FColor ChannelColors[ECC_MAX];
+    FCogDebug::GetDebugChannelColors(ChannelColors);
+
+    FName SelectedChannelName;
+    const UCollisionProfile* CollisionProfile = UCollisionProfile::Get();
+    if (CollisionProfile != nullptr)
+    {
+        SelectedChannelName = CollisionProfile->ReturnChannelNameFromContainerIndex(Channel);
+    }
+
+    bool Result = false;
+    if (ImGui::BeginCombo(Label, TCHAR_TO_ANSI(*SelectedChannelName.ToString()), ImGuiComboFlags_HeightLarge))
+    {
+        for (int32 ChannelIndex = 0; ChannelIndex < (int32)ECC_OverlapAll_Deprecated; ++ChannelIndex)
+        {
+            FColor Color = ChannelColors[ChannelIndex];
+            if (Color == FColor::Transparent)
+            {
+                continue;
+            }
+
+            ImGui::PushID(ChannelIndex);
+
+            const FName ChannelName = CollisionProfile->ReturnChannelNameFromContainerIndex(ChannelIndex);
+
+            FCogImguiHelper::ColorEdit4("Color", Color, ImGuiColorEditFlags_NoPicker | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+            ImGui::SameLine();
+
+            if (ChannelName.IsValid())
+            {
+                if (ImGui::Selectable(TCHAR_TO_ANSI(*ChannelName.ToString())))
+                {
+                    Channel = (ECollisionChannel)ChannelIndex;
+                    Result = true;
+                }
+            }
+
+            ImGui::PopID();
+        }
+        ImGui::EndCombo();
+    }
+
+    return Result;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::CollisionProfileChannel(const UCollisionProfile& CollisionProfile, const int32 ChannelIndex, FColor& ChannelColor, int32& Channels)
+{
+    bool Result = false;
+
+    FCogImguiHelper::ColorEdit4("Color", ChannelColor, ImGuiColorEditFlags_NoPicker | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+	ImGui::SameLine();
+
+    bool IsCollisionActive = (Channels & ECC_TO_BITFIELD(ChannelIndex)) > 0;
+    const FName ChannelName = CollisionProfile.ReturnChannelNameFromContainerIndex(ChannelIndex);
+    if (ImGui::Checkbox(TCHAR_TO_ANSI(*ChannelName.ToString()), &IsCollisionActive))
+    {
+        Result = true;
+
+        if (IsCollisionActive)
+        {
+            Channels |= ECC_TO_BITFIELD(ChannelIndex);
+        }
+        else
+        {
+            Channels &= ~ECC_TO_BITFIELD(ChannelIndex);
+        }
+    }
+
+	return Result;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::CollisionProfileChannels(int32& Channels)
+{
+    const UCollisionProfile* CollisionProfile = UCollisionProfile::Get();
+    if (CollisionProfile == nullptr)
+    {
+        return false;
+    }
+
+    FColor ChannelColors[ECC_MAX];
+    FCogDebug::GetDebugChannelColors(ChannelColors);
+
+    bool Result = false;
+
+    for (int32 ChannelIndex = 0; ChannelIndex < (int32)ECC_OverlapAll_Deprecated; ++ChannelIndex)
+    {
+        FColor Color = ChannelColors[ChannelIndex];
+        if (Color == FColor::Transparent)
+        {
+            continue;
+        }
+
+        ImGui::PushID(ChannelIndex);
+        Result |= CollisionProfileChannel(*CollisionProfile, ChannelIndex, Color, Channels);
+        ImGui::PopID();
+    }
+
+    return Result;
 }

@@ -154,7 +154,7 @@ void UCogSampleAreaComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 #if ENABLE_COG
 
     const AActor* AreaInstigator = UCogSampleFunctionLibrary_Gameplay::GetInstigator(GetOwner());
-    if (FCogDebugLog::IsLogCategoryActive(LogCogArea) && FCogDebugSettings::IsDebugActiveForObject(AreaInstigator))
+    if (FCogDebugLog::IsLogCategoryActive(LogCogArea) && FCogDebug::IsDebugActiveForObject(AreaInstigator))
     {
         TArray<USceneComponent*, TInlineAllocator<8>> Components;
         GetOwner()->GetComponents<USceneComponent>(Components);

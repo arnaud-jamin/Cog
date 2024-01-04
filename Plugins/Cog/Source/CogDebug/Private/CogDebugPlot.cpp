@@ -425,7 +425,7 @@ FCogDebugPlotEntry* FCogDebugPlot::RegisterPlot(const UObject* WorldContextObjec
         return nullptr;
     }
 
-    if (FCogDebugSettings::IsDebugActiveForObject(WorldContextObject) == false)
+    if (FCogDebug::IsDebugActiveForObject(WorldContextObject) == false)
     {
         return nullptr;
     }

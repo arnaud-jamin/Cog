@@ -1,7 +1,7 @@
 #include "CogEngineWindow_LogCategories.h"
 
 #include "CogDebugHelper.h"
-#include "CogDebugSettings.h"
+#include "CogDebug.h"
 #include "CogWindowWidgets.h"
 #include "CogDebugLog.h"
 #include "DrawDebugHelpers.h"
@@ -74,12 +74,12 @@ void FCogEngineWindow_LogCategories::RenderContent()
             ImGui::EndMenu();
         }
 
-        bool bIsFilteringBySelection = FCogDebugSettings::GetIsFilteringBySelection();
+        bool bIsFilteringBySelection = FCogDebug::GetIsFilteringBySelection();
         ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
         FCogWindowWidgets::PushStyleCompact();
         if (ImGui::Checkbox("Filter", &bIsFilteringBySelection))
         {
-            FCogDebugSettings::SetIsFilteringBySelection(GetWorld(), bIsFilteringBySelection);
+            FCogDebug::SetIsFilteringBySelection(GetWorld(), bIsFilteringBySelection);
         }
         FCogWindowWidgets::PopStyleCompact();
 

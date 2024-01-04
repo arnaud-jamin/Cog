@@ -23,7 +23,8 @@
 #include "CogDebugPlot.h"
 #include "CogEngineDataAsset.h"
 #include "CogEngineModule.h"
-#include "CogEngineWindow_Collisions.h"
+#include "CogEngineWindow_CollisionTester.h"
+#include "CogEngineWindow_CollisionViewer.h"
 #include "CogEngineWindow_CommandBindings.h"
 #include "CogEngineWindow_DebugSettings.h"
 #include "CogEngineWindow_ImGui.h"
@@ -40,6 +41,7 @@
 #include "CogEngineWindow_Spawns.h"
 #include "CogEngineWindow_Stats.h"
 #include "CogEngineWindow_TimeScale.h"
+#include "CogEngineWindow_Transform.h"
 #include "CogImguiModule.h"
 #include "CogInputDataAsset.h"
 #include "CogInputWindow_Actions.h"
@@ -128,7 +130,9 @@ void ACogSampleGameState::InitializeCog()
     //---------------------------------------
     // Engine
     //---------------------------------------
-    CogWindowManager->AddWindow<FCogEngineWindow_Collisions>("Engine.Collision");
+    CogWindowManager->AddWindow<FCogEngineWindow_CollisionTester>("Engine.Collision Tester");
+
+    CogWindowManager->AddWindow<FCogEngineWindow_CollisionViewer>("Engine.Collision Viewer");
 
     CogWindowManager->AddWindow<FCogEngineWindow_CommandBindings>("Engine.Command Bindings");
 
@@ -170,6 +174,8 @@ void ACogSampleGameState::InitializeCog()
     FCogEngineWindow_Stats* StatsWindow = CogWindowManager->AddWindow<FCogEngineWindow_Stats>("Engine.Stats");
 
     CogWindowManager->AddWindow<FCogEngineWindow_TimeScale>("Engine.Time Scale");
+
+    CogWindowManager->AddWindow<FCogEngineWindow_Transform>("Engine.Transform");
 
     //---------------------------------------
     // Abilities

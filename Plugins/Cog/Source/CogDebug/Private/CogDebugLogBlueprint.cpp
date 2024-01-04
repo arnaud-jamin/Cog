@@ -41,7 +41,7 @@ bool UCogDebugLogBlueprint::IsLogActive(const UObject* WorldContextObject, const
             return false;
         }
 
-        if (FCogDebugSettings::IsDebugActiveForObject(WorldContextObject) == false)
+        if (FCogDebug::IsDebugActiveForObject(WorldContextObject) == false)
         {
             return false;
         }

@@ -40,6 +40,7 @@ public:
     virtual FReply OnKeyUp(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent) override;
     virtual FReply OnAnalogValueChanged(const FGeometry& MyGeometry, const FAnalogInputEvent& AnalogInputEvent) override;
     virtual FReply OnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
+    virtual FReply OnMouseButtonDoubleClick(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
     virtual FReply OnMouseButtonUp(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
     virtual FReply OnMouseWheel(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
     virtual FReply OnMouseMove(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
@@ -53,7 +54,8 @@ public:
 
 protected:
 
-    FReply HandleKeyEvent(const FGeometry& MyGeometry, const FKeyEvent& KeyEvent, bool Down);
+    FReply HandleKeyEvent(const FKeyEvent& KeyEvent, bool Down);
+    FReply HandleMouseButtonEvent(const FPointerEvent& MouseEvent, bool Down);
 
     void RefreshVisibility();
 

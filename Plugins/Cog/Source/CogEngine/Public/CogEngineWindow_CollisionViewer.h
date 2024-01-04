@@ -4,13 +4,13 @@
 #include "CogWindow.h"
 #include "CogWindowConfig.h"
 #include "Engine/EngineTypes.h"
-#include "CogEngineWindow_Collisions.generated.h"
+#include "CogEngineWindow_CollisionViewer.generated.h"
 
-class UCogEngineConfig_Collisions;
+class UCogEngineConfig_CollisionViewer;
 class UCogEngineDataAsset;
 
 //--------------------------------------------------------------------------------------------------------------------------
-class COGENGINE_API FCogEngineWindow_Collisions : public FCogWindow
+class COGENGINE_API FCogEngineWindow_CollisionViewer : public FCogWindow
 {
     typedef FCogWindow Super;
 
@@ -26,24 +26,18 @@ protected:
 
     virtual void RenderContent() override;
 
-    virtual void SetAsset(const UCogEngineDataAsset* Value);
-
     struct FChannel
     {
         bool IsValid = false;
         FColor Color;
     };
 
-    FChannel Channels[ECC_MAX];
-
-    TObjectPtr<const UCogEngineDataAsset> Asset = nullptr;
-
-    TObjectPtr<UCogEngineConfig_Collisions> Config = nullptr;
+    TObjectPtr<UCogEngineConfig_CollisionViewer> Config = nullptr;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(Config = Cog)
-class UCogEngineConfig_Collisions : public UCogWindowConfig
+class UCogEngineConfig_CollisionViewer : public UCogWindowConfig
 {
     GENERATED_BODY()
 
@@ -70,9 +64,6 @@ public:
     UPROPERTY(Config)
     bool ShowActorsNames = false;
 
-    UPROPERTY(Config)
-    bool ShowQuery = false;
-
     virtual void Reset() override
     {
         Super::Reset();
@@ -84,6 +75,5 @@ public:
         QueryThickness = 0.0f;
         UseComplexCollisions = false;
         ShowActorsNames = false;
-        ShowQuery = false;
     }
 };

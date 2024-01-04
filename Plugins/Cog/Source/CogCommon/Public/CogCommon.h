@@ -9,13 +9,13 @@
 
 #if ENABLE_COG
 
-#include "CogDebugSettings.h"
+#include "CogDebug.h"
 
 #define IF_COG(expr)            { expr; }
 #define COG_LOG_CATEGORY        FLogCategoryBase
 
 //--------------------------------------------------------------------------------------------------------------------------
-#define COG_LOG_ACTIVE_FOR_OBJECT(Object)   (FCogDebugSettings::IsDebugActiveForObject(Object))
+#define COG_LOG_ACTIVE_FOR_OBJECT(Object)   (FCogDebug::IsDebugActiveForObject(Object))
 
 //--------------------------------------------------------------------------------------------------------------------------
 #define COG_LOG(LogCategory, Verbosity, Format, ...)                                                                        \
