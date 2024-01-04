@@ -56,7 +56,7 @@ private:
         FName Category;
     };
 
-    void DrawRow(const char* BufferStart, const FLineInfo& Info, bool IsTableShown);
+    void DrawRow(const char* BufferStart, const FLineInfo& Info, bool IsTableShown) const;
 
     ImGuiTextBuffer TextBuffer;
 

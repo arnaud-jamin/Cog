@@ -47,21 +47,27 @@ void FCogInputWindow_Actions::RenderContent()
 
     if (Asset == nullptr)
     {
-        ImGui::Text("No Actions Asset");
+        ImGui::TextDisabled("Invalid Asset");
         return;
     }
 
     ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
     if (LocalPlayer == nullptr)
     {
-        ImGui::Text("No Local Player");
+        ImGui::TextDisabled("No Local Player");
         return;
     }
 
     UEnhancedInputLocalPlayerSubsystem* EnhancedInputSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
     if (EnhancedInputSubsystem == nullptr)
     {
-        ImGui::Text("No Enhanced Input Subsystem");
+        ImGui::TextDisabled("No Enhanced Input Subsystem");
+        return;
+    }
+
+    if(EnhancedInputSubsystem->GetPlayerInput() == nullptr)
+    {
+        ImGui::TextDisabled("No Player Input");
         return;
     }
     

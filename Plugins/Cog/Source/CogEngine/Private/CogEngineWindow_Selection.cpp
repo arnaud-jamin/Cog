@@ -5,7 +5,6 @@
 #include "CogEngineReplicator.h"
 #include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
-#include "CogImguiModule.h"
 #include "CogWindowManager.h"
 #include "CogWindowWidgets.h"
 #include "Components/PrimitiveComponent.h"

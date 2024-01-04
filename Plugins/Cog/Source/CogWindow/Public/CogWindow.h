@@ -78,12 +78,12 @@ public:
     template<class T>
     T* GetConfig() { return Cast<T>(GetConfig(T::StaticClass())); }
 
-    UCogWindowConfig* GetConfig(const TSubclassOf<UCogWindowConfig> ConfigClass);
+    UCogWindowConfig* GetConfig(const TSubclassOf<UCogWindowConfig> ConfigClass) const;
 
     template<class T>
     const T* GetAsset() { return Cast<T>(GetAsset(T::StaticClass())); }
 
-    const UObject* GetAsset(const TSubclassOf<UObject> AssetClass);
+    const UObject* GetAsset(const TSubclassOf<UObject> AssetClass) const;
 
 protected:
     
@@ -105,11 +105,11 @@ protected:
     
     virtual void OnSelectionChanged(AActor* OldSelection, AActor* NewSelection) {}
 
-    APawn* GetLocalPlayerPawn();
+    APawn* GetLocalPlayerPawn() const;
 
-    APlayerController* GetLocalPlayerController();
+    APlayerController* GetLocalPlayerController() const;
 
-    ULocalPlayer* GetLocalPlayer();
+    ULocalPlayer* GetLocalPlayer() const;
 
 protected:
 

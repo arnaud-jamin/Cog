@@ -7,10 +7,7 @@
 #include "CogAbilityDataAsset.h"
 #include "CogAbilityHelper.h"
 #include "CogImguiHelper.h"
-#include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
-#include "EngineUtils.h"
-#include "GameFramework/Character.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Effects::Initialize()
@@ -87,9 +84,10 @@ void FCogAbilityWindow_Effects::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Effects::RenderEffectsTable()
 {
-    UAbilitySystemComponent* AbilitySystemComponent = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetSelection(), true);
+	const UAbilitySystemComponent* AbilitySystemComponent = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetSelection(), true);
     if (AbilitySystemComponent == nullptr)
     {
+        ImGui::TextDisabled("Selection has no ability system component");
         return;
     }
 
@@ -113,7 +111,7 @@ void FCogAbilityWindow_Effects::RenderEffectsTable()
         static int SelectedIndex = -1;
         int Index = 0;
 
-        FGameplayEffectQuery Query;
+        const FGameplayEffectQuery Query;
         TArray<FActiveGameplayEffectHandle> Effects = AbilitySystemComponent->GetActiveEffects(Query);
 
         if (Config->SortByName || Config->SortByAlignment)
@@ -138,7 +136,7 @@ void FCogAbilityWindow_Effects::RenderEffectsTable()
                 }
 
                 bool AlignmentOrder = false;
-                if (Config->SortByAlignment)
+                if (Config->SortByAlignment && Asset != nullptr)
                 {
                     const FGameplayTagContainer& Tags1 = Effect1->InheritableGameplayEffectTags.CombinedTags;
                     const FGameplayTagContainer& Tags2 = Effect2->InheritableGameplayEffectTags.CombinedTags;
@@ -267,7 +265,7 @@ void FCogAbilityWindow_Effects::RenderEffectInfo(const UAbilitySystemComponent& 
 {
     if (ImGui::BeginTable("Effect", 2, ImGuiTableFlags_Borders))
     {
-        const ImVec4 TextColor(1.0f, 1.0f, 1.0f, 0.5f);
+	    constexpr ImVec4 TextColor(1.0f, 1.0f, 1.0f, 0.5f);
 
         ImGui::TableSetupColumn("Property");
         ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
@@ -407,7 +405,7 @@ void FCogAbilityWindow_Effects::RenderRemainingTime(const UAbilitySystemComponen
 
     if (Duration >= 0)
     {
-        UWorld* World = AbilitySystemComponent.GetWorld();
+	    const UWorld* World = AbilitySystemComponent.GetWorld();
         const float RemainingTime = StartTime + Duration - World->GetTimeSeconds();
 
         ImGui::PushStyleColor(ImGuiCol_PlotHistogram, IM_COL32(100, 100, 100, 255));
@@ -473,13 +471,13 @@ void FCogAbilityWindow_Effects::CloseEffect(const FActiveGameplayEffectHandle& H
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Effects::RenderOpenEffects()
 {
-    AActor* Selection = GetSelection();
+	const AActor* Selection = GetSelection();
     if (Selection == nullptr)
     {
         return;
     }
 
-    UAbilitySystemComponent* AbilitySystemComponent = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Selection, true);
+	const UAbilitySystemComponent* AbilitySystemComponent = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Selection, true);
     if (AbilitySystemComponent == nullptr)
     {
         return;
@@ -487,7 +485,7 @@ void FCogAbilityWindow_Effects::RenderOpenEffects()
 
     for (int i = OpenedEffects.Num() - 1; i >= 0; --i)
     {
-        FActiveGameplayEffectHandle Handle = OpenedEffects[i];
+	    const FActiveGameplayEffectHandle Handle = OpenedEffects[i];
 
         const FActiveGameplayEffect* ActiveEffectPtr = AbilitySystemComponent->GetActiveGameplayEffect(Handle);
         if (ActiveEffectPtr == nullptr)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogEngineReplicator.h"
 #include "CogWindow.h"
 
 class UCogEngineDataAsset;
@@ -21,9 +22,9 @@ protected:
 
     virtual void RenderContent() override;
 
-    virtual void RenderSpawnGroup(const FCogEngineSpawnGroup& SpawnGroup);
+    virtual void RenderSpawnGroup(ACogEngineReplicator& Replicator, const FCogEngineSpawnGroup& SpawnGroup);
 
-    virtual bool RenderSpawnAsset(const FCogEngineSpawnEntry& SpawnEntry, bool IsLastSelected);
+    virtual bool RenderSpawnAsset(ACogEngineReplicator& Replicator, const FCogEngineSpawnEntry& SpawnEntry, bool IsLastSelected);
 
 private:
 

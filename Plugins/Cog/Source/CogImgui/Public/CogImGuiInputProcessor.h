@@ -41,7 +41,7 @@ protected:
 
 	void AddMousePosEvent(const FVector2D& MousePosition) const;
 
-	TObjectPtr<FCogImguiContext> Context = nullptr;
+	FCogImguiContext* Context = nullptr;
 
 	TObjectPtr<UPlayerInput> PlayerInput;
 

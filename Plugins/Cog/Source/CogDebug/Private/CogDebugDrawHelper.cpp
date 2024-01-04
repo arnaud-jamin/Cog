@@ -10,13 +10,13 @@
 namespace 
 {
     //----------------------------------------------------------------------------------------------------------------------
-    ULineBatchComponent* GetDebugLineBatcher(const UWorld* InWorld, bool bPersistentLines, float LifeTime, bool bDepthIsForeground)
+    ULineBatchComponent* GetDebugLineBatcher(const UWorld* InWorld, const bool bPersistentLines, const float LifeTime, const bool bDepthIsForeground)
     {
         return (InWorld ? (bDepthIsForeground ? InWorld->ForegroundLineBatcher : ((bPersistentLines || (LifeTime > 0.f)) ? InWorld->PersistentLineBatcher : InWorld->LineBatcher)) : nullptr);
     }
 
     //----------------------------------------------------------------------------------------------------------------------
-    static float GetLineLifeTime(ULineBatchComponent* LineBatcher, float LifeTime, bool bPersistent)
+    static float GetLineLifeTime(const ULineBatchComponent* LineBatcher, const float LifeTime, const bool bPersistent)
     {
         return bPersistent ? -1.0f : ((LifeTime > 0.f) ? LifeTime : LineBatcher->DefaultLifeTime);
     }
@@ -154,8 +154,8 @@ void FCogDebugDrawHelper::DrawFlatCapsule(
     const uint8 DepthPriority,
     const float Thickness)
 {
-    FVector2D Forward = (End - Start).GetSafeNormal();
-    FVector2D Right = FVector2D(-Forward.Y, Forward.X);
+	const FVector2D Forward = (End - Start).GetSafeNormal();
+	const FVector2D Right = FVector2D(-Forward.Y, Forward.X);
 
     ::DrawDebugLine(InWorld, FVector(Start - Right * Radius, Z), FVector(End - Right * Radius, Z), Color, bPersistentLines, LifeTime, DepthPriority, Thickness);
     ::DrawDebugLine(InWorld, FVector(Start + Right * Radius, Z), FVector(End + Right * Radius, Z), Color, bPersistentLines, LifeTime, DepthPriority, Thickness);

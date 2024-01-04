@@ -19,7 +19,7 @@ class COGIMGUI_API SCogImguiWidget : public SLeafWidget
 public:
 
     SLATE_BEGIN_ARGS(SCogImguiWidget) {}
-    SLATE_ARGUMENT(FCogImguiContext*, Context)
+        SLATE_ARGUMENT(FCogImguiContext*, Context)
     SLATE_END_ARGS()
 
     void Construct(const FArguments& InArgs);
@@ -59,7 +59,7 @@ protected:
 
     void RefreshVisibility();
 
-    TObjectPtr<FCogImguiContext> Context = nullptr;
+    FCogImguiContext* Context = nullptr;
 
     TSharedPtr<SWindow> Window = nullptr;
 

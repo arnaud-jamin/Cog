@@ -4,7 +4,6 @@
 #include "AbilitySystemGlobals.h"
 #include "CogAbilityDataAsset.h"
 #include "CogImguiHelper.h"
-#include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
 #include "imgui_internal.h"
 
@@ -33,12 +32,20 @@ void FCogAbilityWindow_Pools::RenderContent()
 
     if (Asset == nullptr)
     {
+        ImGui::TextDisabled("Invalid Asset");
         return;
     }
 
-    UAbilitySystemComponent* AbilitySystem = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetSelection(), true);
+    const UAbilitySystemComponent* AbilitySystem = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetSelection(), true);
     if (AbilitySystem == nullptr)
     {
+        ImGui::TextDisabled("No ability system found on selection");
+        return;
+    }
+
+    if (Asset->Pools.Num() == 0)
+    {
+        ImGui::TextDisabled("No pool have been defined");
         return;
     }
 

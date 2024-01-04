@@ -6,11 +6,8 @@
 #include "CogAbilityDataAsset.h"
 #include "CogAbilityHelper.h"
 #include "CogImguiHelper.h"
-#include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
 #include "AttributeSet.h"
-#include "EngineUtils.h"
-#include "GameFramework/Character.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Attributes::Initialize()
@@ -52,6 +49,7 @@ void FCogAbilityWindow_Attributes::RenderContent()
     UAbilitySystemComponent* AbilitySystemComponent = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetSelection(), true);
     if (AbilitySystemComponent == nullptr)
     {
+        ImGui::TextDisabled("Selection has no ability system component");
         return;
     }
 

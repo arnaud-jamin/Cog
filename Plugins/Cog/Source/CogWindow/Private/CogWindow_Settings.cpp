@@ -2,8 +2,6 @@
 
 #include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
-#include "CogImguiModule.h"
-#include "CogImguiWidget.h"
 #include "CogWindowManager.h"
 #include "CogWindowWidgets.h"
 #include "imgui.h"
@@ -157,7 +155,7 @@ void FCogWindow_Settings::RenderTick(float DeltaTime)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogWindow_Settings::SetDPIScale(float Value)
+void FCogWindow_Settings::SetDPIScale(float Value) const
 {
     Config->DPIScale = Value;
     GetOwner()->GetContext().SetDPIScale(Config->DPIScale);

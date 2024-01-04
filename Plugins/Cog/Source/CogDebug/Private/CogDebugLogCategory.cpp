@@ -18,7 +18,7 @@ FLogCategoryBase* FCogLogCategory::GetLogCategory() const
 
     if (LogCategory == nullptr)
     {
-        if (FCogDebugLogCategoryInfo* CategoryInfo = FCogDebugLog::GetLogCategories().Find(Name))
+        if (const FCogDebugLogCategoryInfo* CategoryInfo = FCogDebugLog::GetLogCategories().Find(Name))
         {
             LogCategory = CategoryInfo->LogCategory;
         }
