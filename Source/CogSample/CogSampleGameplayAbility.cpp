@@ -197,8 +197,8 @@ bool UCogSampleGameplayAbility::IsCostGameplayEffectIsZero(const UGameplayEffect
         const float CostValue = ModSpec.GetEvaluatedMagnitude();
 
         //----------------------------------------------------------------------------------------------
-        // The Cost in the Settings is positive, but UCogSampleModifierCalculation_Cost negates it.
-        // Therefore a cost less than zero is an actual cost, and a cost of 0 or greater can be ignored
+        // The Cost in the Data is positive, but UCogSampleModifierCalculation_Cost negates it.
+        // Therefore, a cost less than zero is an actual cost, and a cost of 0 or greater can be ignored
         //----------------------------------------------------------------------------------------------
         if (CostValue < 0)
         {

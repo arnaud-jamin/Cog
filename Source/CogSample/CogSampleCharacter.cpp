@@ -677,7 +677,7 @@ void ACogSampleCharacter::OnGhostTagNewOrRemoved(const FGameplayTag InTag, int32
 void ACogSampleCharacter::OnScaleAttributeChanged(const FOnAttributeChangeData& Data)
 {
     //----------------------------------------------------------------------------------
-    // 'Settings.NewValue' is not used because it seems to only corresponds to the changes 
+    // 'Data.NewValue' is not used because it seems to only corresponds to the changes 
     // of the BaseValue which do not account for the temporary modifiers.
     //----------------------------------------------------------------------------------
     

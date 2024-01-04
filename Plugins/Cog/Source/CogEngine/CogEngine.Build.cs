@@ -2,53 +2,53 @@ using UnrealBuildTool;
 
 public class CogEngine : ModuleRules
 {
-	public CogEngine(ReadOnlyTargetRules Target) : base(Target)
-	{
-		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		
-		PublicIncludePaths.AddRange(
-			new string[] 
-			{
-			}
-			);
-				
-		
-		PrivateIncludePaths.AddRange(
-			new string[] 
-			{
-			}
-			);
-			
-		
-		PublicDependencyModuleNames.AddRange(
-			new string[]
-			{
+    public CogEngine(ReadOnlyTargetRules Target) : base(Target)
+    {
+        PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+        
+        PublicIncludePaths.AddRange(
+            new string[] 
+            {
+            }
+            );
+                
+        
+        PrivateIncludePaths.AddRange(
+            new string[] 
+            {
+            }
+            );
+            
+        
+        PublicDependencyModuleNames.AddRange(
+            new string[]
+            {
                 "CogDebug",
             }
-		);
-			
-		
-		PrivateDependencyModuleNames.AddRange(
-			new string[]
-			{
-				"CogCommon",
+        );
+            
+        
+        PrivateDependencyModuleNames.AddRange(
+            new string[]
+            {
+                "CogCommon",
                 "CogImgui",
                 "CogWindow",
-				"Core",
+                "Core",
                 "CoreUObject",
-				"Engine",
+                "Engine",
                 "InputCore",
                 "NetCore",
-				"Slate",
-				"SlateCore",
+                "Slate",
+                "SlateCore",
             }
-			);
-		
-		
-		DynamicallyLoadedModuleNames.AddRange(
-			new string[]
-			{
-			}
-			);
-	}
+            );
+        
+        
+        DynamicallyLoadedModuleNames.AddRange(
+            new string[]
+            {
+            }
+            );
+    }
 }
