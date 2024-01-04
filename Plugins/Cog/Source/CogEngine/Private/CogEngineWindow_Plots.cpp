@@ -1,12 +1,10 @@
 #include "CogEngineWindow_Plots.h"
 
 #include "CogDebugPlot.h"
-#include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
 #include "Engine/World.h"
 #include "imgui.h"
 #include "implot_internal.h"
-#include "Kismet/GameplayStatics.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Plots::Initialize()
@@ -169,7 +167,7 @@ void FCogEngineWindow_Plots::RenderPlotsList(TArray<FCogDebugPlotEntry*>& Visibl
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Plots::RenderPlots(const TArray<FCogDebugPlotEntry*>& VisiblePlots)
+void FCogEngineWindow_Plots::RenderPlots(const TArray<FCogDebugPlotEntry*>& VisiblePlots) const
 {
     if (ImGui::BeginChild("Graph", ImVec2(0, -1)))
     {
@@ -186,14 +184,14 @@ void FCogEngineWindow_Plots::RenderPlots(const TArray<FCogDebugPlotEntry*>& Visi
                     ImPlotAxisFlags HasPlotOnAxisY2 = false;
                     ImPlotAxisFlags HasPlotOnAxisY3 = false;
 
-                    for (FCogDebugPlotEntry* PlotPtr : VisiblePlots)
+                    for (const FCogDebugPlotEntry* PlotPtr : VisiblePlots)
                     {
                         HasPlotOnAxisY1 |= PlotPtr->CurrentYAxis == ImAxis_Y1 && PlotPtr->CurrentRow == PlotIndex;
                         HasPlotOnAxisY2 |= PlotPtr->CurrentYAxis == ImAxis_Y2 && PlotPtr->CurrentRow == PlotIndex;
                         HasPlotOnAxisY3 |= PlotPtr->CurrentYAxis == ImAxis_Y3 && PlotPtr->CurrentRow == PlotIndex;
                     }
 
-                    ImPlot::SetupAxis(ImAxis_X1, NULL, ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoGridLines);
+                    ImPlot::SetupAxis(ImAxis_X1, nullptr, ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoGridLines);
                     ImPlot::SetupAxis(ImAxis_Y1, HasPlotOnAxisY1 ? "" : "[drop here]", (HasPlotOnAxisY1 ? ImPlotAxisFlags_None : (ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoGridLines)) | ImPlotAxisFlags_AutoFit);
                     ImPlot::SetupAxis(ImAxis_Y2, HasPlotOnAxisY2 ? "" : "[drop here]", (HasPlotOnAxisY2 ? ImPlotAxisFlags_None : (ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoGridLines)) | ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_Opposite);
                     ImPlot::SetupAxis(ImAxis_Y3, HasPlotOnAxisY3 ? "" : "[drop here]", (HasPlotOnAxisY3 ? ImPlotAxisFlags_None : (ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoGridLines)) | ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_Opposite);
@@ -259,7 +257,7 @@ void FCogEngineWindow_Plots::RenderPlots(const TArray<FCogDebugPlotEntry*>& Visi
                                 && Mouse.y < PlotMax.y
                                 && ImGui::GetDragDropPayload() == nullptr)
                             {
-                                ImVec2 Drag = ImGui::GetMouseDragDelta(0);
+	                            const ImVec2 Drag = ImGui::GetMouseDragDelta(0);
                                 if (FMath::Abs(Drag.x) > 10)
                                 {
                                     FCogDebugPlot::Pause = true;
@@ -354,7 +352,7 @@ void FCogEngineWindow_Plots::RenderPlots(const TArray<FCogDebugPlotEntry*>& Visi
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Plots::RenderTimeMarker()
+void FCogEngineWindow_Plots::RenderTimeMarker() const
 {
     const ImVec2 PlotMin = ImPlot::GetPlotPos();
     const ImVec2 PlotSize = ImPlot::GetPlotSize();
@@ -410,7 +408,7 @@ void FCogEngineWindow_Plots::RenderValues(FCogDebugPlotEntry& Entry, const char*
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Plots::RenderEvents(FCogDebugPlotEntry& Entry, const char* Label, const ImVec2& PlotMin, const ImVec2& PlotMax)
+void FCogEngineWindow_Plots::RenderEvents(FCogDebugPlotEntry& Entry, const char* Label, const ImVec2& PlotMin, const ImVec2& PlotMax) const
 {
     const ImVec2 Mouse = ImGui::GetMousePos();
     ImDrawList* PlotDrawList = ImPlot::GetPlotDrawList();
@@ -444,7 +442,7 @@ void FCogEngineWindow_Plots::RenderEvents(FCogDebugPlotEntry& Entry, const char*
         const bool IsInstant = Event.StartTime == Event.EndTime;
         if (IsInstant)
         {
-            const float Radius = 10.0f;
+	        constexpr float Radius = 10.0f;
             PlotDrawList->AddNgon(PosMid, 10, Event.BorderColor, 4);
             PlotDrawList->AddNgonFilled(PosMid, 10, Event.FillColor, 4);
             PlotDrawList->AddText(ImVec2(PosMid.x + 15, PosMid.y - 6), IM_COL32(255, 255, 255, 255), TCHAR_TO_ANSI(*Event.DisplayName));
@@ -461,7 +459,7 @@ void FCogEngineWindow_Plots::RenderEvents(FCogDebugPlotEntry& Entry, const char*
             const ImVec2 Min = ImVec2(PosBot.x, PosBot.y);
             const ImVec2 Max = ImVec2(PosEnd.x, PosTop.y);
 
-            ImDrawFlags Flags = Event.EndTime == 0.0f ? ImDrawFlags_RoundCornersLeft : ImDrawFlags_RoundCornersAll;
+            const ImDrawFlags Flags = Event.EndTime == 0.0f ? ImDrawFlags_RoundCornersLeft : ImDrawFlags_RoundCornersAll;
             PlotDrawList->AddRect(Min, Max, Event.BorderColor, 6.0f, Flags);
             PlotDrawList->AddRectFilled(Min, Max, Event.FillColor, 6.0f, Flags);
             PlotDrawList->PushClipRect(ImMax(Min, PlotMin), ImMin(Max, PlotMax));

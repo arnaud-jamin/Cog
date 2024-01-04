@@ -66,7 +66,7 @@ public:
     template<class T>
     T* GetConfig();
 
-    const UObject* GetAsset(const TSubclassOf<UObject> AssetClass);
+    const UObject* GetAsset(const TSubclassOf<UObject> AssetClass) const;
 
     template<typename T> 
     T* GetAsset();

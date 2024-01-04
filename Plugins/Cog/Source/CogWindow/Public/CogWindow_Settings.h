@@ -20,7 +20,7 @@ public:
 
     const UCogWindowConfig_Settings* GetSettingsConfig() const { return Config; }
 
-    void SetDPIScale(float Value);
+    void SetDPIScale(float Value) const;
 
 protected: 
 

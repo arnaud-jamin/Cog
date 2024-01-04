@@ -20,7 +20,7 @@ void FCogEngineWindow_CommandBindings::RenderContent()
 {
     Super::RenderContent();
 
-    APlayerController* PlayerController = GetLocalPlayerController();
+    const APlayerController* PlayerController = GetLocalPlayerController();
     if (PlayerController == nullptr)
     {
         return;

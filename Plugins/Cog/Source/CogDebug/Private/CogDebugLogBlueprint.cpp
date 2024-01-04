@@ -5,7 +5,7 @@
 #include "CogDebugLogCategory.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogDebugLogBlueprint::Log(const UObject* WorldContextObject, FCogLogCategory LogCategory, ECogLogVerbosity Verbosity, const FString& Text)
+void UCogDebugLogBlueprint::Log(const UObject* WorldContextObject, const FCogLogCategory LogCategory, ECogLogVerbosity Verbosity, const FString& Text)
 {
 #if ENABLE_COG
 
@@ -30,7 +30,7 @@ void UCogDebugLogBlueprint::Log(const UObject* WorldContextObject, FCogLogCatego
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogDebugLogBlueprint::IsLogActive(const UObject* WorldContextObject, FCogLogCategory LogCategory)
+bool UCogDebugLogBlueprint::IsLogActive(const UObject* WorldContextObject, const FCogLogCategory LogCategory)
 {
 #if ENABLE_COG
 

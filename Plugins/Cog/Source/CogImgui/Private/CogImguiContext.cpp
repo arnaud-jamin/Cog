@@ -3,7 +3,6 @@
 #include "Application/ThrottleManager.h"
 #include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
-#include "CogImGuiInputProcessor.h"
 #include "CogImguiWidget.h"
 #include "Engine/Console.h"
 #include "Engine/Engine.h"
@@ -327,7 +326,7 @@ void FCogImguiContext::ImGui_CreateWindow(ImGuiViewport* Viewport)
         return;
     }
 
-    FCogImguiContext* Context = ParentViewportData->Context.Get();
+    FCogImguiContext* Context = ParentViewportData->Context;
 
     const bool bTooltipWindow = (Viewport->Flags & ImGuiViewportFlags_TopMost);
     const bool bPopupWindow = (Viewport->Flags & ImGuiViewportFlags_NoTaskBarIcon);

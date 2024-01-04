@@ -2,7 +2,6 @@
 
 #include "AbilitySystemComponent.h"
 #include "CogAbilityDataAsset.h"
-#include "CogImguiHelper.h"
 #include "GameplayEffect.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -27,6 +26,11 @@ FVector4f UCogAbilityConfig_Alignment::GetAttributeColor(const UAbilitySystemCom
 //--------------------------------------------------------------------------------------------------------------------------
 FVector4f UCogAbilityConfig_Alignment::GetEffectColor(const UCogAbilityDataAsset* Asset, const UGameplayEffect& Effect) const
 {
+    if (Asset == nullptr)
+    {
+        return NeutralColor;
+    }
+
     const FGameplayTagContainer& Tags = Effect.InheritableGameplayEffectTags.CombinedTags;
 
     if (Tags.HasTag(Asset->NegativeEffectTag))

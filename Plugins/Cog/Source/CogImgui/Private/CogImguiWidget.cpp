@@ -2,8 +2,6 @@
 
 #include "CogImguiContext.h"
 #include "CogImguiInputHelper.h"
-#include "CogImguiModule.h"
-#include "CogImguiWidget.h"
 #include "Engine/GameViewportClient.h"
 #include "imgui.h"
 #include "SlateOptMacros.h"
@@ -39,12 +37,12 @@ void SCogImguiWidget::Tick(const FGeometry& AllottedGeometry, const double InCur
 
 //--------------------------------------------------------------------------------------------------------------------------
 int32 SCogImguiWidget::OnPaint(
-    const FPaintArgs& Args, 
-    const FGeometry& AllottedGeometry, 
+    const FPaintArgs& Args,
+    const FGeometry& AllottedGeometry,
     const FSlateRect& MyClippingRect,
-    FSlateWindowElementList& OutDrawElements, 
-    int32 LayerId, 
-    const FWidgetStyle& WidgetStyle, 
+    FSlateWindowElementList& OutDrawElements,
+    int32 LayerId,
+    const FWidgetStyle& WidgetStyle,
     bool bParentEnabled) const
 {
 
@@ -180,7 +178,7 @@ FReply SCogImguiWidget::OnAnalogValueChanged(const FGeometry& MyGeometry, const 
         //    return FReply::Unhandled();
         //}
 
-    	return FReply::Unhandled();
+        return FReply::Unhandled();
     }
 
     return FReply::Handled();

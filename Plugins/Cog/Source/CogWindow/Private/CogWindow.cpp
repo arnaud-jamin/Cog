@@ -160,9 +160,9 @@ void FCogWindow::SetSelection(AActor* NewSelection)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-APawn* FCogWindow::GetLocalPlayerPawn()
+APawn* FCogWindow::GetLocalPlayerPawn() const
 {
-    APlayerController* LocalPlayerController = GetLocalPlayerController();
+	const APlayerController* LocalPlayerController = GetLocalPlayerController();
     
     if (LocalPlayerController == nullptr)
     {
@@ -175,9 +175,9 @@ APawn* FCogWindow::GetLocalPlayerPawn()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-APlayerController* FCogWindow::GetLocalPlayerController()
+APlayerController* FCogWindow::GetLocalPlayerController() const
 {
-    ULocalPlayer* LocalPlayer = GetLocalPlayer();
+	const ULocalPlayer* LocalPlayer = GetLocalPlayer();
     if (LocalPlayer == nullptr)
     {
         return nullptr;
@@ -187,7 +187,7 @@ APlayerController* FCogWindow::GetLocalPlayerController()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ULocalPlayer* FCogWindow::GetLocalPlayer()
+ULocalPlayer* FCogWindow::GetLocalPlayer() const
 {
     const UWorld* World = GetWorld();
     if (World == nullptr)
@@ -199,13 +199,13 @@ ULocalPlayer* FCogWindow::GetLocalPlayer()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogWindowConfig* FCogWindow::GetConfig(const TSubclassOf<UCogWindowConfig> ConfigClass)
+UCogWindowConfig* FCogWindow::GetConfig(const TSubclassOf<UCogWindowConfig> ConfigClass) const
 {
     return GetOwner()->GetConfig(ConfigClass);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-const UObject* FCogWindow::GetAsset(const TSubclassOf<UObject> AssetClass)
+const UObject* FCogWindow::GetAsset(const TSubclassOf<UObject> AssetClass) const
 {
     return GetOwner()->GetAsset(AssetClass);
 }

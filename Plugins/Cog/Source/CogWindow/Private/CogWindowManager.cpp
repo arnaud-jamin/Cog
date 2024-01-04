@@ -46,11 +46,11 @@ void UCogWindowManager::InitializeInternal()
     ImGuiSettingsHandler IniHandler;
     IniHandler.TypeName = "Cog";
     IniHandler.TypeHash = ImHashStr("Cog");
-    IniHandler.ClearAllFn = UCogWindowManager::SettingsHandler_ClearAll;
-    IniHandler.ReadOpenFn = UCogWindowManager::SettingsHandler_ReadOpen;
-    IniHandler.ReadLineFn = UCogWindowManager::SettingsHandler_ReadLine;
-    IniHandler.ApplyAllFn = UCogWindowManager::SettingsHandler_ApplyAll;
-    IniHandler.WriteAllFn = UCogWindowManager::SettingsHandler_WriteAll;
+    IniHandler.ClearAllFn = SettingsHandler_ClearAll;
+    IniHandler.ReadOpenFn = SettingsHandler_ReadOpen;
+    IniHandler.ReadLineFn = SettingsHandler_ReadLine;
+    IniHandler.ApplyAllFn = SettingsHandler_ApplyAll;
+    IniHandler.WriteAllFn = SettingsHandler_WriteAll;
     IniHandler.UserData = this;
     ImGui::AddSettingsHandler(&IniHandler);
 
@@ -142,7 +142,7 @@ void UCogWindowManager::Tick(float DeltaTime)
     
     if (LayoutToLoad != -1)
     {
-        FString Filename = FCogImguiHelper::GetIniFilePath(FString::Printf(TEXT("ImGui_Layout_%d"), LayoutToLoad));
+	    const FString Filename = FCogImguiHelper::GetIniFilePath(FString::Printf(TEXT("ImGui_Layout_%d"), LayoutToLoad));
         ImGui::LoadIniSettingsFromDisk(TCHAR_TO_ANSI(*Filename));
         LayoutToLoad = -1;
     }
@@ -166,7 +166,7 @@ void UCogWindowManager::Render(float DeltaTime)
     ImGui::DockSpaceOverViewport(0, ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingInCentralNode | ImGuiDockNodeFlags_AutoHideTabBar);
     ImGui::PopStyleColor(1);
 
-    bool bCompactSaved = SettingsWindow->GetSettingsConfig()->bCompactMode;
+    const bool bCompactSaved = SettingsWindow->GetSettingsConfig()->bCompactMode;
     if (bCompactSaved)
     {
         FCogWindowWidgets::PushStyleCompact();
@@ -204,7 +204,7 @@ void UCogWindowManager::Render(float DeltaTime)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::AddWindow(FCogWindow* Window, const FString& Name, bool AddToMainMenu /*= true*/)
+void UCogWindowManager::AddWindow(FCogWindow* Window, const FString& Name, const bool AddToMainMenu /*= true*/)
 {
     Window->SetFullName(Name);
     Window->SetOwner(this);
@@ -227,7 +227,7 @@ void UCogWindowManager::AddWindow(FCogWindow* Window, const FString& Name, bool 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FCogWindow* UCogWindowManager::FindWindowByID(ImGuiID ID)
+FCogWindow* UCogWindowManager::FindWindowByID(const ImGuiID ID)
 {
     for (FCogWindow* Window : Windows)
     {
@@ -240,7 +240,7 @@ FCogWindow* UCogWindowManager::FindWindowByID(ImGuiID ID)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::SetHideAllWindows(bool Value)
+void UCogWindowManager::SetHideAllWindows(const bool Value)
 {
     HideAllWindowsCounter = FMath::Max(HideAllWindowsCounter + (Value ? +1 : -1), 0);
     bHideAllWindows = HideAllWindowsCounter > 0;
@@ -249,7 +249,7 @@ void UCogWindowManager::SetHideAllWindows(bool Value)
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::ResetLayout()
 {
-    for (FCogWindow* Window : Windows)
+    for (const FCogWindow* Window : Windows)
     {
         ImGui::SetWindowPos(TCHAR_TO_ANSI(*Window->GetName()), ImVec2(10, 10), ImGuiCond_Always);
     }
@@ -267,7 +267,7 @@ void UCogWindowManager::CloseAllWindows()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::LoadLayout(int32 LayoutIndex)
+void UCogWindowManager::LoadLayout(const int32 LayoutIndex)
 {
     for (FCogWindow* Window : Windows)
     {
@@ -278,9 +278,9 @@ void UCogWindowManager::LoadLayout(int32 LayoutIndex)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::SaveLayout(int32 LayoutIndex)
+void UCogWindowManager::SaveLayout(const int32 LayoutIndex)
 {
-    FString Filename = *FCogImguiHelper::GetIniFilePath(FString::Printf(TEXT("imgui_layout_%d"), LayoutIndex));
+	const FString Filename = *FCogImguiHelper::GetIniFilePath(FString::Printf(TEXT("imgui_layout_%d"), LayoutIndex));
     ImGui::SaveIniSettingsToDisk(TCHAR_TO_ANSI(*Filename));
 }
 
@@ -290,7 +290,7 @@ void UCogWindowManager::SortMainMenu()
     MainMenu.SubMenus.Empty();
 
     TArray<FCogWindow*> SortedWindows = Windows;
-    SortedWindows.Sort([](FCogWindow& Lhs, FCogWindow& Rhs) { return Lhs.GetFullName() < Rhs.GetFullName(); });
+    SortedWindows.Sort([](const FCogWindow& Lhs, const FCogWindow& Rhs) { return Lhs.GetFullName() < Rhs.GetFullName(); });
 
     for (FCogWindow* Window : SortedWindows)
     {
@@ -307,12 +307,12 @@ UCogWindowManager::FMenu* UCogWindowManager::AddMenu(const FString& Name)
     TArray<FString> Path;
     Name.ParseIntoArray(Path, TEXT("."));
 
-    UCogWindowManager::FMenu* CurrentMenu = &MainMenu;
+    FMenu* CurrentMenu = &MainMenu;
     for (int i = 0; i < Path.Num(); ++i)
     {
         FString MenuName = Path[i];
 
-        int SubMenuIndex = CurrentMenu->SubMenus.IndexOfByPredicate([&](const UCogWindowManager::FMenu& Menu) { return Menu.Name == MenuName; });
+        int SubMenuIndex = CurrentMenu->SubMenus.IndexOfByPredicate([&](const FMenu& Menu) { return Menu.Name == MenuName; });
         if (SubMenuIndex != -1)
         {
             CurrentMenu = &CurrentMenu->SubMenus[SubMenuIndex];
@@ -334,7 +334,7 @@ void UCogWindowManager::RenderMainMenu()
 
     if (ImGui::BeginMainMenuBar())
     {
-        for (UCogWindowManager::FMenu& Menu : MainMenu.SubMenus)
+        for (FMenu& Menu : MainMenu.SubMenus)
         {
             RenderOptionMenu(Menu);
         }
@@ -383,7 +383,7 @@ void UCogWindowManager::RenderMainMenu()
 
                     if (ImGui::IsItemActive() && ImGui::IsItemHovered() == false)
                     {
-                        int iNext = i + (ImGui::GetMouseDragDelta(0).y < 0.f ? -1 : 1);
+	                    const int iNext = i + (ImGui::GetMouseDragDelta(0).y < 0.f ? -1 : 1);
                         if (iNext >= 0 && iNext < Widgets.Num())
                         {
                             Widgets[i] = Widgets[iNext];
@@ -480,7 +480,7 @@ void UCogWindowManager::RenderMainMenu()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::RenderOptionMenu(UCogWindowManager::FMenu& Menu)
+void UCogWindowManager::RenderOptionMenu(FMenu& Menu)
 {
     if (Menu.Window != nullptr)
     {
@@ -490,7 +490,7 @@ void UCogWindowManager::RenderOptionMenu(UCogWindowManager::FMenu& Menu)
     {
         if (ImGui::BeginMenu(TCHAR_TO_ANSI(*Menu.Name)))
         {
-            for (UCogWindowManager::FMenu& SubMenu : Menu.SubMenus)
+            for (FMenu& SubMenu : Menu.SubMenus)
             {
                 RenderOptionMenu(SubMenu);
             }
@@ -613,7 +613,7 @@ void UCogWindowManager::SettingsHandler_WriteAll(ImGuiContext* Context, ImGuiSet
     const UCogWindowManager* Manager = (UCogWindowManager*)Handler->UserData;
 
     Buffer->appendf("[%s][Windows]\n", Handler->TypeName);
-    for (FCogWindow* Window : Manager->Windows)
+    for (const FCogWindow* Window : Manager->Windows)
     {
         if (Window->GetIsVisible())
         {
@@ -623,7 +623,7 @@ void UCogWindowManager::SettingsHandler_WriteAll(ImGuiContext* Context, ImGuiSet
     Buffer->append("\n");
 
     Buffer->appendf("[%s][Widgets]\n", Handler->TypeName);
-    for (FCogWindow* Window : Manager->Widgets)
+    for (const FCogWindow* Window : Manager->Widgets)
     {
         Buffer->appendf("0x%08X %d\n", Window->GetID(), Window->GetIsWidgetVisible());
     }
@@ -725,7 +725,7 @@ UCogWindowConfig* UCogWindowManager::GetConfig(const TSubclassOf<UCogWindowConfi
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-const UObject* UCogWindowManager::GetAsset(const TSubclassOf<UObject> AssetClass) 
+const UObject* UCogWindowManager::GetAsset(const TSubclassOf<UObject> AssetClass) const
 {
     const UClass* Class = AssetClass.Get();
 

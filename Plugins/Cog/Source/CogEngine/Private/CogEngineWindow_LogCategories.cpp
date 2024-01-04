@@ -34,7 +34,7 @@ void FCogEngineWindow_LogCategories::ResetConfig()
 {
     Super::ResetConfig();
 
-    FCogDebugLog::DeactivateAllLogCateories(*GetWorld());
+    FCogDebugLog::DeactivateAllLogCategories(*GetWorld());
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ void FCogEngineWindow_LogCategories::RenderContent()
         {
             if (ImGui::MenuItem("Deactivate All"))
             {
-                FCogDebugLog::DeactivateAllLogCateories(*World);
+                FCogDebugLog::DeactivateAllLogCategories(*World);
             }
             if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
             {
@@ -103,6 +103,12 @@ void FCogEngineWindow_LogCategories::RenderContent()
         ImGui::EndMenuBar();
     }
 
+    if (FCogDebugLog::GetLogCategories().Num() == 0)
+    {
+        ImGui::Text("No log categories have been added.");
+        return;
+    }
+
     const bool IsClient = World->GetNetMode() == NM_Client;
 
     ImGuiStyle& Style = ImGui::GetStyle();
@@ -110,7 +116,7 @@ void FCogEngineWindow_LogCategories::RenderContent()
     int Index = 0;
     for (const auto& Entry : FCogDebugLog::GetLogCategories())
     {
-        FName CategoryName = Entry.Key;
+	    const FName CategoryName = Entry.Key;
         const FCogDebugLogCategoryInfo& CategoryInfo = Entry.Value;
         if (CategoryInfo.bVisible == false)
         {
@@ -128,7 +134,7 @@ void FCogEngineWindow_LogCategories::RenderContent()
             const bool IsControlDown = ImGui::GetIO().KeyCtrl;
             if (IsClient)
             {
-                ELogVerbosity::Type Verbosity = FCogDebugLog::GetServerVerbosity(CategoryName);
+	            const ELogVerbosity::Type Verbosity = FCogDebugLog::GetServerVerbosity(CategoryName);
                 bool IsActive = FCogDebugLog::IsVerbosityActive(Verbosity);
 
                 if (Verbosity == ELogVerbosity::VeryVerbose)
@@ -169,7 +175,7 @@ void FCogEngineWindow_LogCategories::RenderContent()
             }
 
             {
-                ELogVerbosity::Type Verbosity = Category->GetVerbosity();
+	            const ELogVerbosity::Type Verbosity = Category->GetVerbosity();
                 bool IsActive = FCogDebugLog::IsVerbosityActive(Verbosity);
 
                 if (Verbosity == ELogVerbosity::VeryVerbose)
@@ -214,14 +220,14 @@ void FCogEngineWindow_LogCategories::RenderContent()
         {
             if (IsClient)
             {
-                ELogVerbosity::Type CurrentVerbosity = FCogDebugLog::GetServerVerbosity(CategoryName);
+	            const ELogVerbosity::Type CurrentVerbosity = FCogDebugLog::GetServerVerbosity(CategoryName);
                 FCogWindowWidgets::SetNextItemToShortWidth();
                 if (ImGui::BeginCombo("##Server", FCogDebugHelper::VerbosityToString(CurrentVerbosity)))
                 {
                     for (int32 i = (int32)ELogVerbosity::Error; i <= (int32)ELogVerbosity::VeryVerbose; ++i)
                     {
-                        bool IsSelected = i == (int32)CurrentVerbosity;
-                        ELogVerbosity::Type Verbosity = (ELogVerbosity::Type)i;
+	                    const bool IsSelected = i == (int32)CurrentVerbosity;
+	                    const ELogVerbosity::Type Verbosity = (ELogVerbosity::Type)i;
 
                         if (ImGui::Selectable(FCogDebugHelper::VerbosityToString(Verbosity), IsSelected))
                         {
@@ -244,14 +250,14 @@ void FCogEngineWindow_LogCategories::RenderContent()
             }
 
             {
-                ELogVerbosity::Type CurrentVerbosity = Category->GetVerbosity();
+	            const ELogVerbosity::Type CurrentVerbosity = Category->GetVerbosity();
                 FCogWindowWidgets::SetNextItemToShortWidth();
                 if (ImGui::BeginCombo("##Local", FCogDebugHelper::VerbosityToString(CurrentVerbosity)))
                 {
                     for (int32 i = (int32)ELogVerbosity::Error; i <= (int32)ELogVerbosity::VeryVerbose; ++i)
                     {
-                        bool IsSelected = i == (int32)CurrentVerbosity;
-                        ELogVerbosity::Type Verbosity = (ELogVerbosity::Type)i;
+	                    const bool IsSelected = i == (int32)CurrentVerbosity;
+	                    const ELogVerbosity::Type Verbosity = (ELogVerbosity::Type)i;
 
                         if (ImGui::Selectable(FCogDebugHelper::VerbosityToString(Verbosity), IsSelected))
                         {
