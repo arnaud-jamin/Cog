@@ -138,32 +138,24 @@ FReply SCogImguiWidget::HandleKeyEvent(const FKeyEvent& KeyEvent, bool Down)
     {
         return FReply::Unhandled();
     }
+
     if (KeyEvent.GetKey().IsGamepadKey())
     {
-        //if (bShareGamepad)
-        //{
-        //    // TODO: handle imgui gamepad
-        //    return FReply::Unhandled();
-        //}
+        return FReply::Unhandled();
     }
-    else
-    {
-        if (FCogImguiInputHelper::IsKeyEventHandled(Context->GetGameViewport()->GetWorld(), KeyEvent) == false)
-        {
-            return FReply::Unhandled();
-        }
 
-        ImGuiIO& IO = ImGui::GetIO();
-        IO.AddKeyEvent(FCogImguiInputHelper::ToImKey(KeyEvent.GetKey()), Down);
-        IO.AddKeyEvent(ImGuiMod_Ctrl, KeyEvent.IsControlDown());
-        IO.AddKeyEvent(ImGuiMod_Shift, KeyEvent.IsShiftDown());
-        IO.AddKeyEvent(ImGuiMod_Alt, KeyEvent.IsAltDown());
-        IO.AddKeyEvent(ImGuiMod_Super, KeyEvent.IsCommandDown());
-        //if (bShareKeyboard)
-        //{
-        //    return FReply::Unhandled();
-        //}
+    if (FCogImguiInputHelper::IsKeyEventHandled(Context->GetGameViewport()->GetWorld(), KeyEvent) == false)
+    {
+        return FReply::Unhandled();
     }
+
+    ImGuiIO& IO = ImGui::GetIO();
+    IO.AddKeyEvent(FCogImguiInputHelper::ToImKey(KeyEvent.GetKey()), Down);
+    IO.AddKeyEvent(ImGuiMod_Ctrl, KeyEvent.IsControlDown());
+    IO.AddKeyEvent(ImGuiMod_Shift, KeyEvent.IsShiftDown());
+    IO.AddKeyEvent(ImGuiMod_Alt, KeyEvent.IsAltDown());
+    IO.AddKeyEvent(ImGuiMod_Super, KeyEvent.IsCommandDown());
+
     return FReply::Handled();
 }
 
@@ -172,12 +164,6 @@ FReply SCogImguiWidget::OnAnalogValueChanged(const FGeometry& MyGeometry, const 
 {
     if (AnalogInputEvent.GetKey().IsGamepadKey())
     {
-        //if (bShareGamepad)
-        //{
-        //    // TODO: handle imgui gamepad
-        //    return FReply::Unhandled();
-        //}
-
         return FReply::Unhandled();
     }
 
