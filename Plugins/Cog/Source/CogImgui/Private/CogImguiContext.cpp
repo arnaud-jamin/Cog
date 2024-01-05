@@ -37,9 +37,8 @@ void FCogImguiContext::Initialize()
 
     SAssignNew(MainWidget, SCogImguiWidget)
               .Context(this);
-
     GameViewport->AddViewportWidgetContent(MainWidget.ToSharedRef(), TNumericLimits<int32>::Max());
-    
+
     //--------------------------------------------------------------------
     // Register input processor to forward input events to imgui
     //--------------------------------------------------------------------
@@ -274,6 +273,8 @@ bool FCogImguiContext::BeginFrame(float InDeltaTime)
         const FVector2D TransformedMousePosition = MousePosition - MainWidget->GetTickSpaceGeometry().GetAbsolutePosition();
         IO.AddMousePosEvent(TransformedMousePosition.X, TransformedMousePosition.Y);
     }
+
+    bWantCaptureMouse = ImGui::GetIO().WantCaptureMouse || (CaptureMouseCount > 0);
 
     //-------------------------------------------------------------------------------------------------------
     // 
@@ -561,7 +562,7 @@ void FCogImguiContext::ImGui_RenderWindow(ImGuiViewport* Viewport, void* Data)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-static UPlayerInput* GetPlayerInput(const UWorld* World)
+static APlayerController* GetLocalPlayerController(const UWorld* World)
 {
     if (World == nullptr)
     {
@@ -574,11 +575,22 @@ static UPlayerInput* GetPlayerInput(const UWorld* World)
         APlayerController* ItPlayerController = Iterator->Get();
         if (ItPlayerController->IsLocalController())
         {
-            PlayerController = ItPlayerController;
-            break;
+            return ItPlayerController;
         }
     }
 
+    return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+static UPlayerInput* GetPlayerInput(const UWorld* World)
+{
+    if (World == nullptr)
+    {
+        return nullptr;
+    }
+
+    APlayerController* PlayerController = GetLocalPlayerController(World);
     if (PlayerController == nullptr)
     {
         return nullptr;
@@ -620,12 +632,47 @@ void FCogImguiContext::SetEnableInput(bool Value)
         }
     }
 
+    RefreshMouseCursor();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogImguiContext::SetShareMouse(bool Value)
+void FCogImguiContext::SetShowCursorWhenSharingMouse(bool Value)
 {
-    bShareMouse = Value;
+    bShowCursorWhenSharingMouse = Value;
+    RefreshMouseCursor();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogImguiContext::SetShareMouse(bool Value) 
+{
+    bShareMouse = Value; 
+    RefreshMouseCursor();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogImguiContext::RefreshMouseCursor()
+{
+    if (bEnableInput)
+    {
+        if (bShareMouse && bShowCursorWhenSharingMouse)
+        {
+            if (APlayerController* PlayerController = GetLocalPlayerController(GameViewport->GetWorld()))
+            {
+                bPlayerControllerShowMouse = PlayerController->ShouldShowMouseCursor();
+                PlayerController->SetShowMouseCursor(true);
+            }
+        }
+    }
+    else
+    {
+        if (bShareMouse && bShowCursorWhenSharingMouse)
+        {
+            if (APlayerController* PlayerController = GetLocalPlayerController(GameViewport->GetWorld()))
+            {
+                PlayerController->SetShowMouseCursor(bPlayerControllerShowMouse);
+            }
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

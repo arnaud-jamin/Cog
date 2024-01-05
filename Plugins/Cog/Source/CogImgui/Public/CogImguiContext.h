@@ -10,6 +10,7 @@ class FCogImguiContext;
 class IInputProcessor;
 class SCogImguiWidget;
 class SCogImguiWidget;
+class SCogImguiInputCatcherWidget;
 class SWidget;
 class SWindow;
 class UGameViewportClient;
@@ -36,9 +37,19 @@ public:
 
 	void SetEnableInput(bool Value);
 
+	bool GetWantCaptureMouse() const { return bWantCaptureMouse; }
+
 	bool GetShareMouse() const { return bShareMouse; }
 
 	void SetShareMouse(bool Value);
+
+	bool GetShowCursorWhenSharingMouse() const { return bShowCursorWhenSharingMouse; }
+
+	void SetShowCursorWhenSharingMouse(bool Value);
+
+	bool GetShareKeyboard() const { return bShareKeyboard; }
+
+	void SetShareKeyboard(bool Value) { bShareKeyboard = Value; }
 
 	bool BeginFrame(float InDeltaTime);
 
@@ -47,6 +58,10 @@ public:
 	float GetDpiScale() const { return DpiScale; }
 
 	void SetDPIScale(float Value);
+
+	void PushCaptureMouse();
+
+	void PopCaptureMouse();
 
 	TObjectPtr<const UGameViewportClient> GetGameViewport() const { return GameViewport; }
 
@@ -61,6 +76,8 @@ private:
 	void DrawDebug();
 
 	void BuildFont();
+
+	void RefreshMouseCursor();
 
 	ULocalPlayer* GetLocalPlayer() const;
 
@@ -101,6 +118,8 @@ private:
 
 	TSharedPtr<SCogImguiWidget> MainWidget = nullptr;
 
+	TSharedPtr<SCogImguiInputCatcherWidget> InputCatcherWidget = nullptr;
+
 	TWeakPtr<SWidget> PreviousMouseCaptor = nullptr;
 
 	TObjectPtr<UGameViewportClient> GameViewport = nullptr;
@@ -113,7 +132,13 @@ private:
 
 	bool bEnableInput = false;
 
-	bool bShareMouse = true;
+	bool bShareMouse = false;
+
+	bool bShowCursorWhenSharingMouse = false;
+
+	bool bPlayerControllerShowMouse = false;
+
+	bool bShareKeyboard = false;
 
 	bool bRefreshDPIScale = false;
 
@@ -121,6 +146,9 @@ private:
 
 	bool bIsFirstFrame = true;
 
-	float DpiScale = 1.f;
+	bool bWantCaptureMouse = false;
 
+	int32 CaptureMouseCount = 0;
+
+	float DpiScale = 1.f;
 };

@@ -5,7 +5,6 @@
 #include "DrawDebugHelpers.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 FCogDebugShape FCogDebugShape::MakePoint(const FVector& Location, const float Size, const FColor& Color, const bool bPersistent, const uint8 DepthPriority)
 {
     FCogDebugShape NewElement;
@@ -21,7 +20,6 @@ FCogDebugShape FCogDebugShape::MakePoint(const FVector& Location, const float Si
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 void FCogDebugShape::DrawPoint(UWorld* World) const
 {
 #if ENABLE_COG
@@ -42,7 +40,6 @@ void FCogDebugShape::DrawPoint(UWorld* World) const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 FCogDebugShape FCogDebugShape::MakeSegment(const FVector& StartLocation, const FVector& EndLocation, const FColor& Color, const float Thickness, const bool bPersistent, const uint8 DepthPriority)
 {
     FCogDebugShape NewElement;
@@ -59,7 +56,6 @@ FCogDebugShape FCogDebugShape::MakeSegment(const FVector& StartLocation, const F
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 void FCogDebugShape::DrawSegment(UWorld* World) const
 {
 #if ENABLE_COG
@@ -81,7 +77,6 @@ void FCogDebugShape::DrawSegment(UWorld* World) const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 FCogDebugShape FCogDebugShape::MakeArrow(const FVector& StartLocation, const FVector& EndLocation, const float HeadSize, const FColor& Color, const float Thickness, const bool bPersistent, const uint8 DepthPriority)
 {
     FCogDebugShape NewElement;
@@ -99,7 +94,6 @@ FCogDebugShape FCogDebugShape::MakeArrow(const FVector& StartLocation, const FVe
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 void FCogDebugShape::DrawArrow(UWorld* World) const
 {
 #if ENABLE_COG
@@ -122,7 +116,6 @@ void FCogDebugShape::DrawArrow(UWorld* World) const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 FCogDebugShape FCogDebugShape::MakeAxes(const FVector& Location, const FRotator& Rotation, const float HeadSize, const FColor& Color, const float Thickness, const bool bPersistent, const uint8 DepthPriority)
 {
     FCogDebugShape NewElement;
@@ -140,7 +133,6 @@ FCogDebugShape FCogDebugShape::MakeAxes(const FVector& Location, const FRotator&
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 void FCogDebugShape::DrawAxes(UWorld* World) const
 {
 #if ENABLE_COG
@@ -162,7 +154,6 @@ void FCogDebugShape::DrawAxes(UWorld* World) const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 FCogDebugShape FCogDebugShape::MakeBox(const FVector& Center, const FRotator& Rotation, const FVector& Extent, const FColor& Color, const float Thickness, const bool bPersistent, const uint8 DepthPriority)
 {
     FCogDebugShape NewElement;
@@ -180,7 +171,6 @@ FCogDebugShape FCogDebugShape::MakeBox(const FVector& Center, const FRotator& Ro
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 void FCogDebugShape::DrawBox(UWorld* World) const
 {
 #if ENABLE_COG
@@ -203,7 +193,6 @@ void FCogDebugShape::DrawBox(UWorld* World) const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 FCogDebugShape FCogDebugShape::MakeSolidBox(const FVector& Center, const FRotator& Rotation, const FVector& Extent, const FColor& Color, const bool bPersistent, const uint8 DepthPriority)
 {
     FCogDebugShape NewElement;
@@ -241,7 +230,6 @@ void FCogDebugShape::DrawSolidBox(UWorld* World) const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 FCogDebugShape FCogDebugShape::MakeCone(const FVector& Location, const FVector& Direction, const float Length, const FColor& Color, const float Thickness, const bool bPersistent, const uint8 DepthPriority)
 {
     FCogDebugShape NewElement;
@@ -259,7 +247,6 @@ FCogDebugShape FCogDebugShape::MakeCone(const FVector& Location, const FVector& 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 void FCogDebugShape::DrawCone(UWorld* World) const
 {
 #if ENABLE_COG
@@ -286,7 +273,6 @@ void FCogDebugShape::DrawCone(UWorld* World) const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 FCogDebugShape FCogDebugShape::MakeCylinder(const FVector& Center, const float Radius, const float HalfHeight, const FColor& Color, const float Thickness, const bool bPersistent, const uint8 DepthPriority)
 {
     FCogDebugShape NewElement;
@@ -326,7 +312,6 @@ void FCogDebugShape::DrawCylinder(UWorld* World) const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 FCogDebugShape FCogDebugShape::MakeCircle(const FVector& Center, const FRotator& Rotation, const float Radius, const FColor& Color, const float Thickness, const bool bPersistent, const uint8 DepthPriority)
 {
     FCogDebugShape NewElement;
@@ -344,7 +329,6 @@ FCogDebugShape FCogDebugShape::MakeCircle(const FVector& Center, const FRotator&
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 void FCogDebugShape::DrawCicle(UWorld* World) const
 {
 #if ENABLE_COG
@@ -368,7 +352,6 @@ void FCogDebugShape::DrawCicle(UWorld* World) const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 FCogDebugShape FCogDebugShape::MakeCircleArc(const FVector& Center, const FRotator& Rotation, const float InnerRadius, const float OuterRadius, const float Angle, const FColor& Color, const float Thickness, const bool bPersistent, const uint8 DepthPriority)
 {
     FCogDebugShape NewElement;
@@ -386,7 +369,6 @@ FCogDebugShape FCogDebugShape::MakeCircleArc(const FVector& Center, const FRotat
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 void FCogDebugShape::DrawCicleArc(UWorld* World) const
 {
 #if ENABLE_COG
@@ -411,7 +393,6 @@ void FCogDebugShape::DrawCicleArc(UWorld* World) const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 FCogDebugShape FCogDebugShape::MakeCapsule(const FVector& Center, const FQuat& Rotation, const float Radius, const float HalfHeight, const FColor& Color, const float Thickness, const bool bPersistent, const uint8 DepthPriority)
 {
     FCogDebugShape NewElement;
@@ -429,7 +410,6 @@ FCogDebugShape FCogDebugShape::MakeCapsule(const FVector& Center, const FQuat& R
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 void FCogDebugShape::DrawCapsule(UWorld* World) const
 {
 #if ENABLE_COG
@@ -453,7 +433,6 @@ void FCogDebugShape::DrawCapsule(UWorld* World) const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 FCogDebugShape FCogDebugShape::MakeFlatCapsule(const FVector2D& Start, const FVector2D& End, const float Radius, const float Z, const FColor& Color, const float Thickness, const bool bPersistent, const uint8 DepthPriority)
 {
     FCogDebugShape NewElement;
@@ -496,7 +475,6 @@ void FCogDebugShape::DrawFlatCapsule(UWorld* World) const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 FCogDebugShape FCogDebugShape::MakeBone(const FVector& BoneLocation, const FVector& ParentLocation, const FColor& Color, const float Thickness, const bool bPersistent, const uint8 DepthPriority)
 {
     FCogDebugShape NewElement;
@@ -513,7 +491,6 @@ FCogDebugShape FCogDebugShape::MakeBone(const FVector& BoneLocation, const FVect
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 void FCogDebugShape::DrawBone(UWorld* World) const
 {
 #if ENABLE_COG
@@ -545,7 +522,6 @@ void FCogDebugShape::DrawBone(UWorld* World) const
 
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 FCogDebugShape FCogDebugShape::MakePolygon(const TArray<FVector>& Verts, const FColor& Color, const bool bPersistent, const uint8 DepthPriority)
 {
     FCogDebugShape NewElement;
@@ -559,7 +535,6 @@ FCogDebugShape FCogDebugShape::MakePolygon(const TArray<FVector>& Verts, const F
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 void FCogDebugShape::DrawPolygon(UWorld* World) const
 {
 #if ENABLE_COG
@@ -589,7 +564,6 @@ void FCogDebugShape::DrawPolygon(UWorld* World) const
 
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 void FCogDebugShape::Draw(UWorld* World) const
 {
     switch (Type)
@@ -612,7 +586,6 @@ void FCogDebugShape::Draw(UWorld* World) const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 FArchive& operator<<(FArchive& Ar, FCogDebugShape& Shape)
 {
     Ar << Shape.ShapeData;
