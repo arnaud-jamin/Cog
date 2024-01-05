@@ -221,8 +221,10 @@ Used to change the game global time scale.
 
 ### Transform
 Used to read and set the selected actor transform. 
+
 ![Transform](https://github.com/arnaud-jamin/Cog/assets/13844285/f4fa2aeb-2e06-4820-8500-6eb14536b5b3)
 - A gizmo in the viewport can also be used to change the transform.
+
 ![Transform](https://github.com/arnaud-jamin/Cog/assets/13844285/9d702dfd-cb4f-4bd1-8ac3-f71708f4c851)
 
 ### Tweaks
