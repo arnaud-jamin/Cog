@@ -15,8 +15,7 @@ Cog provides:
 General Info:
 - Cog can be used both in editor and package builds. It is disabled by default on shipping builds.
 - Press the `[F1]` key or use the `Cog.ToggleInput` console command to open the ImGui Main Menu.
-- Mouse over a window title to display its help.
-- Most windows display their contents based on a selected actor. The selector actor can be chosen using the `Engine/Selection` window or widget.
+- Many windows display their contents based on a selected actor. The selector actor can be chosen using the `Engine/Selection` window or widget.
 
 ## Cog Windows
 
