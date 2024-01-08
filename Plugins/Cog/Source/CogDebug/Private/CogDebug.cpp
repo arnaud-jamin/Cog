@@ -19,7 +19,7 @@ void FCogDebug::Reset()
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogDebug::IsDebugActiveForObject(const UObject* WorldContextObject)
 {
-    UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+	const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
     if (World == nullptr)
     {
         return true;
@@ -30,7 +30,7 @@ bool FCogDebug::IsDebugActiveForObject(const UObject* WorldContextObject)
         return true;
     }
 
-    bool Result = IsDebugActiveForObject_Internal(WorldContextObject, Selection.Get(), Settings.bIsFilteringBySelection);
+    const bool Result = IsDebugActiveForObject_Internal(WorldContextObject, Selection.Get(), Settings.bIsFilteringBySelection);
 
     return Result;
 }
@@ -92,7 +92,7 @@ AActor* FCogDebug::GetSelection()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebug::SetSelection(UWorld* World, AActor* Value)
+void FCogDebug::SetSelection(const UWorld* World, AActor* Value)
 {
     Selection = Value;
 

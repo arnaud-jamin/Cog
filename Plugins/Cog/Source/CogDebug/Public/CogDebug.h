@@ -62,6 +62,9 @@ struct FCogDebugSettings
     float TextSize = 1.0f;
 
     UPROPERTY(Config)
+    bool ActorNameUseLabel = true;
+
+    UPROPERTY(Config)
     float GizmoScale = 1.0f;
 
     UPROPERTY(Config)
@@ -363,7 +366,7 @@ public:
 
     static AActor* GetSelection();
     
-    static void SetSelection(UWorld* World, AActor* Value);
+    static void SetSelection(const UWorld* World, AActor* Value);
     
     static bool GetIsFilteringBySelection();
 

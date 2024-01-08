@@ -73,7 +73,7 @@ void FCogAbilityWindow_Attributes::RenderContent()
             ImGui::EndMenu();
         }
 
-        FCogWindowWidgets::MenuSearchBar(Filter);
+        FCogWindowWidgets::SearchBar(Filter);
 
         ImGui::EndMenuBar();
     }

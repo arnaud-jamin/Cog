@@ -10,7 +10,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogCogEngine, Verbose, All);
 
 class APlayerController;
 
-using FCogEnineSpawnFunction = TFunction<void(const FCogEngineSpawnEntry& SpawnEntry)>;
+using FCogEngineSpawnFunction = TFunction<void(const FCogEngineSpawnEntry& SpawnEntry)>;
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(NotBlueprintable, NotBlueprintType, notplaceable, noteditinlinenew, hidedropdown, Transient)
@@ -30,9 +30,9 @@ public:
 
     APlayerController* GetPlayerController() const { return OwnerPlayerController.Get(); }
 
-    FCogEnineSpawnFunction GetSpawnFunction() const { return SpawnFunction; }
+    FCogEngineSpawnFunction GetSpawnFunction() const { return SpawnFunction; }
 
-    void SetSpawnFunction(FCogEnineSpawnFunction Value) { SpawnFunction = Value; }
+    void SetSpawnFunction(FCogEngineSpawnFunction Value) { SpawnFunction = Value; }
 
     UFUNCTION(Server, Reliable)
     void Server_Spawn(const FCogEngineSpawnEntry& SpawnEntry);
@@ -46,6 +46,9 @@ public:
 
     UFUNCTION(Server, Reliable)
     void Server_ResetPossession();
+
+    UFUNCTION(Server, Reliable)
+    void Server_DeleteActor(AActor* Actor);
 
 protected:
 
@@ -65,5 +68,5 @@ private:
     UPROPERTY(ReplicatedUsing = OnRep_TimeDilation)
     float TimeDilation = 1.0f;
 
-    FCogEnineSpawnFunction SpawnFunction;
+    FCogEngineSpawnFunction SpawnFunction;
 };

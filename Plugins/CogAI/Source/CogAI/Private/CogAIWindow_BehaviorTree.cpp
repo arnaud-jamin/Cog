@@ -140,7 +140,7 @@ void FCogAIWindow_BehaviorTree::RenderContent()
             ImGui::EndMenu();
         }
 
-        FCogWindowWidgets::MenuSearchBar(Filter);
+        FCogWindowWidgets::SearchBar(Filter);
 
         ImGui::EndMenuBar();
     }

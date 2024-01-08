@@ -171,7 +171,7 @@ void FCogEngineWindow_OutputLog::RenderContent()
         ImGui::SetNextItemWidth(ImGui::GetFontSize() * 9);
         if (ImGui::BeginCombo("##Verbosity", FCogDebugHelper::VerbosityToString((ELogVerbosity::Type)Config->VerbosityFilter)))
         {
-            for (int32 i = (int32)ELogVerbosity::Error; i <= (int32)ELogVerbosity::VeryVerbose; ++i)
+            for (int32 i = ELogVerbosity::Error; i <= (int32)ELogVerbosity::VeryVerbose; ++i)
             {
 	            const bool IsSelected = i == Config->VerbosityFilter;
 	            const ELogVerbosity::Type Verbosity = (ELogVerbosity::Type)i;
@@ -184,7 +184,7 @@ void FCogEngineWindow_OutputLog::RenderContent()
             ImGui::EndCombo();
         }
 
-        FCogWindowWidgets::MenuSearchBar(Filter);
+        FCogWindowWidgets::SearchBar(Filter);
 
         ImGui::EndMenuBar();
     }

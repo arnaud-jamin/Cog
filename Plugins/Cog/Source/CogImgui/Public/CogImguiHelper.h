@@ -24,6 +24,8 @@ public:
 
     static ImGuiWindow* GetCurrentWindow();
 
+    static float GetNextItemWidth();
+
     static FColor ToFColor(ImU32 Color);
 
     static FSlateRect ToSlateRect(const ImVec4& Value);

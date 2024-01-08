@@ -15,8 +15,8 @@ Cog provides:
 General Info:
 - Cog can be used both in editor and package builds. It is disabled by default on shipping builds.
 - Press the `[F1]` key or use the `Cog.ToggleInput` console command to open the ImGui Main Menu.
-- Mouse over a window title to display its help.
-- Most windows display their contents based on a selected actor. The selector actor can be chosen using the `Engine/Selection` window or widget.
+- Many windows display their contents based on a selected actor. The selector actor can be chosen using the `Engine/Selection` window or widget.
+- Widgets such as Stats (FPS, Ping), or Actor Selection, can be added in the main menu bar from the 'Window/Widgets" menu.
 
 ## Cog Windows
 
@@ -221,9 +221,11 @@ Used to change the game global time scale.
 
 ### Transform
 Used to read and set the selected actor transform. 
+
 ![Transform](https://github.com/arnaud-jamin/Cog/assets/13844285/f4fa2aeb-2e06-4820-8500-6eb14536b5b3)
 - A gizmo in the viewport can also be used to change the transform.
-![Transform](https://github.com/arnaud-jamin/Cog/assets/13844285/9d702dfd-cb4f-4bd1-8ac3-f71708f4c851)
+
+![Transform](https://github.com/arnaud-jamin/Cog/assets/13844285/34657828-9fda-4af4-bdd0-4ea4514c23a0)
 
 ### Tweaks
 Used to apply tweaks to all the spawned actors

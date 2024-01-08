@@ -59,25 +59,17 @@ protected:
 
     virtual bool DrawSelectionCombo();
 
-    virtual void DrawActorContextMenu(AActor* Actor);
-
     virtual void HackWaitInputRelease();
 
     virtual void SetGlobalSelection(AActor* Value) const;
 
     virtual void RenderPickButtonTooltip();
 
+    virtual void RenderActorContextMenu(AActor& Actor);
+
     TSubclassOf<AActor> GetSelectedActorClass() const;
 
-    FString GetActorName(const AActor* Actor) const;
-
-    FString GetActorName(const AActor& Actor) const;
-
     void TickSelectionMode();
-
-    void DrawActorFrame(const AActor& Actor);
-
-    bool ComputeBoundingBoxScreenPosition(const APlayerController* PlayerController, const FVector& Origin, const FVector& Extent, FVector2D& Min, FVector2D& Max);
 
     FVector LastSelectedActorLocation = FVector::ZeroVector;
 
@@ -94,6 +86,8 @@ protected:
     TArray<IConsoleObject*> ConsoleCommands;
 
     TObjectPtr<UCogEngineConfig_Selection> Config;
+
+	ImGuiTextFilter Filter;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -108,9 +102,6 @@ public:
     bool bReapplySelection = true;
 
     UPROPERTY(Config)
-    bool bDisplayActorLabel = true;
-
-    UPROPERTY(Config)
     FString SelectionName;
 
     UPROPERTY(Config)
@@ -121,7 +112,6 @@ public:
         Super::Reset();
 
         bReapplySelection = true;
-        bDisplayActorLabel = true;
         SelectionName.Reset();
         SelectedClassIndex = 0;
     }

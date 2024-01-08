@@ -1,8 +1,8 @@
 #include "CogEngineWindow_Selection.h"
 
-#include "CogDebugDraw.h"
 #include "CogDebug.h"
-#include "CogEngineReplicator.h"
+#include "CogEngineHelper.h"
+#include "CogEngineWindow_ImGui.h"
 #include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
 #include "CogWindowManager.h"
@@ -75,7 +75,7 @@ void FCogEngineWindow_Selection::PreSaveConfig()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Selection::TryReapplySelection() const
 {
-    UWorld* World = GetWorld();
+	const UWorld* World = GetWorld();
     if (World == nullptr)
     {
         return;
@@ -91,14 +91,14 @@ void FCogEngineWindow_Selection::TryReapplySelection() const
         return;
     }
 
-    TSubclassOf<AActor> SelectedClass = GetSelectedActorClass();
+    const TSubclassOf<AActor> SelectedClass = GetSelectedActorClass();
     if (SelectedClass == nullptr)
     {
         return;
     }
 
     TArray<AActor*> Actors;
-    for (TActorIterator<AActor> It(World, SelectedClass); It; ++It)
+    for (TActorIterator It(World, SelectedClass); It; ++It)
     {
         AActor* Actor = *It;
         if (GetNameSafe(Actor) == Config->SelectionName)
@@ -155,9 +155,9 @@ void FCogEngineWindow_Selection::DeactivateSelectionMode()
     bSelectionModeActive = false;
 
     //--------------------------------------------------------------------------------------------
-    // We can enter selection mode by a command, and imgui might not have the input focus
-    // When in selection mode we need imgui to have the input focus
-    // When leaving selection mode we want to leave it as is was before
+    // We can enter selection mode by a command, and ImGui might not have the input focus
+    // When in selection mode we need ImGui to have the input focus
+    // When leaving selection mode we want to leave it as it was before
     //--------------------------------------------------------------------------------------------
     GetOwner()->GetContext().SetEnableInput(bIsInputEnabledBeforeEnteringSelectionMode);
 
@@ -179,11 +179,11 @@ void FCogEngineWindow_Selection::RenderTick(float DeltaTime)
         TickSelectionMode();
     }
 
-    if (AActor* Actor = GetSelection())
+    if (const AActor* Actor = GetSelection())
     {
         if (Actor != GetLocalPlayerPawn())
         {
-            DrawActorFrame(*Actor);
+            FCogWindowWidgets::ActorFrame(*Actor);
         }
     }
 }
@@ -198,8 +198,16 @@ void FCogEngineWindow_Selection::RenderContent()
         if (ImGui::MenuItem("Pick"))
         {
             ActivateSelectionMode();
-            HackWaitInputRelease();
+            //HackWaitInputRelease();
         }
+
+        if (ImGui::BeginMenu("Options"))
+        {
+            ImGui::Checkbox("Save selection", &Config->bReapplySelection);
+            ImGui::Checkbox("Actor Name Use Label", &FCogDebug::Settings.ActorNameUseLabel);
+            ImGui::EndMenu();
+        }
+
         RenderPickButtonTooltip();
 
         ImGui::EndMenuBar();
@@ -211,171 +219,7 @@ void FCogEngineWindow_Selection::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogEngineWindow_Selection::DrawSelectionCombo()
 {
-    bool SelectionChanged = false;
-
-    APawn* LocalPlayerPawn = GetLocalPlayerPawn();
-
-    //------------------------
-    // Actor Class Combo
-    //------------------------
-
-    TSubclassOf<AActor> SelectedClass = GetSelectedActorClass();
-
-    ImGui::SetNextItemWidth(-1);
-    if (ImGui::BeginCombo("##SelectionType", TCHAR_TO_ANSI(*GetNameSafe(SelectedClass))))
-    {
-        for (int32 i = 0; i < ActorClasses.Num(); ++i)
-        {
-            TSubclassOf<AActor> SubClass = ActorClasses[i];
-            if (ImGui::Selectable(TCHAR_TO_ANSI(*GetNameSafe(SubClass)), false))
-            {
-                Config->SelectedClassIndex = i;
-                SelectedClass = SubClass;
-            }
-        }
-        ImGui::EndCombo();
-    }
-
-    ImGui::Separator();
-
-    //------------------------
-    // Actor List
-    //------------------------
-    ImGui::BeginChild("ActorList", ImVec2(-1, -1), false);
-
-    TArray<AActor*> Actors;
-    for (TActorIterator<AActor> It(GetWorld(), SelectedClass); It; ++It)
-    {
-        AActor* Actor = *It;
-        Actors.Add(Actor);
-    }
-
-    ImGuiListClipper Clipper;
-    Clipper.Begin(Actors.Num());
-    while (Clipper.Step())
-    {
-        for (int32 i = Clipper.DisplayStart; i < Clipper.DisplayEnd; i++)
-        {
-            AActor* Actor = Actors[i];
-            if (Actor == nullptr)
-            {
-                continue;
-            }
-
-            ImGui::PushStyleColor(ImGuiCol_Text, Actor == LocalPlayerPawn ? IM_COL32(255, 255, 0, 255) : IM_COL32(255, 255, 255, 255));
-
-            bool bIsSelected = Actor == FCogDebug::GetSelection();
-            if (ImGui::Selectable(TCHAR_TO_ANSI(*GetActorName(*Actor)), bIsSelected))
-            {
-                SetGlobalSelection(Actor);
-                SelectionChanged = true;
-            }
-
-            ImGui::PopStyleColor(1);
-
-            DrawActorContextMenu(Actor);
-
-            //------------------------
-            // Draw Frame
-            //------------------------
-            if (ImGui::IsItemHovered())
-            {
-                DrawActorFrame(*Actor);
-            }
-
-            if (bIsSelected)
-            {
-                ImGui::SetItemDefaultFocus();
-            }
-        }
-    }
-    Clipper.End();
-    ImGui::EndChild();
-
-    return SelectionChanged;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-FString FCogEngineWindow_Selection::GetActorName(const AActor* Actor) const
-{
-    if (Actor == nullptr)
-    {
-        return FString("none");
-    }
-
-    return GetActorName(*Actor);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-FString FCogEngineWindow_Selection::GetActorName(const AActor& Actor) const
-{
-#if WITH_EDITOR
-
-    return Config->bDisplayActorLabel ? Actor.GetActorLabel() : Actor.GetName();
-
-#else //WITH_EDITOR
-
-    return Actor.GetName();
-
-#endif //WITH_EDITOR
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Selection::DrawActorContextMenu(AActor* Actor)
-{
-    //------------------------
-    // ContextMenu
-    //------------------------
-    ImGui::SetNextWindowSize(ImVec2(FCogWindowWidgets::GetFontWidth() * 30, 0));
-    if (ImGui::BeginPopupContextItem())
-    {
-        if (ImGui::Button("Reset Selection", ImVec2(-1, 0)))
-        {
-            ImGui::CloseCurrentPopup();
-            SetGlobalSelection(GetLocalPlayerPawn());
-        }
-
-        if (ImGui::IsItemHovered())
-        {
-            ImGui::SetTooltip("Reset the selection to the controlled actor.");
-        }
-
-        if (APawn* Pawn = Cast<APawn>(Actor))
-        {
-            if (ImGui::Button("Possess", ImVec2(-1, 0)))
-            {
-                if (ACogEngineReplicator* Replicator = ACogEngineReplicator::GetLocalReplicator(*GetWorld()))
-                {
-                    Replicator->Server_Possess(Pawn);
-                }
-
-            }
-            if (ImGui::IsItemHovered())
-            {
-                ImGui::SetTooltip("Possess this pawn.");
-            }
-
-            if (ImGui::Button("Reset Possession", ImVec2(-1, 0)))
-            {
-                if (ACogEngineReplicator* Replicator = ACogEngineReplicator::GetLocalReplicator(*GetWorld()))
-                {
-                    Replicator->Server_ResetPossession();
-                }
-
-            }
-            if (ImGui::IsItemHovered())
-            {
-                ImGui::SetTooltip("Reset pawn.");
-            }
-        }
-
-        ImGui::Separator();
-
-        ImGui::Checkbox("Save selection", &Config->bReapplySelection);
-        ImGui::Checkbox("Display Actor Label", &Config->bDisplayActorLabel);
-
-        ImGui::EndPopup();
-    }
+    return FCogWindowWidgets::ActorsListWithFilters(*GetWorld(), ActorClasses, Config->SelectedClassIndex, &Filter, GetLocalPlayerPawn());
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -439,7 +283,7 @@ void FCogEngineWindow_Selection::TickSelectionMode()
 
     if (HoveredActor != nullptr)
     {
-        DrawActorFrame(*HoveredActor);
+        FCogWindowWidgets::ActorFrame(*HoveredActor);
     }
 
     if (bSelectionModeActive)
@@ -464,107 +308,6 @@ void FCogEngineWindow_Selection::TickSelectionMode()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Selection::DrawActorFrame(const AActor& Actor)
-{
-    APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-    if (PlayerController == nullptr)
-    {
-        return;
-    }
-
-    ImGuiViewport* Viewport = ImGui::GetMainViewport();
-    if (Viewport == nullptr)
-    {
-        return;
-    }
-
-    ImDrawList* DrawList = ImGui::GetBackgroundDrawList(Viewport);
-
-    FVector BoxOrigin, BoxExtent;
-
-    bool PrimitiveFound = false;
-    FBox Bounds(ForceInit);
-    
-    if (const UPrimitiveComponent* PrimitiveComponent = Cast<UPrimitiveComponent>(Actor.GetRootComponent()))
-    {
-        PrimitiveFound = true;
-    
-        Bounds += PrimitiveComponent->Bounds.GetBox();
-    }
-    else
-    {
-        Actor.ForEachComponent<UPrimitiveComponent>(true, [&](const UPrimitiveComponent* InPrimComp)
-            {
-                if (InPrimComp->IsRegistered() && InPrimComp->IsCollisionEnabled())
-                {
-                    Bounds += InPrimComp->Bounds.GetBox();
-                    PrimitiveFound = true;
-                }
-            });
-    }
-
-    if (PrimitiveFound)
-    {
-        Bounds.GetCenterAndExtents(BoxOrigin, BoxExtent);
-    }
-    else
-    {
-        BoxOrigin = Actor.GetActorLocation();
-        BoxExtent = FVector(50.f, 50.f, 50.f);
-    }
-
-    FVector2D ScreenPosMin, ScreenPosMax;
-    if (ComputeBoundingBoxScreenPosition(PlayerController, BoxOrigin, BoxExtent, ScreenPosMin, ScreenPosMax))
-    {
-        const ImU32 Color = (&Actor == GetSelection()) ? IM_COL32(255, 255, 255, 255) : IM_COL32(255, 255, 255, 128);
-        DrawList->AddRect(FCogImguiHelper::ToImVec2(ScreenPosMin) + Viewport->Pos, FCogImguiHelper::ToImVec2(ScreenPosMax) + Viewport->Pos, Color, 0.0f, 0, 1.0f);
-        FCogWindowWidgets::AddTextWithShadow(DrawList, FCogImguiHelper::ToImVec2(ScreenPosMin + FVector2D(0, -14.0f)) + Viewport->Pos, Color, TCHAR_TO_ANSI(*GetActorName(Actor)));
-    }
-}
-
-//-----------------------------------------------------------------------------------------
-bool FCogEngineWindow_Selection::ComputeBoundingBoxScreenPosition(const APlayerController* PlayerController, const FVector& Origin, const FVector& Extent, FVector2D& Min, FVector2D& Max)
-{
-    FVector Corners[8];
-    Corners[0].Set(-Extent.X, -Extent.Y, -Extent.Z); // - - - 
-    Corners[1].Set(Extent.X, -Extent.Y, -Extent.Z);  // + - - 
-    Corners[2].Set(-Extent.X, Extent.Y, -Extent.Z);  // - + - 
-    Corners[3].Set(-Extent.X, -Extent.Y, Extent.Z);  // - - + 
-    Corners[4].Set(Extent.X, Extent.Y, -Extent.Z);   // + + - 
-    Corners[5].Set(Extent.X, -Extent.Y, Extent.Z);   // + - + 
-    Corners[6].Set(-Extent.X, Extent.Y, Extent.Z);   // - + + 
-    Corners[7].Set(Extent.X, Extent.Y, Extent.Z);    // + + + 
-
-    Min.X = FLT_MAX;
-    Min.Y = FLT_MAX;
-    Max.X = -FLT_MAX;
-    Max.Y = -FLT_MAX;
-
-    for (int i = 0; i < 8; ++i)
-    {
-        FVector2D ScreenLocation;
-        if (PlayerController->ProjectWorldLocationToScreen(Origin + Corners[i], ScreenLocation, false) == false)
-        {
-            return false;
-        }
-
-        Min.X = FMath::Min(ScreenLocation.X, Min.X);
-        Min.Y = FMath::Min(ScreenLocation.Y, Min.Y);
-        Max.X = FMath::Max(ScreenLocation.X, Max.X);
-        Max.Y = FMath::Max(ScreenLocation.Y, Max.Y);
-    }
-
-    // Prevent getting large values when the camera get close to the target
-    ImVec2 DisplaySize = ImGui::GetIO().DisplaySize;
-    Min.X = FMath::Max(-DisplaySize.x, Min.X);
-    Min.Y = FMath::Max(-DisplaySize.y, Min.Y);
-    Max.X = FMath::Min(DisplaySize.x * 2, Max.X);
-    Max.Y = FMath::Min(DisplaySize.y * 2, Max.Y);
-
-    return true;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 float FCogEngineWindow_Selection::GetMainMenuWidgetWidth(int32 SubWidgetIndex, float MaxWidth)
 {
     switch (SubWidgetIndex)
@@ -576,7 +319,6 @@ float FCogEngineWindow_Selection::GetMainMenuWidgetWidth(int32 SubWidgetIndex, f
 
     return -1.0f;
 }
-
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Selection::RenderMainMenuWidget(int32 SubWidgetIndex, float Width)
@@ -602,44 +344,8 @@ void FCogEngineWindow_Selection::RenderMainMenuWidget(int32 SubWidgetIndex, floa
     }
     else if (SubWidgetIndex == 1)
     {
-        if (ImGui::BeginPopup("SelectionPopup"))
-        {
-            ImGui::BeginChild("Popup", ImVec2(Width, FCogWindowWidgets::GetFontWidth() * 40), false);
-
-            if (DrawSelectionCombo())
-            {
-                ImGui::CloseCurrentPopup();
-            }
-
-            ImGui::EndChild();
-            ImGui::EndPopup();
-        }
-
-        AActor* GlobalSelection = FCogDebug::GetSelection();
-
-        //-----------------------------------
-        // Selection
-        //-----------------------------------
-        {
-            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
-            ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
-            ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(0, 0, 0, 0));
-            FString CurrentSelectionName = GetActorName(GlobalSelection);
-
-            if (ImGui::Button(TCHAR_TO_ANSI(*CurrentSelectionName), ImVec2(Width, 0.0f)))
-            {
-                ImGui::OpenPopup("SelectionPopup");
-            }
-            if (ImGui::IsItemHovered())
-            {
-                ImGui::SetTooltip("Current Selection: %s", TCHAR_TO_ANSI(*CurrentSelectionName));
-            }
-
-            ImGui::PopStyleColor(1);
-            ImGui::PopStyleVar(2);
-
-            DrawActorContextMenu(GlobalSelection);
-        }
+        ImGui::SetNextItemWidth(Width);
+        FCogWindowWidgets::MenuActorsCombo("MenuActorSelection", *GetWorld(), ActorClasses, Config->SelectedClassIndex, &Filter, GetLocalPlayerPawn(), [this](AActor& Actor) { RenderActorContextMenu(Actor);  });
     }
     else if (SubWidgetIndex == 2)
     {
@@ -662,6 +368,12 @@ void FCogEngineWindow_Selection::RenderMainMenuWidget(int32 SubWidgetIndex, floa
             ImGui::PopStyleVar(1);
         }
     }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_Selection::RenderActorContextMenu(AActor& Actor)
+{
+    FCogEngineHelper::ActorContextMenu(Actor);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

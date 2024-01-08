@@ -250,7 +250,7 @@ void FCogEngineWindow_Inspector::RenderMenu()
         //-----------------------------------
         // Search
         //-----------------------------------
-        FCogWindowWidgets::MenuSearchBar(Filter, -FCogWindowWidgets::GetFontWidth() * 9);
+        FCogWindowWidgets::SearchBar(Filter, -FCogWindowWidgets::GetFontWidth() * 9);
 
         //-----------------------------------
         // Options
