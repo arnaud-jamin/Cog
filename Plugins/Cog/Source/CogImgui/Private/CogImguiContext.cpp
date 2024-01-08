@@ -2,6 +2,7 @@
 
 #include "Application/ThrottleManager.h"
 #include "CogImguiHelper.h"
+#include "CogImguiInputCatcherWidget.h"
 #include "CogImguiInputHelper.h"
 #include "CogImguiWidget.h"
 #include "Engine/Console.h"
@@ -31,23 +32,16 @@ void FCogImguiContext::Initialize()
     {
         return;
     }
+
     FSlateApplication& SlateApp = FSlateApplication::Get();
 
     GameViewport = GEngine->GameViewport;
 
-    SAssignNew(MainWidget, SCogImguiWidget)
-              .Context(this);
+    SAssignNew(MainWidget, SCogImguiWidget).Context(this);
     GameViewport->AddViewportWidgetContent(MainWidget.ToSharedRef(), TNumericLimits<int32>::Max());
 
-    //--------------------------------------------------------------------
-    // Register input processor to forward input events to imgui
-    //--------------------------------------------------------------------
-    //if (FSlateApplication::IsInitialized())
-    //{
-    //    UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*GameViewport->GetWorld());
-    //    InputProcessor = MakeShared<FCogImGuiInputProcessor>(PlayerInput, this, MainWidget.Get());
-    //    FSlateApplication::Get().RegisterInputPreProcessor(InputProcessor.ToSharedRef(), 0);
-    //}
+    SAssignNew(InputCatcherWidget, SCogImguiInputCatcherWidget).Context(this);
+    GameViewport->AddViewportWidgetContent(InputCatcherWidget.ToSharedRef(), -TNumericLimits<int32>::Max());
 
     ImGuiContext = ImGui::CreateContext();
     PlotContext = ImPlot::CreateContext();
@@ -74,7 +68,7 @@ void FCogImguiContext::Initialize()
     // 
     //--------------------------------------------------------------------
     ImGuiViewport* MainViewport = ImGui::GetMainViewport();
-    FImGuiViewportData* ViewportData = new FImGuiViewportData();
+    FCogImGuiViewportData* ViewportData = new FCogImGuiViewportData();
     MainViewport->PlatformUserData = ViewportData;
     ViewportData->Window = SlateApp.GetActiveTopLevelWindow();
     ViewportData->Context = this;
@@ -113,7 +107,7 @@ void FCogImguiContext::Initialize()
 void FCogImguiContext::Shutdown()
 {
     ImGuiViewport* MainViewport = ImGui::GetMainViewport();
-    if (const FImGuiViewportData* ViewportData = static_cast<FImGuiViewportData*>(MainViewport->PlatformUserData))
+    if (const FCogImGuiViewportData* ViewportData = static_cast<FCogImGuiViewportData*>(MainViewport->PlatformUserData))
     {
         delete ViewportData;
         MainViewport->PlatformUserData = nullptr;
@@ -122,12 +116,6 @@ void FCogImguiContext::Shutdown()
     if (FSlateApplication::IsInitialized())
     {
         FSlateApplication& SlateApp = FSlateApplication::Get();
-
-        //if (InputProcessor.IsValid())
-        //{
-        //    SlateApp.UnregisterInputPreProcessor(InputProcessor);
-        //}
-
         if (const TSharedPtr<GenericApplication> PlatformApplication = SlateApp.GetPlatformApplication())
         {
             PlatformApplication->OnDisplayMetricsChanged().RemoveAll(this);
@@ -274,7 +262,7 @@ bool FCogImguiContext::BeginFrame(float InDeltaTime)
         IO.AddMousePosEvent(TransformedMousePosition.X, TransformedMousePosition.Y);
     }
 
-    bWantCaptureMouse = ImGui::GetIO().WantCaptureMouse || (CaptureMouseCount > 0);
+    bWantCaptureMouse = ImGui::GetIO().WantCaptureMouse;
 
     //-------------------------------------------------------------------------------------------------------
     // 
@@ -321,7 +309,7 @@ void FCogImguiContext::ImGui_CreateWindow(ImGuiViewport* Viewport)
         return;
     }
 
-    const FImGuiViewportData* ParentViewportData = static_cast<FImGuiViewportData*>(ParentViewport->PlatformUserData);
+    const FCogImGuiViewportData* ParentViewportData = static_cast<FCogImGuiViewportData*>(ParentViewport->PlatformUserData);
     if (ParentViewportData == nullptr)
     {
         return;
@@ -378,7 +366,7 @@ void FCogImguiContext::ImGui_CreateWindow(ImGuiViewport* Viewport)
 
     Widget->SetWindow(Window);
 
-    FImGuiViewportData* ViewportData = new FImGuiViewportData();
+    FCogImGuiViewportData* ViewportData = new FCogImGuiViewportData();
     Viewport->PlatformUserData = ViewportData;
     ViewportData->Context = ParentViewportData->Context;
     ViewportData->Widget = Widget;
@@ -392,7 +380,7 @@ void FCogImguiContext::ImGui_CreateWindow(ImGuiViewport* Viewport)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::ImGui_DestroyWindow(ImGuiViewport* Viewport)
 {
-    FImGuiViewportData* ViewportData = static_cast<FImGuiViewportData*>(Viewport->PlatformUserData);
+    FCogImGuiViewportData* ViewportData = static_cast<FCogImGuiViewportData*>(Viewport->PlatformUserData);
     if (ViewportData == nullptr)
     {
         return;
@@ -417,7 +405,7 @@ void FCogImguiContext::ImGui_DestroyWindow(ImGuiViewport* Viewport)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::ImGui_ShowWindow(ImGuiViewport* Viewport)
 {
-    if (const FImGuiViewportData* ViewportData = static_cast<FImGuiViewportData*>(Viewport->PlatformUserData))
+    if (const FCogImGuiViewportData* ViewportData = static_cast<FCogImGuiViewportData*>(Viewport->PlatformUserData))
     {
         if (const TSharedPtr<SWindow> Window = ViewportData->Window.Pin())
         {
@@ -429,7 +417,7 @@ void FCogImguiContext::ImGui_ShowWindow(ImGuiViewport* Viewport)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::ImGui_SetWindowPos(ImGuiViewport* Viewport, ImVec2 Pos)
 {
-    if (const FImGuiViewportData* ViewportData = static_cast<FImGuiViewportData*>(Viewport->PlatformUserData))
+    if (const FCogImGuiViewportData* ViewportData = static_cast<FCogImGuiViewportData*>(Viewport->PlatformUserData))
     {
         if (const TSharedPtr<SWindow> Window = ViewportData->Window.Pin())
         {
@@ -441,7 +429,7 @@ void FCogImguiContext::ImGui_SetWindowPos(ImGuiViewport* Viewport, ImVec2 Pos)
 //--------------------------------------------------------------------------------------------------------------------------
 ImVec2 FCogImguiContext::ImGui_GetWindowPos(ImGuiViewport* Viewport)
 {
-    if (const FImGuiViewportData* ViewportData = static_cast<FImGuiViewportData*>(Viewport->PlatformUserData))
+    if (const FCogImGuiViewportData* ViewportData = static_cast<FCogImGuiViewportData*>(Viewport->PlatformUserData))
     {
         if (const TSharedPtr<SCogImguiWidget> Widget = ViewportData->Widget.Pin())
         {
@@ -455,7 +443,7 @@ ImVec2 FCogImguiContext::ImGui_GetWindowPos(ImGuiViewport* Viewport)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::ImGui_SetWindowSize(ImGuiViewport* Viewport, ImVec2 Size)
 {
-    if (const FImGuiViewportData* ViewportData = static_cast<FImGuiViewportData*>(Viewport->PlatformUserData))
+    if (const FCogImGuiViewportData* ViewportData = static_cast<FCogImGuiViewportData*>(Viewport->PlatformUserData))
     {
         if (const TSharedPtr<SWindow> Window = ViewportData->Window.Pin())
         {
@@ -467,7 +455,7 @@ void FCogImguiContext::ImGui_SetWindowSize(ImGuiViewport* Viewport, ImVec2 Size)
 //--------------------------------------------------------------------------------------------------------------------------
 ImVec2 FCogImguiContext::ImGui_GetWindowSize(ImGuiViewport* Viewport)
 {
-    if (const FImGuiViewportData* ViewportData = static_cast<FImGuiViewportData*>(Viewport->PlatformUserData))
+    if (const FCogImGuiViewportData* ViewportData = static_cast<FCogImGuiViewportData*>(Viewport->PlatformUserData))
     {
         if (const TSharedPtr<SCogImguiWidget> Widget = ViewportData->Widget.Pin())
         {
@@ -481,7 +469,7 @@ ImVec2 FCogImguiContext::ImGui_GetWindowSize(ImGuiViewport* Viewport)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::ImGui_SetWindowFocus(ImGuiViewport* Viewport)
 {
-    if (const FImGuiViewportData* ViewportData = static_cast<FImGuiViewportData*>(Viewport->PlatformUserData))
+    if (const FCogImGuiViewportData* ViewportData = static_cast<FCogImGuiViewportData*>(Viewport->PlatformUserData))
     {
         if (const TSharedPtr<SWindow> Window = ViewportData->Window.Pin())
         {
@@ -497,7 +485,7 @@ void FCogImguiContext::ImGui_SetWindowFocus(ImGuiViewport* Viewport)
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogImguiContext::ImGui_GetWindowFocus(ImGuiViewport* Viewport)
 {
-    if (const FImGuiViewportData* ViewportData = static_cast<FImGuiViewportData*>(Viewport->PlatformUserData))
+    if (const FCogImGuiViewportData* ViewportData = static_cast<FCogImGuiViewportData*>(Viewport->PlatformUserData))
     {
         if (const TSharedPtr<SWindow> Window = ViewportData->Window.Pin())
         {
@@ -514,7 +502,7 @@ bool FCogImguiContext::ImGui_GetWindowFocus(ImGuiViewport* Viewport)
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogImguiContext::ImGui_GetWindowMinimized(ImGuiViewport* Viewport)
 {
-    if (const FImGuiViewportData* ViewportData = static_cast<FImGuiViewportData*>(Viewport->PlatformUserData))
+    if (const FCogImGuiViewportData* ViewportData = static_cast<FCogImGuiViewportData*>(Viewport->PlatformUserData))
     {
         if (const TSharedPtr<SWindow> Window = ViewportData->Window.Pin())
         {
@@ -528,7 +516,7 @@ bool FCogImguiContext::ImGui_GetWindowMinimized(ImGuiViewport* Viewport)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::ImGui_SetWindowTitle(ImGuiViewport* Viewport, const char* TitleAnsi)
 {
-    if (const FImGuiViewportData* ViewportData = static_cast<FImGuiViewportData*>(Viewport->PlatformUserData))
+    if (const FCogImGuiViewportData* ViewportData = static_cast<FCogImGuiViewportData*>(Viewport->PlatformUserData))
     {
         if (const TSharedPtr<SWindow> Window = ViewportData->Window.Pin())
         {
@@ -540,7 +528,7 @@ void FCogImguiContext::ImGui_SetWindowTitle(ImGuiViewport* Viewport, const char*
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::ImGui_SetWindowAlpha(ImGuiViewport* Viewport, float Alpha)
 {
-    if (const FImGuiViewportData* ViewportData = static_cast<FImGuiViewportData*>(Viewport->PlatformUserData))
+    if (const FCogImGuiViewportData* ViewportData = static_cast<FCogImGuiViewportData*>(Viewport->PlatformUserData))
     {
         if (const TSharedPtr<SWindow> Window = ViewportData->Window.Pin())
         {
@@ -552,7 +540,7 @@ void FCogImguiContext::ImGui_SetWindowAlpha(ImGuiViewport* Viewport, float Alpha
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::ImGui_RenderWindow(ImGuiViewport* Viewport, void* Data)
 {
-    if (const FImGuiViewportData* ViewportData = static_cast<FImGuiViewportData*>(Viewport->PlatformUserData))
+    if (const FCogImGuiViewportData* ViewportData = static_cast<FCogImGuiViewportData*>(Viewport->PlatformUserData))
     {
         if (const TSharedPtr<SCogImguiWidget> Widget = ViewportData->Widget.Pin())
         {
@@ -636,41 +624,37 @@ void FCogImguiContext::SetEnableInput(bool Value)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogImguiContext::SetShowCursorWhenSharingMouse(bool Value)
+void FCogImguiContext::SetShareMouse(bool Value)
 {
-    bShowCursorWhenSharingMouse = Value;
+    bShareMouse = Value;
     RefreshMouseCursor();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogImguiContext::SetShareMouse(bool Value) 
+void FCogImguiContext::SetShareMouseWithGameplay(bool Value)
 {
-    bShareMouse = Value; 
+    bShareMouseWithGameplay = Value;
     RefreshMouseCursor();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::RefreshMouseCursor()
 {
-    if (bEnableInput)
+    if (APlayerController* PlayerController = GetLocalPlayerController(GameViewport->GetWorld()))
     {
-        if (bShareMouse && bShowCursorWhenSharingMouse)
+        if (bHasSavedInitialCursorVisibility == false)
         {
-            if (APlayerController* PlayerController = GetLocalPlayerController(GameViewport->GetWorld()))
-            {
-                bPlayerControllerShowMouse = PlayerController->ShouldShowMouseCursor();
-                PlayerController->SetShowMouseCursor(true);
-            }
+            bIsCursorInitiallyVisible = PlayerController->ShouldShowMouseCursor();
+            bHasSavedInitialCursorVisibility = true;
         }
-    }
-    else
-    {
-        if (bShareMouse && bShowCursorWhenSharingMouse)
+
+        if (bEnableInput && bShareMouse && bShareMouseWithGameplay)
         {
-            if (APlayerController* PlayerController = GetLocalPlayerController(GameViewport->GetWorld()))
-            {
-                PlayerController->SetShowMouseCursor(bPlayerControllerShowMouse);
-            }
+            PlayerController->SetShowMouseCursor(true);
+        }
+        else
+        {
+            PlayerController->SetShowMouseCursor(bIsCursorInitiallyVisible);
         }
     }
 }

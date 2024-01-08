@@ -12,19 +12,19 @@ class SWindow;
 class UGameViewportClient;
 
 //--------------------------------------------------------------------------------------------------------------------------
-class COGIMGUI_API SCogImguiWidget : public SLeafWidget
+class COGIMGUI_API SCogImguiInputCatcherWidget : public SLeafWidget
 {
     typedef SLeafWidget Super;
 
 public:
 
-    SLATE_BEGIN_ARGS(SCogImguiWidget) {}
+    SLATE_BEGIN_ARGS(SCogImguiInputCatcherWidget) {}
         SLATE_ARGUMENT(FCogImguiContext*, Context)
     SLATE_END_ARGS()
 
     void Construct(const FArguments& InArgs);
 
-    ~SCogImguiWidget();
+    ~SCogImguiInputCatcherWidget();
 
     virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
 
@@ -52,10 +52,6 @@ public:
 
     virtual FReply OnMouseMove(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
 
-    virtual FReply OnFocusReceived(const FGeometry& MyGeometry, const FFocusEvent& FocusEvent) override;
-
-    void SetDrawData(const ImDrawData* InDrawData);
-
     TSharedPtr<const SWindow> GetWindow() const { return Window; }
 
     void SetWindow(TSharedPtr<SWindow> Value) { Window = Value; }
@@ -71,6 +67,4 @@ protected:
     FCogImguiContext* Context = nullptr;
 
     TSharedPtr<SWindow> Window = nullptr;
-
-    FCogImguiDrawData DrawData;
 };

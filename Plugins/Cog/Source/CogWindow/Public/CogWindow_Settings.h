@@ -67,7 +67,7 @@ public:
     bool bShareMouse = false;
 
     UPROPERTY(Config)
-    bool bShowCursorWhenSharingMouse = false;
+    bool bShareMouseWithGameplay = false;
 
     UPROPERTY(Config)
     bool bShareKeyboard = false;
@@ -75,14 +75,11 @@ public:
     UPROPERTY(Config)
     bool bNavEnableKeyboard = false;
 
-    UPROPERTY(Config)
-    bool bNavEnableGamepad = false;
+    //UPROPERTY(Config)
+    //bool bNavEnableGamepad = false;
 
-    UPROPERTY(Config)
-    bool bNavNoCaptureInput = true;
-
-    UPROPERTY(Config)
-    bool bNoMouseCursorChange = false;
+    //UPROPERTY(Config)
+    //bool bNavNoCaptureInput = true;
 
     virtual void Reset() override
     {

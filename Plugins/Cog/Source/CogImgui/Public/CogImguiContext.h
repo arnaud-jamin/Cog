@@ -18,7 +18,7 @@ class ULocalPlayer;
 struct FDisplayMetrics;
 struct ImPlotContext;
 
-struct COGIMGUI_API FImGuiViewportData
+struct COGIMGUI_API FCogImGuiViewportData
 {
 	TWeakPtr<SWindow> Window = nullptr;
 	FCogImguiContext* Context = nullptr;
@@ -43,9 +43,9 @@ public:
 
 	void SetShareMouse(bool Value);
 
-	bool GetShowCursorWhenSharingMouse() const { return bShowCursorWhenSharingMouse; }
+	bool GetShareMouseWithGameplay() const { return bShareMouseWithGameplay; }
 
-	void SetShowCursorWhenSharingMouse(bool Value);
+	void SetShareMouseWithGameplay(bool Value);
 
 	bool GetShareKeyboard() const { return bShareKeyboard; }
 
@@ -58,10 +58,6 @@ public:
 	float GetDpiScale() const { return DpiScale; }
 
 	void SetDPIScale(float Value);
-
-	void PushCaptureMouse();
-
-	void PopCaptureMouse();
 
 	TObjectPtr<const UGameViewportClient> GetGameViewport() const { return GameViewport; }
 
@@ -134,9 +130,11 @@ private:
 
 	bool bShareMouse = false;
 
-	bool bShowCursorWhenSharingMouse = false;
+	bool bShareMouseWithGameplay = false;
 
-	bool bPlayerControllerShowMouse = false;
+	bool bHasSavedInitialCursorVisibility = false;
+
+	bool bIsCursorInitiallyVisible = false;
 
 	bool bShareKeyboard = false;
 
@@ -147,8 +145,6 @@ private:
 	bool bIsFirstFrame = true;
 
 	bool bWantCaptureMouse = false;
-
-	int32 CaptureMouseCount = 0;
 
 	float DpiScale = 1.f;
 };

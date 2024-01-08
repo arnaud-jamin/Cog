@@ -20,8 +20,8 @@ void FCogEngineWindow_LogCategories::Initialize()
 void FCogEngineWindow_LogCategories::RenderHelp()
 {
     ImGui::Text(
-        "This window can be used to activate and deactivate log categories."
-        "Activating a log category set its verbosity to VeryVerbose. "
+        "This window can be used to activate and deactivate log categories. "
+        "Activating a log category set its verbosity to Verbose, or VeryVerbose when CTRL is pressed. "
         "Deactivating a log category set its verbosity to Warning. "
         "The detailed verbosity of each log category can shown by using the Option menu. "
         "On a client, both the client and the server verbosity can be modified. "
