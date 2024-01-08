@@ -172,7 +172,7 @@ void FCogAbilityWindow_Abilities::RenderAbiltiesMenu(AActor* Selection)
             ImGui::EndMenu();
         }
 
-        FCogWindowWidgets::MenuSearchBar(Filter);
+        FCogWindowWidgets::SearchBar(Filter);
 
         ImGui::EndMenuBar();
     }

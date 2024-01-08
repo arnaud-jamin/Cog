@@ -1,15 +1,12 @@
 #include "CogSampleGameState.h"
 
 #include "CogSampleAbilitySystemComponent.h"
-#include "CogSampleFunctionLibrary_Tag.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/GameMode.h"
 #include "GameFramework/GameState.h"
 #include "Modules/ModuleManager.h"
 
 #if ENABLE_COG
-#include "CogAbilityDataAsset.h"
-#include "CogAbilityModule.h"
 #include "CogAbilityWindow_Abilities.h"
 #include "CogAbilityWindow_Attributes.h"
 #include "CogAbilityWindow_Cheats.h"
@@ -19,10 +16,7 @@
 #include "CogAbilityWindow_Tweaks.h"
 #include "CogAIWindow_BehaviorTree.h"
 #include "CogAIWindow_Blackboard.h"
-#include "CogDebugDrawImGui.h"
 #include "CogDebugPlot.h"
-#include "CogEngineDataAsset.h"
-#include "CogEngineModule.h"
 #include "CogEngineWindow_CollisionTester.h"
 #include "CogEngineWindow_CollisionViewer.h"
 #include "CogEngineWindow_CommandBindings.h"
@@ -42,11 +36,8 @@
 #include "CogEngineWindow_Stats.h"
 #include "CogEngineWindow_TimeScale.h"
 #include "CogEngineWindow_Transform.h"
-#include "CogImguiModule.h"
-#include "CogInputDataAsset.h"
 #include "CogInputWindow_Actions.h"
 #include "CogInputWindow_Gamepad.h"
-#include "CogSampleLogCategories.h"
 #include "CogSampleWindow_Team.h"
 #include "CogWindowManager.h"
 

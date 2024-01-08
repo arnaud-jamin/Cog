@@ -43,38 +43,17 @@ void FCogEngineWindow_CollisionTester::RenderContent()
     //-------------------------------------------------
     if (ImGui::BeginMenuBar())
     {
-        ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(0, 0, 0, 0));
-        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
-
-        if (ImGui::ArrowButton("SelectPrev", ImGuiDir_Left))
-        {
-        }
-        if (ImGui::BeginItemTooltip())
-        {
-            ImGui::SetTooltip("Select previous collision tester");
-            ImGui::EndTooltip();
-        }
-
-        ImGui::SameLine();
-        if (ImGui::ArrowButton("SelectNext", ImGuiDir_Right))
-        {
-        }
-        if (ImGui::BeginItemTooltip())
-        {
-            ImGui::SetTooltip("Select next collision tester");
-            ImGui::EndTooltip();
-        }
-
-        ImGui::PopStyleColor(1);
-        ImGui::PopStyleVar(1);
-
-
         if (ImGui::MenuItem("Spawn"))
         {
             const FActorSpawnParameters SpawnInfo;
             const FTransform Transform = GetSelection() ? GetSelection()->GetActorTransform() : FTransform::Identity;
-            ACogEngineCollisionTester* Actor = GetWorld()->SpawnActor<ACogEngineCollisionTester>(ACogEngineCollisionTester::StaticClass(), Transform, SpawnInfo);
-            FCogDebug::SetSelection(GetWorld(), Actor);
+            ACogEngineCollisionTester* NewActor = GetWorld()->SpawnActor<ACogEngineCollisionTester>(ACogEngineCollisionTester::StaticClass(), Transform, SpawnInfo);
+
+#if WITH_EDITOR
+            NewActor->SetActorLabel(NewActor->GetName().Replace(TEXT("CogEngine"), TEXT("")));
+#endif
+
+            FCogDebug::SetSelection(GetWorld(), NewActor);
         }
         if (ImGui::BeginItemTooltip())
         {
@@ -102,12 +81,17 @@ void FCogEngineWindow_CollisionTester::RenderContent()
             ImGui::EndDisabled();
         }
 
+        ImGui::SetNextItemWidth(-1);
+        FCogWindowWidgets::MenuActorsCombo("CollisionTesters", *GetWorld(), ACogEngineCollisionTester::StaticClass());
+
         ImGui::EndMenuBar();
     }
 
     if (CollisionTester == nullptr)
     {
-        ImGui::TextDisabled("Spawn or select a Collision Tester actor");
+        ImGui::PushTextWrapPos(0.0f);
+        ImGui::TextDisabled("Select or spawn a Collision Tester actor");
+        ImGui::PopTextWrapPos();
         return;
     }
 
@@ -224,19 +208,19 @@ void FCogEngineWindow_CollisionTester::RenderContent()
         }
     }
 
-    ImGui::Separator();
-
     //-------------------------------------------------
 	// Channels
 	//-------------------------------------------------
     if (CollisionTester->By == ECogEngine_CollisionQueryBy::Profile)
     {
+        ImGui::Separator();
         ImGui::BeginDisabled();
         FCogWindowWidgets::CollisionProfileChannels(CollisionTester->ObjectTypesToQuery);
         ImGui::EndDisabled();
     }
     else if (CollisionTester->By == ECogEngine_CollisionQueryBy::ObjectType)
     {
+        ImGui::Separator();
         FCogWindowWidgets::CollisionProfileChannels(CollisionTester->ObjectTypesToQuery);
     }
 }
