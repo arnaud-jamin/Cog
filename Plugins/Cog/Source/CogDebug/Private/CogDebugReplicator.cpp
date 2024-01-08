@@ -24,9 +24,9 @@ ACogDebugReplicator* ACogDebugReplicator::Spawn(APlayerController* Controller)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ACogDebugReplicator* ACogDebugReplicator::GetLocalReplicator(UWorld& World)
+ACogDebugReplicator* ACogDebugReplicator::GetLocalReplicator(const UWorld& World)
 {
-    for (TActorIterator<ACogDebugReplicator> It(&World, ACogDebugReplicator::StaticClass()); It; ++It)
+    for (TActorIterator<ACogDebugReplicator> It(&World, StaticClass()); It; ++It)
     {
         ACogDebugReplicator* Replicator = *It;
         return Replicator;

@@ -2,12 +2,14 @@
 
 #include "CogDebug.h"
 #include "CogImguiHelper.h"
-#include "CogImguiKeyInfo.h"
 #include "CogImguiInputHelper.h"
+#include "CogImguiKeyInfo.h"
+#include "CogWindowHelper.h"
+#include "EngineUtils.h"
+#include "GameFramework/PlayerInput.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "InputCoreTypes.h"
-#include "GameFramework/PlayerInput.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogWindowWidgets::BeginTableTooltip()
@@ -24,6 +26,18 @@ void FCogWindowWidgets::EndTableTooltip()
     ImGui::EndTooltip();
     ImGui::PopStyleColor();
     ImGui::PopStyleVar(2);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogWindowWidgets::ThinSeparatorText(const char* Label)
+{
+	ImGui::PushStyleVar(ImGuiStyleVar_SeparatorTextBorderSize, 2);
+	ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(100, 100, 100, 255));
+
+	ImGui::SeparatorText(Label);
+
+    ImGui::PopStyleColor();
+	ImGui::PopStyleVar();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -208,25 +222,24 @@ void FCogWindowWidgets::AddTextWithShadow(ImDrawList* DrawList, const ImVec2& Po
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogWindowWidgets::MenuSearchBar(ImGuiTextFilter& Filter, float Width /*= -1*/)
+void FCogWindowWidgets::SearchBar(ImGuiTextFilter& Filter, float Width /*= -1*/)
 {
-    ImGuiWindow* Window = FCogImguiHelper::GetCurrentWindow();
-    ImGui::SameLine();
-    ImVec2 Pos1 = Window->DC.CursorPos;
-    Filter.Draw("", Width);
-    ImVec2 Pos2 = Window->DC.CursorPos;
+	const ImGuiWindow* Window = FCogImguiHelper::GetCurrentWindow();
+	const ImVec2 Pos1 = Window->DC.CursorPos;
+    Filter.Draw("##Filter", Width);
+	const ImVec2 Pos2 = Window->DC.CursorPosPrevLine;
 
     if (ImGui::IsItemActive() == false && Filter.Filters.empty())
     {
         static const char* Text = "Search";
         const float Height = ImGui::GetFrameHeight();
-        ImGuiContext& g = *ImGui::GetCurrentContext();
-        ImVec2 Min = Pos1 + ImVec2(g.Style.ItemSpacing.x, 0.0f);
-        ImVec2 Max = Pos2 + ImVec2(-g.Style.ItemSpacing.x, Height);
-        ImRect BB(Min, Max);
-        ImVec2 TextSize = ImGui::CalcTextSize(Text, NULL);
+        const ImGuiContext& g = *ImGui::GetCurrentContext();
+        const ImVec2 Min = Pos1 + ImVec2(g.Style.ItemSpacing.x, 0.0f);
+        const ImVec2 Max = Pos2 + ImVec2(-g.Style.ItemSpacing.x, Height);
+        const ImRect BB(Min, Max);
+        const ImVec2 TextSize = ImGui::CalcTextSize(Text, nullptr);
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 128));
-        ImGui::RenderTextClipped(Min, Max, Text, NULL, &TextSize, ImVec2(0.0f, 0.5f), &BB);
+        ImGui::RenderTextClipped(Min, Max, Text, nullptr, &TextSize, ImVec2(0.0f, 0.5f), &BB);
         ImGui::PopStyleColor();
     }
 }
@@ -716,4 +729,292 @@ bool FCogWindowWidgets::CollisionProfileChannels(int32& Channels)
     }
 
     return Result;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::ActorsListWithFilters(const UWorld& World, const TArray<TSubclassOf<AActor>>& ActorClasses, int32& SelectedActorClassIndex, ImGuiTextFilter* Filter, const APawn* LocalPlayerPawn, const FCogWindowActorContextMenuFunction& ContextMenuFunction)
+{
+    TSubclassOf<AActor> SelectedClass = AActor::StaticClass();
+    if (ActorClasses.IsValidIndex(SelectedActorClassIndex))
+    {
+        SelectedClass = ActorClasses[SelectedActorClassIndex];
+    }
+
+    bool AddSeparator = false;
+
+    //------------------------
+    // Actor Class Combo
+    //------------------------
+    if (ActorClasses.Num() > 1)
+    {
+        ImGui::SetNextItemWidth(18 * GetFontWidth());
+        if (ImGui::BeginCombo("##SelectionType", TCHAR_TO_ANSI(*GetNameSafe(SelectedClass))))
+        {
+            for (int32 i = 0; i < ActorClasses.Num(); ++i)
+            {
+                TSubclassOf<AActor> SubClass = ActorClasses[i];
+                if (ImGui::Selectable(TCHAR_TO_ANSI(*GetNameSafe(SubClass)), false))
+                {
+                    SelectedActorClassIndex = i;
+                    SelectedClass = SubClass;
+                }
+            }
+            ImGui::EndCombo();
+        }
+
+        AddSeparator = true;
+    }
+
+    if (Filter != nullptr)
+    {
+        ImGui::SameLine();
+        SearchBar(*Filter);
+        AddSeparator = true;
+    }
+
+    if (AddSeparator)
+    {
+        ImGui::Separator();
+    }
+
+    //------------------------
+    // Actor List
+    //------------------------
+    ImGui::BeginChild("ActorsList", ImVec2(-1, -1), false);
+    const bool SelectionChanged = ActorsList(World, SelectedClass, Filter, LocalPlayerPawn, ContextMenuFunction);
+    ImGui::EndChild();
+
+    return SelectionChanged;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::ActorsList(const UWorld& World, const TSubclassOf<AActor> ActorClass, const ImGuiTextFilter* Filter, const APawn* LocalPlayerPawn, const FCogWindowActorContextMenuFunction& ContextMenuFunction)
+{
+    TArray<AActor*> Actors;
+    for (TActorIterator It(&World, ActorClass); It; ++It)
+    {
+        AActor* Actor = *It;
+
+        bool AddActor = true;
+        if (Filter != nullptr && Filter->IsActive())
+        {
+            const char* ActorName = TCHAR_TO_ANSI(*FCogWindowHelper::GetActorName(*Actor));
+            if (Filter != nullptr && Filter->PassFilter(ActorName) == false)
+            {
+                AddActor = false;
+            }
+        }
+
+        if (AddActor)
+        {
+            Actors.Add(Actor);
+        }
+    }
+
+    const AActor* OldSelection = FCogDebug::GetSelection();
+    const AActor* NewSelection = OldSelection;
+
+    ImGuiListClipper Clipper;
+    Clipper.Begin(Actors.Num());
+    while (Clipper.Step())
+    {
+        for (int32 i = Clipper.DisplayStart; i < Clipper.DisplayEnd; i++)
+        {
+	        AActor* Actor = Actors[i];
+            if (Actor == nullptr)
+            {
+                continue;
+            }
+
+            ImGui::PushStyleColor(ImGuiCol_Text, Actor == LocalPlayerPawn ? IM_COL32(255, 255, 0, 255) : IM_COL32(255, 255, 255, 255));
+
+            const bool bIsSelected = Actor == FCogDebug::GetSelection();
+            if (ImGui::Selectable(TCHAR_TO_ANSI(*FCogWindowHelper::GetActorName(*Actor)), bIsSelected))
+            {
+                FCogDebug::SetSelection(&World, Actor);
+                NewSelection = Actor;
+            }
+
+            ImGui::PopStyleColor(1);
+
+            
+            ActorContextMenu(*Actor, ContextMenuFunction);
+
+            //------------------------
+            // Draw Frame
+            //------------------------
+            if (ImGui::IsItemHovered())
+            {
+                ActorFrame(*Actor);
+            }
+
+            if (bIsSelected)
+            {
+                ImGui::SetItemDefaultFocus();
+            }
+        }
+    }
+    Clipper.End();
+
+    return NewSelection != OldSelection;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::MenuActorsCombo(const char* StrID, const UWorld& World, TSubclassOf<AActor> ActorClass, const FCogWindowActorContextMenuFunction& ContextMenuFunction)
+{
+    int32 SelectedActorClassIndex = 0;
+    const TArray ActorClasses = { ActorClass };
+
+    AActor* Actor = nullptr;
+    return MenuActorsCombo(StrID, World, ActorClasses, SelectedActorClassIndex, nullptr, nullptr, ContextMenuFunction);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::MenuActorsCombo(const char* StrID, const UWorld& World, const TArray<TSubclassOf<AActor>>& ActorClasses, int32& SelectedActorClassIndex, ImGuiTextFilter* Filter, const APawn* LocalPlayerPawn, const FCogWindowActorContextMenuFunction& ContextMenuFunction)
+{
+    bool Result = false;
+    ImGui::PushID(StrID);
+
+    const ImVec2 Pos1 = ImGui::GetCursorScreenPos();
+    const float Width = FCogImguiHelper::GetNextItemWidth();
+
+	//-----------------------------------
+	// Combo button
+	//-----------------------------------
+    {
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
+        ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
+        ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(0, 0, 0, 0));
+
+        TSubclassOf<AActor> SelectedClass = AActor::StaticClass();
+        if (ActorClasses.IsValidIndex(SelectedActorClassIndex))
+        {
+            SelectedClass = ActorClasses[SelectedActorClassIndex];
+        }
+
+        AActor* Selection = FCogDebug::GetSelection();
+        if (Selection != nullptr && Selection->IsA(SelectedClass) == false)
+        {
+            Selection = nullptr;
+        }
+
+        const FString CurrentSelectionName = FCogWindowHelper::GetActorName(Selection);
+        if (ImGui::Button(TCHAR_TO_ANSI(*CurrentSelectionName), ImVec2(Width, 0.0f)))
+        {
+            ImGui::OpenPopup("ActorListPopup");
+        }
+        if (ImGui::IsItemHovered())
+        {
+            ImGui::SetTooltip("Current Selection: %s", TCHAR_TO_ANSI(*CurrentSelectionName));
+        }
+
+        ImGui::PopStyleColor(1);
+        ImGui::PopStyleVar(2);
+
+        if (Selection != nullptr)
+        {
+            ActorContextMenu(*Selection, ContextMenuFunction);
+        }
+    }
+
+    //-----------------------------------
+	// Popup
+	//-----------------------------------
+    const ImVec2 Pos2 = ImGui::GetCursorScreenPos();
+    ImGui::SetNextWindowPos(ImVec2(Pos1.x, Pos1.y + ImGui::GetFrameHeight()));
+    if (ImGui::BeginPopup("ActorListPopup"))
+    {
+        ImGui::BeginChild("Child", ImVec2(Pos2.x - Pos1.x, GetFontWidth() * 40), false);
+
+        Result = ActorsListWithFilters(World, ActorClasses, SelectedActorClassIndex, Filter, LocalPlayerPawn, ContextMenuFunction);
+        if (Result)
+        {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndChild();
+        ImGui::EndPopup();
+    }
+
+    ImGui::PopID();
+
+    return Result;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogWindowWidgets::ActorContextMenu(AActor& Selection, const FCogWindowActorContextMenuFunction& ContextMenuFunction)
+{
+	if (ContextMenuFunction == nullptr)
+	{
+        return;
+	}
+
+    ImGui::SetNextWindowSize(ImVec2(GetFontWidth() * 30, 0));
+    if (ImGui::BeginPopupContextItem())
+    {
+        ContextMenuFunction(Selection);
+        ImGui::EndPopup();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogWindowWidgets::ActorFrame(const AActor& Actor)
+{
+	const APlayerController* PlayerController = Actor.GetWorld()->GetFirstPlayerController();
+    if (PlayerController == nullptr)
+    {
+        return;
+    }
+
+    ImGuiViewport* Viewport = ImGui::GetMainViewport();
+    if (Viewport == nullptr)
+    {
+        return;
+    }
+
+    ImDrawList* DrawList = ImGui::GetBackgroundDrawList(Viewport);
+
+    FVector BoxOrigin, BoxExtent;
+
+    bool PrimitiveFound = false;
+    FBox Bounds(ForceInit);
+
+    if (const UPrimitiveComponent* PrimitiveComponent = Cast<UPrimitiveComponent>(Actor.GetRootComponent()))
+    {
+        PrimitiveFound = true;
+
+        Bounds += PrimitiveComponent->Bounds.GetBox();
+    }
+    else
+    {
+        Actor.ForEachComponent<UPrimitiveComponent>(true, [&](const UPrimitiveComponent* InPrimComp)
+            {
+                if (InPrimComp->IsRegistered() && InPrimComp->IsCollisionEnabled())
+                {
+                    Bounds += InPrimComp->Bounds.GetBox();
+                    PrimitiveFound = true;
+                }
+            });
+    }
+
+    if (PrimitiveFound)
+    {
+        Bounds.GetCenterAndExtents(BoxOrigin, BoxExtent);
+    }
+    else
+    {
+        BoxOrigin = Actor.GetActorLocation();
+        BoxExtent = FVector::ZeroVector;
+    }
+
+    FVector2D ScreenPosMin, ScreenPosMax;
+    if (FCogWindowHelper::ComputeBoundingBoxScreenPosition(PlayerController, BoxOrigin, BoxExtent, ScreenPosMin, ScreenPosMax))
+    {
+        const ImU32 Color = (&Actor == FCogDebug::GetSelection()) ? IM_COL32(255, 255, 255, 255) : IM_COL32(255, 255, 255, 128);
+        if (ScreenPosMin != ScreenPosMax)
+        {
+            DrawList->AddRect(FCogImguiHelper::ToImVec2(ScreenPosMin) + Viewport->Pos, FCogImguiHelper::ToImVec2(ScreenPosMax) + Viewport->Pos, Color, 0.0f, 0, 1.0f);
+        }
+        AddTextWithShadow(DrawList, FCogImguiHelper::ToImVec2(ScreenPosMin + FVector2D(0, -14.0f)) + Viewport->Pos, Color, TCHAR_TO_ANSI(*FCogWindowHelper::GetActorName(Actor)));
+    }
 }

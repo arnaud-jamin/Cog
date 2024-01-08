@@ -423,7 +423,7 @@ bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
                     InOutTransform.SetLocation(NewLocation);
                     Result = true;
 
-                    const FString Text = FString::Printf(TEXT("%0.1f"), SnappedDelta);
+                    const FString Text = FString::Printf(TEXT("%+0.1f"), SnappedDelta);
                     DrawGizmoText(FCogImguiHelper::ToImVec2(Center2D), FCogImguiHelper::ToImU32(Settings.GizmoTextColor), StringCast<ANSICHAR>(*Text).Get());
 
                     //DrawDebugPoint(World, InitialTransform.GetTranslation(), 5.0f, FColor::White);
@@ -453,7 +453,7 @@ bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
                     InOutTransform.SetLocation(NewLocation);
                     Result = true;
 
-                    const FString Text = FString::Printf(TEXT("%0.1f  %0.1f"), SnappedDeltaU, SnappedDeltaV);
+                    const FString Text = FString::Printf(TEXT("%+0.1f  %+0.1f"), SnappedDeltaU, SnappedDeltaV);
                     DrawGizmoText(FCogImguiHelper::ToImVec2(Center2D), FCogImguiHelper::ToImU32(Settings.GizmoTextColor), StringCast<ANSICHAR>(*Text).Get());
 
                     //DrawDebugPoint(World, InitialTransform.GetTranslation(), 5.0f, FColor::White);
@@ -474,7 +474,7 @@ bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
                     InOutTransform.SetRotation(NewRot);
                     Result = true;
 
-                    const FString Text = FString::Printf(TEXT("%0.1f"), SnappedAngle);
+                    const FString Text = FString::Printf(TEXT("%+0.1f"), SnappedAngle);
                     DrawGizmoText(FCogImguiHelper::ToImVec2(Center2D), FCogImguiHelper::ToImU32(Settings.GizmoTextColor), StringCast<ANSICHAR>(*Text).Get());
 
                     break;
@@ -490,7 +490,7 @@ bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
                     InOutTransform.SetScale3D(NewScale);
                     Result = true;
 
-                    const FString Text = FString::Printf(TEXT("%0.1f"), SnappedDelta);
+                    const FString Text = FString::Printf(TEXT("%+0.1f"), SnappedDelta);
                     DrawGizmoText(FCogImguiHelper::ToImVec2(Center2D), FCogImguiHelper::ToImU32(Settings.GizmoTextColor), StringCast<ANSICHAR>(*Text).Get());
 
                     break;
@@ -505,7 +505,7 @@ bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
                     InOutTransform.SetScale3D(NewScale);
                     Result = true;
 
-                    const FString Text = FString::Printf(TEXT("%0.1f"), SnappedDelta);
+                    const FString Text = FString::Printf(TEXT("%+0.1f"), SnappedDelta);
                     DrawGizmoText(FCogImguiHelper::ToImVec2(Center2D), FCogImguiHelper::ToImU32(Settings.GizmoTextColor), StringCast<ANSICHAR>(*Text).Get());
 
                     break;

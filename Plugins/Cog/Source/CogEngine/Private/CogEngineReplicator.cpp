@@ -207,3 +207,16 @@ void ACogEngineReplicator::Server_ResetPossession_Implementation()
 
 #endif // !UE_BUILD_SHIPPING
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogEngineReplicator::Server_DeleteActor_Implementation(AActor* Actor)
+{
+#if !UE_BUILD_SHIPPING
+
+    if (Actor != nullptr)
+    {
+        GetWorld()->DestroyActor(Actor);
+    }
+
+#endif // !UE_BUILD_SHIPPING
+}

@@ -91,6 +91,12 @@ void FCogEngineWindow_DebugSettings::RenderContent()
             ImGui::SetTooltip("Make debug draw always persist");
         }
 
+        ImGui::Checkbox("Actor Name Use Label", &Settings.ActorNameUseLabel);
+        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
+        {
+            ImGui::SetTooltip("Use the actor label when displaying the actor name.");
+        }
+
         ImGui::Checkbox("Text Shadow", &Settings.TextShadow);
         if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
         {

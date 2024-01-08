@@ -32,6 +32,25 @@ ImGuiWindow* FCogImguiHelper::GetCurrentWindow()
     return Context.CurrentWindow;
 }
 
+
+//--------------------------------------------------------------------------------------------------------------------------
+float FCogImguiHelper::GetNextItemWidth()
+{
+    float Width;
+    const ImGuiContext& g = *GImGui;
+    if (g.NextItemData.Flags & ImGuiNextItemDataFlags_HasWidth)
+    {
+        Width = g.NextItemData.Width;
+    }
+    else
+    {
+	    const ImGuiWindow* Window = GetCurrentWindow();
+        Width = Window->DC.ItemWidth;
+    }
+
+    return Width;
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 FColor FCogImguiHelper::ToFColor(ImU32 Color)
 {

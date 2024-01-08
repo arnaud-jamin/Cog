@@ -61,7 +61,7 @@ public:
     
     static ACogDebugReplicator* Spawn(APlayerController* Controller);
 
-    static ACogDebugReplicator* GetLocalReplicator(UWorld& World);
+    static ACogDebugReplicator* GetLocalReplicator(const UWorld& World);
 
     static void GetRemoteReplicators(UWorld& World, TArray<ACogDebugReplicator*>& Replicators);
 

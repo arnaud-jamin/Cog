@@ -4,32 +4,16 @@ public class CogEngine : ModuleRules
 {
     public CogEngine(ReadOnlyTargetRules Target) : base(Target)
     {
-        PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-        
-        PublicIncludePaths.AddRange(
-            new string[] 
-            {
-            }
-            );
-                
-        
-        PrivateIncludePaths.AddRange(
-            new string[] 
-            {
-            }
-            );
-            
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         
         PublicDependencyModuleNames.AddRange(
-            new string[]
+	        new []
             {
                 "CogDebug",
-            }
-        );
-            
+            });
         
         PrivateDependencyModuleNames.AddRange(
-            new string[]
+	        new []
             {
                 "CogCommon",
                 "CogImgui",
@@ -41,14 +25,16 @@ public class CogEngine : ModuleRules
                 "NetCore",
                 "Slate",
                 "SlateCore",
-            }
-            );
+            });
         
-        
-        DynamicallyLoadedModuleNames.AddRange(
-            new string[]
+        if (Target.bBuildEditor)
+        {
+	        PrivateDependencyModuleNames.AddRange(
+                new []
             {
-            }
-            );
+	            "AssetTools"
+            });
+        }
+
     }
 }
