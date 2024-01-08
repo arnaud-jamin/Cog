@@ -26,9 +26,9 @@ ACogAbilityReplicator* ACogAbilityReplicator::Spawn(APlayerController* Controlle
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ACogAbilityReplicator* ACogAbilityReplicator::GetLocalReplicator(UWorld& World)
+ACogAbilityReplicator* ACogAbilityReplicator::GetFirstReplicator(const UWorld& World)
 {
-    for (TActorIterator<ACogAbilityReplicator> It(&World, ACogAbilityReplicator::StaticClass()); It; ++It)
+    for (TActorIterator<ACogAbilityReplicator> It(&World, StaticClass()); It; ++It)
     {
         ACogAbilityReplicator* Replicator = *It;
         return Replicator;
@@ -38,9 +38,9 @@ ACogAbilityReplicator* ACogAbilityReplicator::GetLocalReplicator(UWorld& World)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::GetRemoteReplicators(UWorld& World, TArray<ACogAbilityReplicator*>& Replicators)
+void ACogAbilityReplicator::GetReplicators(const UWorld& World, TArray<ACogAbilityReplicator*>& Replicators)
 {
-    for (TActorIterator<ACogAbilityReplicator> It(&World, ACogAbilityReplicator::StaticClass()); It; ++It)
+    for (TActorIterator<ACogAbilityReplicator> It(&World, StaticClass()); It; ++It)
     {
         ACogAbilityReplicator* Replicator = Cast<ACogAbilityReplicator>(*It);
         Replicators.Add(Replicator);
@@ -81,8 +81,6 @@ void ACogAbilityReplicator::BeginPlay()
 
     OwnerPlayerController = Cast<APlayerController>(GetOwner());
     
-    OnAnyActorSpawnedHandle = GetWorld()->AddOnActorSpawnedHandler(FOnActorSpawned::FDelegate::CreateUObject(this, &ACogAbilityReplicator::OnAnyActorSpawned));
-
     ApplyAllTweaksOnAllActors();
 }
 
@@ -92,12 +90,6 @@ void ACogAbilityReplicator::EndPlay(const EEndPlayReason::Type EndPlayReason)
     GetWorld()->RemoveOnActorSpawnedHandler(OnAnyActorSpawnedHandle);
 
     Super::EndPlay(EndPlayReason);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::ApplyCheat(AActor* CheatInstigator, const TArray<AActor*>& Targets, const FCogAbilityCheat& Cheat)
-{
-    Server_ApplyCheat(CheatInstigator, Targets, Cheat);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -127,7 +119,7 @@ void ACogAbilityReplicator::Server_ApplyCheat_Implementation(const AActor* Cheat
             ContextHandle.AddSourceObject(InstigatorAbilitySystem);
             FGameplayEffectSpecHandle SpecHandle = InstigatorAbilitySystem->MakeOutgoingSpec(Cheat.Effect, 1, ContextHandle);
 
-            if (FGameplayEffectSpec* EffectSpec = SpecHandle.Data.Get())
+            if (const FGameplayEffectSpec* EffectSpec = SpecHandle.Data.Get())
             {
                 FHitResult HitResult;
                 HitResult.HitObjectHandle = FActorInstanceHandle(Target);
@@ -152,7 +144,7 @@ bool ACogAbilityReplicator::IsCheatActive(const AActor* EffectTarget, const FCog
         return false;
     }
 
-    UAbilitySystemComponent* AbilitySystem = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(EffectTarget, true);
+    const UAbilitySystemComponent* AbilitySystem = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(EffectTarget, true);
     if (AbilitySystem == nullptr)
     {
         return false;
@@ -160,12 +152,6 @@ bool ACogAbilityReplicator::IsCheatActive(const AActor* EffectTarget, const FCog
 
     const int32 Count = AbilitySystem->GetGameplayEffectCount(Cheat.Effect, nullptr);
     return Count > 0;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::GiveAbility(AActor* Target, TSubclassOf<UGameplayAbility> AbilityClass) const
-{
-    Server_GiveAbility(Target, AbilityClass);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -193,12 +179,6 @@ void ACogAbilityReplicator::Server_GiveAbility_Implementation(AActor* TargetActo
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::RemoveAbility(AActor* TargetActor, const FGameplayAbilitySpecHandle& Handle) const
-{
-    Server_RemoveAbility(TargetActor, Handle);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void ACogAbilityReplicator::Server_RemoveAbility_Implementation(AActor* TargetActor, const FGameplayAbilitySpecHandle& Handle) const
 {
     UAbilitySystemComponent* AbilitySystem = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(TargetActor, true);
@@ -221,11 +201,6 @@ void ACogAbilityReplicator::Server_RemoveAbility_Implementation(AActor* TargetAc
     AbilitySystem->SetRemoveAbilityOnEnd(Handle);
 }
 
-//--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::ResetAllTweaks()
-{
-    Server_ResetAllTweaks();
-}
 
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogAbilityReplicator::Server_ResetAllTweaks_Implementation()
@@ -234,35 +209,46 @@ void ACogAbilityReplicator::Server_ResetAllTweaks_Implementation()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::OnAnyActorSpawned(AActor* Actor)
+void ACogAbilityReplicator::TryApplyAllTweaksOnActor(const AActor* Actor)
 {
-    if (AbilityAsset == nullptr)
+    if (Actor == nullptr)
     {
         return;
     }
 
-    if (AbilityAsset->ActorRootClass != nullptr && Actor->GetClass()->IsChildOf(AbilityAsset->ActorRootClass) == false)
+	ACogAbilityReplicator* Replicator = GetFirstReplicator(*Actor->GetWorld());
+    if (Replicator == nullptr)
     {
         return;
     }
 
-    const int32 TweakCategoryIndex = FindTweakCategoryFromActor(Actor);
-    if (TweakCategoryIndex == INDEX_NONE)
-    {
-        return;
-    }
-
-    ApplyAllTweaksOnActor(TweakCategoryIndex, Actor);
+    Replicator->ApplyAllTweaksOnActor(Actor);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::SetTweakValue(int32 TweakIndex, int32 TweakCategoryIndex, float Value)
+void ACogAbilityReplicator::ApplyAllTweaksOnActor(const AActor* Actor)
 {
-    Server_SetTweakValue(TweakIndex, TweakCategoryIndex, Value);
+	if (AbilityAsset == nullptr)
+	{
+		return;
+	}
+
+	if (AbilityAsset->ActorRootClass != nullptr && Actor->GetClass()->IsChildOf(AbilityAsset->ActorRootClass) == false)
+	{
+		return;
+	}
+
+	const int32 TweakCategoryIndex = FindTweakCategoryFromActor(Actor);
+	if (TweakCategoryIndex == INDEX_NONE)
+	{
+		return;
+	}
+
+	ApplyAllTweaksOnActor(TweakCategoryIndex, Actor);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::Server_SetTweakValue_Implementation(int32 TweakIndex, int32 TweakCategoryIndex, float Value)
+void ACogAbilityReplicator::Server_SetTweakValue_Implementation(const int32 TweakIndex, const int32 TweakCategoryIndex, const float Value)
 {
     if (AbilityAsset == nullptr)
     {
@@ -285,14 +271,14 @@ void ACogAbilityReplicator::Server_SetTweakValue_Implementation(int32 TweakIndex
 
     TArray<AActor*> Actors;
     FindActorsFromTweakCategory(TweakCategoryIndex, Actors);
-    for (AActor* Actor : Actors)
+    for (const AActor* Actor : Actors)
     {
         ApplyTweakOnActor(Actor, Tweak, Value, AbilityAsset->SetByCallerMagnitudeTag);
     }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::ApplyAllTweaksOnActor(int32 TweakCategoryIndex, AActor* Actor)
+void ACogAbilityReplicator::ApplyAllTweaksOnActor(const int32 TweakCategoryIndex, const AActor* Actor)
 {
     if (AbilityAsset == nullptr)
     {
@@ -314,7 +300,7 @@ void ACogAbilityReplicator::ApplyAllTweaksOnActor(int32 TweakCategoryIndex, AAct
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::ApplyTweakOnActor(AActor* Actor, const FCogAbilityTweak& Tweak, float Value, const FGameplayTag& SetByCallerMagnitudeTag)
+void ACogAbilityReplicator::ApplyTweakOnActor(const AActor* Actor, const FCogAbilityTweak& Tweak, const float Value, const FGameplayTag& SetByCallerMagnitudeTag)
 {
     UAbilitySystemComponent* AbilitySystem = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Actor, true);
     if (AbilitySystem == nullptr)
@@ -326,7 +312,7 @@ void ACogAbilityReplicator::ApplyTweakOnActor(AActor* Actor, const FCogAbilityTw
 
     if (Value != 0.0f)
     {
-        FGameplayEffectSpecHandle SpecHandle = AbilitySystem->MakeOutgoingSpec(Tweak.Effect, 1, AbilitySystem->MakeEffectContext());
+	    const FGameplayEffectSpecHandle SpecHandle = AbilitySystem->MakeOutgoingSpec(Tweak.Effect, 1, AbilitySystem->MakeEffectContext());
 
         if (FGameplayEffectSpec* EffectSpec = SpecHandle.Data.Get())
         {
@@ -337,9 +323,9 @@ void ACogAbilityReplicator::ApplyTweakOnActor(AActor* Actor, const FCogAbilityTw
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-float ACogAbilityReplicator::GetTweakCurrentValue(int32 TweakIndex, int32 TweakCategoryIndex)
+float ACogAbilityReplicator::GetTweakCurrentValue(const int32 TweakIndex, const int32 TweakCategoryIndex)
 {
-    float* Value = GetTweakCurrentValuePtr(TweakIndex, TweakCategoryIndex);
+	const float* Value = GetTweakCurrentValuePtr(TweakIndex, TweakCategoryIndex);
     if (Value == nullptr)
     {
         return 0.0f; 
@@ -349,7 +335,7 @@ float ACogAbilityReplicator::GetTweakCurrentValue(int32 TweakIndex, int32 TweakC
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-float* ACogAbilityReplicator::GetTweakCurrentValuePtr(int32 TweakIndex, int32 TweakCategoryIndex)
+float* ACogAbilityReplicator::GetTweakCurrentValuePtr(const int32 TweakIndex, const int32 TweakCategoryIndex)
 {
     if (AbilityAsset == nullptr)
     {
@@ -369,7 +355,7 @@ float* ACogAbilityReplicator::GetTweakCurrentValuePtr(int32 TweakIndex, int32 Tw
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::SetTweakCurrentValue(int32 TweakIndex, int32 TweakCategoryIndex, float Value)
+void ACogAbilityReplicator::SetTweakCurrentValue(const int32 TweakIndex, const int32 TweakCategoryIndex, const float Value)
 {
     if (AbilityAsset == nullptr)
     {
@@ -389,12 +375,6 @@ void ACogAbilityReplicator::SetTweakCurrentValue(int32 TweakIndex, int32 TweakCa
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::SetTweakProfile(int32 ProfileIndex)
-{
-    Server_SetTweakProfile(ProfileIndex);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void ACogAbilityReplicator::Server_SetTweakProfile_Implementation(int32 ProfileIndex)
 {
     if (AbilityAsset == nullptr)
@@ -410,7 +390,7 @@ void ACogAbilityReplicator::Server_SetTweakProfile_Implementation(int32 ProfileI
     TweakProfileIndex = ProfileIndex;
     MARK_PROPERTY_DIRTY_FROM_NAME(ACogAbilityReplicator, TweakProfileIndex, this);
 
-    ResetAllTweaks();
+    Server_ResetAllTweaks();
 
     if (AbilityAsset->TweakProfiles.IsValidIndex(TweakProfileIndex))
     {
@@ -444,7 +424,7 @@ void ACogAbilityReplicator::ApplyAllTweaksOnAllActors()
         TArray<AActor*> Actors;
         FindActorsFromTweakCategory(TweakCategoryIndex,  Actors);
         
-        for (AActor* Actor : Actors)
+        for (const AActor* Actor : Actors)
         {
             ApplyAllTweaksOnActor(TweakCategoryIndex, Actor);
         }
@@ -452,7 +432,7 @@ void ACogAbilityReplicator::ApplyAllTweaksOnAllActors()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogAbilityReplicator::FindActorsFromTweakCategory(int32 TweakCategoryIndex, TArray<AActor*>& Actors)
+void ACogAbilityReplicator::FindActorsFromTweakCategory(const int32 TweakCategoryIndex, TArray<AActor*>& Actors) const
 {
     if (AbilityAsset == nullptr)
     {
@@ -466,10 +446,10 @@ void ACogAbilityReplicator::FindActorsFromTweakCategory(int32 TweakCategoryIndex
     
     const FCogAbilityTweakCategory& TweakCategory = AbilityAsset->TweaksCategories[TweakCategoryIndex];
 
-    for (TActorIterator<AActor> It(GetWorld(), TweakCategory.ActorClass); It; ++It)
+    for (TActorIterator It(GetWorld(), TweakCategory.ActorClass); It; ++It)
     {
         AActor* Actor = *It;
-        if (UAbilitySystemComponent* AbilitySystem = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Actor, true))
+        if (const UAbilitySystemComponent* AbilitySystem = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Actor, true))
         {
             const bool bHasRequiredTags = AbilitySystem->HasAllMatchingGameplayTags(TweakCategory.RequiredTags);
             const bool bHasIgnoredTags = AbilitySystem->HasAnyMatchingGameplayTags(TweakCategory.IgnoredTags);
@@ -482,9 +462,9 @@ void ACogAbilityReplicator::FindActorsFromTweakCategory(int32 TweakCategoryIndex
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-int32 ACogAbilityReplicator::FindTweakCategoryFromActor(AActor* Actor)
+int32 ACogAbilityReplicator::FindTweakCategoryFromActor(const AActor* Actor) const
 {
-    UAbilitySystemComponent* AbilitySystem = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Actor, true);
+	const UAbilitySystemComponent* AbilitySystem = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Actor, true);
     if (AbilitySystem == nullptr)
     {
         return INDEX_NONE;
@@ -493,7 +473,6 @@ int32 ACogAbilityReplicator::FindTweakCategoryFromActor(AActor* Actor)
     for (int32 i = 0; i < AbilityAsset->TweaksCategories.Num(); ++i)
     {
         const FCogAbilityTweakCategory& TweakCategory = AbilityAsset->TweaksCategories[i];
-
         if (IsActorMatchingTweakCategory(Actor, AbilitySystem, TweakCategory))
         {
             return i;

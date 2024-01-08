@@ -90,7 +90,7 @@ void FCogAbilityWindow_Cheats::TryReapplyCheats()
         return;
     }
 
-    ACogAbilityReplicator* Replicator = ACogAbilityReplicator::GetLocalReplicator(*GetWorld());
+    ACogAbilityReplicator* Replicator = ACogAbilityReplicator::GetFirstReplicator(*GetWorld());
     if (Replicator == nullptr)
     {
         return;
@@ -105,7 +105,7 @@ void FCogAbilityWindow_Cheats::TryReapplyCheats()
         if (const FCogAbilityCheat* Cheat = Asset->PersistentEffects.FindByPredicate(
             [AppliedCheatName](const FCogAbilityCheat& Cheat) { return Cheat.Name == AppliedCheatName; }))
         {
-            Replicator->ApplyCheat(LocalPawn, Targets, *Cheat);
+            Replicator->Server_ApplyCheat(LocalPawn, Targets, *Cheat);
         }
         else
         {
@@ -329,8 +329,8 @@ void FCogAbilityWindow_Cheats::RequestCheat(AActor* ControlledActor, AActor* Sel
         Actors.Add(SelectedActor);
     }
 
-    if (ACogAbilityReplicator* Replicator = ACogAbilityReplicator::GetLocalReplicator(*GetWorld()))
+    if (ACogAbilityReplicator* Replicator = ACogAbilityReplicator::GetFirstReplicator(*GetWorld()))
     {
-        Replicator->ApplyCheat(ControlledActor, Actors, Cheat);
+        Replicator->Server_ApplyCheat(ControlledActor, Actors, Cheat);
     }
 }

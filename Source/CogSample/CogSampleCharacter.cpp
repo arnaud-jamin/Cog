@@ -10,7 +10,6 @@
 #include "CogSampleFunctionLibrary_Team.h"
 #include "CogSampleGameplayAbility.h"
 #include "CogSampleLogCategories.h"
-#include "CogSamplePlayerController.h"
 #include "CogSampleRootMotionParams.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -26,7 +25,7 @@
 #include "Net/UnrealNetwork.h"
 
 #if ENABLE_COG
-#include "CogDebugDraw.h"
+#include "CogAbilityReplicator.h"
 #include "CogDebugMetric.h"
 #include "CogDebugPlot.h"
 #endif //ENABLE_COG
@@ -351,6 +350,10 @@ void ACogSampleCharacter::TryFinishInitialize()
     {
         return;
     }
+
+#if ENABLE_COG
+	ACogAbilityReplicator::TryApplyAllTweaksOnActor(this);
+#endif //ENABLE_COG
 
     RegisterToAbilitySystemEvents();
 

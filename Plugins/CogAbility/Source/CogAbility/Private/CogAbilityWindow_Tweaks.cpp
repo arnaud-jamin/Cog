@@ -37,7 +37,7 @@ void FCogAbilityWindow_Tweaks::RenderContent()
         return;
     }
 
-    ACogAbilityReplicator* Replicator = ACogAbilityReplicator::GetLocalReplicator(*GetWorld());
+    ACogAbilityReplicator* Replicator = ACogAbilityReplicator::GetFirstReplicator(*GetWorld());
     if (Replicator == nullptr)
     {
         ImGui::TextDisabled("Invalid Replicator");
@@ -48,7 +48,7 @@ void FCogAbilityWindow_Tweaks::RenderContent()
     {
         if (ImGui::MenuItem("Reset"))
         {
-            Replicator->ResetAllTweaks();
+            Replicator->Server_ResetAllTweaks();
         }
 
         ImGui::EndMenuBar();
@@ -67,7 +67,7 @@ void FCogAbilityWindow_Tweaks::RenderContent()
 	        const bool IsSelected = CurrentTweakProfileIndex == INDEX_NONE;
             if (ImGui::Selectable("None", IsSelected))
             {
-                Replicator->SetTweakProfile(INDEX_NONE);
+                Replicator->Server_SetTweakProfile(INDEX_NONE);
             }
         }
 
@@ -78,7 +78,7 @@ void FCogAbilityWindow_Tweaks::RenderContent()
 
             if (ImGui::Selectable(TCHAR_TO_ANSI(*TweakProfile.Name.ToString()), IsSelected))
             {
-                Replicator->SetTweakProfile(TweakProfileIndex);
+                Replicator->Server_SetTweakProfile(TweakProfileIndex);
             }
         }
         ImGui::EndCombo();
@@ -161,6 +161,6 @@ void FCogAbilityWindow_Tweaks::DrawTweak(ACogAbilityReplicator* Replicator, int3
 
     if (bUpdateValue)
     {
-        Replicator->SetTweakValue(TweakIndex, TweakCategoryIndex, *Value);
+        Replicator->Server_SetTweakValue(TweakIndex, TweakCategoryIndex, *Value);
     }
 }
