@@ -100,7 +100,6 @@ void FCogImguiContext::Initialize()
         PlatformApplication->OnDisplayMetricsChanged().AddRaw(this, &FCogImguiContext::OnDisplayMetricsChanged);
         OnDisplayMetricsChanged(DisplayMetrics);
     }
-
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -640,6 +639,19 @@ void FCogImguiContext::SetShareMouseWithGameplay(bool Value)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::RefreshMouseCursor()
 {
+    //-------------------------------------------------------------------------------------------
+    // Focus the main widget when enabling input otherwise the mouse can still be hidden because
+    // the gameplay might have the focus and might hide the cursor.
+    //-------------------------------------------------------------------------------------------
+    if (bEnableInput)
+    {
+        FSlateApplication::Get().SetKeyboardFocus(MainWidget);
+        FSlateApplication::Get().SetUserFocus(0, MainWidget);
+    }
+
+    //-------------------------------------------------------------------------------------------
+	// Force to show the cursor when sharing mouse with gameplay for games that hide the cursor
+    //-------------------------------------------------------------------------------------------
     if (APlayerController* PlayerController = GetLocalPlayerController(GameViewport->GetWorld()))
     {
         if (bHasSavedInitialCursorVisibility == false)
