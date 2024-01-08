@@ -69,7 +69,7 @@ FReply SCogImguiInputCatcherWidget::OnKeyUp(const FGeometry& MyGeometry, const F
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiInputCatcherWidget::OnAnalogValueChanged(const FGeometry& MyGeometry, const FAnalogInputEvent& AnalogInputEvent)
 {
-    return FReply::Handled();
+    return FReply::Unhandled();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
