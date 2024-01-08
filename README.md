@@ -15,8 +15,8 @@ Cog provides:
 General Info:
 - Cog can be used both in editor and package builds. It is disabled by default on shipping builds.
 - Press the `[F1]` key or use the `Cog.ToggleInput` console command to open the ImGui Main Menu.
-- Mouse over a window title to display its help.
-- Most windows display their contents based on a selected actor. The selector actor can be chosen using the `Engine/Selection` window or widget.
+- Many windows display their contents based on a selected actor. The selector actor can be chosen using the `Engine/Selection` window or widget.
+- Widgets such as Stats (FPS, Ping), or Actor Selection, can be added in the main menu bar from the 'Window/Widgets" menu.
 
 ## Cog Windows
 
@@ -65,12 +65,17 @@ Used to apply cheats to the selected actor.
   - `[ALT]` Apply the cheat to the allies of the selected actor
   - `[SHIFT]` Apply the cheat to the enemies of the selected actor
 
-### Collisions
-Used to inspect collisions by performing a collision query with the selected channels. 
+### Collisions Tester
+Used to test a collision query
 
-![Collisions](https://github.com/arnaud-jamin/Cog/assets/13844285/ccee855b-b33b-4dfc-ba14-dff87e1150cf)
+![Collisions Tester](https://github.com/arnaud-jamin/Cog/assets/13844285/12f7cb7e-13c9-4eed-8ea4-f3eb7475cf34)
+![Collisions Tester](https://github.com/arnaud-jamin/Cog/assets/13844285/4d01fd01-d0b3-41a7-9344-662f190ebaf0)
+
+### Collisions Viewer
+Used to inspect collisions in the world 
+
+![Collisions Viewer](https://github.com/arnaud-jamin/Cog/assets/13844285/ccee855b-b33b-4dfc-ba14-dff87e1150cf)
 - The query can be configured in the options.
-- The displayed collision channels can be configured in a Data Asset.
 - It can be used to better understand what object collisions are blocking a raycast.
 
 ### Command Bindings
@@ -86,7 +91,7 @@ Used to configure the command bindings.
 ### Debug Settings
 Used to tweak how the debug display is drawn.
 
-![Debug Settings](https://github.com/arnaud-jamin/Cog/assets/13844285/e55c8d07-133e-48ab-a974-ed076f3d4a58)
+![Debug Settings](https://github.com/arnaud-jamin/Cog/assets/13844285/1c078311-2395-45e6-9a13-ddc405e1c914)
 
 ### Effects
 Displays the gameplay effects of the selected actor.
@@ -128,7 +133,6 @@ Gather various values sent by the selected actor and compute their rate per seco
 // Adding a metric
 FCogDebugMetric::AddMetric(this, "Damage Dealt", MitigatedDamage, UnmitigatedDamage, false);
 ```
-
 
 ### Net Emulation
 Used to configure the network emulation
@@ -214,6 +218,14 @@ Used to change the game global time scale.
 
 ![Time Scale](https://github.com/arnaud-jamin/Cog/assets/13844285/d19198c5-37dd-400d-a09f-7a5077eb2511)
 - If changed on a client the time scale is also modified on the game server, and replicated to the other clients.
+
+### Transform
+Used to read and set the selected actor transform. 
+
+![Transform](https://github.com/arnaud-jamin/Cog/assets/13844285/f4fa2aeb-2e06-4820-8500-6eb14536b5b3)
+- A gizmo in the viewport can also be used to change the transform.
+
+![Transform](https://github.com/arnaud-jamin/Cog/assets/13844285/34657828-9fda-4af4-bdd0-4ea4514c23a0)
 
 ### Tweaks
 Used to apply tweaks to all the spawned actors

@@ -101,6 +101,8 @@ protected:
 
     virtual void RenderMenuItem(FCogWindow& Window, const char* MenuItemName);
 
+    void RenderMenuItemHelp(FCogWindow& Window);
+
     virtual void ToggleInputMode();
 
     static void SettingsHandler_ClearAll(ImGuiContext* ctx, ImGuiSettingsHandler*);

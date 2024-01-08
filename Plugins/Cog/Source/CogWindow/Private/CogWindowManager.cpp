@@ -166,6 +166,7 @@ void UCogWindowManager::Render(float DeltaTime)
     ImGui::DockSpaceOverViewport(0, ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingInCentralNode | ImGuiDockNodeFlags_AutoHideTabBar);
     ImGui::PopStyleColor(1);
 
+
     const bool bCompactSaved = SettingsWindow->GetSettingsConfig()->bCompactMode;
     if (bCompactSaved)
     {
@@ -518,6 +519,8 @@ void UCogWindowManager::RenderMenuItem(FCogWindow& Window, const char* MenuItemN
         {
             Window.SetIsVisible(!Window.GetIsVisible());
         }
+
+        RenderMenuItemHelp(Window);
     }
     else
     {
@@ -526,6 +529,37 @@ void UCogWindowManager::RenderMenuItem(FCogWindow& Window, const char* MenuItemN
         {
             Window.SetIsVisible(bIsVisible);
         }
+     
+        RenderMenuItemHelp(Window);
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogWindowManager::RenderMenuItemHelp(FCogWindow& Window)
+{
+    if (SettingsWindow->GetSettingsConfig()->bShowHelp)
+    {
+        ImGui::SameLine();
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() - FCogWindowWidgets::GetFontWidth() * 3.0f);
+        ImGui::TextDisabled("(?)");
+        if (ImGui::IsItemHovered())
+        {
+            ImGui::PushStyleColor(ImGuiCol_PopupBg, IM_COL32(29, 42, 62, 240));
+            const float HelpWidth = FCogWindowWidgets::GetFontWidth() * 80;
+            ImGui::SetNextWindowSizeConstraints(ImVec2(HelpWidth / 2.0f, 0.0f), ImVec2(HelpWidth, FLT_MAX));
+            if (ImGui::BeginTooltip())
+            {
+                ImGui::PushTextWrapPos(HelpWidth - 1 * FCogWindowWidgets::GetFontWidth());
+                Window.RenderHelp();
+                ImGui::Separator();
+                ImGui::TextDisabled("Help can be hidden in Window/Settings.");
+                ImGui::PopTextWrapPos();
+                ImGui::EndTooltip();
+            }
+            ImGui::PopStyleColor();
+        }
+        ImGui::SameLine();
+        ImGui::Dummy(ImVec2(FCogWindowWidgets::GetFontWidth() * 1, 0));
     }
 }
 
@@ -754,3 +788,4 @@ void UCogWindowManager::ToggleInputMode()
     UE_LOG(LogCogImGui, Verbose, TEXT("UCogWindowManager::ToggleInputMode"));
     Context.SetEnableInput(!Context.GetEnableInput());
 }
+

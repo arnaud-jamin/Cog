@@ -79,25 +79,6 @@ void FCogWindow::Render(float DeltaTime)
             ImGui::PopStyleVar(1);
         }
 
-        if (GetOwner()->GetSettingsWindow()->GetSettingsConfig()->bShowHelp)
-        {
-            if (ImGui::IsItemHovered())
-            {
-                ImGui::PushStyleColor(ImGuiCol_PopupBg, IM_COL32(29, 42, 62, 240));
-                const float HelpWidth = FCogWindowWidgets::GetFontWidth() * 80;
-                ImGui::SetNextWindowSizeConstraints(ImVec2(HelpWidth / 2.0f, 0.0f), 
-                                                    ImVec2(HelpWidth, FLT_MAX));
-                if (ImGui::BeginTooltip())
-                {
-                    ImGui::PushTextWrapPos(HelpWidth - 1 * FCogWindowWidgets::GetFontWidth());
-                    RenderHelp();
-                    ImGui::PopTextWrapPos();
-                    ImGui::EndTooltip();
-                }
-                ImGui::PopStyleColor();
-            }
-        }
-
         if (ImGui::BeginPopupContextWindow())
         {
             if (bHasMenu)
@@ -215,4 +196,3 @@ UWorld* FCogWindow::GetWorld() const
 {
     return Owner->GetWorld();
 }
-

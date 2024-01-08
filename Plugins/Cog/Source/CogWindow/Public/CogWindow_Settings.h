@@ -67,6 +67,12 @@ public:
     bool bShareMouse = false;
 
     UPROPERTY(Config)
+    bool bShowCursorWhenSharingMouse = false;
+
+    UPROPERTY(Config)
+    bool bShareKeyboard = false;
+
+    UPROPERTY(Config)
     bool bNavEnableKeyboard = false;
 
     UPROPERTY(Config)
@@ -90,9 +96,9 @@ public:
         bShowWindowsInMainMenu = true;
         bEnableInput = false;
         bShareMouse = false;
+        bShareKeyboard = false;
         bNavEnableKeyboard = false;
-        bNavEnableGamepad = false;
-        bNavNoCaptureInput = true;
-        bNoMouseCursorChange = false;
+        //bNavEnableGamepad = false;
+        //bNavNoCaptureInput = true;
     }
 };
