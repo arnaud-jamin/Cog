@@ -5,6 +5,8 @@
 #include "CogWindowWidgets.h"
 #include "Components/PrimitiveComponent.h"
 #include "Components/SceneComponent.h"
+#include "Engine/CollisionProfile.h"
+#include "Engine/World.h"
 #include "imgui.h"
 
 //--------------------------------------------------------------------------------------------------------------------------

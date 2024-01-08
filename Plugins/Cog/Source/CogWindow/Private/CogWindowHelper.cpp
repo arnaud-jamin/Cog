@@ -3,6 +3,8 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetRegistry/IAssetRegistry.h"
 #include "CogDebug.h"
+#include "GameFramework/PlayerController.h"
+#include "imgui.h"
 
 //----------------------------------------------------------------------------------------------------------------------
 const UObject* FCogWindowHelper::GetFirstAssetByClass(const TSubclassOf<UObject> AssetClass)

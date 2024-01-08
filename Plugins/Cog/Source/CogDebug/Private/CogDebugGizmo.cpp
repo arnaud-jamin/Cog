@@ -5,6 +5,8 @@
 #include "CogImGuiHelper.h"
 #include "Components/PrimitiveComponent.h"
 #include "Components/SceneComponent.h"
+#include "DrawDebugHelpers.h"
+#include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 #include "imgui.h"
 #include "Kismet/GameplayStatics.h"
@@ -244,7 +246,7 @@ bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
     const FColor GizmoAxisColorsZHigh[]     = { Settings.GizmoAxisColorsZHighX,        Settings.GizmoAxisColorsZHighY,        Settings.GizmoAxisColorsZHighZ,        Settings.GizmoAxisColorsZHighW };
     const FColor GizmoAxisColorsSelection[] = { Settings.GizmoAxisColorsSelectionX,    Settings.GizmoAxisColorsSelectionY,    Settings.GizmoAxisColorsSelectionZ,    Settings.GizmoAxisColorsSelectionW };
 
-    FCogDebug_GizmoElement GizmoElements[ECogDebug_GizmoElementType::MAX];
+    FCogDebug_GizmoElement GizmoElements[(uint8)ECogDebug_GizmoElementType::MAX];
     for (FCogDebug_GizmoElement& GizmoElement : GizmoElements)
     {
         GizmoElement.Type = ECogDebug_GizmoType::MAX;

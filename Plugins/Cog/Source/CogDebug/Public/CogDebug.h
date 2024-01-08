@@ -1,15 +1,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/EngineTypes.h"
 #include "UObject/WeakObjectPtrTemplates.h"
 #include "CogDebug.generated.h"
 
-struct FCogDebugDrawSweepParams;
+class AActor;
+class UObject;
+class UWorld;
 struct FCogDebugDrawLineTraceParams;
 struct FCogDebugDrawOverlapParams;
-class UObject;
-class AActor;
-class UWorld;
+struct FCogDebugDrawSweepParams;
 
 USTRUCT()
 struct FCogDebugSettings

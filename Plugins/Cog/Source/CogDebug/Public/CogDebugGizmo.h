@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 #include "CogDebugGizmo.generated.h"
 
+class APlayerController;
+
 //--------------------------------------------------------------------------------------------------------------------------
 UENUM(Flags)
 enum class ECogDebug_GizmoFlags : uint8

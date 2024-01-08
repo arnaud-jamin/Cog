@@ -4,6 +4,7 @@
 #include "CogDebug.h"
 #include "Components/PrimitiveComponent.h"
 #include "Components/SceneComponent.h"
+#include "Engine/World.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 ACogEngineCollisionTester::ACogEngineCollisionTester(const FObjectInitializer& ObjectInitializer)

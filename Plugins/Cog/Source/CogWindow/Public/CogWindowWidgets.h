@@ -5,11 +5,12 @@
 #include "UObject/ReflectedTypeAccessors.h"
 
 class FEnumProperty;
+class UCollisionProfile;
 class UEnum;
 class UObject;
 enum class ECheckBoxState : uint8;
+enum ECollisionChannel : int;
 struct FCogImGuiKeyInfo;
-struct FKeyBind;
 struct FKeyBind;
 
 using FCogWindowActorContextMenuFunction = TFunction<void(AActor& Actor)>;

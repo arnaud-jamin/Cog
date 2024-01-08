@@ -8,6 +8,7 @@
 #include "CogAbilityHelper.h"
 #include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
+#include "Engine/World.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Effects::Initialize()

@@ -2,6 +2,8 @@
 
 #include "CoreMinimal.h"
 
+class AActor;
+
 class COGENGINE_API FCogEngineHelper
 {
 public:

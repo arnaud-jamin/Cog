@@ -3,6 +3,7 @@
 #include "CogDebug.h"
 #include "CogImGuiHelper.h"
 #include "CogWindowWidgets.h"
+#include "GameFramework/Actor.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 

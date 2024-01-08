@@ -1,7 +1,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/EngineTypes.h"
 #include "Engine/HitResult.h"
+#include "GameFramework/Actor.h"
 #include "CogEngineCollisionTester.generated.h"
 
 //--------------------------------------------------------------------------------------------------------------------------

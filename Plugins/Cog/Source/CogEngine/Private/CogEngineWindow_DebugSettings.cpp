@@ -3,7 +3,7 @@
 #include "CogDebug.h"
 #include "CogImGuiHelper.h"
 #include "CogWindowWidgets.h"
-#include "imgui_internal.h"
+#include "Engine/CollisionProfile.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_DebugSettings::RenderHelp()
@@ -47,7 +47,7 @@ void FCogEngineWindow_DebugSettings::PreSaveConfig()
 void RenderCollisionChannelColor(const UCollisionProfile& CollisionProfile, FColor& Color, ECollisionChannel Channel, ImGuiColorEditFlags ColorEditFlags)
 {
     const FString ChannelName = CollisionProfile.ReturnChannelNameFromContainerIndex(Channel).ToString();
-	FCogImguiHelper::ColorEdit4(StringCast<ANSICHAR>(*ChannelName).Get(), Color, ColorEditFlags);
+    FCogImguiHelper::ColorEdit4(StringCast<ANSICHAR>(*ChannelName).Get(), Color, ColorEditFlags);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -312,38 +312,38 @@ void FCogEngineWindow_DebugSettings::RenderContent()
     {
         if (const UCollisionProfile* CollisionProfile = UCollisionProfile::Get())
         {
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorWorldStatic,           ECC_WorldStatic,            ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorWorldDynamic,          ECC_WorldDynamic,           ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorPawn,                  ECC_Pawn,                   ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorVisibility,            ECC_Visibility,             ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorCamera,                ECC_Camera,                 ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorPhysicsBody,           ECC_PhysicsBody,            ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorVehicle,               ECC_Vehicle,                ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorDestructible,          ECC_Destructible,           ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorEngineTraceChannel1,   ECC_EngineTraceChannel1,    ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorEngineTraceChannel2,   ECC_EngineTraceChannel2,    ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorEngineTraceChannel3,   ECC_EngineTraceChannel3,    ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorEngineTraceChannel4,   ECC_EngineTraceChannel4,    ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorEngineTraceChannel5,   ECC_EngineTraceChannel5,    ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorEngineTraceChannel6,   ECC_EngineTraceChannel6,    ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel1,     ECC_GameTraceChannel1,      ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel2,     ECC_GameTraceChannel2,      ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel3,     ECC_GameTraceChannel3,      ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel4,     ECC_GameTraceChannel4,      ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel5,     ECC_GameTraceChannel5,      ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel6,     ECC_GameTraceChannel6,      ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel7,     ECC_GameTraceChannel7,      ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel8,     ECC_GameTraceChannel8,      ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel9,     ECC_GameTraceChannel9,      ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel10,    ECC_GameTraceChannel10,     ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel11,    ECC_GameTraceChannel11,     ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel12,    ECC_GameTraceChannel12,     ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel13,    ECC_GameTraceChannel13,     ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel14,    ECC_GameTraceChannel14,     ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel15,    ECC_GameTraceChannel15,     ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel16,    ECC_GameTraceChannel16,     ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel17,    ECC_GameTraceChannel17,     ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel18,    ECC_GameTraceChannel18,     ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorWorldStatic, ECC_WorldStatic, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorWorldDynamic, ECC_WorldDynamic, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorPawn, ECC_Pawn, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorVisibility, ECC_Visibility, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorCamera, ECC_Camera, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorPhysicsBody, ECC_PhysicsBody, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorVehicle, ECC_Vehicle, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorDestructible, ECC_Destructible, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorEngineTraceChannel1, ECC_EngineTraceChannel1, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorEngineTraceChannel2, ECC_EngineTraceChannel2, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorEngineTraceChannel3, ECC_EngineTraceChannel3, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorEngineTraceChannel4, ECC_EngineTraceChannel4, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorEngineTraceChannel5, ECC_EngineTraceChannel5, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorEngineTraceChannel6, ECC_EngineTraceChannel6, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel1, ECC_GameTraceChannel1, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel2, ECC_GameTraceChannel2, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel3, ECC_GameTraceChannel3, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel4, ECC_GameTraceChannel4, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel5, ECC_GameTraceChannel5, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel6, ECC_GameTraceChannel6, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel7, ECC_GameTraceChannel7, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel8, ECC_GameTraceChannel8, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel9, ECC_GameTraceChannel9, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel10, ECC_GameTraceChannel10, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel11, ECC_GameTraceChannel11, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel12, ECC_GameTraceChannel12, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel13, ECC_GameTraceChannel13, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel14, ECC_GameTraceChannel14, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel15, ECC_GameTraceChannel15, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel16, ECC_GameTraceChannel16, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel17, ECC_GameTraceChannel17, ColorEditFlags);
+            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel18, ECC_GameTraceChannel18, ColorEditFlags);
         }
     }
 
@@ -361,7 +361,7 @@ void FCogEngineWindow_DebugSettings::RenderContent()
         FCogWindowWidgets::SetNextItemToShortWidth();
         ImGui::DragFloat("Primitive Actors Name Size", &Settings.CollisionQueryHitPrimitiveActorsNameSize);
 
-    	FCogWindowWidgets::SetNextItemToShortWidth();
+        FCogWindowWidgets::SetNextItemToShortWidth();
         ImGui::DragFloat("Hit Point Size", &Settings.CollisionQueryHitPointSize);
 
         FCogImguiHelper::ColorEdit4("Hit Color", Settings.CollisionQueryHitColor, ColorEditFlags);

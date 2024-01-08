@@ -4,6 +4,8 @@
 #include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
 #include "imgui.h"
+#include "GameFramework/Actor.h"
+#include "GameFramework/Pawn.h"
 
 #if WITH_EDITOR
 #include "IAssetTools.h"
