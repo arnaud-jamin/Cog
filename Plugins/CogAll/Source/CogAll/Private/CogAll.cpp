@@ -32,6 +32,7 @@
 #include "CogInputWindow_Gamepad.h"
 #include "CogWindowManager.h"
 
+#include "Engine/Engine.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/GameStateBase.h"
 #include "GameFramework/GameUserSettings.h"

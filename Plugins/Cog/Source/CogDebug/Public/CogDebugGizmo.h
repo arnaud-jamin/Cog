@@ -4,6 +4,7 @@
 #include "CogDebugGizmo.generated.h"
 
 class APlayerController;
+class USceneComponent;
 
 //--------------------------------------------------------------------------------------------------------------------------
 UENUM(Flags)
