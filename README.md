@@ -306,12 +306,14 @@ public class CogSample : ModuleRules
         {
             PublicDependencyModuleNames.AddRange(new string[]
             {
-                "CogDebug",
-                "CogImgui",
-                "CogWindow",
-                "CogEngine",
-                "CogInput",
                 "CogAbility",
+                "CogAI",
+                "CogAll",
+                "CogDebug",
+                "CogEngine",
+                "CogImgui",
+                "CogInput",
+                "CogWindow",
             });
         }
     }
