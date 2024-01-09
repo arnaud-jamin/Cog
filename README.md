@@ -264,7 +264,7 @@ You must have Unreal 5.1 or greater and Visual Studio to launch the sample
 The Cog repository has the following structure:
 - `CogSample` - A Sample that demonstrate various Cog functionalities. The project was saved in Unreal 5.1
 - `Plugins/CogAbility` - ImGui windows for the Gameplay Ability System (Abilities, Effects, Tags, ...)
--  `Plugins/CogAI` - ImGui windows for AI (Behavior Tree, Blackboard)
+- `Plugins/CogAI` - ImGui windows for AI (Behavior Tree, Blackboard)
 - `Plugins/CogInput` - ImGui windows for the Enhanced Input library (Input action, Gamepad)
 - `Plugins/Cog` - The main Cog plugin which contains the following modules
   - `CogEngine` - ImGui windows for the core unreal engine functionalities (Log, Stats, Time, Collisions, Skeleton, ...)
@@ -272,7 +272,8 @@ The Cog repository has the following structure:
   - `CogDebug` - Debug functionalities (Log, Debug Draw, Plot, Metric, ...)
   - `CogImGui` - Integration of Imgui for Unreal, inspired by [UnrealImGui](https://github.com/segross/UnrealImGui)
   - `CogCommon` - Interfaces implemented by your project actor classes which cannot be excluded from a shipping build
-
+- `Plugins/CogAll` - Only contains a utility function to easily add all the built-in windows from all the Cog plugins. Useful for projects that do not need to exclude some plugins. 
+  
 Cog has multiple plugins to ease the integration for projects that do not use the `Ability System Component` or `Enhanced Input`. For the next steps, it is assumed all the plugins are used.
 
 - Setup up module dependencies:
@@ -359,17 +360,16 @@ void ACogSampleGameState::BeginPlay()
     CogWindowManager = NewObject<UCogWindowManager>(this);
     CogWindowManagerRef = CogWindowManager;
 
-    // Add windows
-    CogWindowManager->AddWindow<FCogEngineWindow_DebugSettings>("Engine.Debug Settings");
-    CogWindowManager->AddWindow<FCogEngineWindow_ImGui>("Engine.ImGui");
-    CogWindowManager->AddWindow<FCogAbilityWindow_Abilities>("Gameplay.Abilities");
-    CogWindowManager->AddWindow<FCogAbilityWindow_Attributes>("Gameplay.Attributes");
+    // Add all the built-in windows
+    Cog::AddAllWindows(*CogWindowManager);
+
+    // Add a custom window
+    CogWindowManager->AddWindow<FCogSampleWindow_Team>("Gameplay.Team");
 
     [...]
 #endif //ENABLE_COG
 }
 ```
-
 
 - Tick the CogWindowManager:
 ```cpp
