@@ -344,6 +344,8 @@ protected:
 
     void UpdateActiveAbilitySlots();
 
+    void RefreshScale();
+
     UFUNCTION()
     void OnRep_Scale();
 

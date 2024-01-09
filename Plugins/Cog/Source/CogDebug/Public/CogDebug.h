@@ -90,7 +90,7 @@ struct FCogDebugSettings
     float GizmoCursorSelectionThreshold = 10.0f;
 
     UPROPERTY(Config)
-    float GizmoTranslationAxisLength = 50.0f;
+    float GizmoTranslationAxisLength = 80.0f;
 
     UPROPERTY(Config)
     bool GizmoTranslationSnapEnable = false;
@@ -126,10 +126,10 @@ struct FCogDebugSettings
     float GizmoScaleSnapValue = 1.0f;
 
     UPROPERTY(Config)
-    float GizmoScaleBoxOffset = 50.0f;
+    float GizmoScaleBoxOffset = 85.0f;
 
     UPROPERTY(Config)
-    float GizmoScaleBoxExtent = 2.0f;
+    float GizmoScaleBoxExtent = 5.0f;
 
     UPROPERTY(Config)
     float GizmoScaleSpeed = 0.01f;

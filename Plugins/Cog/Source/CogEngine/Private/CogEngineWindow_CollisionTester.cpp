@@ -106,11 +106,8 @@ void FCogEngineWindow_CollisionTester::RenderContent()
 
     if (const APlayerController* LocalPlayerController = GetLocalPlayerController())
     {
-        FTransform Transform = CollisionTester->EndComponent->GetComponentTransform();
-        if (EndGizmo.Draw("CollisionTesterEndGizmo", *LocalPlayerController, Transform, ECogDebug_GizmoFlags::NoRotation | ECogDebug_GizmoFlags::NoScale))
-        {
-            CollisionTester->EndComponent->SetWorldTransform(Transform);
-        }
+        StartGizmo.Draw("CollisionTesterStartGizmo", *LocalPlayerController, *CollisionTester->StartComponent);
+        EndGizmo.Draw("CollisionTesterEndGizmo", *LocalPlayerController, *CollisionTester->EndComponent, ECogDebug_GizmoFlags::NoRotation | ECogDebug_GizmoFlags::NoScale);
     }
 
     FCogWindowWidgets::SetNextItemToShortWidth();

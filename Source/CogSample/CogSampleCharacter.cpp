@@ -355,6 +355,8 @@ void ACogSampleCharacter::TryFinishInitialize()
 	ACogAbilityReplicator::TryApplyAllTweaksOnActor(this);
 #endif //ENABLE_COG
 
+    RefreshScale();
+
     RegisterToAbilitySystemEvents();
 
     bIsInitialized = true;
@@ -679,12 +681,13 @@ void ACogSampleCharacter::OnGhostTagNewOrRemoved(const FGameplayTag InTag, int32
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleCharacter::OnScaleAttributeChanged(const FOnAttributeChangeData& Data)
 {
-    //----------------------------------------------------------------------------------
-    // 'Data.NewValue' is not used because it seems to only corresponds to the changes 
-    // of the BaseValue which do not account for the temporary modifiers.
-    //----------------------------------------------------------------------------------
-    
-    const float CurrentScaleValue = AbilitySystem->GetNumericAttribute(Data.Attribute);
+    RefreshScale();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogSampleCharacter::RefreshScale()
+{
+    const float CurrentScaleValue = AbilitySystem->GetNumericAttribute(UCogSampleAttributeSet_Misc::GetScaleAttribute());
     Scale = CurrentScaleValue;
 
     MARK_PROPERTY_DIRTY_FROM_NAME(ACogSampleCharacter, Scale, this);

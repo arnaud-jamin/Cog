@@ -41,6 +41,7 @@ protected:
 
     TObjectPtr<UCogEngineConfig_CollisionTester> Config = nullptr;
 
+    FCogDebug_Gizmo StartGizmo;
     FCogDebug_Gizmo EndGizmo;
 };
 

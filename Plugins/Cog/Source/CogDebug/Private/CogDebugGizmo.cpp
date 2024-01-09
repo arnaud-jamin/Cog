@@ -189,6 +189,19 @@ void RenderSnap(bool* SnapEnable, float* Snap)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerController, USceneComponent& SceneComponent, ECogDebug_GizmoFlags Flags)
+{
+    FTransform Transform = SceneComponent.GetComponentTransform();
+    if (Draw(Id, InPlayerController, Transform, Flags))
+    {
+        SceneComponent.SetWorldTransform(Transform);
+        return true;
+    }
+
+    return false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerController, FTransform& InOutTransform, ECogDebug_GizmoFlags Flags)
 {
     UWorld* World = InPlayerController.GetWorld();
