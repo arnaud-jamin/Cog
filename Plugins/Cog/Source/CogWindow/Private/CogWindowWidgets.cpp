@@ -800,8 +800,8 @@ bool FCogWindowWidgets::ActorsList(const UWorld& World, const TSubclassOf<AActor
         bool AddActor = true;
         if (Filter != nullptr && Filter->IsActive())
         {
-            const char* ActorName = TCHAR_TO_ANSI(*FCogWindowHelper::GetActorName(*Actor));
-            if (Filter != nullptr && Filter->PassFilter(ActorName) == false)
+            const auto ActorName = StringCast<ANSICHAR>(*FCogWindowHelper::GetActorName(*Actor));
+            if (Filter != nullptr && Filter->PassFilter(ActorName.Get()) == false)
             {
                 AddActor = false;
             }
