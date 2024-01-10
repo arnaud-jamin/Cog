@@ -10,7 +10,7 @@
   "DocsURL": "",
   "MarketplaceURL": "",
   "SupportURL": "",
-  "CanContainContent": true,
+  "CanContainContent": false,
   "IsBetaVersion": false,
   "IsExperimentalVersion": false,
   "Installed": false,
