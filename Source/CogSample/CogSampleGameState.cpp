@@ -35,7 +35,11 @@ void ACogSampleGameState::BeginPlay()
 #if ENABLE_COG
     CogWindowManager = NewObject<UCogWindowManager>(this);
     CogWindowManagerRef = CogWindowManager;
+
+	// Add all the built-in windows
     Cog::AddAllWindows(*CogWindowManager);
+
+	// Add a custom window 
     CogWindowManager->AddWindow<FCogSampleWindow_Team>("Gameplay.Team");
 #endif //ENABLE_COG
 }
