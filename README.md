@@ -375,7 +375,19 @@ void ACogSampleGameState::BeginPlay()
 
 - Tick the CogWindowManager:
 ```cpp
+
 // ACogSampleGameState.cpp
+ACogSampleGameState::ACogSampleGameState(const FObjectInitializer & ObjectInitializer)
+    : Super(ObjectInitializer)
+{
+    // Enable ticking
+    PrimaryActorTick.bCanEverTick = true;
+    PrimaryActorTick.SetTickFunctionEnable(true);
+    PrimaryActorTick.bStartWithTickEnabled = true;
+    
+    [...]
+}
+
 void ACogSampleGameState::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
@@ -385,6 +397,8 @@ void ACogSampleGameState::Tick(float DeltaSeconds)
 #endif //ENABLE_COG
 }
 ```
+
+
 
 - In your PlayerController class, spawn the Cog Replicators. The Replicator are used to communicate between the client and the server, for example to apply cheats, spawn actors, etc.
 ```cpp
