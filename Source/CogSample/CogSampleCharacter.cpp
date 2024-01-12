@@ -534,16 +534,8 @@ void ACogSampleCharacter::Look(const FInputActionValue& Value)
 //--------------------------------------------------------------------------------------------------------------------------
 ECogCommonAllegiance ACogSampleCharacter::GetAllegianceWithOtherActor(const AActor* OtherActor) const
 {
-    ECogSampleAllegiance Allegiance = UCogSampleFunctionLibrary_Team::GetActorsAllegiance(this, OtherActor);
-
-    switch (Allegiance)
-    {
-    case ECogSampleAllegiance::Enemy:       return ECogCommonAllegiance::Enemy;
-    case ECogSampleAllegiance::Friendly:    return ECogCommonAllegiance::Friendly;
-    case ECogSampleAllegiance::Neutral:     return ECogCommonAllegiance::Neutral;
-    }
-
-    return ECogCommonAllegiance::Neutral;
+    const ECogCommonAllegiance Allegiance = static_cast<ECogCommonAllegiance>(UCogSampleFunctionLibrary_Team::GetActorsAllegiance(this, OtherActor));
+    return Allegiance;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
