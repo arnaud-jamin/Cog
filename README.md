@@ -446,7 +446,7 @@ class ACogSamplePlayerController
 
 ![Data Assets](https://github.com/arnaud-jamin/Cog/assets/13844285/1f4f3255-4104-4dfc-ab9e-fd34335c0289)
 
-Currently, Cog does not properly work when running under a single process in multiplayer mode. You might want to change the following setting to run with multiple processes:
+Currently, Cog does not properly work when running under a single process in multiplayer mode. You might want to disable the setting 'Editor Preferences - Run Under One Process':
 
 ![image](https://github.com/arnaud-jamin/Cog/assets/13844285/6079b71c-bd41-4193-b3c6-aa76a70984e5)
 
