@@ -154,7 +154,7 @@ FVector UCogSampleFunctionLibrary_Gameplay::GetActorTargetLocation(const AActor*
 
     if (const ICogSampleTargetableInterface* Targetable = Cast<ICogSampleTargetableInterface>(Actor))
     {
-        return Targetable->GetTargetLocation();
+        return Targetable->GetTargetActorLocation();
     }
 
     return Actor->GetActorLocation();

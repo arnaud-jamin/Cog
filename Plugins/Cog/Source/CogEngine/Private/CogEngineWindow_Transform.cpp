@@ -1,7 +1,7 @@
 #include "CogEngineWindow_Transform.h"
 
 #include "CogDebug.h"
-#include "CogImGuiHelper.h"
+#include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
 #include "GameFramework/Actor.h"
 #include "imgui.h"

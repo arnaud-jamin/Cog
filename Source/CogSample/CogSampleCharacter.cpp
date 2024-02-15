@@ -827,7 +827,7 @@ void ACogSampleCharacter::UpdateActiveAbilitySlots()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FVector ACogSampleCharacter::GetTargetLocation() const
+FVector ACogSampleCharacter::GetTargetActorLocation() const
 {
     return GetActorLocation();
 }

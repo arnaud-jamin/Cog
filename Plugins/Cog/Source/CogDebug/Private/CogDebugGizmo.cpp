@@ -2,7 +2,7 @@
 
 #include "CogDebug.h"
 #include "CogDebugDrawHelper.h"
-#include "CogImGuiHelper.h"
+#include "CogImguiHelper.h"
 #include "Components/PrimitiveComponent.h"
 #include "Components/SceneComponent.h"
 #include "DrawDebugHelpers.h"

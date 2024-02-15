@@ -1,7 +1,7 @@
 #include "CogEngineWindow_CollisionTester.h"
 
 #include "CogDebug.h"
-#include "CogImGuiHelper.h"
+#include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
 #include "Components/PrimitiveComponent.h"
 #include "Components/SceneComponent.h"

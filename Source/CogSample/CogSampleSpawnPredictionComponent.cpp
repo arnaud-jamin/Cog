@@ -296,10 +296,10 @@ FColor UCogSampleSpawnPredictionComponent::GetRoleColor() const
 {
     switch (Role)
     {
-        case ECogSampleSpawnPredictionRole::Server:     return FColor::FColor(255,   0,   0, 255);
-        case ECogSampleSpawnPredictionRole::Predicted:  return FColor::FColor(255, 255,   0, 255);
-        case ECogSampleSpawnPredictionRole::Replicated: return FColor::FColor(128, 128,   0, 255);
-        case ECogSampleSpawnPredictionRole::Remote:     return FColor::FColor(255,   0, 255, 255);
+        case ECogSampleSpawnPredictionRole::Server:     return FColor(255,   0,   0, 255);
+        case ECogSampleSpawnPredictionRole::Predicted:  return FColor(255, 255,   0, 255);
+        case ECogSampleSpawnPredictionRole::Replicated: return FColor(128, 128,   0, 255);
+        case ECogSampleSpawnPredictionRole::Remote:     return FColor(255,   0, 255, 255);
     }
 
     return FColor(128, 128, 128, 255);

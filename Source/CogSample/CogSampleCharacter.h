@@ -134,7 +134,7 @@ public:
     // ICogSampleTargetInterface overrides
     //----------------------------------------------------------------------------------------------------------------------
     
-    virtual FVector GetTargetLocation() const override;
+    virtual FVector GetTargetActorLocation() const override;
 
     virtual void GetTargetCapsules(TArray<const UCapsuleComponent*>& Capsules) const override;
 

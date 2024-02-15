@@ -18,7 +18,7 @@ class ICogSampleTargetableInterface
 
 public:
 
-    virtual FVector GetTargetLocation() const { return FVector::ZeroVector; }
+    virtual FVector GetTargetActorLocation() const { return FVector::ZeroVector; }
 
     virtual void GetTargetCapsules(TArray<const UCapsuleComponent*>& Capsules) const { }
 };

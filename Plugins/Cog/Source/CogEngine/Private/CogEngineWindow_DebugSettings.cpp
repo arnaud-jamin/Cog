@@ -1,7 +1,7 @@
 #include "CogEngineWindow_DebugSettings.h"
 
 #include "CogDebug.h"
-#include "CogImGuiHelper.h"
+#include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
 #include "Engine/CollisionProfile.h"
 
