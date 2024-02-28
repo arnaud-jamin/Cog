@@ -88,6 +88,9 @@ public:
     UFUNCTION(BlueprintCallable)
     static bool IsDead(const AActor* Actor);
 
+    UFUNCTION(BlueprintCallable)
+    static const UGameplayEffectComponent* GetEffectComponent(const UGameplayEffect* Effect, TSubclassOf<UGameplayEffectComponent> ClassToFind);
+
     static void AdjustAttributeForMaxChange(UAbilitySystemComponent* AbilityComponent, FGameplayAttributeData& AffectedAttribute, float OldValue, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty);
 
     static FCollisionObjectQueryParams ConfigureCollisionObjectParams(const TArray<TEnumAsByte<EObjectTypeQuery>>& ObjectTypes);
@@ -109,5 +112,4 @@ public:
     static void MakeOutgoingSpecs(const AActor* Actor, const TArray<TSubclassOf<UGameplayEffect>>& Effects, const TArray<FGameplayEffectSpecHandle>& BakedEffects, TMap<TSubclassOf<UGameplayEffect>, FGameplayEffectSpecHandle>& Result);
 
     static APlayerController* GetFirstLocalPlayerController(UObject* WorldContextObject);
-
 };

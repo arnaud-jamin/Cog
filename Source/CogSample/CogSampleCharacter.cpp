@@ -122,12 +122,6 @@ void ACogSampleCharacter::BeginPlay()
 void ACogSampleCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
     Super::EndPlay(EndPlayReason);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void ACogSampleCharacter::MarkComponentsAsPendingKill()
-{
-    Super::MarkComponentsAsPendingKill();
 
     UnregisterFromAbilitySystemEvents();
 }
@@ -137,7 +131,6 @@ UAbilitySystemComponent* ACogSampleCharacter::GetAbilitySystemComponent() const
 {
     return AbilitySystem; 
 }
-
 
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleCharacter::PossessedBy(AController* NewController)

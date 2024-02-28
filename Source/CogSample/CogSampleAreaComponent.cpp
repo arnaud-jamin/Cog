@@ -463,9 +463,9 @@ void UCogSampleAreaComponent::RefreshOtherComponentsValues()
         }
         else if (UNiagaraComponent* NiagaraComponent = Cast<UNiagaraComponent>(SceneComponent))
         {
-            NiagaraComponent->SetNiagaraVariableVec3("HalfExtent", HalfExtent);
-            NiagaraComponent->SetNiagaraVariableFloat("TickRate", TickRate);
-            NiagaraComponent->SetNiagaraVariableFloat("Duration", Duration);
+            NiagaraComponent->SetVariableVec3(HalfExtentName, HalfExtent);
+            NiagaraComponent->SetVariableFloat(TickRateName, TickRate);
+            NiagaraComponent->SetVariableFloat(DurationName, Duration);
         }
     }
 }

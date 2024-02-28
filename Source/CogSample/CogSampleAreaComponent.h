@@ -101,6 +101,15 @@ public:
     bool OnlyDetectOnAuthority = true;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Area")
+    FName HalfExtentName = "HalfExtent";
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Area")
+    FName TickRateName = "TickRate";
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Area")
+    FName DurationName = "Duration";
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Area")
     TArray<FCogSampleAreaEffectConfig> Effects;
 
     UPROPERTY(Transient, BlueprintReadWrite, Category = "Internal")

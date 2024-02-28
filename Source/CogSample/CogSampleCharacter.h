@@ -105,8 +105,6 @@ public:
 
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-    virtual void MarkComponentsAsPendingKill() override;
-
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
     virtual void PossessedBy(AController* NewController) override;

@@ -31,7 +31,7 @@ FVector4f UCogAbilityConfig_Alignment::GetEffectColor(const UCogAbilityDataAsset
         return NeutralColor;
     }
 
-    const FGameplayTagContainer& Tags = Effect.InheritableGameplayEffectTags.CombinedTags;
+    const FGameplayTagContainer& Tags = Effect.GetAssetTags();
 
     if (Tags.HasTag(Asset->NegativeEffectTag))
     {

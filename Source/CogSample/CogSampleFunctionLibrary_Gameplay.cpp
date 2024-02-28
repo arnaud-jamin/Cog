@@ -490,3 +490,15 @@ void UCogSampleFunctionLibrary_Gameplay::MakeOutgoingSpecs(
         }
     }
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+const UGameplayEffectComponent* UCogSampleFunctionLibrary_Gameplay::GetEffectComponent(const UGameplayEffect* Effect, TSubclassOf<UGameplayEffectComponent> ClassToFind)
+{
+    if (Effect == nullptr)
+    {
+        return nullptr;
+    }
+
+    const UGameplayEffectComponent* EffectComponent = Effect->FindComponent(ClassToFind);
+    return EffectComponent;
+}

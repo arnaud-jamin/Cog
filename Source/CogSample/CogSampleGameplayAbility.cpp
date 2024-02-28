@@ -101,7 +101,7 @@ bool UCogSampleGameplayAbility::CheckCost(const FGameplayAbilitySpecHandle Handl
         //-----------------------------------------------------------------------------------
         // Can start ability if it cost stamina and stamina > 0 
         //-----------------------------------------------------------------------------------
-        if (CostEffect->InheritableGameplayEffectTags.CombinedTags.HasTag(Tag_Effect_Type_Cost_Stamina))
+        if (CostEffect->GetAssetTags().HasTag(Tag_Effect_Type_Cost_Stamina))
         {
             const float Stamina = ActorInfo->AbilitySystemComponent->GetNumericAttribute(UCogSampleAttributeSet_Caster::GetStaminaAttribute());
             if (Stamina > 0)

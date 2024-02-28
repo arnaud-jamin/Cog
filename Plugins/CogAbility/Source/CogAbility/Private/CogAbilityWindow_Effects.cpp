@@ -139,8 +139,8 @@ void FCogAbilityWindow_Effects::RenderEffectsTable()
                 bool AlignmentOrder = false;
                 if (Config->SortByAlignment && Asset != nullptr)
                 {
-                    const FGameplayTagContainer& Tags1 = Effect1->InheritableGameplayEffectTags.CombinedTags;
-                    const FGameplayTagContainer& Tags2 = Effect2->InheritableGameplayEffectTags.CombinedTags;
+                    const FGameplayTagContainer& Tags1 = Effect1->GetAssetTags();
+                    const FGameplayTagContainer& Tags2 = Effect2->GetAssetTags();
                     const int32 Pos1 = Tags1.HasTag(Asset->PositiveEffectTag) ? 1 : Tags1.HasTag(Asset->NegativeEffectTag) ? -1 : 0;
                     const int32 Pos2 = Tags2.HasTag(Asset->PositiveEffectTag) ? 1 : Tags2.HasTag(Asset->NegativeEffectTag) ? -1 : 0;
                     const int32 Diff = Pos2 - Pos1;
@@ -419,7 +419,7 @@ void FCogAbilityWindow_Effects::RenderRemainingTime(const UAbilitySystemComponen
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Effects::RenderStacks(const FActiveGameplayEffect& ActiveEffect, const UGameplayEffect& Effect)
 {
-    const int32 CurrentStackCount = ActiveEffect.Spec.StackCount;
+    const int32 CurrentStackCount = ActiveEffect.Spec.GetStackCount();
     if (Effect.StackLimitCount <= 0)
     {
         ImGui::Text("0");
