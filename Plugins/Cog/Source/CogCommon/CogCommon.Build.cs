@@ -31,7 +31,7 @@ public class CogCommon : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
-				"Engine", "CogDebug",
+				"Engine",
             }
 			);
 		
