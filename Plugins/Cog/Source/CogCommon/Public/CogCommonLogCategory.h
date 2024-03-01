@@ -1,13 +1,11 @@
 #pragma  once
 
 #include "CoreMinimal.h"
-#include "CogDebugLogCategory.generated.h"
-
-struct FCogLogCategory;
+#include "CogCommonLogCategory.generated.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 USTRUCT(BlueprintType)
-struct COGDEBUG_API FCogLogCategory
+struct COGCOMMON_API FCogLogCategory
 {
     GENERATED_USTRUCT_BODY()
 
@@ -17,10 +15,6 @@ struct COGDEBUG_API FCogLogCategory
     FName Name;
 
     FString GetName() const { return Name.ToString(); }
-
-    FLogCategoryBase* GetLogCategory() const;
-
-private:
 
     mutable FLogCategoryBase* LogCategory = nullptr;
 };

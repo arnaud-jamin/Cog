@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "CogDebugGraphPanelPinFactory.h"
-#include "CogDebugLogCategory.h"
+#include "CogCommonLogCategory.h"
 #include "EdGraphSchema_K2.h"
 #include "EdGraphUtilities.h"
 #include "SCogDebugLogCategoryGraphPin.h"

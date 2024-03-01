@@ -1,6 +1,6 @@
 #include "CogDebugLogCategoryDetails.h"
 
-#include "CogDebugLogCategory.h"
+#include "CogCommonLogCategory.h"
 #include "CogDebugLog.h"
 #include "DetailWidgetRow.h"
 #include "Editor.h"

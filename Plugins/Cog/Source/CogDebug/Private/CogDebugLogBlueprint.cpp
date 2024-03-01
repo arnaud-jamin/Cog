@@ -2,14 +2,14 @@
 
 #include "CogCommon.h"
 #include "CogDebugLog.h"
-#include "CogDebugLogCategory.h"
+#include "CogCommonLogCategory.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogDebugLogBlueprint::Log(const UObject* WorldContextObject, const FCogLogCategory LogCategory, ECogLogVerbosity Verbosity, const FString& Text)
 {
 #if ENABLE_COG
 
-    const FLogCategoryBase* LogCategoryPtr = LogCategory.GetLogCategory();
+    const FLogCategoryBase* LogCategoryPtr = FCogDebugLog::GetLogCategoryBase(LogCategory);
 
     if (LogCategoryPtr == nullptr)
     {
@@ -34,7 +34,7 @@ bool UCogDebugLogBlueprint::IsLogActive(const UObject* WorldContextObject, const
 {
 #if ENABLE_COG
 
-    if (const FLogCategoryBase* LogCategoryPtr = LogCategory.GetLogCategory())
+    if (const FLogCategoryBase* LogCategoryPtr = FCogDebugLog::GetLogCategoryBase(LogCategory))
     {
         if (FCogDebugLog::IsLogCategoryActive(*LogCategoryPtr) == false)
         {

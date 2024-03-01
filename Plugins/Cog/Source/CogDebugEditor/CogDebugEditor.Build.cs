@@ -24,6 +24,7 @@ public class CogDebugEditor : ModuleRules
 			new string[]
 			{
                 "AssetTools",
+                "CogCommon",
                 "CogDebug",
                 "EditorStyle",
                 "EditorWidgets",

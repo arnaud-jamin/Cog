@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 #include "Logging/LogVerbosity.h"
 
+struct FCogLogCategory;
+
 //--------------------------------------------------------------------------------------------------------------------------
 DECLARE_LOG_CATEGORY_EXTERN(LogCogNone, Warning, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogCogServerDebug, Verbose, All);
@@ -37,6 +39,8 @@ struct COGDEBUG_API FCogDebugLog
     static void SetLogCategoryActive(FLogCategoryBase& LogCategory, bool Value);
 
     static FLogCategoryBase* FindLogCategory(FName CategoryName);
+
+    static FLogCategoryBase* GetLogCategoryBase(const FCogLogCategory& LogCategory);
 
     static FCogDebugLogCategoryInfo* FindLogCategoryInfo(FName CategoryName);
 

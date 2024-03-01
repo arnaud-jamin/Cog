@@ -1,5 +1,6 @@
 #include "CogDebugLog.h"
 
+#include "CogCommonLogCategory.h"
 #include "CogDebugModule.h"
 #include "CogDebugReplicator.h"
 #include "Engine/Engine.h"
@@ -149,3 +150,32 @@ void FCogDebugLog::DeactivateAllLogCategories(UWorld& World)
         PlayerController->ServerExec(ToggleStr);
     }
 }
+
+
+//--------------------------------------------------------------------------------------------------------------------------
+FLogCategoryBase* FCogDebugLog::GetLogCategoryBase(const FCogLogCategory& LogCategory)
+{
+#if NO_LOGGING
+
+    return nullptr;
+
+#else
+
+    if (LogCategory.Name.IsNone() || LogCategory.Name.IsValid() == false)
+    {
+        return nullptr;
+    }
+
+    if (LogCategory.LogCategory == nullptr)
+    {
+        if (const FCogDebugLogCategoryInfo* CategoryInfo = FCogDebugLog::GetLogCategories().Find(LogCategory.Name))
+        {
+            LogCategory.LogCategory = CategoryInfo->LogCategory;
+        }
+    }
+
+    return LogCategory.LogCategory;
+
+#endif //NO_LOGGING
+}
+
