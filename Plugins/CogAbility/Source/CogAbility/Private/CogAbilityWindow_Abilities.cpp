@@ -7,7 +7,10 @@
 #include "CogAbilityReplicator.h"
 #include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
+#include "CogDebugRob.h"
 #include "imgui.h"
+
+DEFINE_PRIVATE_ACCESSOR_VARIABLE(GameplayAbility_ActivationBlockedTags, UGameplayAbility, FGameplayTagContainer, ActivationBlockedTags);
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Abilities::Initialize()
@@ -244,7 +247,7 @@ void FCogAbilityWindow_Abilities::RenderAbilitiesTable(UAbilitySystemComponent& 
         ImGui::TableSetupColumn("Level");
         ImGui::TableSetupColumn("Input");
         ImGui::TableSetupColumn("Cooldown");
-        ImGui::TableSetupColumn("Blocked");
+        ImGui::TableSetupColumn("Blocking");
         ImGui::TableHeadersRow();
 
         static int SelectedIndex = -1;
@@ -331,13 +334,27 @@ void FCogAbilityWindow_Abilities::RenderAbilitiesTable(UAbilitySystemComponent& 
             RenderAbilityCooldown(AbilitySystemComponent, *Ability);
 
             //------------------------
-            // Blocked
+            // Blocking
             //------------------------
             ImGui::TableNextColumn();
-            const bool IsBlocked = Ability->DoesAbilitySatisfyTagRequirements(AbilitySystemComponent) == false;
-            if (IsBlocked)
+            if (Ability->DoesAbilitySatisfyTagRequirements(AbilitySystemComponent) == false)
             {
-                ImGui::Text("Blocked");
+                if (const FGameplayTagContainer* ActivationBlockedTags = &PRIVATE_ACCESS_PTR(Ability, GameplayAbility_ActivationBlockedTags))
+                {
+                    FGameplayTagContainer AllBlockingTags;
+                    AbilitySystemComponent.GetBlockedAbilityTags(AllBlockingTags);
+
+                    FGameplayTagContainer OwnedGameplayTags;
+                    AbilitySystemComponent.GetOwnedGameplayTags(OwnedGameplayTags);
+                    AllBlockingTags.AppendTags(OwnedGameplayTags);
+
+                    FGameplayTagContainer FilteredTags = AllBlockingTags.FilterExact(*ActivationBlockedTags);
+                    FCogAbilityHelper::RenderTagContainer(FilteredTags, true, FCogImguiHelper::ToImVec4(Config->BlockedColor));
+                }
+                else
+                {
+                    ImGui::Text("Blocked");
+                }
             }
 
             ImGui::PopID();
@@ -526,7 +543,7 @@ void FCogAbilityWindow_Abilities::RenderAbilityInfo(const UAbilitySystemComponen
         //------------------------
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
-        ImGui::TextColored(TextColor, "InputPressed");
+        ImGui::TextColored(TextColor, "Input Pressed");
         ImGui::TableNextColumn();
         ImGui::Text("%d", Spec.InputPressed);
 
@@ -535,14 +552,28 @@ void FCogAbilityWindow_Abilities::RenderAbilityInfo(const UAbilitySystemComponen
         //------------------------
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
-        ImGui::TextColored(TextColor, "AbilityTags");
+        ImGui::TextColored(TextColor, "Ability Tags");
         ImGui::TableNextColumn();
-        const bool SatisfyTagRequirements = Ability->DoesAbilitySatisfyTagRequirements(AbilitySystemComponent);
         FCogAbilityHelper::RenderTagContainer(Ability->AbilityTags);
 
-        //---------------------------------------------
-        // TODO: find a way to display blocking tags
-        //---------------------------------------------
+        //------------------------
+		// BlockingTags
+		//------------------------
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+        ImGui::TextColored(TextColor, "Blocking Tags");
+        ImGui::TableNextColumn();
+        if (const FGameplayTagContainer* ActivationBlockedTags = &PRIVATE_ACCESS_PTR(Ability, GameplayAbility_ActivationBlockedTags))
+        {
+            FGameplayTagContainer AllBlockingTags;
+            AbilitySystemComponent.GetBlockedAbilityTags(AllBlockingTags);
+
+            FGameplayTagContainer OwnedGameplayTags;
+            AbilitySystemComponent.GetOwnedGameplayTags(OwnedGameplayTags);
+            AllBlockingTags.AppendTags(OwnedGameplayTags);
+
+            FCogAbilityHelper::RenderTagContainerHighlighted(*ActivationBlockedTags, AllBlockingTags, false, ImVec4(0.4f, 0.4f, 0.4f, 1.0f), FCogImguiHelper::ToImVec4(Config->BlockedColor));
+        }
 
         ImGui::EndTable();
     }

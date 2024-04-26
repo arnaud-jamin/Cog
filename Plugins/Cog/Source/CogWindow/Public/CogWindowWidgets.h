@@ -102,6 +102,8 @@ public:
     static void ActorContextMenu(AActor& Selection, const FCogWindowActorContextMenuFunction& ContextMenuFunction);
 
     static void ActorFrame(const AActor& Actor);
+
+    static void SmallButton(const char* Text, const ImVec4& Color);
 };
 
 template<typename EnumType>

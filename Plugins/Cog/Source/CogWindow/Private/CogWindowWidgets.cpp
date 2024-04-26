@@ -1020,3 +1020,13 @@ void FCogWindowWidgets::ActorFrame(const AActor& Actor)
         AddTextWithShadow(DrawList, FCogImguiHelper::ToImVec2(ScreenPosMin + FVector2D(0, -14.0f)) + Viewport->Pos, Color, TCHAR_TO_ANSI(*FCogWindowHelper::GetActorName(Actor)));
     }
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogWindowWidgets::SmallButton(const char* Text, const ImVec4& Color)
+{
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(Color.x, Color.y, Color.z, Color.w * 0.6f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(Color.x, Color.y, Color.z, Color.w * 0.8f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(Color.x, Color.y, Color.z, Color.w * 1.0f));
+    ImGui::SmallButton(Text);
+    ImGui::PopStyleColor(3);
+}

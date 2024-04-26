@@ -6,6 +6,7 @@
 #include "CogAbilityWindow_Effects.h"
 #include "CogAbilityWindow_Pools.h"
 #include "CogAbilityWindow_Tags.h"
+#include "CogAbilityWindow_Tasks.h"
 #include "CogAbilityWindow_Tweaks.h"
 #include "CogAIWindow_BehaviorTree.h"
 #include "CogAIWindow_Blackboard.h"
@@ -106,6 +107,8 @@ void Cog::AddAllWindows(UCogWindowManager& CogWindowManager)
     CogWindowManager.AddWindow<FCogAbilityWindow_Pools>("Gameplay.Pools");
 
     CogWindowManager.AddWindow<FCogAbilityWindow_OwnedTags>("Gameplay.Owned Tags");
+
+    CogWindowManager.AddWindow<FCogAbilityWindow_Tasks>("Gameplay.Tasks");
 
     CogWindowManager.AddWindow<FCogAbilityWindow_Tweaks>("Gameplay.Tweaks");
 

@@ -1,4 +1,5 @@
 using UnrealBuildTool;
+using UnrealBuildTool.Rules;
 
 public class CogAbility : ModuleRules
 {
@@ -37,6 +38,7 @@ public class CogAbility : ModuleRules
 			new string[]
 			{
 				"CoreUObject",
+                "GameplayTasks",
 				"Engine",
 			}
 			);

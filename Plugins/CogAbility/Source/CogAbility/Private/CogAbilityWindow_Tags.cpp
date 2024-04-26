@@ -235,6 +235,8 @@ void FCogAbilityWindow_OwnedTags::GetTagContainer(FGameplayTagContainer& TagCont
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+// FCogAbilityWindow_BlockedTags
+//------------------------------------------
 void FCogAbilityWindow_BlockedTags::Initialize()
 {
     Super::Initialize();
