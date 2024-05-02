@@ -92,13 +92,19 @@ public:
     bool ShowBlocked = true;
 
     UPROPERTY(Config)
-    FVector4f ActiveColor = FVector4f(0.0f, 1.0f, 0.5f, 1.0f);
+    FVector4f ActiveAbilityColor = FVector4f(0.0f, 1.0f, 0.5f, 1.0f);
 
     UPROPERTY(Config)
-    FVector4f InactiveColor = FVector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    FVector4f InactiveAbilityColor = FVector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
     UPROPERTY(Config)
-    FVector4f BlockedColor = FVector4f(1.0f, 0.5f, 0.5f, 1.0f);
+    FVector4f BlockedAbilityColor = FVector4f(1.0f, 0.5f, 0.5f, 1.0f);
+
+    UPROPERTY(Config)
+    FVector4f DefaultTagsColor = FVector4f(0.6f, 0.6f, 0.6f, 1.0f);
+
+    UPROPERTY(Config)
+    FVector4f BlockedTagsColor = FVector4f(1.0f, 0.5f, 0.5f, 1.0f);
 
     virtual void Reset() override
     {
@@ -108,8 +114,10 @@ public:
         ShowActive = true;
         ShowInactive = true;
         ShowBlocked = true;
-        ActiveColor = FVector4f(0.0f, 1.0f, 0.5f, 1.0f);
-        InactiveColor = FVector4f(1.0f, 1.0f, 1.0f, 1.0f);
-        BlockedColor = FVector4f(1.0f, 0.5f, 0.5f, 1.0f);
+        ActiveAbilityColor = FVector4f(0.0f, 1.0f, 0.5f, 1.0f);
+        InactiveAbilityColor = FVector4f(1.0f, 1.0f, 1.0f, 1.0f);
+        BlockedAbilityColor = FVector4f(1.0f, 0.5f, 0.5f, 1.0f);
+        DefaultTagsColor = FVector4f(0.6f, 0.6f, 0.6f, 1.0f);
+        BlockedTagsColor = FVector4f(1.0f, 0.5f, 0.5f, 1.0f);
     }
 };

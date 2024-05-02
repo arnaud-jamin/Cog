@@ -28,13 +28,28 @@ void FCogAbilityHelper::RenderTagContainer(const FGameplayTagContainer& Containe
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogAbilityHelper::RenderTagContainerHighlighted(const FGameplayTagContainer& Container, const FGameplayTagContainer& TagsToHighlight, const bool Inline, const ImVec4& NormalColor, const ImVec4& HighlightColor)
+void FCogAbilityHelper::RenderTagContainer(
+    const FGameplayTagContainer& ContainerTags,
+    const FGameplayTagContainer& TagsToMatch,
+    const bool InverseMatch,
+    const bool OnlyShowMatches,
+    const bool Inline,
+    const ImVec4& NormalColor,
+    const ImVec4& MatchColor)
 {
-    TArray<FGameplayTag> GameplayTags;
-    Container.GetGameplayTagArray(GameplayTags);
-    for (const FGameplayTag& Tag : GameplayTags)
+    TArray<FGameplayTag> Tags;
+    ContainerTags.GetGameplayTagArray(Tags);
+
+    for (const FGameplayTag& Tag : Tags)
     {
-        const ImVec4 Color = TagsToHighlight.HasTag(Tag) ? HighlightColor : NormalColor;
+        bool hasTag = TagsToMatch.HasTag(Tag);
+        hasTag = InverseMatch ? !hasTag : hasTag;
+
+        if (OnlyShowMatches && hasTag == false) {
+            continue;
+        }
+
+        const ImVec4 Color = hasTag ? MatchColor : NormalColor;
         FCogWindowWidgets::SmallButton(StringCast<ANSICHAR>(*Tag.ToString()).Get(), Color);
         if (Inline)
         {
