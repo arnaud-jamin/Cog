@@ -48,6 +48,8 @@ protected:
 
     virtual void RenderPrediction(const FActiveGameplayEffect& ActiveEffect, bool Short);
 
+    virtual void RenderInhibition(const FActiveGameplayEffect& ActiveEffect, bool Short);
+
     virtual FString GetEffectName(const UGameplayEffect& Effect);
     
     virtual FString GetEffectNameSafe(const UGameplayEffect* Effect);
