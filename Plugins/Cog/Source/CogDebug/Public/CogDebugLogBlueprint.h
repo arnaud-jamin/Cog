@@ -2,7 +2,8 @@
 
 #include "CoreMinimal.h"
 #include "CogCommonLog.h"
-#include "Logging/LogVerbosity.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
+
 #include "CogDebugLogBlueprint.generated.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
