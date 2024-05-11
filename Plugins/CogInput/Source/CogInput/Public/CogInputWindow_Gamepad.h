@@ -1,9 +1,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogCommonConfig.h"
 #include "CogInjectActionInfo.h"
 #include "CogWindow.h"
-#include "CogWindowConfig.h"
 #include "imgui.h"
 #include "InputCoreTypes.h"
 #include "CogInputWindow_Gamepad.generated.h"
@@ -66,7 +66,7 @@ protected:
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(Config = Cog)
-class UCogInputConfig_Gamepad : public UCogWindowConfig
+class UCogInputConfig_Gamepad : public UCogCommonConfig
 {
     GENERATED_BODY()
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogWindowConfig.h"
+#include "CogCommonConfig.h"
 #include "CogAbilityConfig_Alignment.generated.h"
 
 class UAbilitySystemComponent;
@@ -14,7 +14,7 @@ struct FModifierSpec;
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(Config = Cog)
-class UCogAbilityConfig_Alignment : public UCogWindowConfig
+class UCogAbilityConfig_Alignment : public UCogCommonConfig
 {
     GENERATED_BODY()
 

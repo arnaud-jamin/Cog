@@ -1,8 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogCommonConfig.h"
 #include "CogWindow.h"
-#include "CogWindowConfig.h"
 #include "CogAbilityWindow_Tags.generated.h"
 
 struct FGameplayTagContainer;
@@ -67,7 +67,7 @@ class COGABILITY_API FCogAbilityWindow_BlockedTags : public FCogAbilityWindow_Ta
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(Config = Cog)
-class UCogAbilityConfig_Tags : public UCogWindowConfig
+class UCogAbilityConfig_Tags : public UCogCommonConfig
 {
     GENERATED_BODY()
 

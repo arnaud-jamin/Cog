@@ -1,8 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogCommonConfig.h"
 #include "CogWindow.h"
-#include "CogWindowConfig.h"
 #include "CogAbilityWindow_Attributes.generated.h"
 
 class UAbilitySystemComponent;
@@ -42,7 +42,7 @@ private:
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(Config = Cog)
-class UCogAbilityConfig_Attributes : public UCogWindowConfig
+class UCogAbilityConfig_Attributes : public UCogCommonConfig
 {
     GENERATED_BODY()
 

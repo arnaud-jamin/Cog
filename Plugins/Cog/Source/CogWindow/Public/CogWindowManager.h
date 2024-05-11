@@ -5,12 +5,12 @@
 #include "imgui.h"
 #include "CogWindowManager.generated.h"
 
+class UCogCommonConfig;
 class FCogWindow;
 class FCogWindow_Layouts;
 class FCogWindow_Settings;
 class IConsoleObject;
 class SCogImguiWidget;
-class UCogWindowConfig;
 class UPlayerInput;
 class UWorld;
 struct ImGuiSettingsHandler;
@@ -61,7 +61,7 @@ public:
     
     const FCogWindow_Settings* GetSettingsWindow() const { return SettingsWindow; }
 
-    UCogWindowConfig* GetConfig(const TSubclassOf<UCogWindowConfig> ConfigClass);
+    UCogCommonConfig* GetConfig(const TSubclassOf<UCogCommonConfig> ConfigClass);
 
     template<class T>
     T* GetConfig();
@@ -124,7 +124,7 @@ protected:
     static FString ResetLayoutCommand;
 
     UPROPERTY()
-    mutable TArray<UCogWindowConfig*> Configs;
+    mutable TArray<UCogCommonConfig*> Configs;
 
     UPROPERTY()
     mutable TArray<const UObject*> Assets;
@@ -172,7 +172,7 @@ T* UCogWindowManager::AddWindow(const FString& Name, bool AddToMainMenu)
 template<class T>
 T* UCogWindowManager::GetConfig()
 {
-    static_assert(TPointerIsConvertibleFromTo<T, const UCogWindowConfig>::Value);
+    static_assert(TPointerIsConvertibleFromTo<T, const UCogCommonConfig>::Value);
     return Cast<T>(&GetConfig(T::StaticClass()));
 }
 

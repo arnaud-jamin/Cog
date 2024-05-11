@@ -1,8 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogCommonConfig.h"
 #include "CogWindow.h"
-#include "CogWindowConfig.h"
 #include "CogWindow_Settings.generated.h"
 
 class UCogEngineConfig_Settings;
@@ -36,7 +36,7 @@ protected:
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(Config = Cog)
-class UCogWindowConfig_Settings : public UCogWindowConfig
+class UCogWindowConfig_Settings : public UCogCommonConfig
 {
     GENERATED_BODY()
 

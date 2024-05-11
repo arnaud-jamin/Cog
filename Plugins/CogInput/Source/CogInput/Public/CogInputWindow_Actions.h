@@ -1,9 +1,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogCommonConfig.h"
 #include "CogInjectActionInfo.h"
 #include "CogWindow.h"
-#include "CogWindowConfig.h"
 #include "CogInputWindow_Actions.generated.h"
 
 class UInputAction;
@@ -44,7 +44,7 @@ private:
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(Config = Cog)
-class UCogInputConfig_Actions : public UCogWindowConfig
+class UCogInputConfig_Actions : public UCogCommonConfig
 {
     GENERATED_BODY()
 

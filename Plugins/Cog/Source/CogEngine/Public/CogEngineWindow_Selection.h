@@ -1,9 +1,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogCommonConfig.h"
 #include "GameFramework/Actor.h"
 #include "CogWindow.h"
-#include "CogWindowConfig.h"
 #include "CogEngineWindow_Selection.generated.h"
 
 class IConsoleObject;
@@ -92,7 +92,7 @@ protected:
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(Config = Cog)
-class UCogEngineConfig_Selection : public UCogWindowConfig
+class UCogEngineConfig_Selection : public UCogCommonConfig
 {
     GENERATED_BODY()
 

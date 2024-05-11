@@ -1,8 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogCommonConfig.h"
 #include "CogWindow.h"
-#include "CogWindowConfig.h"
 #include "Engine/EngineTypes.h"
 #include "CogEngineWindow_CollisionViewer.generated.h"
 
@@ -37,7 +37,7 @@ protected:
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(Config = Cog)
-class UCogEngineConfig_CollisionViewer : public UCogWindowConfig
+class UCogEngineConfig_CollisionViewer : public UCogCommonConfig
 {
     GENERATED_BODY()
 

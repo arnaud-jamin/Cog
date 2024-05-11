@@ -6,7 +6,6 @@
 #include "CogWindow_Layouts.h"
 #include "CogWindow_Settings.h"
 #include "CogWindow_Spacing.h"
-#include "CogWindowConfig.h"
 #include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
 #include "Engine/Engine.h"
@@ -116,7 +115,7 @@ void UCogWindowManager::Shutdown()
     }
     Windows.Empty();
 
-    for (UCogWindowConfig* Config : Configs)
+    for (UCogCommonConfig* Config : Configs)
     {
         Config->SaveConfig();
     }
@@ -741,19 +740,19 @@ void UCogWindowManager::SortCommands(UPlayerInput* PlayerInput)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogWindowConfig* UCogWindowManager::GetConfig(const TSubclassOf<UCogWindowConfig> ConfigClass)
+UCogCommonConfig* UCogWindowManager::GetConfig(const TSubclassOf<UCogCommonConfig> ConfigClass)
 {
     const UClass* Class = ConfigClass.Get();
 
-    for (UCogWindowConfig* Config : Configs)
+    for (UCogCommonConfig* Config : Configs)
     {
         if (Config && Config->IsA(Class))
         {
-            return Cast<UCogWindowConfig>(Config);
+            return Cast<UCogCommonConfig>(Config);
         }
     }
 
-    UCogWindowConfig* Config = NewObject<UCogWindowConfig>(this, Class);
+    UCogCommonConfig* Config = NewObject<UCogCommonConfig>(this, Class);
     Configs.Add(Config);
     return Config;
 }

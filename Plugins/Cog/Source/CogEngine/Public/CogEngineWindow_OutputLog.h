@@ -1,8 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogCommonConfig.h"
 #include "CogWindow.h"
-#include "CogWindowConfig.h"
 #include "imgui.h"
 #include "Misc/OutputDevice.h"
 #include "CogEngineWindow_OutputLog.generated.h"
@@ -71,7 +71,7 @@ private:
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(Config = Cog)
-class UCogEngineConfig_OutputLog : public UCogWindowConfig
+class UCogEngineConfig_OutputLog : public UCogCommonConfig
 {
     GENERATED_BODY()
 

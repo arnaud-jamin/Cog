@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogCommonConfig.h"
 #include "imgui.h"
 #include "Templates/SubclassOf.h"
 #include "UObject/ReflectedTypeAccessors.h"
@@ -9,7 +10,6 @@
 class AActor;
 class APawn;
 class APlayerController;
-class UCogWindowConfig;
 class UCogWindowManager;
 class ULocalPlayer;
 class UWorld;
@@ -78,7 +78,7 @@ public:
     template<class T>
     T* GetConfig() { return Cast<T>(GetConfig(T::StaticClass())); }
 
-    UCogWindowConfig* GetConfig(const TSubclassOf<UCogWindowConfig> ConfigClass) const;
+    UCogCommonConfig* GetConfig(const TSubclassOf<UCogCommonConfig> ConfigClass) const;
 
     template<class T>
     const T* GetAsset() { return Cast<T>(GetAsset(T::StaticClass())); }

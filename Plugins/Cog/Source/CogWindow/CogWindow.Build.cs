@@ -22,6 +22,7 @@ public class CogWindow : ModuleRules
 			new string[]
 			{
 				"Core",
+                "CogCommon",
                 "CogImgui",
                 "CogDebug",
 			}

@@ -1,10 +1,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogCommonConfig.h"
 #include "CogWindow.h"
-#include "CogWindowConfig.h"
 #include "GameplayAbilitySpecHandle.h"
-#include "GameplayTagContainer.h"
 #include "CogAbilityWindow_Abilities.generated.h"
 
 class UAbilitySystemComponent;
@@ -98,7 +97,7 @@ protected:
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(Config = Cog)
-class UCogAbilityConfig_Abilities : public UCogWindowConfig
+class UCogAbilityConfig_Abilities : public UCogCommonConfig
 {
     GENERATED_BODY()
 

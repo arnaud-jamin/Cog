@@ -2,8 +2,8 @@
 
 #include "CoreMinimal.h"
 #include "ActiveGameplayEffectHandle.h"
+#include "CogCommonConfig.h"
 #include "CogWindow.h"
-#include "CogWindowConfig.h"
 #include "imgui.h"
 #include "CogAbilityWindow_Effects.generated.h"
 
@@ -73,7 +73,7 @@ protected:
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(Config = Cog)
-class UCogAbilityConfig_Effects : public UCogWindowConfig
+class UCogAbilityConfig_Effects : public UCogCommonConfig
 {
     GENERATED_BODY()
 

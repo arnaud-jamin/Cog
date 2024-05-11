@@ -1,8 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogCommonConfig.h"
 #include "CogWindow.h"
-#include "CogWindowConfig.h"
 #include "CogEngineWindow_Metrics.generated.h"
 
 struct FCogDebugMetricEntry;
@@ -41,7 +41,7 @@ private:
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(Config = Cog)
-class UCogEngineConfig_Metrics : public UCogWindowConfig
+class UCogEngineConfig_Metrics : public UCogCommonConfig
 {
     GENERATED_BODY()
 

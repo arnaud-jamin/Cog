@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
-#include "CogWindowConfig.h"
 #include "CogAbilityWindow_Tasks.generated.h"
 
 class UAbilitySystemComponent;
@@ -45,7 +44,7 @@ protected:
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(Config = Cog)
-class UCogAbilityConfig_Tasks : public UCogWindowConfig
+class UCogAbilityConfig_Tasks : public UCogCommonConfig
 {
     GENERATED_BODY()
 

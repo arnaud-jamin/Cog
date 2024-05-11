@@ -1,10 +1,8 @@
 #include "CogWindow.h"
 
-#include "CogDebugDraw.h"
 #include "CogDebug.h"
 #include "CogWindow_Settings.h"
 #include "CogWindowManager.h"
-#include "CogWindowWidgets.h"
 #include "Engine/World.h"
 #include "imgui_internal.h"
 #include "GameFramework/Pawn.h"
@@ -180,7 +178,7 @@ ULocalPlayer* FCogWindow::GetLocalPlayer() const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogWindowConfig* FCogWindow::GetConfig(const TSubclassOf<UCogWindowConfig> ConfigClass) const
+UCogCommonConfig* FCogWindow::GetConfig(const TSubclassOf<UCogCommonConfig> ConfigClass) const
 {
     return GetOwner()->GetConfig(ConfigClass);
 }

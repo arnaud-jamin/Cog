@@ -1,8 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogCommonConfig.h"
 #include "CogWindow.h"
-#include "CogWindowConfig.h"
 #include "CogAIWindow_Blackboard.generated.h"
 
 class UCogAIConfig_Blackboard;
@@ -33,7 +33,7 @@ private:
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(Config = Cog)
-class UCogAIConfig_Blackboard : public UCogWindowConfig
+class UCogAIConfig_Blackboard : public UCogCommonConfig
 {
     GENERATED_BODY()
 

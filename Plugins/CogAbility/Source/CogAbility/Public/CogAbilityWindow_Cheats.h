@@ -1,8 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogCommonConfig.h"
 #include "CogWindow.h"
-#include "CogWindowConfig.h"
 #include "CogAbilityWindow_Cheats.generated.h"
 
 class AActor;
@@ -47,7 +47,7 @@ protected:
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(Config = Cog)
-class UCogAbilityConfig_Cheats : public UCogWindowConfig
+class UCogAbilityConfig_Cheats : public UCogCommonConfig
 {
     GENERATED_BODY()
 

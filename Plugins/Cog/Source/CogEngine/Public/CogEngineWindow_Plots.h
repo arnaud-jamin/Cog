@@ -1,8 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogCommonConfig.h"
 #include "CogWindow.h"
-#include "CogWindowConfig.h"
 #include "CogEngineWindow_Plots.generated.h"
 
 struct ImVec2;
@@ -50,7 +50,7 @@ private:
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(Config = Cog)
-class UCogEngineConfig_Plots : public UCogWindowConfig
+class UCogEngineConfig_Plots : public UCogCommonConfig
 {
     GENERATED_BODY()
 

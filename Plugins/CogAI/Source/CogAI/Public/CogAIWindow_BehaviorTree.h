@@ -1,8 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogCommonConfig.h"
 #include "CogWindow.h"
-#include "CogWindowConfig.h"
 #include "CogAIWindow_BehaviorTree.generated.h"
 
 class UBehaviorTreeComponent;
@@ -37,7 +37,7 @@ private:
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(Config = Cog)
-class UCogAIConfig_BehaviorTree : public UCogWindowConfig
+class UCogAIConfig_BehaviorTree : public UCogCommonConfig
 {
     GENERATED_BODY()
 
