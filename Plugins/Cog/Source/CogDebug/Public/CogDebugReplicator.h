@@ -1,9 +1,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogCommonLog.h"
 #include "GameFramework/Actor.h"
 #include "CogDebugShape.h"
-#include "CogDebugLogBlueprint.h"
 #include "UObject/Class.h"
 #include "UObject/ObjectMacros.h"
 #include "CogDebugReplicator.generated.h"

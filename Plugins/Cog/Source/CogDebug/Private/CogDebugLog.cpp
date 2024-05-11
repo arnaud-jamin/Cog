@@ -1,7 +1,6 @@
 #include "CogDebugLog.h"
 
-#include "CogCommonLogCategory.h"
-#include "CogDebugModule.h"
+#include "CogCommonLog.h"
 #include "CogDebugReplicator.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"

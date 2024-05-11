@@ -1,22 +1,9 @@
 #pragma  once
 
 #include "CoreMinimal.h"
-#include "Kismet/KismetSystemLibrary.h"
+#include "CogCommonLog.h"
 #include "Logging/LogVerbosity.h"
 #include "CogDebugLogBlueprint.generated.h"
-
-//--------------------------------------------------------------------------------------------------------------------------
-UENUM()
-enum class ECogLogVerbosity : uint8
-{
-    Fatal           = ELogVerbosity::Fatal,
-    Error           = ELogVerbosity::Error,
-    Warning         = ELogVerbosity::Warning,
-    Display         = ELogVerbosity::Display,
-    Log             = ELogVerbosity::Log,
-    Verbose         = ELogVerbosity::Verbose,
-    VeryVerbose     = ELogVerbosity::VeryVerbose
-};
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(meta = (ScriptName = "CogLogBlueprint"))

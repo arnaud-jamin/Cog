@@ -1,7 +1,7 @@
 #include "CogDebugDrawBlueprint.h"
 
 #include "CogDebugDraw.h"
-#include "CogCommonLogCategory.h"
+#include "CogCommonLog.h"
 #include "CogDebugLog.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
