@@ -4,6 +4,8 @@
 #include "CogDebugDrawHelper.h"
 #include "DrawDebugHelpers.h"
 
+DEFINE_LOG_CATEGORY(LogCogServerVLOG);
+
 //--------------------------------------------------------------------------------------------------------------------------
 FCogDebugShape FCogDebugShape::MakePoint(const FVector& Location, const float Size, const FColor& Color, const bool bPersistent, const uint8 DepthPriority)
 {
@@ -20,20 +22,25 @@ FCogDebugShape FCogDebugShape::MakePoint(const FVector& Location, const float Si
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugShape::DrawPoint(UWorld* World) const
+void FCogDebugShape::DrawPoint(const UWorld* World) const
 {
 #if ENABLE_COG
 
     if (ShapeData.Num() == 1)
     {
+        const FVector Location = ShapeData[0];
+        const float ServerThickness = FCogDebug::GetDebugServerThickness(Thickness);
+
         DrawDebugPoint(
             World,
-            ShapeData[0],
-            FCogDebug::GetDebugServerThickness(Thickness),
+            Location,
+            ServerThickness,
             FCogDebug::ModulateServerColor(Color),
             FCogDebug::GetDebugPersistent(bPersistent),
             FCogDebug::GetDebugDuration(bPersistent),
             FCogDebug::GetDebugDepthPriority(DepthPriority));
+
+        UE_VLOG_LOCATION(World, LogCogServerVLOG, Verbose, Location, ServerThickness, Color, TEXT(""));
     }
 
 #endif //ENABLE_COG
@@ -56,21 +63,28 @@ FCogDebugShape FCogDebugShape::MakeSegment(const FVector& StartLocation, const F
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugShape::DrawSegment(UWorld* World) const
+void FCogDebugShape::DrawSegment(const UWorld* World) const
 {
 #if ENABLE_COG
 
     if (ShapeData.Num() == 2)
     {
+        const FVector Start = ShapeData[0];
+        const FVector End = ShapeData[1];
+        const FColor ServerColor = FCogDebug::ModulateServerColor(Color);
+        const float ServerThickness = FCogDebug::GetDebugServerThickness(Thickness);
+
         DrawDebugLine(
             World,
-            ShapeData[0],
-            ShapeData[1],
-            FCogDebug::ModulateServerColor(Color),
+            Start,
+            End,
+            ServerColor,
             FCogDebug::GetDebugPersistent(bPersistent),
             FCogDebug::GetDebugDuration(bPersistent),
             FCogDebug::GetDebugDepthPriority(DepthPriority),
-            FCogDebug::GetDebugServerThickness(Thickness));
+            ServerThickness);
+
+        UE_VLOG_SEGMENT_THICK(World, LogCogServerVLOG, Verbose, Start, End, ServerColor, ServerThickness, TEXT(""));
     }
 
 #endif //ENABLE_COG
@@ -94,22 +108,29 @@ FCogDebugShape FCogDebugShape::MakeArrow(const FVector& StartLocation, const FVe
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugShape::DrawArrow(UWorld* World) const
+void FCogDebugShape::DrawArrow(const UWorld* World) const
 {
 #if ENABLE_COG
 
     if (ShapeData.Num() == 3)
     {
+        const FVector Start = ShapeData[0];
+        const FVector End = ShapeData[1];
+        const float Size = ShapeData[2].X;
+        const FColor ServerColor = FCogDebug::ModulateServerColor(Color);
+
         DrawDebugDirectionalArrow(
             World,
-            ShapeData[0],
-            ShapeData[1],
-            ShapeData[2].X,
-            FCogDebug::ModulateServerColor(Color),
+            Start,
+            End,
+            Size,
+            ServerColor,
             FCogDebug::GetDebugPersistent(bPersistent),
             FCogDebug::GetDebugDuration(bPersistent),
             FCogDebug::GetDebugDepthPriority(DepthPriority),
             FCogDebug::GetDebugServerThickness(Thickness));
+
+        UE_VLOG_ARROW(World, LogCogServerVLOG, Verbose, Start, End, ServerColor, TEXT(""));
     }
 
 #endif //ENABLE_COG
@@ -133,21 +154,30 @@ FCogDebugShape FCogDebugShape::MakeAxes(const FVector& Location, const FRotator&
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugShape::DrawAxes(UWorld* World) const
+void FCogDebugShape::DrawAxes(const UWorld* World) const
 {
 #if ENABLE_COG
 
     if (ShapeData.Num() == 3)
     {
+        const FVector Location = ShapeData[0];
+        const FRotator Rotation(ShapeData[1].X, ShapeData[1].Y, ShapeData[1].Z);
+        const float Scale = ShapeData[2].X;
+
         DrawDebugCoordinateSystem(
             World,
-            ShapeData[0],
-            FRotator(ShapeData[1].X, ShapeData[1].Y, ShapeData[1].Z),
-            ShapeData[2].X,
+            Location,
+            Rotation,
+            Scale,
             FCogDebug::GetDebugPersistent(bPersistent),
             FCogDebug::GetDebugDuration(bPersistent),
             FCogDebug::GetDebugDepthPriority(DepthPriority),
             FCogDebug::GetDebugServerThickness(Thickness));
+
+        const FRotationMatrix Matrix(Rotation);
+        UE_VLOG_ARROW(World, LogCogServerVLOG, Verbose, Location, Location + Matrix.GetScaledAxis(EAxis::X) * Scale, FColor::Red, TEXT(""));
+        UE_VLOG_ARROW(World, LogCogServerVLOG, Verbose, Location, Location + Matrix.GetScaledAxis(EAxis::Y) * Scale, FColor::Green, TEXT(""));
+        UE_VLOG_ARROW(World, LogCogServerVLOG, Verbose, Location, Location + Matrix.GetScaledAxis(EAxis::Z) * Scale, FColor::Blue, TEXT(""));
     }
 
 #endif //ENABLE_COG
@@ -171,22 +201,27 @@ FCogDebugShape FCogDebugShape::MakeBox(const FVector& Center, const FRotator& Ro
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugShape::DrawBox(UWorld* World) const
+void FCogDebugShape::DrawBox(const UWorld* World) const
 {
 #if ENABLE_COG
 
     if (ShapeData.Num() == 3)
     {
+        const FVector Location = ShapeData[0];
+        const FVector Extent = ShapeData[1];
+        const FRotator Rotation(ShapeData[2].X, ShapeData[2].Y, ShapeData[2].Z);
+        const FColor ServerColor = FCogDebug::ModulateServerColor(Color);
+
         DrawDebugBox(
-            World,
-            ShapeData[0],
-            ShapeData[1],
-            FQuat(FRotator(ShapeData[2].X, ShapeData[2].Y, ShapeData[2].Z)),
-            FCogDebug::ModulateServerColor(Color),
+            World, Location, Extent, FQuat(Rotation),
+            ServerColor,
             FCogDebug::GetDebugPersistent(bPersistent),
             FCogDebug::GetDebugDuration(bPersistent),
             FCogDebug::GetDebugDepthPriority(DepthPriority),
             FCogDebug::GetDebugServerThickness(Thickness));
+
+        const FBox Box(-Extent, Extent);
+        UE_VLOG_OBOX(World, LogCogServerVLOG, Verbose, Box, FRotationTranslationMatrix(Rotation, Location), ServerColor, TEXT(""));
     }
 
 #endif //ENABLE_COG
@@ -209,21 +244,29 @@ FCogDebugShape FCogDebugShape::MakeSolidBox(const FVector& Center, const FRotato
 }
 
 
-void FCogDebugShape::DrawSolidBox(UWorld* World) const
+void FCogDebugShape::DrawSolidBox(const UWorld* World) const
 {
 #if ENABLE_COG
 
     if (ShapeData.Num() == 12)
     {
+        const FVector Location = ShapeData[0];
+        const FVector Extent = ShapeData[1];
+        const FRotator Rotation(ShapeData[2].X, ShapeData[2].Y, ShapeData[2].Z);
+        const FColor ServerColor = FCogDebug::ModulateServerColor(Color);
+
         DrawDebugSolidBox(
             World,
-            ShapeData[0],
-            ShapeData[1],
-            FQuat(FRotator(ShapeData[1].X, ShapeData[1].Y, ShapeData[1].Z)),
-            FCogDebug::ModulateServerColor(Color),
+            Location,
+            Extent,
+            FQuat(Rotation),
+            ServerColor,
             FCogDebug::GetDebugPersistent(bPersistent),
             FCogDebug::GetDebugDuration(bPersistent),
             FCogDebug::GetDebugDepthPriority(DepthPriority));
+
+        const FBox Box(-Extent, Extent);
+        UE_VLOG_OBOX(World, LogCogServerVLOG, Verbose, Box, FRotationTranslationMatrix(Rotation, Location), ServerColor, TEXT(""));
     }
 
 #endif //ENABLE_COG
@@ -247,26 +290,33 @@ FCogDebugShape FCogDebugShape::MakeCone(const FVector& Location, const FVector& 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugShape::DrawCone(UWorld* World) const
+void FCogDebugShape::DrawCone(const UWorld* World) const
 {
 #if ENABLE_COG
 
     if (ShapeData.Num() == 3 && ShapeData[2].X > 0)
     {
+        const FVector Location = ShapeData[0];
+        const FVector Direction = ShapeData[1];
+        const float Length = ShapeData[2].X;
         const float DefaultConeAngle = 0.25f; // ~ 15 degrees
+        const FColor ServerColor = FCogDebug::ModulateServerColor(Color);
+
         DrawDebugCone(
             World,
-            ShapeData[0],
-            ShapeData[1],
-            ShapeData[2].X,
+            Location,
+            Direction,
+            Length,
             DefaultConeAngle,
             DefaultConeAngle,
             FCogDebug::GetCircleSegments(),
-            FCogDebug::ModulateServerColor(Color),
+            ServerColor,
             FCogDebug::GetDebugPersistent(bPersistent),
             FCogDebug::GetDebugDuration(bPersistent),
             FCogDebug::GetDebugDepthPriority(DepthPriority),
             FCogDebug::GetDebugServerThickness(Thickness));
+
+        UE_VLOG_CONE(World, LogCogServerVLOG, Verbose, Location, Direction, Length, DefaultConeAngle, ServerColor, TEXT(""));
     }
 
 #endif //ENABLE_COG
@@ -289,7 +339,7 @@ FCogDebugShape FCogDebugShape::MakeCylinder(const FVector& Center, const float R
 }
 //--------------------------------------------------------------------------------------------------------------------------
 
-void FCogDebugShape::DrawCylinder(UWorld* World) const
+void FCogDebugShape::DrawCylinder(const UWorld* World) const
 {
 #if ENABLE_COG
 
@@ -329,23 +379,33 @@ FCogDebugShape FCogDebugShape::MakeCircle(const FVector& Center, const FRotator&
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugShape::DrawCicle(UWorld* World) const
+void FCogDebugShape::DrawCircle(const UWorld* World) const
 {
 #if ENABLE_COG
 
     if (ShapeData.Num() == 3)
     {
+        const FVector Location = ShapeData[0];
+        const FRotator Rotation (ShapeData[1].X, ShapeData[1].Y, ShapeData[1].Z);
+        const FRotationTranslationMatrix Matrix(Rotation, Location);
+        const float Radius = ShapeData[2].X;
+        const FColor ServerColor = FCogDebug::ModulateServerColor(Color);
+        const float ServerThickness = FCogDebug::GetDebugServerThickness(Thickness);
+
         DrawDebugCircle(
             World,
-            FRotationTranslationMatrix(FRotator(ShapeData[1].X, ShapeData[1].Y, ShapeData[1].Z), ShapeData[0]),
-            ShapeData[2].X,
+            Matrix,
+            Radius,
             FCogDebug::GetCircleSegments(),
-            FCogDebug::ModulateServerColor(Color),
+            ServerColor,
             FCogDebug::GetDebugPersistent(bPersistent),
             FCogDebug::GetDebugDuration(bPersistent),
             FCogDebug::GetDebugDepthPriority(DepthPriority),
-            FCogDebug::GetDebugServerThickness(Thickness),
+            ServerThickness,
             false);
+
+        UE_VLOG_CIRCLE_THICK(World, LogCogServerVLOG, Verbose, Location, Matrix.GetUnitAxis(EAxis::X), Radius, ServerColor, ServerThickness, TEXT(""));
+
     }
 
 #endif //ENABLE_COG
@@ -369,7 +429,7 @@ FCogDebugShape FCogDebugShape::MakeCircleArc(const FVector& Center, const FRotat
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugShape::DrawCicleArc(UWorld* World) const
+void FCogDebugShape::DrawCircleArc(const UWorld* World) const
 {
 #if ENABLE_COG
 
@@ -410,7 +470,7 @@ FCogDebugShape FCogDebugShape::MakeCapsule(const FVector& Center, const FQuat& R
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugShape::DrawCapsule(UWorld* World) const
+void FCogDebugShape::DrawCapsule(const UWorld* World) const
 {
 #if ENABLE_COG
 
@@ -451,7 +511,7 @@ FCogDebugShape FCogDebugShape::MakeFlatCapsule(const FVector2D& Start, const FVe
 
 //--------------------------------------------------------------------------------------------------------------------------
 
-void FCogDebugShape::DrawFlatCapsule(UWorld* World) const
+void FCogDebugShape::DrawFlatCapsule(const UWorld* World) const
 {
 #if ENABLE_COG
 
@@ -491,7 +551,7 @@ FCogDebugShape FCogDebugShape::MakeBone(const FVector& BoneLocation, const FVect
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugShape::DrawBone(UWorld* World) const
+void FCogDebugShape::DrawBone(const UWorld* World) const
 {
 #if ENABLE_COG
 
@@ -535,7 +595,7 @@ FCogDebugShape FCogDebugShape::MakePolygon(const TArray<FVector>& Verts, const F
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugShape::DrawPolygon(UWorld* World) const
+void FCogDebugShape::DrawPolygon(const UWorld* World) const
 {
 #if ENABLE_COG
 
@@ -564,7 +624,7 @@ void FCogDebugShape::DrawPolygon(UWorld* World) const
 
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugShape::Draw(UWorld* World) const
+void FCogDebugShape::Draw(const UWorld* World) const
 {
     switch (Type)
     {
@@ -573,8 +633,8 @@ void FCogDebugShape::Draw(UWorld* World) const
     case ECogDebugShape::Bone:           DrawBone(World); break;
     case ECogDebugShape::Box:            DrawBox(World); break;
     case ECogDebugShape::Capsule:        DrawCapsule(World); break;
-    case ECogDebugShape::Circle:         DrawCicle(World); break;
-    case ECogDebugShape::CircleArc:      DrawCicleArc(World); break;
+    case ECogDebugShape::Circle:         DrawCircle(World); break;
+    case ECogDebugShape::CircleArc:      DrawCircleArc(World); break;
     case ECogDebugShape::Cone:           DrawCone(World); break;
     case ECogDebugShape::Cylinder:       DrawCylinder(World); break;
     case ECogDebugShape::FlatCapsule:    DrawFlatCapsule(World); break;

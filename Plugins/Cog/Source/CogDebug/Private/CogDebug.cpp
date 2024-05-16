@@ -3,8 +3,10 @@
 #include "CogCommonDebugFilteredActorInterface.h"
 #include "CogDebugDrawHelper.h"
 #include "CogDebugReplicator.h"
+#include "imgui.h"
 #include "Engine/World.h"
 #include "Engine/Engine.h"
+#include "Kismet/KismetMathLibrary.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 TWeakObjectPtr<AActor> FCogDebug::Selection;
@@ -19,7 +21,7 @@ void FCogDebug::Reset()
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogDebug::IsDebugActiveForObject(const UObject* WorldContextObject)
 {
-	const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+    const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
     if (World == nullptr)
     {
         return true;
@@ -188,21 +190,49 @@ FColor FCogDebug::ModulateDebugColor(const UWorld* World, const FColor& Color, b
         return Color;
     }
 
-    const float Time = World->GetTimeSeconds();
-    const FLinearColor BaseColor(Color);
-    FLinearColor ComplementaryColor = BaseColor.LinearRGBToHSV();
-
-    ComplementaryColor.R = ComplementaryColor.R - 180.0f;
-    if (ComplementaryColor.R < 0.0f)
+    switch (Settings.RecolorMode)
     {
-        ComplementaryColor.R = 360.0f - ComplementaryColor.R;
+        case ECogDebugRecolorMode::None:
+        {
+            return Color;
+        }
+
+        case ECogDebugRecolorMode::Color:
+        {
+            return UKismetMathLibrary::LinearColorLerp(Color, Settings.RecolorColor, Settings.RecolorIntensity).ToFColor(true);
+        }
+
+        case ECogDebugRecolorMode::HueOverTime:
+        {
+            const FLinearColor BaseColor(Color);
+
+            FLinearColor ComplementaryColor = BaseColor.LinearRGBToHSV();
+            ComplementaryColor.R = ComplementaryColor.R - 180.0f;
+            if (ComplementaryColor.R < 0.0f)
+            {
+                ComplementaryColor.R = 360.0f - ComplementaryColor.R;
+            }
+            ComplementaryColor = ComplementaryColor.HSVToLinearRGB();
+
+            const FLinearColor NewColor = FLinearColor::LerpUsingHSV(FLinearColor(Color), ComplementaryColor, FMath::Cos(Settings.RecolorTimeSpeed * World->GetTimeSeconds()));
+            const FLinearColor BlendColor = BaseColor * (1.0f - Settings.RecolorIntensity) + NewColor * Settings.RecolorIntensity;
+            return BlendColor.ToFColor(true);
+        }
+
+        case ECogDebugRecolorMode::HueOverFrames:
+        {
+            const FLinearColor BaseColor(Color);
+            const float Factor = (Settings.RecolorFrameCycle > 0) ? (GFrameCounter % Settings.RecolorFrameCycle) / (float)Settings.RecolorFrameCycle : 0.0f;
+            const FLinearColor NewColor(Factor * 360.0f, 1.0f, 1.0f);
+            const FLinearColor BlendColor = BaseColor * (1.0f - Settings.RecolorIntensity) + NewColor.HSVToLinearRGB() * Settings.RecolorIntensity;
+            return BlendColor.ToFColor(true);
+        }
+
+        default:
+        {
+            return Color;
+        }
     }
-
-    ComplementaryColor = ComplementaryColor.HSVToLinearRGB();
-
-    const FLinearColor GradientColor = FLinearColor::LerpUsingHSV(FLinearColor(Color), ComplementaryColor, FMath::Cos(Settings.GradientColorSpeed * Time));
-    const FLinearColor FBlendColor = BaseColor * (1.0f - Settings.GradientColorIntensity) + GradientColor * Settings.GradientColorIntensity;
-    return FBlendColor.ToFColor(true);
 }
 
 
@@ -285,7 +315,7 @@ void FCogDebug::GetDebugDrawOverlapSettings(FCogDebugDrawOverlapParams& Params)
     Params.DepthPriority = Settings.DepthPriority;
     Params.Thickness = Settings.Thickness;
 
-	GetDebugChannelColors(Params.ChannelColors);
+    GetDebugChannelColors(Params.ChannelColors);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

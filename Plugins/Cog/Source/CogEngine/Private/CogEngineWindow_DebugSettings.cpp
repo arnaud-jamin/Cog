@@ -166,25 +166,59 @@ void FCogEngineWindow_DebugSettings::RenderContent()
             ImGui::SetTooltip("The size of debug arrows.");
         }
 
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragFloat("Gradient Intensity", &Settings.GradientColorIntensity, 0.01f, 0.0f, 1.0f, "%.2f");
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
-        {
-            ImGui::SetTooltip("How much the debug elements color should be changed by a gradient color over time.");
-        }
-
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragFloat("Gradient Speed", &Settings.GradientColorSpeed, 0.1f, 0.0f, 10.0f, "%.1f");
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
-        {
-            ImGui::SetTooltip("The speed of the gradient color change.");
-        }
-
-        FCogWindowWidgets::SetNextItemToShortWidth();
+    	FCogWindowWidgets::SetNextItemToShortWidth();
         ImGui::DragFloat("Text Size", &Settings.TextSize, 0.1f, 0.1f, 5.0f, "%.1f");
         if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
         {
             ImGui::SetTooltip("The size of the debug texts.");
+        }
+    }
+
+	if (ImGui::CollapsingHeader("Recolor", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        FCogWindowWidgets::SetNextItemToShortWidth();
+
+        ECogDebugRecolorMode Mode = Settings.RecolorMode;
+        if (FCogWindowWidgets::ComboboxEnum("Recolor mode", Mode))
+        {
+            Settings.RecolorMode = Mode;
+        }
+        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
+        {
+            ImGui::SetTooltip("How the debug element should be recolored.");
+        }
+
+        if (Settings.RecolorMode != ECogDebugRecolorMode::None)
+        {
+            FCogWindowWidgets::SetNextItemToShortWidth();
+            ImGui::DragFloat("Recolor Intensity", &Settings.RecolorIntensity, 0.01f, 0.0f, 1.0f, "%.2f");
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
+            {
+                ImGui::SetTooltip("How much the debug elements color should be changed.");
+            }
+        }
+
+        if (Settings.RecolorMode == ECogDebugRecolorMode::Color)
+        {
+            FCogImguiHelper::ColorEdit4("Recolor Color", Settings.RecolorColor, ColorEditFlags);
+        }
+        else if (Settings.RecolorMode == HueOverTime)
+        {
+            FCogWindowWidgets::SetNextItemToShortWidth();
+            ImGui::DragFloat("Recolor Speed", &Settings.RecolorTimeSpeed, 0.1f, 0.0f, 10.0f, "%.1f");
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
+            {
+                ImGui::SetTooltip("The speed of the recolor.");
+            }
+        }
+        else if (Settings.RecolorMode == ECogDebugRecolorMode::HueOverFrames)
+        {
+            FCogWindowWidgets::SetNextItemToShortWidth();
+            ImGui::DragInt("Recolor Cycle", &Settings.RecolorFrameCycle, 1, 2, 100);
+            if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
+            {
+                ImGui::SetTooltip("How many frames are used to perform a full hue cycle.");
+            }
         }
     }
 

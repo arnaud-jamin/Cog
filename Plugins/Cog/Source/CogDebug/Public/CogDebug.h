@@ -12,6 +12,15 @@ struct FCogDebugDrawLineTraceParams;
 struct FCogDebugDrawOverlapParams;
 struct FCogDebugDrawSweepParams;
 
+UENUM()
+enum ECogDebugRecolorMode : uint8
+{
+    None,
+    Color,
+	HueOverTime,
+    HueOverFrames,
+};
+
 USTRUCT()
 struct FCogDebugSettings
 {
@@ -54,10 +63,19 @@ struct FCogDebugSettings
     float AxesScale = 1.0f;
 
     UPROPERTY(Config)
-    float GradientColorIntensity = 0.0f;
+    TEnumAsByte<ECogDebugRecolorMode> RecolorMode = None;
 
     UPROPERTY(Config)
-    float GradientColorSpeed = 2.0f;
+    float RecolorIntensity = 0.0f;
+
+    UPROPERTY(Config)
+    FColor RecolorColor = FColor(255, 0, 0, 255);
+
+    UPROPERTY(Config)
+    float RecolorTimeSpeed = 2.0f;
+
+    UPROPERTY(Config)
+    int32 RecolorFrameCycle = 6;
 
     UPROPERTY(Config)
     float TextSize = 1.0f;

@@ -2,6 +2,8 @@
 
 #include "CoreMinimal.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogCogServerVLOG, Verbose, All);
+
 enum class ECogDebugShape : uint8
 {
     Invalid,
@@ -58,22 +60,22 @@ struct COGDEBUG_API FCogDebugShape
     static FCogDebugShape MakeFlatCapsule(const FVector2D& Start, const FVector2D& End, const float Radius, const float Z, const FColor& Color, const float Thickness, const bool bPersistent, const uint8 DepthPriority);
     static FCogDebugShape MakePolygon(const TArray<FVector>& Verts, const FColor& Color, const bool bPersistent, const uint8 DepthPriority);
 
-    void DrawPoint(UWorld* World) const;
-    void DrawSegment(UWorld* World) const;
-    void DrawBone(UWorld* World) const;
-    void DrawArrow(UWorld* World) const;
-    void DrawAxes(UWorld* World) const;
-    void DrawBox(UWorld* World) const;
-    void DrawSolidBox(UWorld* World) const;
-    void DrawCone(UWorld* World) const;
-    void DrawCylinder(UWorld* World) const;
-    void DrawCicle(UWorld* World) const;
-    void DrawCicleArc(UWorld* World) const;
-    void DrawCapsule(UWorld* World) const;
-    void DrawFlatCapsule(UWorld* World) const;
-    void DrawPolygon(UWorld* World) const;
+    void DrawPoint(const UWorld* World) const;
+    void DrawSegment(const UWorld* World) const;
+    void DrawBone(const UWorld* World) const;
+    void DrawArrow(const UWorld* World) const;
+    void DrawAxes(const UWorld* World) const;
+    void DrawBox(const UWorld* World) const;
+    void DrawSolidBox(const UWorld* World) const;
+    void DrawCone(const UWorld* World) const;
+    void DrawCylinder(const UWorld* World) const;
+    void DrawCircle(const UWorld* World) const;
+    void DrawCircleArc(const UWorld* World) const;
+    void DrawCapsule(const UWorld* World) const;
+    void DrawFlatCapsule(const UWorld* World) const;
+    void DrawPolygon(const UWorld* World) const;
 
-    void Draw(UWorld* World) const;
+    void Draw(const UWorld* World) const;
 };
 
 FArchive& operator<<(FArchive& Ar, FCogDebugShape& Shape);
