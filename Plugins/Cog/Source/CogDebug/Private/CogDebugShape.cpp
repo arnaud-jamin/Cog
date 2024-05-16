@@ -3,6 +3,8 @@
 #include "CogCommon.h"
 #include "CogDebugDrawHelper.h"
 #include "DrawDebugHelpers.h"
+#include "Engine/World.h"
+#include "VisualLogger/VisualLogger.h"
 
 DEFINE_LOG_CATEGORY(LogCogServerVLOG);
 
