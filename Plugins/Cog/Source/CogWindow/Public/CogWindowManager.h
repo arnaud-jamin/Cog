@@ -9,7 +9,6 @@ class UCogCommonConfig;
 class FCogWindow;
 class FCogWindow_Layouts;
 class FCogWindow_Settings;
-class IConsoleObject;
 class SCogImguiWidget;
 class UPlayerInput;
 class UWorld;
@@ -156,7 +155,7 @@ protected:
 
     bool IsInitialized = false;
 
-    TArray<IConsoleObject*> ConsoleCommands;
+    TArray<FString> ConsoleCommands;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
