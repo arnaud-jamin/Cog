@@ -61,29 +61,33 @@ void UCogWindowManager::InitializeInternal()
     LayoutsWindow = AddWindow<FCogWindow_Layouts>("Window.Layouts", false);
     SettingsWindow = AddWindow<FCogWindow_Settings>("Window.Settings", false);
 
-    ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
+    ConsoleCommands.Add(ToggleInputCommand);
+    IConsoleManager::Get().RegisterConsoleCommand(
         *ToggleInputCommand,
         TEXT("Toggle the input focus between the Game and ImGui"),
         FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { ToggleInputMode(); }), 
-        ECVF_Cheat));
+        ECVF_Cheat);
 
-    ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
+    ConsoleCommands.Add(ResetLayoutCommand);
+    IConsoleManager::Get().RegisterConsoleCommand(
         *ResetLayoutCommand,
         TEXT("Reset the layout."),
         FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { if (Args.Num() > 0) { ResetLayout(); }}),
-        ECVF_Cheat));
+        ECVF_Cheat);
 
-    ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
+    ConsoleCommands.Add(LoadLayoutCommand);
+    IConsoleManager::Get().RegisterConsoleCommand(
         *LoadLayoutCommand,
         TEXT("Load the layout. Cog.LoadLayout <Index>"),
         FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { if (Args.Num() > 0) { LoadLayout(FCString::Atoi(*Args[0])); }}), 
-        ECVF_Cheat));
+        ECVF_Cheat);
 
-    ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
+    ConsoleCommands.Add(SaveLayoutCommand);
+    IConsoleManager::Get().RegisterConsoleCommand(
         *SaveLayoutCommand, 
         TEXT("Save the layout. Cog.SaveLayout <Index>"),
         FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { if (Args.Num() > 0) { SaveLayout(FCString::Atoi(*Args[0])); }}), 
-        ECVF_Cheat));
+        ECVF_Cheat);
 
     IsInitialized = true;
 }
@@ -120,10 +124,11 @@ void UCogWindowManager::Shutdown()
         Config->SaveConfig();
     }
 
-    for (IConsoleObject* ConsoleCommand : ConsoleCommands)
+    for (const FString& ConsoleCommand : ConsoleCommands)
     {
-        IConsoleManager::Get().UnregisterConsoleObject(ConsoleCommand);
+        IConsoleManager::Get().UnregisterConsoleObject(*ConsoleCommand);
     }
+    ConsoleCommands.Empty();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

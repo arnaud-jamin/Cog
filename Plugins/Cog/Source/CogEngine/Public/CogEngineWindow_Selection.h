@@ -6,7 +6,6 @@
 #include "CogWindow.h"
 #include "CogEngineWindow_Selection.generated.h"
 
-class IConsoleObject;
 class UCogEngineConfig_Selection;
 enum class ECogImGuiInputMode : uint8;
 
@@ -83,7 +82,7 @@ protected:
 
     ETraceTypeQuery TraceType = TraceTypeQuery1;
 
-    TArray<IConsoleObject*> ConsoleCommands;
+    TArray<FString> ConsoleCommands;
 
     TObjectPtr<UCogEngineConfig_Selection> Config;
 

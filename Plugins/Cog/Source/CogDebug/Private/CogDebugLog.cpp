@@ -134,8 +134,6 @@ FLogCategoryBase* FCogDebugLog::FindLogCategory(const FName CategoryName)
     {
         return nullptr;
     }
-
-    return nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
