@@ -1,5 +1,6 @@
 #include "CogDebugPlot.h"
 
+#include "CogDebug.h"
 #include "CogDebugDraw.h"
 #include "CogDebugHelper.h"
 #include "CogImguiHelper.h"

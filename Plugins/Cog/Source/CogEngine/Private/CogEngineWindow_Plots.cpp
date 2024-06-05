@@ -227,6 +227,11 @@ void FCogEngineWindow_Plots::RenderPlots(const TArray<FCogDebugPlotEntry*>& Visi
 
                         FCogDebugPlotEntry& Entry = *PlotPtr;
 
+                        if (Entry.Values.empty()) 
+                        {
+                            continue;
+                        }
+
                         if (Entry.CurrentRow == PlotIndex)
                         {
                             //--------------------------------------------------------------------------------

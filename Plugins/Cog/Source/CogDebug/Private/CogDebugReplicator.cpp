@@ -1,5 +1,6 @@
 #include "CogDebugReplicator.h"
 
+#include "CogDebug.h"
 #include "CogDebugDraw.h"
 #include "CogDebugLog.h"
 #include "EngineUtils.h"

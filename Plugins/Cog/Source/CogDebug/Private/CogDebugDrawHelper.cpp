@@ -420,10 +420,10 @@ void FCogDebugDrawHelper::DrawLineTrace(
         End,
         FCogDebug::Settings.ArrowSize,
         HasHits ? Settings.HitColor : Settings.NoHitColor,
-        false,
-        0.0f,
-        FCogDebug::GetDebugDepthPriority(0),
-        FCogDebug::GetDebugThickness(0.0f));
+        Settings.Persistent,
+        Settings.LifeTime,
+        Settings.DepthPriority,
+        Settings.Thickness);
 
     DrawHitResults(World, HitResults, Settings);
 }
@@ -448,10 +448,10 @@ void FCogDebugDrawHelper::DrawSweep(
         End,
         FCogDebug::Settings.ArrowSize,
         Color,
-        false,
-        0.0f,
-        FCogDebug::GetDebugDepthPriority(0),
-        FCogDebug::GetDebugThickness(0.0f));
+        Settings.Persistent,
+        Settings.LifeTime,
+        Settings.DepthPriority,
+        Settings.Thickness);
 
 	DrawShape(World, Shape, Start, Rotation, FVector::OneVector, Color, Settings.Persistent, Settings.LifeTime, Settings.DepthPriority, Settings.Thickness);
 
