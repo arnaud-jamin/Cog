@@ -5,6 +5,7 @@
 #include "Components/PrimitiveComponent.h"
 #include "Components/SceneComponent.h"
 #include "Engine/World.h"
+#include "Engine/OverlapResult.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 ACogEngineCollisionTester::ACogEngineCollisionTester(const FObjectInitializer& ObjectInitializer)
