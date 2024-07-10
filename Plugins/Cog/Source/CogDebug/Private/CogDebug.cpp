@@ -83,8 +83,6 @@ bool FCogDebug::IsDebugActiveForObject_Internal(const UObject* WorldContextObjec
 
         Outer = NewOuter;
     }
-
-    return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
