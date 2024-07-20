@@ -192,17 +192,17 @@ FColor FCogDebug::ModulateDebugColor(const UWorld* World, const FColor& Color, b
 
     switch (Settings.RecolorMode)
     {
-        case ECogDebugRecolorMode::None:
+        case ECogDebugRecolorMode::CDRM_None:
         {
             return Color;
         }
 
-        case ECogDebugRecolorMode::Color:
+        case ECogDebugRecolorMode::CDRM_Color:
         {
             return UKismetMathLibrary::LinearColorLerp(Color, Settings.RecolorColor, Settings.RecolorIntensity).ToFColor(true);
         }
 
-        case ECogDebugRecolorMode::HueOverTime:
+        case ECogDebugRecolorMode::CDRM_HueOverTime:
         {
             const FLinearColor BaseColor(Color);
 
@@ -219,7 +219,7 @@ FColor FCogDebug::ModulateDebugColor(const UWorld* World, const FColor& Color, b
             return BlendColor.ToFColor(true);
         }
 
-        case ECogDebugRecolorMode::HueOverFrames:
+        case ECogDebugRecolorMode::CDRM_HueOverFrames:
         {
             const FLinearColor BaseColor(Color);
             const float Factor = (Settings.RecolorFrameCycle > 0) ? (GFrameCounter % Settings.RecolorFrameCycle) / (float)Settings.RecolorFrameCycle : 0.0f;

@@ -15,10 +15,10 @@ struct FCogDebugDrawSweepParams;
 UENUM()
 enum ECogDebugRecolorMode : uint8
 {
-    None,
-    Color,
-	HueOverTime,
-    HueOverFrames,
+    CDRM_None,
+    CDRM_Color,
+    CDRM_HueOverTime,
+    CDRM_HueOverFrames,
 };
 
 USTRUCT()
@@ -63,7 +63,7 @@ struct FCogDebugSettings
     float AxesScale = 1.0f;
 
     UPROPERTY(Config)
-    TEnumAsByte<ECogDebugRecolorMode> RecolorMode = None;
+    TEnumAsByte<ECogDebugRecolorMode> RecolorMode = CDRM_None;
 
     UPROPERTY(Config)
     float RecolorIntensity = 0.0f;

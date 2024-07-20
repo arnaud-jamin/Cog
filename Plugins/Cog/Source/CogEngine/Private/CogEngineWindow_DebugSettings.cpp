@@ -188,7 +188,7 @@ void FCogEngineWindow_DebugSettings::RenderContent()
             ImGui::SetTooltip("How the debug element should be recolored.");
         }
 
-        if (Settings.RecolorMode != ECogDebugRecolorMode::None)
+        if (Settings.RecolorMode != ECogDebugRecolorMode::CDRM_None)
         {
             FCogWindowWidgets::SetNextItemToShortWidth();
             ImGui::DragFloat("Recolor Intensity", &Settings.RecolorIntensity, 0.01f, 0.0f, 1.0f, "%.2f");
@@ -198,11 +198,11 @@ void FCogEngineWindow_DebugSettings::RenderContent()
             }
         }
 
-        if (Settings.RecolorMode == ECogDebugRecolorMode::Color)
+        if (Settings.RecolorMode == ECogDebugRecolorMode::CDRM_Color)
         {
             FCogImguiHelper::ColorEdit4("Recolor Color", Settings.RecolorColor, ColorEditFlags);
         }
-        else if (Settings.RecolorMode == HueOverTime)
+        else if (Settings.RecolorMode == CDRM_HueOverTime)
         {
             FCogWindowWidgets::SetNextItemToShortWidth();
             ImGui::DragFloat("Recolor Speed", &Settings.RecolorTimeSpeed, 0.1f, 0.0f, 10.0f, "%.1f");
@@ -211,7 +211,7 @@ void FCogEngineWindow_DebugSettings::RenderContent()
                 ImGui::SetTooltip("The speed of the recolor.");
             }
         }
-        else if (Settings.RecolorMode == ECogDebugRecolorMode::HueOverFrames)
+        else if (Settings.RecolorMode == ECogDebugRecolorMode::CDRM_HueOverFrames)
         {
             FCogWindowWidgets::SetNextItemToShortWidth();
             ImGui::DragInt("Recolor Cycle", &Settings.RecolorFrameCycle, 1, 2, 100);
