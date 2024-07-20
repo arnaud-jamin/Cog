@@ -681,6 +681,11 @@ bool UCogWindowManager::RegisterDefaultCommandBindings()
     }
 
     UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*GetWorld());
+	if (PlayerInput == nullptr)
+	{
+        UE_LOG(LogCogImGui, Warning, TEXT("UCogWindowManager::AddCommand: PlayerInput is null"));
+		return false;
+	}
 
     AddCommand(PlayerInput, "Cog.ToggleInput", EKeys::F1);
     AddCommand(PlayerInput, "Cog.LoadLayout 1", EKeys::F2);
@@ -697,6 +702,12 @@ bool UCogWindowManager::RegisterDefaultCommandBindings()
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::AddCommand(UPlayerInput* PlayerInput, const FString& Command, const FKey& Key)
 {
+    if (!PlayerInput)
+	{
+		UE_LOG(LogCogImGui, Warning, TEXT("UCogWindowManager::AddCommand: PlayerInput is null"));
+		return;
+	}
+
     //---------------------------------------------------
     // Reassign conflicting commands
     //---------------------------------------------------
