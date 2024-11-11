@@ -697,28 +697,48 @@ bool UCogWindowManager::RegisterDefaultCommandBindings()
         return false;
     }
 
+    bool bDefaultCommandBindingsRegistered = false;
+
     UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*GetWorld());
-    if (!PlayerInput)
+    if (PlayerInput)
+    {
+        RegisterDefaultCommandBindingsForPlayerInput(PlayerInput);
+        bDefaultCommandBindingsRegistered = true;
+    }
+    else // !PlayerInput
     {
         // Update default player input, so changes will be visible in all PIE sessions created after this point
         if (UPlayerInput* DefaultPlayerInput = GetMutableDefault<UPlayerInput>())
         {
             RegisterDefaultCommandBindingsForPlayerInput(DefaultPlayerInput);
+            bDefaultCommandBindingsRegistered = true;
         }
 
         // Update all existing player inputs to see changes in running PIE sessions
         for (TObjectIterator<UPlayerInput> It; It; ++It)
         {
             RegisterDefaultCommandBindingsForPlayerInput(*It);
+            bDefaultCommandBindingsRegistered = true;
         }
     }
 
-    return true;
+    if (!bDefaultCommandBindingsRegistered)
+    {
+        UE_LOG(LogCogImGui, Warning, TEXT("%s Failed : No PlayerInput found"), ANSI_TO_TCHAR(__FUNCTION__));
+    }
+
+    return bDefaultCommandBindingsRegistered;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::AddCommand(UPlayerInput* PlayerInput, const FString& Command, const FKey& Key)
 {
+    if (PlayerInput == nullptr)
+    {
+        UE_LOG(LogCogImGui, Warning, TEXT("%s Failed : PlayerInput is null"), ANSI_TO_TCHAR(__FUNCTION__));
+        return;
+    }
+    
     //---------------------------------------------------
     // Reassign conflicting commands
     //---------------------------------------------------

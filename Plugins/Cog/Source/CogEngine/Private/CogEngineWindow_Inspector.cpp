@@ -954,12 +954,8 @@ bool FCogEngineWindow_Inspector::HasPropertyAnyChildren(const FProperty* Propert
 {
     if (const FStructProperty* StructProperty = CastField<FStructProperty>(Property))
     {
-        for (TFieldIterator<FProperty> It(StructProperty->Struct); It; ++It)
-        {
-            return true;
-        }
-
-        return false;
+        const TFieldIterator<FProperty> It(StructProperty->Struct);
+        return It ? true : false;
     }
     else if (const FArrayProperty* ArrayProperty = CastField<FArrayProperty>(Property))
     {

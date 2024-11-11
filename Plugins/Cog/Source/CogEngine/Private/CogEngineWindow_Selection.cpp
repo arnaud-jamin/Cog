@@ -27,11 +27,15 @@ void FCogEngineWindow_Selection::Initialize()
 
     Config = GetConfig<UCogEngineConfig_Selection>();
 
-    ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
-        *ToggleSelectionModeCommand,
-        TEXT("Toggle the actor selection mode"),
-        FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { ToggleSelectionMode(); }),
-        ECVF_Cheat));
+    // TODO: consider finding a better way to register since command since this code will be processed by every PIE window
+    if (!IConsoleManager::Get().IsNameRegistered(*ToggleSelectionModeCommand))
+    {
+        ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
+            *ToggleSelectionModeCommand,
+            TEXT("Toggle the actor selection mode"),
+            FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { ToggleSelectionMode(); }),
+            ECVF_Cheat));
+    }
 
     TryReapplySelection();
 }
@@ -52,8 +56,13 @@ void FCogEngineWindow_Selection::Shutdown()
 {
     for (IConsoleObject* ConsoleCommand : ConsoleCommands)
     {
-        IConsoleManager::Get().UnregisterConsoleObject(ConsoleCommand);
+        const FString ObjName = IConsoleManager::Get().FindConsoleObjectName(ConsoleCommand);
+        if (!ObjName.IsEmpty())
+        {
+            IConsoleManager::Get().UnregisterConsoleObject(ConsoleCommand);
+        }
     }
+    ConsoleCommands.Reset();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
