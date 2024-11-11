@@ -1,6 +1,12 @@
 # Cog
 Cog is a set of debug tools for Unreal Engine built on top of [Dear ImGui](https://github.com/ocornut/imgui)
 
+# Fork Information
+This is a forked project from https://github.com/arnaud-jamin/Cog to adapt it to some expanded needs, and extend functionality.
+
+-Supports multiple PIE windows (some functionality might not be intuitive)
+
+# Cog
 ![Cog](https://github.com/arnaud-jamin/Cog/assets/13844285/21659aea-2cd8-4ef6-b3b0-5795f5f3246b)
 
 - [Video](https://www.youtube.com/watch?v=ea5hz3cFcMM)
@@ -17,12 +23,6 @@ General Info:
 - Press the `[F1]` key or use the `Cog.ToggleInput` console command to open the ImGui Main Menu.
 - Many windows display their contents based on a selected actor. The selector actor can be chosen using the `Engine/Selection` window or widget.
 - Widgets such as Stats (FPS, Ping), or Actor Selection, can be added in the main menu bar from the 'Window/Widgets" menu.
-
-# Fork Information
-This is a forked project from https://github.com/arnaud-jamin/Cog to adapt it to some expanded needs, and extend functionality.
-
--Supports multiple PIE windows (some functionality might not be intuitive)
-
 
 ## Cog Windows
 
