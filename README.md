@@ -6,7 +6,7 @@ This is a forked project from https://github.com/arnaud-jamin/Cog to adapt it to
 
 -Supports multiple PIE windows (some functionality might not be intuitive)
 
-# Cog
+# Overview
 ![Cog](https://github.com/arnaud-jamin/Cog/assets/13844285/21659aea-2cd8-4ef6-b3b0-5795f5f3246b)
 
 - [Video](https://www.youtube.com/watch?v=ea5hz3cFcMM)
