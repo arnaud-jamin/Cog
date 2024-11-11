@@ -18,6 +18,12 @@ General Info:
 - Many windows display their contents based on a selected actor. The selector actor can be chosen using the `Engine/Selection` window or widget.
 - Widgets such as Stats (FPS, Ping), or Actor Selection, can be added in the main menu bar from the 'Window/Widgets" menu.
 
+# Fork Information
+This is a forked project from https://github.com/arnaud-jamin/Cog to adapt it to some expanded needs, and extend functionality.
+
+-Supports multiple PIE windows (some functionality might not be intuitive)
+
+
 ## Cog Windows
 
 ### Abilities 
