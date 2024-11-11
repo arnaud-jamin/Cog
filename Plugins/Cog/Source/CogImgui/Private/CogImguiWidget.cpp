@@ -112,11 +112,7 @@ FVector2D SCogImguiWidget::ComputeDesiredSize(float Scale) const
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiWidget::OnKeyChar(const FGeometry& MyGeometry, const FCharacterEvent& CharacterEvent)
 {
-    ImGuiIO& IO = ImGui::GetIO();
-    IO.AddInputCharacter(FCogImguiInputHelper::CastInputChar(CharacterEvent.GetCharacter()));
-
-    const FReply Result = IO.WantCaptureKeyboard ? FReply::Handled() : FReply::Unhandled();
-    return Result;
+    return Context->GetInputHandler().OnKeyChar(CharacterEvent);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -178,71 +174,31 @@ FReply SCogImguiWidget::OnAnalogValueChanged(const FGeometry& MyGeometry, const 
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiWidget::OnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
-    return HandleMouseButtonEvent(MouseEvent, true);
+    return Context->GetInputHandler().OnMouseButtonDown(MouseEvent);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiWidget::OnMouseButtonDoubleClick(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
-    return HandleMouseButtonEvent(MouseEvent, true);
+    return Context->GetInputHandler().OnMouseButtonDoubleClick(MouseEvent);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiWidget::OnMouseButtonUp(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
-    return HandleMouseButtonEvent(MouseEvent, false);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-FReply SCogImguiWidget::HandleMouseButtonEvent(const FPointerEvent& MouseEvent, bool Down)
-{
-    if (Context->GetEnableInput() == false)
-    {
-        UE_LOG(LogCogImGui, VeryVerbose, TEXT("SCogImguiWidget::HandleMouseButtonEvent | %s | Unhandled | EnableInput == false | Down:%d"), Window.IsValid() ? *Window->GetTitle().ToString() : *FString("None"), Down);
-        return FReply::Unhandled();
-    }
-    const uint32 MouseButton = FCogImguiInputHelper::ToImGuiMouseButton(MouseEvent.GetEffectingButton());
-    ImGui::GetIO().AddMouseSourceEvent(ImGuiMouseSource_Mouse);
-    ImGui::GetIO().AddMouseButtonEvent(MouseButton, Down);
-
-    UE_LOG(LogCogImGui, VeryVerbose, TEXT("SCogImguiWidget::HandleMouseButtonEvent | Window:%s | Handled | Down:%d"), Window.IsValid() ? *Window->GetTitle().ToString() : *FString("None"), Down);
-    return FReply::Handled();
+    return Context->GetInputHandler().OnMouseButtonUp(MouseEvent);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiWidget::OnMouseWheel(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
-    if (Context->GetEnableInput() == false)
-    {
-        return FReply::Unhandled();
-    }
-    ImGui::GetIO().AddMouseSourceEvent(ImGuiMouseSource_Mouse);
-    ImGui::GetIO().AddMouseWheelEvent(0, MouseEvent.GetWheelDelta());
-    return FReply::Handled();
+    return Context->GetInputHandler().OnMouseWheel(MouseEvent);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiWidget::OnMouseMove(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
-    if (Context->GetEnableInput() == false)
-    {
-        //UE_LOG(LogCogImGui, VeryVerbose, TEXT("SCogImguiWidget::OnMouseMove | Window:%s | Unhandled | EnableInput == false"), Window.IsValid() ? *Window->GetTitle().ToString() : *FString("None"));
-        return FReply::Unhandled();
-    }
-
-    ImGuiIO& IO = ImGui::GetIO();
-    if (IO.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-    {
-        IO.AddMousePosEvent(MouseEvent.GetScreenSpacePosition().X, MouseEvent.GetScreenSpacePosition().Y);
-    }
-    else
-    {
-        const FVector2D TransformedMousePosition = MouseEvent.GetScreenSpacePosition() - Context->GetMainWidget()->GetTickSpaceGeometry().GetAbsolutePosition();
-        IO.AddMousePosEvent(TransformedMousePosition.X, TransformedMousePosition.Y);
-    }
-
-    //UE_LOG(LogCogImGui, VeryVerbose, TEXT("SCogImguiWidget::OnMouseMove | Window:%s | Handled"), Window.IsValid() ? *Window->GetTitle().ToString() : *FString("None"));
-    return FReply::Handled();
+    return Context->GetInputHandler().OnMouseMove(MouseEvent.GetScreenSpacePosition(), MouseEvent);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

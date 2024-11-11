@@ -14,4 +14,7 @@ public:
 	virtual void ShutdownModule() override;
 
 private:
+	void RegisterPlayerControllerSpawnedCallback();
+	static void OnPlayerControllerSpawned(AGameModeBase* GameMode, APlayerController* NewPlayer);
+	
 };

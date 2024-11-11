@@ -75,19 +75,19 @@ FReply SCogImguiInputCatcherWidget::OnAnalogValueChanged(const FGeometry& MyGeom
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiInputCatcherWidget::OnMouseButtonDown(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
-    return HandleMouseButtonEvent(MouseEvent, true);
+    return Context->GetInputHandler().OnMouseButtonDown(MouseEvent);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiInputCatcherWidget::OnMouseButtonDoubleClick(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
-    return HandleMouseButtonEvent(MouseEvent, true);
+    return Context->GetInputHandler().OnMouseButtonDoubleClick(MouseEvent);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiInputCatcherWidget::OnMouseButtonUp(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
-    return HandleMouseButtonEvent(MouseEvent, false);
+    return Context->GetInputHandler().OnMouseButtonUp(MouseEvent);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -110,13 +110,7 @@ FReply SCogImguiInputCatcherWidget::HandleMouseButtonEvent(const FPointerEvent& 
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiInputCatcherWidget::OnMouseWheel(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
-    if (Context->GetEnableInput() == false)
-    {
-        return FReply::Unhandled();
-    }
-    ImGui::GetIO().AddMouseSourceEvent(ImGuiMouseSource_Mouse);
-    ImGui::GetIO().AddMouseWheelEvent(0, MouseEvent.GetWheelDelta());
-    return FReply::Handled();
+    return Context->GetInputHandler().OnMouseWheel(MouseEvent);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

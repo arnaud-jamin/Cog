@@ -7,16 +7,12 @@
 #include "CogWindow_Settings.h"
 #include "CogWindow_Spacing.h"
 #include "CogWindowHelper.h"
+#include "CogWindowModule.h"
 #include "CogWindowWidgets.h"
 #include "Engine/Engine.h"
 #include "GameFramework/PlayerInput.h"
 #include "HAL/IConsoleManager.h"
 #include "imgui_internal.h"
-
-FString UCogWindowManager::ToggleInputCommand   = TEXT("Cog.ToggleInput");
-FString UCogWindowManager::LoadLayoutCommand    = TEXT("Cog.LoadLayout");
-FString UCogWindowManager::SaveLayoutCommand    = TEXT("Cog.SaveLayout");
-FString UCogWindowManager::ResetLayoutCommand   = TEXT("Cog.ResetLayout");
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCogWindowManager::UCogWindowManager()
@@ -61,29 +57,24 @@ void UCogWindowManager::InitializeInternal()
     LayoutsWindow = AddWindow<FCogWindow_Layouts>("Window.Layouts", false);
     SettingsWindow = AddWindow<FCogWindow_Settings>("Window.Settings", false);
 
-    ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
-        *ToggleInputCommand,
-        TEXT("Toggle the input focus between the Game and ImGui"),
-        FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { ToggleInputMode(); }), 
-        ECVF_Cheat));
-
-    ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
-        *ResetLayoutCommand,
-        TEXT("Reset the layout."),
-        FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { if (Args.Num() > 0) { ResetLayout(); }}),
-        ECVF_Cheat));
-
-    ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
-        *LoadLayoutCommand,
-        TEXT("Load the layout. Cog.LoadLayout <Index>"),
-        FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { if (Args.Num() > 0) { LoadLayout(FCString::Atoi(*Args[0])); }}), 
-        ECVF_Cheat));
-
-    ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
-        *SaveLayoutCommand, 
-        TEXT("Save the layout. Cog.SaveLayout <Index>"),
-        FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { if (Args.Num() > 0) { SaveLayout(FCString::Atoi(*Args[0])); }}), 
-        ECVF_Cheat));
+    if (FCogWindowModule* Module = FModuleManager::GetModulePtr<FCogWindowModule>("CogWindow"))
+    {
+        ConsoleCommandHandles.Add( FCommandDelegateHandlePair(&Module->ModuleCommands.OnToggleInputCommandExecuted,
+        Module->ModuleCommands.OnToggleInputCommandExecuted.AddLambda(
+        [this]() { ToggleInputMode(); } )));
+        
+        ConsoleCommandWithArgsHandles.Add( FCommandWithArgsDelegateHandlePair(&Module->ModuleCommands.OnSaveLayoutCommandExecuted,
+                Module->ModuleCommands.OnSaveLayoutCommandExecuted.AddLambda(
+                [this](const int32 Index) { SaveLayout(Index); } )));
+        
+        ConsoleCommandWithArgsHandles.Add( FCommandWithArgsDelegateHandlePair(&Module->ModuleCommands.OnLoadLayoutCommandExecuted,
+                Module->ModuleCommands.OnLoadLayoutCommandExecuted.AddLambda(
+                    [this](const int32 Index) { LoadLayout(Index); } )));
+        
+        ConsoleCommandHandles.Add( FCommandDelegateHandlePair(&Module->ModuleCommands.OnResetLayoutCommandExecuted,
+                Module->ModuleCommands.OnResetLayoutCommandExecuted.AddLambda(
+                    [this]() { ResetLayout(); } )));
+    }
 
     IsInitialized = true;
 }
@@ -91,13 +82,32 @@ void UCogWindowManager::InitializeInternal()
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::Shutdown()
 {
+    // Clear Console Commands
+    for (const FCommandDelegateHandlePair& Pair : ConsoleCommandHandles)
+    {
+        CA_ASSUME(Pair.Key);
+        Pair.Key->Remove(Pair.Value);
+    }
+
+    for (const FCommandWithArgsDelegateHandlePair& Pair : ConsoleCommandWithArgsHandles)
+    {
+        CA_ASSUME(Pair.Key);
+        Pair.Key->Remove(Pair.Value);
+    }
+
+    Context.SetAsCurrent();
+    
     //------------------------------------------------------------
     // Call PreSaveConfig before destroying imgui context
     // if PreSaveConfig needs to read ImGui IO for example
+    // TODO: If multiple contexts are present in one instance (multiple PIEs) then which config should we save?
     //------------------------------------------------------------
-    for (FCogWindow* Window : Windows)
+    if (Context.IsContextSet())
     {
-        Window->PreSaveConfig();
+        for (FCogWindow* Window : Windows)
+        {
+            Window->PreSaveConfig();
+        }
     }
 
     //------------------------------------------------------------
@@ -118,11 +128,6 @@ void UCogWindowManager::Shutdown()
     for (UCogCommonConfig* Config : Configs)
     {
         Config->SaveConfig();
-    }
-
-    for (IConsoleObject* ConsoleCommand : ConsoleCommands)
-    {
-        IConsoleManager::Get().UnregisterConsoleObject(ConsoleCommand);
     }
 }
 
@@ -672,6 +677,18 @@ void UCogWindowManager::ResetAllWindowsConfig()
     }
 }
 
+void UCogWindowManager::RegisterDefaultCommandBindingsForPlayerInput(UPlayerInput* PlayerInput)
+{    
+    AddCommand(PlayerInput, "Cog.ToggleInput", EKeys::F1);
+    AddCommand(PlayerInput, "Cog.LoadLayout 1", EKeys::F2);
+    AddCommand(PlayerInput, "Cog.LoadLayout 2", EKeys::F3);
+    AddCommand(PlayerInput, "Cog.LoadLayout 3", EKeys::F4);
+    AddCommand(PlayerInput, "Cog.ToggleSelectionMode", EKeys::F5);
+    
+    SortCommands(PlayerInput);
+    PlayerInput->SaveConfig();
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 bool UCogWindowManager::RegisterDefaultCommandBindings()
 {
@@ -681,15 +698,20 @@ bool UCogWindowManager::RegisterDefaultCommandBindings()
     }
 
     UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*GetWorld());
+    if (!PlayerInput)
+    {
+        // Update default player input, so changes will be visible in all PIE sessions created after this point
+        if (UPlayerInput* DefaultPlayerInput = GetMutableDefault<UPlayerInput>())
+        {
+            RegisterDefaultCommandBindingsForPlayerInput(DefaultPlayerInput);
+        }
 
-    AddCommand(PlayerInput, "Cog.ToggleInput", EKeys::F1);
-    AddCommand(PlayerInput, "Cog.LoadLayout 1", EKeys::F2);
-    AddCommand(PlayerInput, "Cog.LoadLayout 2", EKeys::F3);
-    AddCommand(PlayerInput, "Cog.LoadLayout 3", EKeys::F4);
-    AddCommand(PlayerInput, "Cog.ToggleSelectionMode", EKeys::F5);
-
-    SortCommands(PlayerInput);
-    PlayerInput->SaveConfig();
+        // Update all existing player inputs to see changes in running PIE sessions
+        for (TObjectIterator<UPlayerInput> It; It; ++It)
+        {
+            RegisterDefaultCommandBindingsForPlayerInput(*It);
+        }
+    }
 
     return true;
 }

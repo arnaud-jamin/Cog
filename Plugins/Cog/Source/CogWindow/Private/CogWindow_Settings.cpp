@@ -3,6 +3,7 @@
 #include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
 #include "CogWindowManager.h"
+#include "CogWindowModuleCommands.h"
 #include "CogWindowWidgets.h"
 #include "imgui.h"
 #include "InputCoreTypes.h"
@@ -78,7 +79,7 @@ void FCogWindow_Settings::RenderContent()
         }
         ImGui::SetItemTooltip("Enable ImGui inputs. When enabled the ImGui menu is shown and inputs are forwarded to ImGui.");
 
-        const auto ShortcutText = StringCast<ANSICHAR>(*FCogImguiInputHelper::CommandToString(PlayerInput, UCogWindowManager::ToggleInputCommand));
+        const auto ShortcutText = StringCast<ANSICHAR>(*FCogImguiInputHelper::CommandToString(PlayerInput, FCogWindowModuleCommands::ToggleInputCommand));
         const float ShortcutWidth = (ShortcutText.Get() != nullptr && ShortcutText.Get()[0]) ? ImGui::CalcTextSize(ShortcutText.Get(), NULL).x : 0.0f;
         if (ShortcutWidth > 0.0f)
         {

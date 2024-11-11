@@ -47,6 +47,10 @@ void FCogImguiContext::Initialize()
     PlotContext = ImPlot::CreateContext();
     ImPlot::SetImGuiContext(ImGuiContext);
 
+    InputHandler.Initialize(this);
+
+    ImGui::SetCurrentContext(ImGuiContext);
+
     ImGuiIO& IO = ImGui::GetIO();
     IO.UserData = this;
 
@@ -105,6 +109,13 @@ void FCogImguiContext::Initialize()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::Shutdown()
 {
+    if (GImGui == nullptr)
+    {
+        // This should never happen!
+        checkf(false, TEXT("ImGuiContext shutting down while GImGui is null! This should never happen!!"));
+        return;
+    }
+    
     ImGuiViewport* MainViewport = ImGui::GetMainViewport();
     if (const FCogImGuiViewportData* ViewportData = static_cast<FCogImGuiViewportData*>(MainViewport->PlatformUserData))
     {
@@ -122,17 +133,23 @@ void FCogImguiContext::Shutdown()
     }
 
     GameViewport->RemoveViewportWidgetContent(MainWidget.ToSharedRef());
-
-    if (PlotContext)
-    {
-        ImPlot::DestroyContext(PlotContext);
-        PlotContext = nullptr;
-    }
+    GameViewport->RemoveViewportWidgetContent(InputCatcherWidget.ToSharedRef());
 
     if (ImGuiContext)
     {
-        ImGui::DestroyContext(ImGuiContext);
-        ImGuiContext = nullptr;
+        SetAsCurrent();
+
+        if (PlotContext)
+        {
+            ImPlot::DestroyContext(PlotContext);
+            PlotContext = nullptr;
+        }
+
+        if (ImGuiContext)
+        {
+            ImGui::DestroyContext(ImGuiContext);
+            ImGuiContext = nullptr;
+        }
     }
 }
 
@@ -162,6 +179,18 @@ void FCogImguiContext::OnDisplayMetricsChanged(const FDisplayMetrics& DisplayMet
     }
 }
 
+bool FCogImguiContext::IsCurrentContext() const
+{
+    return ImGui::GetCurrentContext() == ImGuiContext;
+}
+
+void FCogImguiContext::SetAsCurrent()
+{
+    ImGui::SetCurrentContext(ImGuiContext);
+    ImPlot::SetImGuiContext(ImGuiContext);
+    ImPlot::SetCurrentContext(PlotContext);
+}
+
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogImguiContext::BeginFrame(float InDeltaTime)
 {
@@ -176,9 +205,7 @@ bool FCogImguiContext::BeginFrame(float InDeltaTime)
         return false;
     }
 
-    ImGui::SetCurrentContext(ImGuiContext);
-    ImPlot::SetImGuiContext(ImGuiContext);
-    ImPlot::SetCurrentContext(PlotContext);
+    SetAsCurrent();
 
     ImGuiIO& IO = ImGui::GetIO();
     IO.DeltaTime = InDeltaTime;
@@ -250,16 +277,8 @@ bool FCogImguiContext::BeginFrame(float InDeltaTime)
     //-------------------------------------------------------------------------------------------------------
 	// 
 	//-------------------------------------------------------------------------------------------------------
-    const FVector2D& MousePosition = SlateApp.GetCursorPos();
-    if (IO.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-    {
-        IO.AddMousePosEvent(MousePosition.X, MousePosition.Y);
-    }
-    else
-    {
-        const FVector2D TransformedMousePosition = MousePosition - MainWidget->GetTickSpaceGeometry().GetAbsolutePosition();
-        IO.AddMousePosEvent(TransformedMousePosition.X, TransformedMousePosition.Y);
-    }
+    Cog::ImguiInterops::CopyInput(IO, InputState, *this);
+    InputState.ClearUpdateState();
 
     bWantCaptureMouse = ImGui::GetIO().WantCaptureMouse;
 
@@ -698,6 +717,11 @@ void FCogImguiContext::BuildFont()
     ImFontConfig FontConfig;
     FontConfig.SizePixels = FMath::RoundFromZero(13.f * DpiScale);
     IO.Fonts->AddFontDefault(&FontConfig);
+
+    /*
+     * IO.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\Arial.ttf", FMath::RoundFromZero(13.f * DpiScale,
+     *      nullptr, IO.Fonts->GetGlyphRangesDefault());
+     */
 
     uint8* TextureDataRaw;
     int32 TextureWidth, TextureHeight, BytesPerPixel;

@@ -2,6 +2,7 @@
 
 #include "CogImguiInputHelper.h"
 #include "CogWindowManager.h"
+#include "CogWindowModuleCommands.h"
 #include "InputCoreTypes.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -43,7 +44,7 @@ void FCogWindow_Layouts::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogWindow_Layouts::RenderLoadLayoutMenuItem(const UPlayerInput* PlayerInput, int LayoutIndex)
 {
-	const FString Command = FString::Printf(TEXT("%s %d"), *UCogWindowManager::LoadLayoutCommand, LayoutIndex);
+	const FString Command = FString::Printf(TEXT("%s %d"), FCogWindowModuleCommands::LoadLayoutCommand, LayoutIndex);
 	const FString Shortcut = FCogImguiInputHelper::CommandToString(PlayerInput, Command);
     if (ImGui::MenuItem(TCHAR_TO_ANSI(*FString::Printf(TEXT("Load Layout %d"), LayoutIndex)), TCHAR_TO_ANSI(*Shortcut)))
     {
@@ -54,7 +55,7 @@ void FCogWindow_Layouts::RenderLoadLayoutMenuItem(const UPlayerInput* PlayerInpu
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogWindow_Layouts::RenderSaveLayoutMenuItem(const UPlayerInput* PlayerInput, int LayoutIndex)
 {
-	const FString Command = FString::Printf(TEXT("%s %d"), *UCogWindowManager::SaveLayoutCommand, LayoutIndex);
+	const FString Command = FString::Printf(TEXT("%s %d"), FCogWindowModuleCommands::SaveLayoutCommand, LayoutIndex);
 	const FString Shortcut = FCogImguiInputHelper::CommandToString(PlayerInput, Command);
     if (ImGui::MenuItem(TCHAR_TO_ANSI(*FString::Printf(TEXT("Save Layout %d"), LayoutIndex)), TCHAR_TO_ANSI(*Shortcut)))
     {

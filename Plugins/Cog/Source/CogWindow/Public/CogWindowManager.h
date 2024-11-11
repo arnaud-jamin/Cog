@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "CogImguiContext.h"
+#include "CogWindowModuleCommands.h"
 #include "imgui.h"
 #include "CogWindowManager.generated.h"
 
@@ -56,6 +57,8 @@ public:
     virtual void SetHideAllWindows(bool Value);
 
     virtual void ResetAllWindowsConfig();
+    
+    virtual void RegisterDefaultCommandBindingsForPlayerInput(UPlayerInput* PlayerInput);
 
     virtual bool RegisterDefaultCommandBindings();
     
@@ -115,14 +118,6 @@ protected:
 
     static void SettingsHandler_WriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler, ImGuiTextBuffer* buf);
 
-    static FString ToggleInputCommand;
-    
-    static FString LoadLayoutCommand;
-    
-    static FString SaveLayoutCommand;
-
-    static FString ResetLayoutCommand;
-
     UPROPERTY()
     mutable TArray<UCogCommonConfig*> Configs;
 
@@ -148,6 +143,12 @@ protected:
 
     FMenu MainMenu;
 
+    // TODO: Find a better place to register this, it is registered for all contexts
+    using FCommandDelegateHandlePair = TPair<Cog::Window::FCogWindowModuleCommandDelegate*, FDelegateHandle>;
+    TArray<FCommandDelegateHandlePair> ConsoleCommandHandles;
+    using FCommandWithArgsDelegateHandlePair = TPair<Cog::Window::FCogWindowModuleCommandLayoutDelegate*, FDelegateHandle>;
+    TArray<FCommandWithArgsDelegateHandlePair> ConsoleCommandWithArgsHandles;
+
     int32 LayoutToLoad = -1;
 
     int32 HideAllWindowsCounter = 0;
@@ -155,8 +156,6 @@ protected:
     bool bHideAllWindows = false;
 
     bool IsInitialized = false;
-
-    TArray<IConsoleObject*> ConsoleCommands;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------

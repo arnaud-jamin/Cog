@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogWindowModuleCommands.h"
 #include "Modules/ModuleManager.h"
 
 class COGWINDOW_API FCogWindowModule : public IModuleInterface
@@ -12,6 +13,8 @@ public:
 	virtual void StartupModule() override;
 
 	virtual void ShutdownModule() override;
+
+	FCogWindowModuleCommands ModuleCommands;
 
 private:
 };

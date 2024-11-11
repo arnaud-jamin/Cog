@@ -64,8 +64,6 @@ protected:
 
     FReply HandleKeyEvent(const FKeyEvent& KeyEvent, bool Down);
 
-    FReply HandleMouseButtonEvent(const FPointerEvent& MouseEvent, bool Down);
-
     void RefreshVisibility();
 
     FCogImguiContext* Context = nullptr;

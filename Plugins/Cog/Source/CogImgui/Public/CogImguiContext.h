@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogImguiInputHandler.h"
 #include "Engine/Texture2D.h" 
 #include "imgui.h"
 #include "Templates/SharedPointer.h"
@@ -50,6 +51,18 @@ public:
 	bool GetShareKeyboard() const { return bShareKeyboard; }
 
 	void SetShareKeyboard(bool Value) { bShareKeyboard = Value; }
+
+	// Get Input State used by this context
+	FCogImguiInputState& GetInputState() { return InputState; }
+	const FCogImguiInputState& GetInputState() const { return InputState; }
+
+	FCogImguiInputHandler& GetInputHandler() { return InputHandler; }
+
+	bool IsContextSet() const { return ImGuiContext != nullptr; }
+
+	bool IsCurrentContext() const;
+
+	void SetAsCurrent();
 
 	bool BeginFrame(float InDeltaTime);
 
@@ -109,6 +122,10 @@ private:
 	TMap<TWeakPtr<SWindow>, ImGuiID> WindowToViewportMap;
 
 	TSharedPtr<IInputProcessor> InputProcessor = nullptr;
+
+	FCogImguiInputHandler InputHandler;
+
+	FCogImguiInputState InputState;
 
 	TStrongObjectPtr<UTexture2D> FontAtlasTexturePtr = nullptr;
 
