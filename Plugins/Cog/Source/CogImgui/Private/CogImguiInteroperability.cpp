@@ -1,8 +1,10 @@
 #include "CogImguiInteroperability.h"
 
 #include "CogArrayUtility.h"
+#include "CogImguiContext.h"
 #include "CogImguiInputHandler.h"
 #include "CogImguiInputState.h"
+#include "CogImguiWidget.h"
 #include "imgui.h"
 
 // If TCHAR is wider than ImWchar, enable or disable validation of input character before conversions.
@@ -268,17 +270,6 @@ namespace Cog::ImguiInterops
 		IO.AddKeyEvent(ImGuiMod_Alt, InputState.IsAltDown());
 
 		// Copy buffers.
-		/* Deprecated flow
-		if (!InputState.GetKeysUpdateRange().IsEmpty())
-		{
-			Copy(InputState.GetKeys(), IO.KeysData, InputState.GetKeysUpdateRange());
-		}
-
-		if (!InputState.GetMouseButtonsUpdateRange().IsEmpty())
-		{
-			Copy(InputState.GetMouseButtons(), IO.MouseDown, InputState.GetMouseButtonsUpdateRange());
-		}
-		*/
 		for (const auto& KeyEvent : InputState.GetKeyEvents())
 		{
 			IO.AddKeyEvent(KeyEvent.Key, KeyEvent.Down);
@@ -313,16 +304,14 @@ namespace Cog::ImguiInterops
 
 		{
 			// Copy the mouse position.
-			//IO.MousePos.x = InputState.GetMousePosition().X;
-			//IO.MousePos.y = InputState.GetMousePosition().Y;
-
 			if (IO.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 			{
 				IO.AddMousePosEvent(InputState.GetMousePosition().X, InputState.GetMousePosition().Y);
 			}
 			else
 			{
-				const FVector2D TransformedMousePosition = InputState.GetMousePosition() - CogContext.GetMainWidget()->GetTickSpaceGeometry().GetAbsolutePosition();
+				const FVector2D TransformedMousePosition = InputState.GetMousePosition() -
+					CogContext.GetMainWidget()->GetTickSpaceGeometry().GetAbsolutePosition();
 				IO.AddMousePosEvent(TransformedMousePosition.X, TransformedMousePosition.Y);
 			}
 

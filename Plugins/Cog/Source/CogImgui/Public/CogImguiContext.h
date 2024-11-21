@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "CogImguiInputHandler.h"
+#include "CogImguiInputState.h"
 #include "Engine/Texture2D.h" 
 #include "imgui.h"
 #include "Templates/SharedPointer.h"
@@ -9,7 +10,6 @@
 
 class FCogImguiContext;
 class IInputProcessor;
-class SCogImguiWidget;
 class SCogImguiWidget;
 class SCogImguiInputCatcherWidget;
 class SWidget;
@@ -30,7 +30,7 @@ class COGIMGUI_API FCogImguiContext : public TSharedFromThis<FCogImguiContext>
 {
 public:
 
-	void Initialize();
+	void Initialize(UWorld* World);
 
 	void Shutdown();
 
@@ -136,6 +136,8 @@ private:
 	TWeakPtr<SWidget> PreviousMouseCaptor = nullptr;
 
 	TObjectPtr<UGameViewportClient> GameViewport = nullptr;
+
+	int32 WorldContextId = INDEX_NONE;
 
 	ImGuiContext* ImGuiContext = nullptr;
 

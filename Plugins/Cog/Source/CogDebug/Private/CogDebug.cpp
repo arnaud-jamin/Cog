@@ -3,13 +3,14 @@
 #include "CogCommonDebugFilteredActorInterface.h"
 #include "CogDebugDrawHelper.h"
 #include "CogDebugReplicator.h"
+#include "CogWorldUtility.h"
 #include "imgui.h"
 #include "Engine/World.h"
 #include "Engine/Engine.h"
 #include "Kismet/KismetMathLibrary.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-TWeakObjectPtr<AActor> FCogDebug::Selection;
+TMap<int32, TWeakObjectPtr<AActor>> FCogDebug::SelectionByContext;
 FCogDebugSettings FCogDebug::Settings = FCogDebugSettings();
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -32,7 +33,8 @@ bool FCogDebug::IsDebugActiveForObject(const UObject* WorldContextObject)
         return true;
     }
 
-    const bool Result = IsDebugActiveForObject_Internal(WorldContextObject, Selection.Get(), Settings.bIsFilteringBySelection);
+    const AActor* Selection = GetSelection(World);
+    const bool Result = IsDebugActiveForObject_Internal(WorldContextObject, Selection, Settings.bIsFilteringBySelection);
 
     return Result;
 }
@@ -86,15 +88,35 @@ bool FCogDebug::IsDebugActiveForObject_Internal(const UObject* WorldContextObjec
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-AActor* FCogDebug::GetSelection()
+
+AActor* FCogDebug::GetSelection(const UWorld* World)
 {
-    return Selection.Get();
+    const int32 WorldContextId = CogUtilities::GetWorldContextId(World);
+    if (WorldContextId == CogUtilities::INVALID_CONTEXT_INDEX)
+    {
+        return nullptr;
+    }
+
+    TWeakObjectPtr<AActor>* SelectionForContext = SelectionByContext.Find(WorldContextId);
+
+    if (SelectionForContext == nullptr)
+    {
+        return nullptr;
+    }
+
+    return SelectionForContext->Get();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebug::SetSelection(const UWorld* World, AActor* Value)
 {
-    Selection = Value;
+    const int32 WorldContextId = CogUtilities::GetWorldContextId(World);
+    if (WorldContextId == CogUtilities::INVALID_CONTEXT_INDEX)
+    {
+        return;
+    }
+
+    SelectionByContext.Add(WorldContextId, Value);
 
     if (World != nullptr && World->GetNetMode() == NM_Client)
     {

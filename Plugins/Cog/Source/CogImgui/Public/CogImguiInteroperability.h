@@ -7,7 +7,6 @@
 
 struct FCogImguiInputState;
 class FCogImguiContext;
-struct FCogImguiInputStaste;
 
 namespace Cog::ImguiInterops
 {

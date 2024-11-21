@@ -82,7 +82,7 @@ void ACogDebugReplicator::BeginPlay()
     if (OwnerPlayerController != nullptr && OwnerPlayerController->IsLocalController())
     {
         Server_RequestAllCategoriesVerbosity();
-        Server_SetSelection(FCogDebug::GetSelection());
+        Server_SetSelection(FCogDebug::GetSelection(World));
         Server_SetIsFilteringBySelection(FCogDebug::GetIsFilteringBySelection());
     }
 }

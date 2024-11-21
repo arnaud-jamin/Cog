@@ -383,7 +383,7 @@ public:
     
     static bool IsReplicatedDebugActiveForObject(const UObject* WorldContextObject, const AActor* ServerSelection, bool IsServerFilteringBySelection);
 
-    static AActor* GetSelection();
+    static AActor* GetSelection(const UWorld* World);
     
     static void SetSelection(const UWorld* World, AActor* Value);
     
@@ -429,5 +429,5 @@ private:
 
     static bool IsDebugActiveForObject_Internal(const UObject* WorldContextObject, const AActor* InSelection, bool InIsFilteringBySelection);
 
-    static TWeakObjectPtr<AActor> Selection;
+    static TMap<int32, TWeakObjectPtr<AActor>> SelectionByContext;
 };

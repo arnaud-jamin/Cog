@@ -5,6 +5,7 @@
 #include "CogImguiInputCatcherWidget.h"
 #include "CogImguiInputHelper.h"
 #include "CogImguiWidget.h"
+#include "CogWorldUtility.h"
 #include "Engine/Console.h"
 #include "Engine/Engine.h"
 #include "Engine/GameViewportClient.h"
@@ -24,7 +25,7 @@
 static UPlayerInput* GetPlayerInput(const UWorld* World);
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogImguiContext::Initialize()
+void FCogImguiContext::Initialize(UWorld* World)
 {
     IMGUI_CHECKVERSION();
 
@@ -43,6 +44,7 @@ void FCogImguiContext::Initialize()
     SAssignNew(InputCatcherWidget, SCogImguiInputCatcherWidget).Context(this);
     GameViewport->AddViewportWidgetContent(InputCatcherWidget.ToSharedRef(), -TNumericLimits<int32>::Max());
 
+    WorldContextId = CogUtilities::GetWorldContextId(World);
     ImGuiContext = ImGui::CreateContext();
     PlotContext = ImPlot::CreateContext();
     ImPlot::SetImGuiContext(ImGuiContext);

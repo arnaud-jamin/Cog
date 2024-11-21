@@ -813,7 +813,7 @@ bool FCogWindowWidgets::ActorsList(const UWorld& World, const TSubclassOf<AActor
         }
     }
 
-    const AActor* OldSelection = FCogDebug::GetSelection();
+    const AActor* OldSelection = FCogDebug::GetSelection(&World);
     const AActor* NewSelection = OldSelection;
 
     ImGuiListClipper Clipper;
@@ -830,7 +830,7 @@ bool FCogWindowWidgets::ActorsList(const UWorld& World, const TSubclassOf<AActor
 
             ImGui::PushStyleColor(ImGuiCol_Text, Actor == LocalPlayerPawn ? IM_COL32(255, 255, 0, 255) : IM_COL32(255, 255, 255, 255));
 
-            const bool bIsSelected = Actor == FCogDebug::GetSelection();
+            const bool bIsSelected = Actor == FCogDebug::GetSelection(&World);
             if (ImGui::Selectable(TCHAR_TO_ANSI(*FCogWindowHelper::GetActorName(*Actor)), bIsSelected))
             {
                 FCogDebug::SetSelection(&World, Actor);
@@ -894,7 +894,7 @@ bool FCogWindowWidgets::MenuActorsCombo(const char* StrID, const UWorld& World, 
             SelectedClass = ActorClasses[SelectedActorClassIndex];
         }
 
-        AActor* Selection = FCogDebug::GetSelection();
+        AActor* Selection = FCogDebug::GetSelection(&World);
         if (Selection != nullptr && Selection->IsA(SelectedClass) == false)
         {
             Selection = nullptr;
@@ -1012,7 +1012,7 @@ void FCogWindowWidgets::ActorFrame(const AActor& Actor)
     FVector2D ScreenPosMin, ScreenPosMax;
     if (FCogWindowHelper::ComputeBoundingBoxScreenPosition(PlayerController, BoxOrigin, BoxExtent, ScreenPosMin, ScreenPosMax))
     {
-        const ImU32 Color = (&Actor == FCogDebug::GetSelection()) ? IM_COL32(255, 255, 255, 255) : IM_COL32(255, 255, 255, 128);
+        const ImU32 Color = (&Actor == FCogDebug::GetSelection(Actor.GetWorld())) ? IM_COL32(255, 255, 255, 255) : IM_COL32(255, 255, 255, 128);
         if (ScreenPosMin != ScreenPosMax)
         {
             DrawList->AddRect(FCogImguiHelper::ToImVec2(ScreenPosMin) + Viewport->Pos, FCogImguiHelper::ToImVec2(ScreenPosMax) + Viewport->Pos, Color, 0.0f, 0, 1.0f);

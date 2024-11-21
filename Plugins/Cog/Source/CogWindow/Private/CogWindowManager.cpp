@@ -36,7 +36,7 @@ void UCogWindowManager::PostInitProperties()
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::InitializeInternal()
 {
-    Context.Initialize();
+    Context.Initialize(GetWorld());
 
     ImGuiSettingsHandler IniHandler;
     IniHandler.TypeName = "Cog";

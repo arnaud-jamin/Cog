@@ -116,7 +116,7 @@ void FCogWindow::RenderHelp()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogWindow::RenderTick(float DeltaTime)
 {
-    AActor* NewSelection = FCogDebug::GetSelection();
+    AActor* NewSelection = FCogDebug::GetSelection(GetWorld());
 
     // CogDebug Selection is currently static and not contextual to the ImGuiContext/Session
     // So this is a hacky temp fix to ensure the windows are not looking outside its context

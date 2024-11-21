@@ -1,8 +1,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogImguiInteroperability.h"
-#include "CogImguiContext.h"
 #include "CogImguiInputState.h"
 
 class FCogImguiContext;
