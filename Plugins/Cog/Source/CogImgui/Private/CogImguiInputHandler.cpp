@@ -66,6 +66,7 @@ FReply FCogImguiInputHandler::HandleKeyEvent(const FKeyEvent& KeyEvent, bool Dow
 
 	if (FCogImguiInputHelper::IsKeyEventHandled(Context->GetGameViewport()->GetWorld(), KeyEvent) == false)
 	{
+		CopyModifierKeys(KeyEvent);
 		return FReply::Unhandled();
 	}
 	

@@ -130,34 +130,14 @@ FReply SCogImguiWidget::OnKeyUp(const FGeometry& MyGeometry, const FKeyEvent& Ke
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiWidget::HandleKeyEvent(const FKeyEvent& KeyEvent, bool Down)
 {
-    if (Context->GetEnableInput() == false)
+    if (Down)
     {
-        return FReply::Unhandled();
+        return Context->GetInputHandler().OnKeyDown(KeyEvent);
     }
-
-    if (KeyEvent.GetKey().IsGamepadKey())
+    else
     {
-        return FReply::Unhandled();
+        return Context->GetInputHandler().OnKeyUp(KeyEvent);;
     }
-
-    if (FCogImguiInputHelper::IsKeyEventHandled(Context->GetGameViewport()->GetWorld(), KeyEvent) == false)
-    {
-        return FReply::Unhandled();
-    }
-
-    ImGuiIO& IO = ImGui::GetIO();
-    IO.AddKeyEvent(FCogImguiInputHelper::ToImKey(KeyEvent.GetKey()), Down);
-    IO.AddKeyEvent(ImGuiMod_Ctrl, KeyEvent.IsControlDown());
-    IO.AddKeyEvent(ImGuiMod_Shift, KeyEvent.IsShiftDown());
-    IO.AddKeyEvent(ImGuiMod_Alt, KeyEvent.IsAltDown());
-    IO.AddKeyEvent(ImGuiMod_Super, KeyEvent.IsCommandDown());
-
-    if (IO.WantCaptureKeyboard == false && Context->GetShareKeyboard())
-    {
-        return FReply::Unhandled();
-    }
-
-    return FReply::Handled();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
