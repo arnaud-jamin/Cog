@@ -4,7 +4,7 @@ Cog is a set of debug tools for Unreal Engine built on top of [Dear ImGui](https
 # Fork Information
 This is a forked project from https://github.com/arnaud-jamin/Cog to adapt it to some expanded needs, and extend functionality.
 Changes Include:
-- Supports multiple PIE windows (some functionality might not be intuitive)
+- Supports multiple PIE windows (Selection is per-PIE session!)
 - Gamepad navigation currently disabled until I finish working on it
 
 # Overview
