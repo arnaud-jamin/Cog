@@ -7,6 +7,7 @@
 #include "CogSampleLogCategories.h"
 #include "CogSampleTargetableInterface.h"
 #include "Components/CapsuleComponent.h"
+#include "Engine/OverlapResult.h"
 #include "GameFramework/PlayerController.h"
 
 #if ENABLE_COG

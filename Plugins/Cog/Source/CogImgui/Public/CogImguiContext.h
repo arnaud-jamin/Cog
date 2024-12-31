@@ -25,6 +25,18 @@ struct COGIMGUI_API FCogImGuiViewportData
 	TWeakPtr<SCogImguiWidget> Widget = nullptr;
 };
 
+
+struct COGIMGUI_API FCogImGuiContextScope
+{
+	UE_NODISCARD_CTOR explicit FCogImGuiContextScope(FCogImguiContext& CogImguiContext);
+	UE_NODISCARD_CTOR explicit FCogImGuiContextScope(ImGuiContext* GuiCtx, ImPlotContext* PlotCtx);
+	~FCogImGuiContextScope();
+
+private:
+	ImGuiContext* PrevContext = nullptr;
+	ImPlotContext* PrevPlotContext = nullptr;
+};
+
 class COGIMGUI_API FCogImguiContext : public TSharedFromThis<FCogImguiContext>
 {
 public:
@@ -64,6 +76,8 @@ public:
 	TSharedPtr<const SCogImguiWidget> GetMainWidget() const { return MainWidget; }
 
 private:
+
+	friend struct FCogImGuiContextScope;
 
 	void OnDisplayMetricsChanged(const FDisplayMetrics& DisplayMetrics) const;
 

@@ -2,9 +2,10 @@
 
 #include "CogDebug.h"
 #include "Components/LineBatchComponent.h"
-#include "Engine/Engine.h"
-#include "DrawDebugHelpers.h"
 #include "Components/BoxComponent.h"
+#include "DrawDebugHelpers.h"
+#include "Engine/Engine.h"
+#include "Engine/OverlapResult.h"
 
 namespace 
 {

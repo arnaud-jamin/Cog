@@ -83,8 +83,6 @@ protected:
 
     ETraceTypeQuery TraceType = TraceTypeQuery1;
 
-    TArray<IConsoleObject*> ConsoleCommands;
-
     TObjectPtr<UCogEngineConfig_Selection> Config;
 
 	ImGuiTextFilter Filter;

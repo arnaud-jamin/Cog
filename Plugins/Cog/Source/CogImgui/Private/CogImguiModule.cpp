@@ -33,4 +33,4 @@ void FCogImguiModule::ShutdownModule()
 //--------------------------------------------------------------------------------------------------------------------------
 #undef LOCTEXT_NAMESPACE
 
-IMPLEMENT_MODULE(FCogImguiModule, CogImGui)
+IMPLEMENT_MODULE(FCogImguiModule, CogImgui)

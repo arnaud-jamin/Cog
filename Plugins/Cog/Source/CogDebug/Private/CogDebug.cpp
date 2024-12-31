@@ -3,13 +3,14 @@
 #include "CogCommonDebugFilteredActorInterface.h"
 #include "CogDebugDrawHelper.h"
 #include "CogDebugReplicator.h"
-#include "imgui.h"
-#include "Engine/World.h"
 #include "Engine/Engine.h"
+#include "Engine/World.h"
+#include "imgui.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Misc/EngineVersionComparison.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-TWeakObjectPtr<AActor> FCogDebug::Selection;
+TWeakObjectPtr<AActor> FCogDebug::Selection[] = {};
 FCogDebugSettings FCogDebug::Settings = FCogDebugSettings();
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -32,7 +33,7 @@ bool FCogDebug::IsDebugActiveForObject(const UObject* WorldContextObject)
         return true;
     }
 
-    const bool Result = IsDebugActiveForObject_Internal(WorldContextObject, Selection.Get(), Settings.bIsFilteringBySelection);
+    const bool Result = IsDebugActiveForObject_Internal(WorldContextObject, Selection[GetPieSessionId()].Get(), Settings.bIsFilteringBySelection);
 
     return Result;
 }
@@ -83,20 +84,32 @@ bool FCogDebug::IsDebugActiveForObject_Internal(const UObject* WorldContextObjec
 
         Outer = NewOuter;
     }
-
-    return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 AActor* FCogDebug::GetSelection()
 {
-    return Selection.Get();
+    return Selection[GetPieSessionId()].Get();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+int32 FCogDebug::GetPieSessionId()
+{
+#if UE_EDITOR
+#if UE_VERSION_OLDER_THAN(5, 5, 0)
+    return GPlayInEditorID;
+#else
+    return UE::GetPlayInEditorID();
+#endif
+#else
+    return 0;
+#endif
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebug::SetSelection(const UWorld* World, AActor* Value)
 {
-    Selection = Value;
+    Selection[GetPieSessionId()] = Value;
 
     if (World != nullptr && World->GetNetMode() == NM_Client)
     {

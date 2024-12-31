@@ -427,7 +427,11 @@ public:
 
 private:
 
+    static int32 GetPieSessionId();
+
+    static constexpr uint32 MaxPie = 16;
+
     static bool IsDebugActiveForObject_Internal(const UObject* WorldContextObject, const AActor* InSelection, bool InIsFilteringBySelection);
 
-    static TWeakObjectPtr<AActor> Selection;
+    static TWeakObjectPtr<AActor> Selection[MaxPie];
 };

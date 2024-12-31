@@ -3,6 +3,7 @@
 #include "CogDebugDrawImGui.h"
 #include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
+#include "CogWindowConsoleCommandManager.h"
 #include "CogWindow_Layouts.h"
 #include "CogWindow_Settings.h"
 #include "CogWindow_Spacing.h"
@@ -12,8 +13,10 @@
 #include "GameFramework/PlayerInput.h"
 #include "HAL/IConsoleManager.h"
 #include "imgui_internal.h"
+#include "Misc/EngineVersionComparison.h"
 
 FString UCogWindowManager::ToggleInputCommand   = TEXT("Cog.ToggleInput");
+FString UCogWindowManager::DisableInputCommand  = TEXT("Cog.DisableInput");
 FString UCogWindowManager::LoadLayoutCommand    = TEXT("Cog.LoadLayout");
 FString UCogWindowManager::SaveLayoutCommand    = TEXT("Cog.SaveLayout");
 FString UCogWindowManager::ResetLayoutCommand   = TEXT("Cog.ResetLayout");
@@ -28,19 +31,29 @@ void UCogWindowManager::PostInitProperties()
 {
     Super::PostInitProperties();
 
-    if (bRegisterDefaultCommands)
-    {
-        if (RegisterDefaultCommandBindings())
-        {
-            bRegisterDefaultCommands = false;
-        }
-    }
+    //if (bRegisterDefaultCommands)
+    //{
+    //    if (RegisterDefaultCommandBindings())
+    //    {
+    //        bRegisterDefaultCommands = false;
+    //    }
+    //}
+
+    //-------------------------------------------------------------------------------
+    // Currently always register default commands. 
+    // Since UE5.4, the ini files must have this to be saved:
+    // [SectionsToSave]
+    // bCanSaveAllSections = True
+    //-------------------------------------------------------------------------------
+    RegisterDefaultCommandBindings();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::InitializeInternal()
 {
     Context.Initialize();
+
+    FCogImGuiContextScope ImGuiContextScope(Context);
 
     ImGuiSettingsHandler IniHandler;
     IniHandler.TypeName = "Cog";
@@ -61,29 +74,59 @@ void UCogWindowManager::InitializeInternal()
     LayoutsWindow = AddWindow<FCogWindow_Layouts>("Window.Layouts", false);
     SettingsWindow = AddWindow<FCogWindow_Settings>("Window.Settings", false);
 
-    ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
-        *ToggleInputCommand,
+    FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(
+        *ToggleInputCommand, 
         TEXT("Toggle the input focus between the Game and ImGui"),
-        FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { ToggleInputMode(); }), 
-        ECVF_Cheat));
+        GetWorld(),
+        FCogWindowConsoleCommandDelegate::CreateLambda([this](const TArray<FString>& InArgs, UWorld* InWorld)
+        {
+            ToggleInputMode();
+        }));
 
-    ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
+    FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(
+        *DisableInputCommand,
+        TEXT("Disable ImGui input"), 
+        GetWorld(),
+        FCogWindowConsoleCommandDelegate::CreateLambda([this](const TArray<FString>& InArgs, UWorld* InWorld)
+        {
+            DisableInputMode();
+        }));
+
+    FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(
         *ResetLayoutCommand,
         TEXT("Reset the layout."),
-        FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { if (Args.Num() > 0) { ResetLayout(); }}),
-        ECVF_Cheat));
+        GetWorld(),
+        FCogWindowConsoleCommandDelegate::CreateLambda([this](const TArray<FString>& InArgs, UWorld* InWorld)
+        {
+            if (InArgs.Num() > 0)
+            {
+                ResetLayout();
+            }
+        }));
 
-    ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
+    FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(
         *LoadLayoutCommand,
         TEXT("Load the layout. Cog.LoadLayout <Index>"),
-        FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { if (Args.Num() > 0) { LoadLayout(FCString::Atoi(*Args[0])); }}), 
-        ECVF_Cheat));
+        GetWorld(),
+        FCogWindowConsoleCommandDelegate::CreateLambda([this](const TArray<FString>& InArgs, UWorld* InWorld)
+        {
+            if (InArgs.Num() > 0)
+            {
+                LoadLayout(FCString::Atoi(*InArgs[0]));
+            }
+        }));
 
-    ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
-        *SaveLayoutCommand, 
+    FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(
+        *SaveLayoutCommand,
         TEXT("Save the layout. Cog.SaveLayout <Index>"),
-        FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { if (Args.Num() > 0) { SaveLayout(FCString::Atoi(*Args[0])); }}), 
-        ECVF_Cheat));
+        GetWorld(),
+        FCogWindowConsoleCommandDelegate::CreateLambda([this](const TArray<FString>& InArgs, UWorld* InWorld)
+        {
+            if (InArgs.Num() > 0)
+            {
+                SaveLayout(FCString::Atoi(*InArgs[0]));
+            }
+        }));
 
     IsInitialized = true;
 }
@@ -91,6 +134,8 @@ void UCogWindowManager::InitializeInternal()
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::Shutdown()
 {
+    FCogImGuiContextScope ImGuiContextScope(Context);
+
     //------------------------------------------------------------
     // Call PreSaveConfig before destroying imgui context
     // if PreSaveConfig needs to read ImGui IO for example
@@ -104,7 +149,10 @@ void UCogWindowManager::Shutdown()
     // Destroy ImGui before destroying the windows to make sure 
     // imgui serialize their visibility state in imgui.ini
     //------------------------------------------------------------
-    Context.Shutdown();
+    if (IsInitialized == true)
+    {
+        Context.Shutdown();
+    }
 
     SaveConfig();
 
@@ -120,15 +168,14 @@ void UCogWindowManager::Shutdown()
         Config->SaveConfig();
     }
 
-    for (IConsoleObject* ConsoleCommand : ConsoleCommands)
-    {
-        IConsoleManager::Get().UnregisterConsoleObject(ConsoleCommand);
-    }
+    FCogWindowConsoleCommandManager::UnregisterAllWorldConsoleCommands(GetWorld());
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::Tick(float DeltaTime)
 {
+    FCogImGuiContextScope ImGuiContextScope(Context);
+
     if (GEngine->GameViewport == nullptr)
     {
         return;
@@ -161,6 +208,8 @@ void UCogWindowManager::Tick(float DeltaTime)
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::Render(float DeltaTime)
 {
+    FCogImGuiContextScope ImGuiContextScope(Context);
+
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0));
     ImGui::DockSpaceOverViewport(0, ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingInCentralNode | ImGuiDockNodeFlags_AutoHideTabBar);
     ImGui::PopStyleColor(1);
@@ -249,6 +298,8 @@ void UCogWindowManager::SetHideAllWindows(const bool Value)
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::ResetLayout()
 {
+    FCogImGuiContextScope ImGuiContextScope(Context);
+
     for (const FCogWindow* Window : Windows)
     {
         ImGui::SetWindowPos(TCHAR_TO_ANSI(*Window->GetName()), ImVec2(10, 10), ImGuiCond_Always);
@@ -280,6 +331,8 @@ void UCogWindowManager::LoadLayout(const int32 LayoutIndex)
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::SaveLayout(const int32 LayoutIndex)
 {
+    FCogImGuiContextScope ImGuiContextScope(Context);
+
 	const FString Filename = *FCogImguiHelper::GetIniFilePath(FString::Printf(TEXT("imgui_layout_%d"), LayoutIndex));
     ImGui::SaveIniSettingsToDisk(TCHAR_TO_ANSI(*Filename));
 }
@@ -681,6 +734,10 @@ bool UCogWindowManager::RegisterDefaultCommandBindings()
     }
 
     UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*GetWorld());
+    if (PlayerInput == nullptr)
+    {
+        return false;
+    }
 
     AddCommand(PlayerInput, "Cog.ToggleInput", EKeys::F1);
     AddCommand(PlayerInput, "Cog.LoadLayout 1", EKeys::F2);
@@ -690,13 +747,17 @@ bool UCogWindowManager::RegisterDefaultCommandBindings()
 
     SortCommands(PlayerInput);
     PlayerInput->SaveConfig();
-
     return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::AddCommand(UPlayerInput* PlayerInput, const FString& Command, const FKey& Key)
 {
+    if (PlayerInput == nullptr)
+    {
+        return;
+    }
+
     //---------------------------------------------------
     // Reassign conflicting commands
     //---------------------------------------------------
@@ -786,5 +847,12 @@ void UCogWindowManager::ToggleInputMode()
 {
     UE_LOG(LogCogImGui, Verbose, TEXT("UCogWindowManager::ToggleInputMode"));
     Context.SetEnableInput(!Context.GetEnableInput());
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogWindowManager::DisableInputMode()
+{
+    UE_LOG(LogCogImGui, Verbose, TEXT("UCogWindowManager::DisableInputMode"));
+    Context.SetEnableInput(false);
 }
 

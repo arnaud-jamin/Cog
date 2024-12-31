@@ -101,9 +101,11 @@ protected:
 
     virtual void RenderMenuItem(FCogWindow& Window, const char* MenuItemName);
 
-    void RenderMenuItemHelp(FCogWindow& Window);
+    virtual void RenderMenuItemHelp(FCogWindow& Window);
 
     virtual void ToggleInputMode();
+
+    virtual void DisableInputMode();
 
     static void SettingsHandler_ClearAll(ImGuiContext* ctx, ImGuiSettingsHandler*);
 
@@ -116,6 +118,8 @@ protected:
     static void SettingsHandler_WriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler, ImGuiTextBuffer* buf);
 
     static FString ToggleInputCommand;
+
+    static FString DisableInputCommand;
     
     static FString LoadLayoutCommand;
     
@@ -155,8 +159,6 @@ protected:
     bool bHideAllWindows = false;
 
     bool IsInitialized = false;
-
-    TArray<IConsoleObject*> ConsoleCommands;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------

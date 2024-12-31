@@ -93,6 +93,8 @@ FReply SCogImguiInputCatcherWidget::OnMouseButtonUp(const FGeometry& MyGeometry,
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiInputCatcherWidget::HandleMouseButtonEvent(const FPointerEvent& MouseEvent, bool Down)
 {
+    FCogImGuiContextScope ImGuiContextScope(*Context);
+
     if (Context->GetEnableInput() == false)
     {
         UE_LOG(LogCogImGui, VeryVerbose, TEXT("SCogImguiInputCatcherWidget::HandleMouseButtonEvent | Window:%s | Unhandled | EnableInput == false | Down:%d"), Window.IsValid() ? *Window->GetTitle().ToString() : *FString("None"), Down);
@@ -110,6 +112,8 @@ FReply SCogImguiInputCatcherWidget::HandleMouseButtonEvent(const FPointerEvent& 
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiInputCatcherWidget::OnMouseWheel(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
+    FCogImGuiContextScope ImGuiContextScope(*Context);
+
     if (Context->GetEnableInput() == false)
     {
         return FReply::Unhandled();

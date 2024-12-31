@@ -112,6 +112,8 @@ FVector2D SCogImguiWidget::ComputeDesiredSize(float Scale) const
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiWidget::OnKeyChar(const FGeometry& MyGeometry, const FCharacterEvent& CharacterEvent)
 {
+    FCogImGuiContextScope ImGuiContextScope(*Context);
+
     ImGuiIO& IO = ImGui::GetIO();
     IO.AddInputCharacter(FCogImguiInputHelper::CastInputChar(CharacterEvent.GetCharacter()));
 
@@ -134,6 +136,8 @@ FReply SCogImguiWidget::OnKeyUp(const FGeometry& MyGeometry, const FKeyEvent& Ke
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiWidget::HandleKeyEvent(const FKeyEvent& KeyEvent, bool Down)
 {
+    FCogImGuiContextScope ImGuiContextScope(*Context);
+
     if (Context->GetEnableInput() == false)
     {
         return FReply::Unhandled();
@@ -196,6 +200,8 @@ FReply SCogImguiWidget::OnMouseButtonUp(const FGeometry& MyGeometry, const FPoin
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiWidget::HandleMouseButtonEvent(const FPointerEvent& MouseEvent, bool Down)
 {
+    FCogImGuiContextScope ImGuiContextScope(*Context);
+
     if (Context->GetEnableInput() == false)
     {
         UE_LOG(LogCogImGui, VeryVerbose, TEXT("SCogImguiWidget::HandleMouseButtonEvent | %s | Unhandled | EnableInput == false | Down:%d"), Window.IsValid() ? *Window->GetTitle().ToString() : *FString("None"), Down);
@@ -212,6 +218,8 @@ FReply SCogImguiWidget::HandleMouseButtonEvent(const FPointerEvent& MouseEvent, 
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiWidget::OnMouseWheel(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
+    FCogImGuiContextScope ImGuiContextScope(*Context);
+
     if (Context->GetEnableInput() == false)
     {
         return FReply::Unhandled();
@@ -224,6 +232,8 @@ FReply SCogImguiWidget::OnMouseWheel(const FGeometry& MyGeometry, const FPointer
 //--------------------------------------------------------------------------------------------------------------------------
 FReply SCogImguiWidget::OnMouseMove(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
+    FCogImGuiContextScope ImGuiContextScope(*Context);
+
     if (Context->GetEnableInput() == false)
     {
         //UE_LOG(LogCogImGui, VeryVerbose, TEXT("SCogImguiWidget::OnMouseMove | Window:%s | Unhandled | EnableInput == false"), Window.IsValid() ? *Window->GetTitle().ToString() : *FString("None"));

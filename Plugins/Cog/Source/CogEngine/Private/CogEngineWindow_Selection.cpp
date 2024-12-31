@@ -5,6 +5,7 @@
 #include "CogEngineWindow_ImGui.h"
 #include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
+#include "CogWindowConsoleCommandManager.h"
 #include "CogWindowManager.h"
 #include "CogWindowWidgets.h"
 #include "Components/PrimitiveComponent.h"
@@ -27,11 +28,14 @@ void FCogEngineWindow_Selection::Initialize()
 
     Config = GetConfig<UCogEngineConfig_Selection>();
 
-    ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
+    FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(
         *ToggleSelectionModeCommand,
         TEXT("Toggle the actor selection mode"),
-        FConsoleCommandWithArgsDelegate::CreateLambda([this](const TArray<FString>& Args) { ToggleSelectionMode(); }),
-        ECVF_Cheat));
+        GetWorld(),
+        FCogWindowConsoleCommandDelegate::CreateLambda([this](const TArray<FString>& InArgs, UWorld* InWorld)
+        {
+            ToggleSelectionMode();
+        }));
 
     TryReapplySelection();
 }
@@ -50,10 +54,6 @@ void FCogEngineWindow_Selection::RenderHelp()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Selection::Shutdown()
 {
-    for (IConsoleObject* ConsoleCommand : ConsoleCommands)
-    {
-        IConsoleManager::Get().UnregisterConsoleObject(ConsoleCommand);
-    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

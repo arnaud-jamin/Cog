@@ -17,11 +17,40 @@
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "implot.h"
+#include "Misc/EngineVersionComparison.h"
 #include "TextureResource.h"
 #include "Widgets/SViewport.h"
 #include "Widgets/SWindow.h"
 
 static UPlayerInput* GetPlayerInput(const UWorld* World);
+
+FCogImGuiContextScope::
+FCogImGuiContextScope(FCogImguiContext& CogImguiContext)
+{
+    PrevContext = ImGui::GetCurrentContext();
+    PrevPlotContext = ImPlot::GetCurrentContext();
+
+    ImGui::SetCurrentContext(CogImguiContext.ImGuiContext);
+    ImPlot::SetCurrentContext(CogImguiContext.PlotContext);
+}
+
+FCogImGuiContextScope::
+FCogImGuiContextScope(ImGuiContext* GuiCtx, ImPlotContext* PlotCtx)
+{
+    PrevContext = ImGui::GetCurrentContext();
+    PrevPlotContext = ImPlot::GetCurrentContext();
+
+    ImGui::SetCurrentContext(GuiCtx);
+    ImPlot::SetCurrentContext(PlotCtx);
+}
+
+FCogImGuiContextScope::
+~FCogImGuiContextScope()
+{
+    ImGui::SetCurrentContext(PrevContext);
+    ImPlot::SetCurrentContext(PrevPlotContext);
+}
+
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::Initialize()
@@ -45,7 +74,9 @@ void FCogImguiContext::Initialize()
 
     ImGuiContext = ImGui::CreateContext();
     PlotContext = ImPlot::CreateContext();
+    ImGui::SetCurrentContext(ImGuiContext);
     ImPlot::SetImGuiContext(ImGuiContext);
+    ImPlot::SetCurrentContext(PlotContext);
 
     ImGuiIO& IO = ImGui::GetIO();
     IO.UserData = this;
@@ -105,6 +136,13 @@ void FCogImguiContext::Initialize()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::Shutdown()
 {
+    if (FSlateApplication::IsInitialized() == false)
+    {
+        return;
+    }
+
+    FCogImGuiContextScope ImGuiContextScope(ImGuiContext, PlotContext);
+
     ImGuiViewport* MainViewport = ImGui::GetMainViewport();
     if (const FCogImGuiViewportData* ViewportData = static_cast<FCogImGuiViewportData*>(MainViewport->PlatformUserData))
     {
@@ -122,6 +160,7 @@ void FCogImguiContext::Shutdown()
     }
 
     GameViewport->RemoveViewportWidgetContent(MainWidget.ToSharedRef());
+    GameViewport->RemoveViewportWidgetContent(InputCatcherWidget.ToSharedRef());
 
     if (PlotContext)
     {
@@ -139,6 +178,8 @@ void FCogImguiContext::Shutdown()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::OnDisplayMetricsChanged(const FDisplayMetrics& DisplayMetrics) const
 {
+    FCogImGuiContextScope ImGuiContextScope(ImGuiContext, PlotContext);
+
     ImGuiPlatformIO& PlatformIO = ImGui::GetPlatformIO();
     PlatformIO.Monitors.resize(0);
 
@@ -165,6 +206,8 @@ void FCogImguiContext::OnDisplayMetricsChanged(const FDisplayMetrics& DisplayMet
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogImguiContext::BeginFrame(float InDeltaTime)
 {
+    FCogImGuiContextScope ImGuiContextScope(ImGuiContext, PlotContext);
+
     //-------------------------------------------------------------------------------------------------------
     // Skip the first frame, to let the main widget update its TickSpaceGeometry which is returned by the 
     // plateform callback ImGui_GetWindowPos. When using viewports Imgui needs to know the main viewport 
@@ -175,10 +218,6 @@ bool FCogImguiContext::BeginFrame(float InDeltaTime)
         bIsFirstFrame = false;
         return false;
     }
-
-    ImGui::SetCurrentContext(ImGuiContext);
-    ImPlot::SetImGuiContext(ImGuiContext);
-    ImPlot::SetCurrentContext(PlotContext);
 
     ImGuiIO& IO = ImGui::GetIO();
     IO.DeltaTime = InDeltaTime;
@@ -287,6 +326,8 @@ bool FCogImguiContext::BeginFrame(float InDeltaTime)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::EndFrame()
 {
+    FCogImGuiContextScope ImGuiContextScope(ImGuiContext, PlotContext);
+
     ImGui::Render();
     ImGui_RenderWindow(ImGui::GetMainViewport(), nullptr);
 
@@ -686,6 +727,8 @@ void FCogImguiContext::SetDPIScale(float Value)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::BuildFont()
 {
+    FCogImGuiContextScope ImGuiContextScope(ImGuiContext, PlotContext);
+
     if (FontAtlasTexture != nullptr)
     {
         FontAtlasTexture->RemoveFromRoot();
@@ -703,7 +746,15 @@ void FCogImguiContext::BuildFont()
     int32 TextureWidth, TextureHeight, BytesPerPixel;
     IO.Fonts->GetTexDataAsRGBA32(&TextureDataRaw, &TextureWidth, &TextureHeight, &BytesPerPixel);
 
-    FontAtlasTexture = UTexture2D::CreateTransient(TextureWidth, TextureHeight, PF_R8G8B8A8, TEXT("ImGuiFontAtlas"));
+#if UE_VERSION_OLDER_THAN(5, 5, 0)
+    const int32 PieSessionId = GPlayInEditorID;
+#else
+    const int32 PieSessionId = UE::GetPlayInEditorID();
+#endif
+
+    FString TextureName = FString::Format(TEXT("ImGuiFontAtlas{0}"), { PieSessionId });
+
+    FontAtlasTexture = UTexture2D::CreateTransient(TextureWidth, TextureHeight, PF_R8G8B8A8, *TextureName);
     FontAtlasTexture->Filter = TF_Bilinear;
     FontAtlasTexture->AddressX = TA_Wrap;
     FontAtlasTexture->AddressY = TA_Wrap;
