@@ -631,7 +631,7 @@ void FCogAbilityWindow_Abilities::RenderAbilityInfo(const UAbilitySystemComponen
         ImGui::TableNextColumn();
         ImGui::TextColored(TextColor, "Ability Tags");
         ImGui::TableNextColumn();
-        FCogAbilityHelper::RenderTagContainer(Ability->AbilityTags);
+        FCogAbilityHelper::RenderTagContainer(Ability->GetAssetTags());
 
         //------------------------
         // RequiredTags

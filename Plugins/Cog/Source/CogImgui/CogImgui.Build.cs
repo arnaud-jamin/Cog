@@ -12,6 +12,7 @@ public class CogImgui : ModuleRules
             "Core",
             "ImGui",
             "ImPlot",
+            "NetImgui",
         });
 
         PrivateDependencyModuleNames.AddRange(new[]
@@ -21,7 +22,8 @@ public class CogImgui : ModuleRules
             "Engine",
             "InputCore",
             "Slate",
-            "SlateCore"
+            "SlateCore",
+            "Sockets"
         });
 
         if (Target.bBuildEditor)

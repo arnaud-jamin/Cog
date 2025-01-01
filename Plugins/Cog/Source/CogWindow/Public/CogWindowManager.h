@@ -159,6 +159,8 @@ protected:
     bool bHideAllWindows = false;
 
     bool IsInitialized = false;
+
+    static bool IsNetImguiInitialized;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------

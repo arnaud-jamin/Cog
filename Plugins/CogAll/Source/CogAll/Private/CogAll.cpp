@@ -19,6 +19,7 @@
 #include "CogEngineWindow_LogCategories.h"
 #include "CogEngineWindow_Metrics.h"
 #include "CogEngineWindow_NetEmulation.h"
+#include "CogEngineWindow_NetImGui.h"
 #include "CogEngineWindow_OutputLog.h"
 #include "CogEngineWindow_Plots.h"
 #include "CogEngineWindow_Scalability.h"
@@ -65,11 +66,13 @@ void Cog::AddAllWindows(UCogWindowManager& CogWindowManager)
 
     CogWindowManager.AddWindow<FCogEngineWindow_LogCategories>("Engine.Log Categories");
 
+    CogWindowManager.AddWindow<FCogEngineWindow_Metrics>("Engine.Metrics");
+
     CogWindowManager.AddWindow<FCogEngineWindow_NetEmulation>("Engine.Net Emulation");
 
-    CogWindowManager.AddWindow<FCogEngineWindow_OutputLog>("Engine.Output Log");
+    CogWindowManager.AddWindow<FCogEngineWindow_NetImGui>("Engine.NetImGui");
 
-    CogWindowManager.AddWindow<FCogEngineWindow_Metrics>("Engine.Metrics");
+    CogWindowManager.AddWindow<FCogEngineWindow_OutputLog>("Engine.Output Log");
 
     CogWindowManager.AddWindow<FCogEngineWindow_Plots>("Engine.Plots");
 

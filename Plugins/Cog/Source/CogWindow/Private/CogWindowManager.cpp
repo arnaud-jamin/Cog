@@ -3,10 +3,10 @@
 #include "CogDebugDrawImGui.h"
 #include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
-#include "CogWindowConsoleCommandManager.h"
 #include "CogWindow_Layouts.h"
 #include "CogWindow_Settings.h"
 #include "CogWindow_Spacing.h"
+#include "CogWindowConsoleCommandManager.h"
 #include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
 #include "Engine/Engine.h"
@@ -14,12 +14,15 @@
 #include "HAL/IConsoleManager.h"
 #include "imgui_internal.h"
 #include "Misc/EngineVersionComparison.h"
+#include "NetImgui_Api.h"
 
 FString UCogWindowManager::ToggleInputCommand   = TEXT("Cog.ToggleInput");
 FString UCogWindowManager::DisableInputCommand  = TEXT("Cog.DisableInput");
 FString UCogWindowManager::LoadLayoutCommand    = TEXT("Cog.LoadLayout");
 FString UCogWindowManager::SaveLayoutCommand    = TEXT("Cog.SaveLayout");
 FString UCogWindowManager::ResetLayoutCommand   = TEXT("Cog.ResetLayout");
+
+bool UCogWindowManager::IsNetImguiInitialized = false;
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCogWindowManager::UCogWindowManager()
@@ -128,7 +131,17 @@ void UCogWindowManager::InitializeInternal()
             }
         }));
 
+
+#if NETIMGUI_ENABLED
+    if (IsNetImguiInitialized == false)
+    {
+        NetImgui::Startup();
+        IsNetImguiInitialized = true;
+    }
+#endif
+
     IsInitialized = true;
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -136,19 +149,30 @@ void UCogWindowManager::Shutdown()
 {
     FCogImGuiContextScope ImGuiContextScope(Context);
 
-    //------------------------------------------------------------
+    //------------------------------------------------------------------
     // Call PreSaveConfig before destroying imgui context
     // if PreSaveConfig needs to read ImGui IO for example
-    //------------------------------------------------------------
+    //------------------------------------------------------------------
     for (FCogWindow* Window : Windows)
     {
         Window->PreSaveConfig();
     }
 
-    //------------------------------------------------------------
+    //------------------------------------------------------------------
+    // NetImgui must be shutdown before imgui as it uses context hooks
+    //------------------------------------------------------------------
+#if NETIMGUI_ENABLED
+    if (IsNetImguiInitialized)
+    {
+        NetImgui::Shutdown();
+        IsNetImguiInitialized = false;
+    }
+#endif
+
+    //------------------------------------------------------------------
     // Destroy ImGui before destroying the windows to make sure 
     // imgui serialize their visibility state in imgui.ini
-    //------------------------------------------------------------
+    //------------------------------------------------------------------
     if (IsInitialized == true)
     {
         Context.Shutdown();
