@@ -13,7 +13,7 @@ struct FCogDebugDrawOverlapParams;
 struct FCogDebugDrawSweepParams;
 
 UENUM()
-enum ECogDebugRecolorMode : uint8
+enum class ECogDebugRecolorMode : uint8
 {
     None,
     Color,
@@ -63,7 +63,7 @@ struct FCogDebugSettings
     float AxesScale = 1.0f;
 
     UPROPERTY(Config)
-    TEnumAsByte<ECogDebugRecolorMode> RecolorMode = None;
+    ECogDebugRecolorMode RecolorMode = ECogDebugRecolorMode::None;
 
     UPROPERTY(Config)
     float RecolorIntensity = 0.0f;

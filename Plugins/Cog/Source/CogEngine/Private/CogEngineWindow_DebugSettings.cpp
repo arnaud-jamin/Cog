@@ -202,7 +202,7 @@ void FCogEngineWindow_DebugSettings::RenderContent()
         {
             FCogImguiHelper::ColorEdit4("Recolor Color", Settings.RecolorColor, ColorEditFlags);
         }
-        else if (Settings.RecolorMode == HueOverTime)
+        else if (Settings.RecolorMode == ECogDebugRecolorMode::HueOverTime)
         {
             FCogWindowWidgets::SetNextItemToShortWidth();
             ImGui::DragFloat("Recolor Speed", &Settings.RecolorTimeSpeed, 0.1f, 0.0f, 10.0f, "%.1f");
