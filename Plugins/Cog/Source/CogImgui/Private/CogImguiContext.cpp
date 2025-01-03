@@ -57,20 +57,16 @@ void FCogImguiContext::Initialize()
 {
     IMGUI_CHECKVERSION();
 
-    if (FSlateApplication::IsInitialized() == false)
-    {
-        return;
-    }
-
-    FSlateApplication& SlateApp = FSlateApplication::Get();
-
     GameViewport = GEngine->GameViewport;
 
-    SAssignNew(MainWidget, SCogImguiWidget).Context(this);
-    GameViewport->AddViewportWidgetContent(MainWidget.ToSharedRef(), TNumericLimits<int32>::Max());
+    if (GameViewport != nullptr)
+    {
+        SAssignNew(MainWidget, SCogImguiWidget).Context(this);
+        GameViewport->AddViewportWidgetContent(MainWidget.ToSharedRef(), TNumericLimits<int32>::Max());
 
-    SAssignNew(InputCatcherWidget, SCogImguiInputCatcherWidget).Context(this);
-    GameViewport->AddViewportWidgetContent(InputCatcherWidget.ToSharedRef(), -TNumericLimits<int32>::Max());
+        SAssignNew(InputCatcherWidget, SCogImguiInputCatcherWidget).Context(this);
+        GameViewport->AddViewportWidgetContent(InputCatcherWidget.ToSharedRef(), -TNumericLimits<int32>::Max());
+    }
 
     ImGuiContext = ImGui::CreateContext();
     PlotContext = ImPlot::CreateContext();
@@ -101,7 +97,7 @@ void FCogImguiContext::Initialize()
     ImGuiViewport* MainViewport = ImGui::GetMainViewport();
     FCogImGuiViewportData* ViewportData = new FCogImGuiViewportData();
     MainViewport->PlatformUserData = ViewportData;
-    ViewportData->Window = SlateApp.GetActiveTopLevelWindow();
+    ViewportData->Window = FSlateApplication::IsInitialized() ? FSlateApplication::Get().GetActiveTopLevelWindow() : nullptr;
     ViewportData->Context = this;
     ViewportData->Widget = MainWidget;
 
@@ -124,11 +120,23 @@ void FCogImguiContext::Initialize()
     PlatformIO.Platform_SetWindowAlpha = ImGui_SetWindowAlpha;
     PlatformIO.Platform_RenderWindow = ImGui_RenderWindow;
 
-    if (const TSharedPtr<GenericApplication> PlatformApplication = SlateApp.GetPlatformApplication())
+    if (FSlateApplication::IsInitialized())
     {
+        if (const TSharedPtr<GenericApplication> PlatformApplication = FSlateApplication::Get().GetPlatformApplication())
+        {
+            FDisplayMetrics DisplayMetrics;
+            PlatformApplication->GetInitialDisplayMetrics(DisplayMetrics);
+            PlatformApplication->OnDisplayMetricsChanged().AddRaw(this, &FCogImguiContext::OnDisplayMetricsChanged);
+            OnDisplayMetricsChanged(DisplayMetrics);
+        }
+    }
+    else
+    {
+        FMonitorInfo monitorInfo;
+        monitorInfo.bIsPrimary = true;
+        monitorInfo.DisplayRect = FPlatformRect(0, 0, 1080, 720);
         FDisplayMetrics DisplayMetrics;
-        PlatformApplication->GetInitialDisplayMetrics(DisplayMetrics);
-        PlatformApplication->OnDisplayMetricsChanged().AddRaw(this, &FCogImguiContext::OnDisplayMetricsChanged);
+        DisplayMetrics.MonitorInfo.Add(monitorInfo);
         OnDisplayMetricsChanged(DisplayMetrics);
     }
 }
@@ -136,31 +144,30 @@ void FCogImguiContext::Initialize()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::Shutdown()
 {
-    if (FSlateApplication::IsInitialized() == false)
-    {
-        return;
-    }
-
     FCogImGuiContextScope ImGuiContextScope(ImGuiContext, PlotContext);
 
-    ImGuiViewport* MainViewport = ImGui::GetMainViewport();
-    if (const FCogImGuiViewportData* ViewportData = static_cast<FCogImGuiViewportData*>(MainViewport->PlatformUserData))
+    if (ImGuiViewport* MainViewport = ImGui::GetMainViewport())
     {
-        delete ViewportData;
-        MainViewport->PlatformUserData = nullptr;
+        if (const FCogImGuiViewportData* ViewportData = static_cast<FCogImGuiViewportData*>(MainViewport->PlatformUserData))
+        {
+            delete ViewportData;
+            MainViewport->PlatformUserData = nullptr;
+        }
     }
 
     if (FSlateApplication::IsInitialized())
     {
-        FSlateApplication& SlateApp = FSlateApplication::Get();
-        if (const TSharedPtr<GenericApplication> PlatformApplication = SlateApp.GetPlatformApplication())
+        if (const TSharedPtr<GenericApplication> PlatformApplication = FSlateApplication::Get().GetPlatformApplication())
         {
             PlatformApplication->OnDisplayMetricsChanged().RemoveAll(this);
         }
     }
 
-    GameViewport->RemoveViewportWidgetContent(MainWidget.ToSharedRef());
-    GameViewport->RemoveViewportWidgetContent(InputCatcherWidget.ToSharedRef());
+    if (GameViewport != nullptr)
+    {
+        GameViewport->RemoveViewportWidgetContent(MainWidget.ToSharedRef());
+        GameViewport->RemoveViewportWidgetContent(InputCatcherWidget.ToSharedRef());
+    }
 
     if (PlotContext)
     {
@@ -190,7 +197,7 @@ void FCogImguiContext::OnDisplayMetricsChanged(const FDisplayMetrics& DisplayMet
         ImGuiMonitor.MainSize = ImVec2(Monitor.DisplayRect.Right - Monitor.DisplayRect.Left, Monitor.DisplayRect.Bottom - Monitor.DisplayRect.Top);
         ImGuiMonitor.WorkPos = ImVec2(Monitor.WorkArea.Left, Monitor.WorkArea.Top);
         ImGuiMonitor.WorkSize = ImVec2(Monitor.WorkArea.Right - Monitor.WorkArea.Left, Monitor.WorkArea.Bottom - Monitor.WorkArea.Top);
-        ImGuiMonitor.DpiScale = Monitor.DPI;
+        ImGuiMonitor.DpiScale = 1.0f;
 
         if (Monitor.bIsPrimary)
         {
@@ -221,7 +228,15 @@ bool FCogImguiContext::BeginFrame(float InDeltaTime)
 
     ImGuiIO& IO = ImGui::GetIO();
     IO.DeltaTime = InDeltaTime;
-    IO.DisplaySize = FCogImguiHelper::ToImVec2(MainWidget->GetTickSpaceGeometry().GetAbsoluteSize());
+
+    if (MainWidget != nullptr)
+    {
+        IO.DisplaySize = FCogImguiHelper::ToImVec2(MainWidget->GetTickSpaceGeometry().GetAbsoluteSize());
+    }
+    else
+    {
+        IO.DisplaySize = ImVec2(1080, 720);
+    }
 
     //-------------------------------------------------------------------------------------------------------
     // Build font
@@ -234,35 +249,40 @@ bool FCogImguiContext::BeginFrame(float InDeltaTime)
     //-------------------------------------------------------------------------------------------------------
     // Update which viewport is under the mouse
     //-------------------------------------------------------------------------------------------------------
-    ImGuiID MouseViewportId = 0;
-
-    FSlateApplication& SlateApp = FSlateApplication::Get();
-    FWidgetPath WidgetsUnderCursor = SlateApp.LocateWindowUnderMouse(SlateApp.GetCursorPos(), SlateApp.GetInteractiveTopLevelWindows());
-    if (WidgetsUnderCursor.IsValid())
+    if (FSlateApplication::IsInitialized())
     {
-        TSharedRef<SWindow> Window = WidgetsUnderCursor.GetWindow();
-        ImGuiID* ViewportId = WindowToViewportMap.Find(Window);
+        ImGuiID MouseViewportId = 0;
 
-        if (ViewportId != nullptr)
+        FWidgetPath WidgetsUnderCursor = FSlateApplication::Get().LocateWindowUnderMouse(
+            FSlateApplication::Get().GetCursorPos(), 
+            FSlateApplication::Get().GetInteractiveTopLevelWindows());
+
+        if (WidgetsUnderCursor.IsValid())
         {
-            MouseViewportId = *ViewportId;
+            TSharedRef<SWindow> Window = WidgetsUnderCursor.GetWindow();
+            ImGuiID* ViewportId = WindowToViewportMap.Find(Window);
+
+            if (ViewportId != nullptr)
+            {
+                MouseViewportId = *ViewportId;
+            }
+            else
+            {
+                MouseViewportId = ImGui::GetMainViewport()->ID;
+            }
         }
-        else
-        {
-            MouseViewportId = ImGui::GetMainViewport()->ID;
-        }
+
+        IO.AddMouseViewportEvent(MouseViewportId);
+
+        //-------------------------------------------------------------------------------------------------------
+        // Refresh modifiers otherwise, when pressing ALT-TAB, the Alt modifier is always true
+        //-------------------------------------------------------------------------------------------------------
+        FModifierKeysState ModifierKeys = FSlateApplication::Get().GetModifierKeys();
+        if (ModifierKeys.IsControlDown() != IO.KeyCtrl) { IO.AddKeyEvent(ImGuiMod_Ctrl, ModifierKeys.IsControlDown()); }
+        if (ModifierKeys.IsShiftDown() != IO.KeyShift) { IO.AddKeyEvent(ImGuiMod_Shift, ModifierKeys.IsShiftDown()); }
+        if (ModifierKeys.IsAltDown() != IO.KeyAlt) { IO.AddKeyEvent(ImGuiMod_Alt, ModifierKeys.IsAltDown()); }
+        if (ModifierKeys.IsCommandDown() != IO.KeySuper) { IO.AddKeyEvent(ImGuiMod_Super, ModifierKeys.IsCommandDown()); }
     }
-
-    IO.AddMouseViewportEvent(MouseViewportId);
-
-    //-------------------------------------------------------------------------------------------------------
-    // Refresh modifiers otherwise, when pressing ALT-TAB, the Alt modifier is always true
-    //-------------------------------------------------------------------------------------------------------
-    FModifierKeysState ModifierKeys = FSlateApplication::Get().GetModifierKeys();
-    if (ModifierKeys.IsControlDown() != IO.KeyCtrl) { IO.AddKeyEvent(ImGuiMod_Ctrl, ModifierKeys.IsControlDown()); }
-    if (ModifierKeys.IsShiftDown() != IO.KeyShift) { IO.AddKeyEvent(ImGuiMod_Shift, ModifierKeys.IsShiftDown()); }
-    if (ModifierKeys.IsAltDown() != IO.KeyAlt) { IO.AddKeyEvent(ImGuiMod_Alt, ModifierKeys.IsAltDown()); }
-    if (ModifierKeys.IsCommandDown() != IO.KeySuper) { IO.AddKeyEvent(ImGuiMod_Super, ModifierKeys.IsCommandDown()); }
 
     //-------------------------------------------------------------------------------------------------------
     // 
@@ -276,35 +296,32 @@ bool FCogImguiContext::BeginFrame(float InDeltaTime)
         IO.ConfigFlags |= ImGuiConfigFlags_NoMouse;
     }
 
-    //-------------------------------------------------------------------------------------------------------
-    // 
-    //-------------------------------------------------------------------------------------------------------
-    const bool bHasMouse = (IO.ConfigFlags & ImGuiConfigFlags_NoMouse) == 0;
-    const bool bUpdateMouseMouseCursor = (IO.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange) == 0;
-    if (bHasMouse && bUpdateMouseMouseCursor)
+    if (MainWidget != nullptr)
     {
-        MainWidget->SetCursor(FCogImguiInputHelper::ToSlateMouseCursor(ImGui::GetMouseCursor()));
-    }
+        const bool bHasMouse = (IO.ConfigFlags & ImGuiConfigFlags_NoMouse) == 0;
+        const bool bUpdateMouseMouseCursor = (IO.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange) == 0;
+        if (bHasMouse && bUpdateMouseMouseCursor)
+        {
+            MainWidget->SetCursor(FCogImguiInputHelper::ToSlateMouseCursor(ImGui::GetMouseCursor()));
+        }
 
-    //-------------------------------------------------------------------------------------------------------
-	// 
-	//-------------------------------------------------------------------------------------------------------
-    const FVector2D& MousePosition = SlateApp.GetCursorPos();
-    if (IO.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-    {
-        IO.AddMousePosEvent(MousePosition.X, MousePosition.Y);
-    }
-    else
-    {
-        const FVector2D TransformedMousePosition = MousePosition - MainWidget->GetTickSpaceGeometry().GetAbsolutePosition();
-        IO.AddMousePosEvent(TransformedMousePosition.X, TransformedMousePosition.Y);
+        if (FSlateApplication::IsInitialized())
+        {
+            const FVector2D& MousePosition = FSlateApplication::Get().GetCursorPos();
+            if (IO.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+            {
+                IO.AddMousePosEvent(MousePosition.X, MousePosition.Y);
+            }
+            else
+            {
+                const FVector2D TransformedMousePosition = MousePosition - MainWidget->GetTickSpaceGeometry().GetAbsolutePosition();
+                IO.AddMousePosEvent(TransformedMousePosition.X, TransformedMousePosition.Y);
+            }
+        }
     }
 
     bWantCaptureMouse = ImGui::GetIO().WantCaptureMouse;
 
-    //-------------------------------------------------------------------------------------------------------
-    // 
-    //-------------------------------------------------------------------------------------------------------
     if (bRefreshDPIScale)
     {
         bRefreshDPIScale = false;
@@ -338,6 +355,11 @@ void FCogImguiContext::EndFrame()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::ImGui_CreateWindow(ImGuiViewport* Viewport)
 {
+    if (FSlateApplication::IsInitialized() == false)
+    {
+        return;
+    }
+
     if (Viewport->ParentViewportId == 0)
     {
         return;
@@ -633,13 +655,16 @@ void FCogImguiContext::SetEnableInput(bool Value)
 {
     bEnableInput = Value; 
 
+    if (FSlateApplication::IsInitialized() == false)
+    {
+        return; 
+    }
+
     if (bEnableInput)
     {
         FSlateThrottleManager::Get().DisableThrottle(true);
         bIsThrottleDisabled = true;
 
-        FSlateApplication& SlateApp = FSlateApplication::Get();
-        
         if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
         {
             LocalPlayer->GetSlateOperations()
@@ -653,7 +678,7 @@ void FCogImguiContext::SetEnableInput(bool Value)
         {
             FSlateThrottleManager::Get().DisableThrottle(false);
         }
-
+        
         if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
         {
             LocalPlayer->GetSlateOperations().CaptureMouse(GameViewport->GetGameViewportWidget().ToSharedRef());
@@ -680,6 +705,11 @@ void FCogImguiContext::SetShareMouseWithGameplay(bool Value)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::RefreshMouseCursor()
 {
+    if (FSlateApplication::IsInitialized() == false)
+    {
+        return;
+    }
+
     //-------------------------------------------------------------------------------------------
     // Focus the main widget when enabling input otherwise the mouse can still be hidden because
     // the gameplay might have the focus and might hide the cursor.
@@ -693,21 +723,24 @@ void FCogImguiContext::RefreshMouseCursor()
     //-------------------------------------------------------------------------------------------
 	// Force to show the cursor when sharing mouse with gameplay for games that hide the cursor
     //-------------------------------------------------------------------------------------------
-    if (APlayerController* PlayerController = GetLocalPlayerController(GameViewport->GetWorld()))
+    if (GameViewport != nullptr)
     {
-        if (bHasSavedInitialCursorVisibility == false)
+        if (APlayerController* PlayerController = GetLocalPlayerController(GameViewport->GetWorld()))
         {
-            bIsCursorInitiallyVisible = PlayerController->ShouldShowMouseCursor();
-            bHasSavedInitialCursorVisibility = true;
-        }
+            if (bHasSavedInitialCursorVisibility == false)
+            {
+                bIsCursorInitiallyVisible = PlayerController->ShouldShowMouseCursor();
+                bHasSavedInitialCursorVisibility = true;
+            }
 
-        if (bEnableInput && bShareMouse && bShareMouseWithGameplay)
-        {
-            PlayerController->SetShowMouseCursor(true);
-        }
-        else
-        {
-            PlayerController->SetShowMouseCursor(bIsCursorInitiallyVisible);
+            if (bEnableInput && bShareMouse && bShareMouseWithGameplay)
+            {
+                PlayerController->SetShowMouseCursor(true);
+            }
+            else
+            {
+                PlayerController->SetShowMouseCursor(bIsCursorInitiallyVisible);
+            }
         }
     }
 }
@@ -771,7 +804,9 @@ void FCogImguiContext::BuildFont()
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogImguiContext::IsConsoleOpened() const
 {
-    return GameViewport->ViewportConsole && GameViewport->ViewportConsole->ConsoleState != NAME_None;
+    return GameViewport != nullptr 
+        && GameViewport->ViewportConsole 
+        && GameViewport->ViewportConsole->ConsoleState != NAME_None;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -790,15 +825,14 @@ void FCogImguiContext::DrawDebug()
         ImVec2 LocalSize = FCogImguiHelper::ToImVec2(MainWidget->GetTickSpaceGeometry().GetLocalSize());
         ImGui::InputFloat2("Widget Local Size", &LocalSize.x, "%0.1f");
 
-        FSlateApplication& SlateApp = FSlateApplication::Get();
-        ImVec2 MousePosition = FCogImguiHelper::ToImVec2(SlateApp.GetCursorPos());
+        ImVec2 MousePosition = FCogImguiHelper::ToImVec2(FSlateApplication::Get().GetCursorPos());
         ImGui::InputFloat2("Mouse", &MousePosition.x, "%0.1f");
 
         ImGuiIO& IO = ImGui::GetIO();
         ImGui::InputFloat2("ImGui Mouse", &IO.MousePos.x, "%0.1f");
 
         FString Focus = "None";
-        if (TSharedPtr<SWidget> KeyboardFocusedWidget = SlateApp.GetKeyboardFocusedWidget())
+        if (TSharedPtr<SWidget> KeyboardFocusedWidget = FSlateApplication::Get().GetKeyboardFocusedWidget())
         {
             Focus = KeyboardFocusedWidget->ToString();
         }

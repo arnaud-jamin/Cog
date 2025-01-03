@@ -25,9 +25,21 @@ protected:
 
     virtual void RenderContent() override;
 
+    virtual void RenderTick(float DeltaTime);
+
+    void ConnectTo();
+
+    void ConnectFrom();
+
+    void Disconnect();
+
+    void TryStartup();
+
 private:
 
     TWeakObjectPtr<UCogEngineConfig_NetImGui> Config = nullptr;
+
+    bool HasAlreadyTriedToConnectOnDedicatedServer = false;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -51,4 +63,7 @@ public:
 
     UPROPERTY(Config)
     int32 ClientPort = 8889;
+
+    UPROPERTY(Config)
+    bool AutoConnectOnDedicatedServer = true;
 };

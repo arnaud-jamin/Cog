@@ -5,7 +5,7 @@
 #include "Layout/SlateRect.h"
 #include "Rendering/SlateRenderTransform.h"
 
-COGIMGUI_API DECLARE_LOG_CATEGORY_EXTERN(LogCogImGui, Warning, All);
+COGIMGUI_API DECLARE_LOG_CATEGORY_EXTERN(LogCogImGui, Verbose, All);
 
 struct ImGuiWindow;
 

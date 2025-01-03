@@ -13,6 +13,7 @@
 #include "GameFramework/PlayerInput.h"
 #include "HAL/IConsoleManager.h"
 #include "imgui_internal.h"
+#include "Misc/CoreMisc.h"
 #include "Misc/EngineVersionComparison.h"
 #include "NetImgui_Api.h"
 
@@ -200,7 +201,7 @@ void UCogWindowManager::Tick(float DeltaTime)
 {
     FCogImGuiContextScope ImGuiContextScope(Context);
 
-    if (GEngine->GameViewport == nullptr)
+    if (GEngine->GameViewport == nullptr && IsRunningDedicatedServer() == false)
     {
         return;
     }

@@ -79,6 +79,8 @@ public:
 
     static void SortCommands(UPlayerInput* PlayerInput);
 
+    static bool GetIsNetImguiInitialized() { return IsNetImguiInitialized; }
+
 protected:
 
     friend class FCogWindow_Layouts;
