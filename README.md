@@ -11,6 +11,7 @@ Cog provides:
 - Window mangement with persistent configuration and layouts.
 - C++ and Blueprint functions to log and debug draw within Log Categories.
 - Control over the server regarding debug draw, logging, spawning, cheats.
+- NetImgui support to ease the debugging of game server.
 
 General Info:
 - Cog can be used both in editor and package builds. It is disabled by default on shipping builds.
@@ -260,7 +261,7 @@ Log and debug draw functions can be filtered by the selected actor.
 
 ### Testing the sample
 
-You must have Unreal 5.1 or greater and Visual Studio to launch the sample
+You must have Unreal 5.5 or greater and Visual Studio to launch the sample
 
 1. Download the code
 2. Right Click `Cog.uproject` and click `Generate Visual Studio project files`
@@ -274,7 +275,7 @@ You must have Unreal 5.1 or greater and Visual Studio to launch the sample
 ### Integrating Cog in your project
 
 The Cog repository has the following structure:
-- `CogSample` - A Sample that demonstrate various Cog functionalities. The project was saved in Unreal 5.1
+- `CogSample` - A Sample that demonstrate various Cog functionalities. The project was saved in Unreal 5.5
 - `Plugins/CogAbility` - ImGui windows for the Gameplay Ability System (Abilities, Effects, Tags, ...)
 - `Plugins/CogAI` - ImGui windows for AI (Behavior Tree, Blackboard)
 - `Plugins/CogInput` - ImGui windows for the Enhanced Input library (Input action, Gamepad)
