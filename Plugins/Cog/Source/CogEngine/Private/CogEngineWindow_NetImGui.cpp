@@ -5,6 +5,8 @@
 #include "CogWindowConsoleCommandManager.h"
 #include "CogWindowManager.h"
 #include "CogWindowWidgets.h"
+#include "Engine/EngineBaseTypes.h"
+#include "Engine/World.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "Misc/CoreMisc.h"

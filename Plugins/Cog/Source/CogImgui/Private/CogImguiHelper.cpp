@@ -38,7 +38,7 @@ float FCogImguiHelper::GetNextItemWidth()
 {
     float Width;
     const ImGuiContext& g = *GImGui;
-    if (g.NextItemData.Flags & ImGuiNextItemDataFlags_HasWidth)
+    if (g.NextItemData.HasFlags & ImGuiNextItemDataFlags_HasWidth)
     {
         Width = g.NextItemData.Width;
     }

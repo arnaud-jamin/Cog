@@ -75,7 +75,7 @@ int32 SCogImguiWidget::OnPaint(
             TArray VerticesSlice(Vertices.GetData() + DrawCmd.VtxOffset, Vertices.Num() - DrawCmd.VtxOffset);
             TArray IndicesSlice(Indices.GetData() + DrawCmd.IdxOffset, DrawCmd.ElemCount);
 
-            UTexture2D* Texture = DrawCmd.GetTexID();
+            UTexture2D* Texture = Cast<UTexture2D>(DrawCmd.GetTexID());
             if (TextureBrush.GetResourceObject() != Texture)
             {
                 TextureBrush.SetResourceObject(Texture);

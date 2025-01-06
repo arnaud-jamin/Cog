@@ -21,7 +21,7 @@ private:
     EAssetTypeCategories::Type AssetCategory;
 };
 
-IMPLEMENT_MODULE(FCogDebugEditorModule, CogEditor);
+IMPLEMENT_MODULE(FCogDebugEditorModule, CogDebugEditor);
 
 //----------------------------------------------------------------------------------------------------------------------
 void FCogDebugEditorModule::StartupModule()

@@ -83,7 +83,7 @@ void FCogWindow_Settings::RenderContent()
         if (ShortcutWidth > 0.0f)
         {
             ImGui::SameLine();
-            ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x - ShortcutWidth);
+            ImGui::SetCursorPosX(ImGui::GetContentRegionAvail().x - ShortcutWidth);
             ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
             ImGui::Text("%s", ShortcutText.Get());
             ImGui::PopStyleColor();

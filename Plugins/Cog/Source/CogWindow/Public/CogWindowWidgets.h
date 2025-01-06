@@ -4,6 +4,8 @@
 #include "imgui.h"
 #include "UObject/ReflectedTypeAccessors.h"
 
+#include <Templates/SubclassOf.h>
+
 class AActor;
 class APawn;
 class FEnumProperty;

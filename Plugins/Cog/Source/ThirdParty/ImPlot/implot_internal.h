@@ -31,13 +31,13 @@
 
 #pragma once
 
-#include <time.h>
-#include "imgui_internal.h"
-
 #ifndef IMPLOT_VERSION
 #error Must include implot.h before implot_internal.h
 #endif
 
+#ifndef IMGUI_DISABLE
+#include <time.h>
+#include "imgui_internal.h"
 
 // Support for pre-1.84 versions. ImPool's GetSize() -> GetBufSize()
 #if (IMGUI_VERSION_NUM < 18303)
@@ -1417,7 +1417,7 @@ IMPLOT_API ImVec2 GetLocationPos(const ImRect& outer_rect, const ImVec2& inner_s
 // Calculates the bounding box size of a legend _before_ clipping.
 IMPLOT_API ImVec2 CalcLegendSize(ImPlotItemGroup& items, const ImVec2& pad, const ImVec2& spacing, bool vertical);
 // Clips calculated legend size
-IMPLOT_API bool ClampLegendRect(ImRect& legend_rect, const ImRect& outer_rect, const ImVec2& pad);      
+IMPLOT_API bool ClampLegendRect(ImRect& legend_rect, const ImRect& outer_rect, const ImVec2& pad);
 // Renders legend entries into a bounding box
 IMPLOT_API bool ShowLegendEntries(ImPlotItemGroup& items, const ImRect& legend_bb, bool interactable, const ImVec2& pad, const ImVec2& spacing, bool vertical, ImDrawList& DrawList);
 // Shows an alternate legend for the plot identified by #title_id, outside of the plot frame (can be called before or after of Begin/EndPlot but must occur in the same ImGui window! This is not thoroughly tested nor scrollable!).
@@ -1564,11 +1564,24 @@ IMPLOT_API tm* GetLocTime(const ImPlotTime& t, tm* ptm);
 // NB: The following functions only work if there is a current ImPlotContext because the
 // internal tm struct is owned by the context! They are aware of ImPlotStyle.UseLocalTime.
 
+// // Make a UNIX timestamp from a tm struct according to the current ImPlotStyle.UseLocalTime setting.
+static inline ImPlotTime MkTime(struct tm *ptm) {
+    if (GetStyle().UseLocalTime) return MkLocTime(ptm);
+    else                         return MkGmtTime(ptm);
+}
+// Get a tm struct from a UNIX timestamp according to the current ImPlotStyle.UseLocalTime setting.
+static inline tm* GetTime(const ImPlotTime& t, tm* ptm) {
+    if (GetStyle().UseLocalTime) return GetLocTime(t,ptm);
+    else                         return GetGmtTime(t,ptm);
+}
+
 // Make a timestamp from time components.
 // year[1970-3000], month[0-11], day[1-31], hour[0-23], min[0-59], sec[0-59], us[0,999999]
 IMPLOT_API ImPlotTime MakeTime(int year, int month = 0, int day = 1, int hour = 0, int min = 0, int sec = 0, int us = 0);
 // Get year component from timestamp [1970-3000]
 IMPLOT_API int GetYear(const ImPlotTime& t);
+// Get month component from timestamp [0-11]
+IMPLOT_API int GetMonth(const ImPlotTime& t);
 
 // Adds or subtracts time from a timestamp. #count > 0 to add, < 0 to subtract.
 IMPLOT_API ImPlotTime AddTime(const ImPlotTime& t, ImPlotTimeUnit unit, int count);
@@ -1580,6 +1593,11 @@ IMPLOT_API ImPlotTime CeilTime(const ImPlotTime& t, ImPlotTimeUnit unit);
 IMPLOT_API ImPlotTime RoundTime(const ImPlotTime& t, ImPlotTimeUnit unit);
 // Combines the date of one timestamp with the time-of-day of another timestamp.
 IMPLOT_API ImPlotTime CombineDateTime(const ImPlotTime& date_part, const ImPlotTime& time_part);
+
+// Get the current time as a timestamp.
+static inline ImPlotTime Now() { return ImPlotTime::FromDouble((double)time(nullptr)); }
+// Get the current date as a timestamp.
+static inline ImPlotTime Today() { return ImPlot::FloorTime(Now(), ImPlotTimeUnit_Day); }
 
 // Formats the time part of timestamp t into a buffer according to #fmt
 IMPLOT_API int FormatTime(const ImPlotTime& t, char* buffer, int size, ImPlotTimeFmt fmt, bool use_24_hr_clk);
@@ -1667,3 +1685,5 @@ void Locator_Log10(ImPlotTicker& ticker, const ImPlotRange& range, float pixels,
 void Locator_SymLog(ImPlotTicker& ticker, const ImPlotRange& range, float pixels, bool vertical, ImPlotFormatter formatter, void* formatter_data);
 
 } // namespace ImPlot
+
+#endif // #ifndef IMGUI_DISABLE

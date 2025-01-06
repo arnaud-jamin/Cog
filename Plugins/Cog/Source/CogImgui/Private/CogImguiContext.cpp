@@ -80,10 +80,9 @@ void FCogImguiContext::Initialize()
     ImGuiIO& IO = ImGui::GetIO();
     IO.UserData = this;
 
+
     IO.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     IO.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
-    IO.ConfigFlags |= ImGuiConfigFlags_NavNoCaptureKeyboard;
-    IO.ConfigFlags |= ImGuiConfigFlags_NavEnableSetMousePos;
     IO.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     IO.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 

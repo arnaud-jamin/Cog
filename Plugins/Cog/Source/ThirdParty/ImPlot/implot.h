@@ -46,6 +46,7 @@
 
 #pragma once
 #include "imgui.h"
+#ifndef IMGUI_DISABLE
 
 //-----------------------------------------------------------------------------
 // [SECTION] Macros and Defines
@@ -56,7 +57,7 @@
 // backward nor forward ABI compatibility and also function call overhead. If you
 // do use ImPlot as a DLL, be sure to call SetImGuiContext (see Miscellanous section).
 #ifndef IMPLOT_API
-#define IMPLOT_API __declspec( dllexport )
+#define IMPLOT_API
 #endif
 
 // ImPlot version string.
@@ -286,8 +287,10 @@ enum ImPlotInfLinesFlags_ {
 
 // Flags for PlotPieChart
 enum ImPlotPieChartFlags_ {
-    ImPlotPieChartFlags_None      = 0,      // default
-    ImPlotPieChartFlags_Normalize = 1 << 10 // force normalization of pie chart values (i.e. always make a full circle if sum < 0)
+    ImPlotPieChartFlags_None         = 0,       // default
+    ImPlotPieChartFlags_Normalize    = 1 << 10, // force normalization of pie chart values (i.e. always make a full circle if sum < 0)
+    ImPlotPieChartFlags_IgnoreHidden = 1 << 11, // ignore hidden slices when drawing the pie chart (as if they were not there)
+    ImPlotPieChartFlags_Exploding    = 1 << 12  // Explode legend-hovered slice
 };
 
 // Flags for PlotHeatmap
@@ -828,7 +831,7 @@ IMPLOT_API void SetNextAxesToFit();
 //    an ImPlot function post-fixed with a G (e.g. PlotScatterG). This has a slight performance
 //    cost, but probably not enough to worry about unless your data is very large. Examples:
 //
-//    ImPlotPoint MyDataGetter(void* data, int idx) {
+//    ImPlotPoint MyDataGetter(int idx, void* data) {
 //        MyData* my_data = (MyData*)data;
 //        ImPlotPoint p;
 //        p.x = my_data->GetTime(idx);
@@ -892,6 +895,7 @@ IMPLOT_TMP void PlotStems(const char* label_id, const T* xs, const T* ys, int co
 IMPLOT_TMP void PlotInfLines(const char* label_id, const T* values, int count, ImPlotInfLinesFlags flags=0, int offset=0, int stride=sizeof(T));
 
 // Plots a pie chart. Center and radius are in plot units. #label_fmt can be set to nullptr for no labels.
+IMPLOT_TMP void PlotPieChart(const char* const label_ids[], const T* values, int count, double x, double y, double radius, ImPlotFormatter fmt, void* fmt_data=nullptr, double angle0=90, ImPlotPieChartFlags flags=0);
 IMPLOT_TMP void PlotPieChart(const char* const label_ids[], const T* values, int count, double x, double y, double radius, const char* label_fmt="%.1f", double angle0=90, ImPlotPieChartFlags flags=0);
 
 // Plots a 2D heatmap chart. Values are expected to be in row-major order by default. Leave #scale_min and scale_max both at 0 for automatic color scaling, or set them to a predefined range. #label_fmt can be set to nullptr for no labels.
@@ -1292,4 +1296,5 @@ IMPLOT_DEPRECATED( IMPLOT_API bool BeginPlot(const char* title_id,
 
 } // namespace ImPlot
 
-#endif
+#endif // #ifndef IMPLOT_DISABLE_OBSOLETE_FUNCTIONS
+#endif // #ifndef IMGUI_DISABLE
