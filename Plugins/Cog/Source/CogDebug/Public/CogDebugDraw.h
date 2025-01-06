@@ -5,6 +5,9 @@
 
 class USkeletalMeshComponent;
 struct FCogDebugShape;
+struct FCollisionShape;
+struct FHitResult;
+struct FOverlapResult;
 
 #if ENABLE_COG
 
@@ -51,6 +54,12 @@ struct COGDEBUG_API FCogDebugDraw
     static void Frustum(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FMatrix& Matrix, const float Angle, const float AspectRatio, const float NearPlane, const float FarPlane, const FColor& Color, const bool Persistent, const uint8 DepthPriority = 0U);
     
     static void Skeleton(const FLogCategoryBase& LogCategory, const USkeletalMeshComponent* Skeleton, const FColor& Color, bool DrawSecondaryBones = false, const uint8 DepthPriority = 1);
+
+    static void LineTrace(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& Start, const FVector& End, const bool HasHits, TArray<FHitResult>& HitResults, const FCogDebugDrawLineTraceParams& Settings);
+
+    static void Sweep(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FCollisionShape& Shape, const FVector& Start, const FVector& End, const FQuat& Rotation, const bool HasHits, TArray<FHitResult>& HitResults, const FCogDebugDrawSweepParams& Settings);
+
+    static void Overlap(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FCollisionShape& Shape, const FVector& Location, const FQuat& Rotation, TArray<FOverlapResult>& OverlapResults, const FCogDebugDrawOverlapParams& Settings);
 
     static void ReplicateShape(const UObject* WorldContextObject, const FCogDebugShape& Shape);
 };

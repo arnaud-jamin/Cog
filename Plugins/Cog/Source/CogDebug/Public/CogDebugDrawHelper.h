@@ -19,7 +19,7 @@ struct FCogDebugDrawOverlapParams
     bool DrawHitPrimitiveActorsName = false;
     bool HitPrimitiveActorsNameShadow = true;
     float HitPrimitiveActorsNameSize = 1.0f;
-    bool Persistent = false;
+    mutable bool Persistent = false;
     float LifeTime = 0.0f;
     uint8 DepthPriority = 0;
     float Thickness = 0.0f;

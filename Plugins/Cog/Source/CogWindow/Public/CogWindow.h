@@ -59,7 +59,7 @@ public:
 
     bool GetIsVisible() const { return bIsVisible; }
 
-    void SetIsVisible(bool Value) { bIsVisible = Value; }
+    void SetIsVisible(bool Value);
 
     bool HasWidget() const { return bHasWidget; }
 
@@ -103,6 +103,8 @@ protected:
 
     virtual bool CheckEditorVisibility();
     
+    virtual void OnWindowVisibilityChanged(bool NewVisibility) { }
+
     virtual void OnSelectionChanged(AActor* OldSelection, AActor* NewSelection) {}
 
     APawn* GetLocalPlayerPawn() const;

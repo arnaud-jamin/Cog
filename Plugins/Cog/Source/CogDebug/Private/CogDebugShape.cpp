@@ -597,6 +597,22 @@ FCogDebugShape FCogDebugShape::MakePolygon(const TArray<FVector>& Verts, const F
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+FCogDebugShape FCogDebugShape::MakeCollisionShape(const FCollisionShape& Shape, const FVector& Location, const FQuat& Rotation, const FVector& Extent, const FColor& Color, const float Thickness, const bool bPersistent, const uint8 DepthPriority)
+{
+    switch (Shape.ShapeType)
+    {
+        case ECollisionShape::Box:
+            return MakeBox(Location, Rotation.Rotator(), Extent, Color, Thickness, bPersistent, DepthPriority);
+        case ECollisionShape::Capsule:
+            return MakeCapsule(Location, Rotation, Extent.X, Extent.Z, Color, Thickness, bPersistent, DepthPriority);
+
+        default:
+        case ECollisionShape::Sphere:
+            return MakeCapsule(Location, Rotation, Extent.X, 0.0f, Color, Thickness, bPersistent, DepthPriority);
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugShape::DrawPolygon(const UWorld* World) const
 {
 #if ENABLE_COG

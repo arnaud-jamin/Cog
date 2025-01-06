@@ -638,6 +638,90 @@ void FCogDebugDraw::Skeleton(const FLogCategoryBase& LogCategory, const USkeleta
     }
 }
 
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogDebugDraw::LineTrace(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& Start, const FVector& End, const bool HasHits, TArray<FHitResult>& HitResults, const FCogDebugDrawLineTraceParams& Settings)
+{
+    if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
+    { return; }
+
+    const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+    if (World == nullptr)
+    { return; }
+
+    Settings.Persistent = FCogDebug::GetDebugPersistent(Settings.Persistent);
+    FCogDebugDrawHelper::DrawLineTrace(World, Start, End, HasHits, HitResults, Settings);
+
+    ReplicateShape(WorldContextObject,
+                   FCogDebugShape::MakeArrow(Start,
+                                             End,
+                                             FCogDebug::Settings.ArrowSize,
+                                             HasHits
+                                                 ? Settings.HitColor
+                                                 : Settings.NoHitColor,
+                                             FCogDebug::Settings.Thickness,
+                                             Settings.Persistent,
+                                             Settings.DepthPriority));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogDebugDraw::Sweep(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FCollisionShape& Shape, const FVector& Start, const FVector& End, const FQuat& Rotation, const bool HasHits, TArray<FHitResult>& HitResults, const FCogDebugDrawSweepParams& Settings)
+{
+    if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
+    { return; }
+
+    const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+    if (World == nullptr)
+    { return; }
+
+    FCogDebugDrawHelper::DrawSweep(World, Shape, Start, End, Rotation, HasHits, HitResults, Settings);
+
+    const FColor Color = HasHits
+                       ? Settings.HitColor
+                       : Settings.NoHitColor;
+    ReplicateShape(WorldContextObject,
+                   FCogDebugShape::MakeCollisionShape(Shape,
+                                                      Start,
+                                                      Rotation,
+                                                      Shape.GetExtent(),
+                                                      Color,
+                                                      FCogDebug::Settings.Thickness,
+                                                      Settings.Persistent,
+                                                      Settings.DepthPriority));
+    ReplicateShape(WorldContextObject,
+                   FCogDebugShape::MakeArrow(Start,
+                                             End,
+                                             FCogDebug::Settings.ArrowSize,
+                                             Color,
+                                             FCogDebug::Settings.Thickness,
+                                             Settings.Persistent,
+                                             Settings.DepthPriority));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogDebugDraw::Overlap(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FCollisionShape& Shape, const FVector& Location, const FQuat& Rotation, TArray<FOverlapResult>& OverlapResults, const FCogDebugDrawOverlapParams& Settings)
+{
+    if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
+    { return; }
+
+    const UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+    if (World == nullptr)
+    { return; }
+
+    FCogDebugDrawHelper::DrawOverlap(World, Shape, Location, Rotation, OverlapResults, Settings);
+
+    const FColor Color = OverlapResults.Num() > 0
+                       ? Settings.HitColor
+                       : Settings.NoHitColor;
+    ReplicateShape(WorldContextObject,
+                   FCogDebugShape::MakeCollisionShape(Shape,
+                                                      Location,
+                                                      Rotation,
+                                                      Shape.GetExtent(),
+                                                      Color,
+                                                      FCogDebug::Settings.Thickness,
+                                                      Settings.Persistent,
+                                                      Settings.DepthPriority));
+}
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDraw::ReplicateShape(const UObject* WorldContextObject, const FCogDebugShape& Shape)

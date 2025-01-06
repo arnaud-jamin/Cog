@@ -139,6 +139,16 @@ void FCogWindow::SetSelection(AActor* NewSelection)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+
+void FCogWindow::SetIsVisible(const bool Value)
+{
+    if (bIsVisible == Value)
+    { return; }
+
+    bIsVisible = Value;
+    OnWindowVisibilityChanged(Value);
+}
+
 APawn* FCogWindow::GetLocalPlayerPawn() const
 {
 	const APlayerController* LocalPlayerController = GetLocalPlayerController();

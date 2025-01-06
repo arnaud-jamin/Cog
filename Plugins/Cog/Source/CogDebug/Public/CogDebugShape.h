@@ -4,6 +4,8 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogCogServerVLOG, Verbose, All);
 
+struct FCollisionShape;
+
 enum class ECogDebugShape : uint8
 {
     Invalid,
@@ -59,6 +61,7 @@ struct COGDEBUG_API FCogDebugShape
     static FCogDebugShape MakeCapsule(const FVector& Center, const FQuat& Rotation, const float Radius, const float HalfHeight, const FColor& Color, const float Thickness, const bool bPersistent, const uint8 DepthPriority);
     static FCogDebugShape MakeFlatCapsule(const FVector2D& Start, const FVector2D& End, const float Radius, const float Z, const FColor& Color, const float Thickness, const bool bPersistent, const uint8 DepthPriority);
     static FCogDebugShape MakePolygon(const TArray<FVector>& Verts, const FColor& Color, const bool bPersistent, const uint8 DepthPriority);
+    static FCogDebugShape MakeCollisionShape(const FCollisionShape& Shape, const FVector& Location, const FQuat& Rotation, const FVector& Extent, const FColor& Color, const float Thickness, const bool bPersistent, const uint8 DepthPriority);
 
     void DrawPoint(const UWorld* World) const;
     void DrawSegment(const UWorld* World) const;
