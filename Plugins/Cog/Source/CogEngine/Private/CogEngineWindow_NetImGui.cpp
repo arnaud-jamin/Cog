@@ -11,14 +11,14 @@
 #include "NetImgui_Api.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_NetImGui::Initialize()
+void FCogEngineWindow_NetImgui::Initialize()
 {
     Super::Initialize();
-	bHasMenu = true;
-	Config = GetConfig<UCogEngineConfig_NetImGui>();
+	
+	Config = GetConfig<UCogEngineWindowConfig_NetImgui>();
 
 	FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(
-		TEXT("Cog.NetImgui.ConnectTo"),
+		TEXT("Cog.NetImgui.Connect"),
 		TEXT("Connect to NetImgui server"),
 		GetWorld(),
 		FCogWindowConsoleCommandDelegate::CreateLambda([this](const TArray<FString>& InArgs, UWorld* InWorld)
@@ -27,7 +27,7 @@ void FCogEngineWindow_NetImGui::Initialize()
 	}));
 
 	FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(
-		TEXT("Cog.NetImgui.ConnectFrom"),
+		TEXT("Cog.NetImgui.Listen"),
 		TEXT("Listen for NetImgui server connection"),
 		GetWorld(),
 		FCogWindowConsoleCommandDelegate::CreateLambda([this](const TArray<FString>& InArgs, UWorld* InWorld)
@@ -43,121 +43,129 @@ void FCogEngineWindow_NetImGui::Initialize()
 	{
 		Disconnect();
 	}));
+
+	FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(
+		TEXT("Cog.NetImgui.RunServer"),
+		TEXT("Run NetImgui server"),
+		GetWorld(),
+		FCogWindowConsoleCommandDelegate::CreateLambda([this](const TArray<FString>& InArgs, UWorld* InWorld)
+	{
+		RunServer();
+	}));
+
+	FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(
+		TEXT("Cog.NetImgui.CloseServer"),
+		TEXT("Close NetImgui server"),
+		GetWorld(),
+		FCogWindowConsoleCommandDelegate::CreateLambda([this](const TArray<FString>& InArgs, UWorld* InWorld)
+	{
+		CloseServer();
+	}));
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_NetImGui::Shutdown()
+void FCogEngineWindow_NetImgui::Shutdown()
 {
-	if (NetImgui::IsConnected())
+	if (NetImgui::IsConnected() || NetImgui::IsConnectionPending())
 	{
-		ImGui::TextUnformatted("Status: Connected");
-		if (ImGui::Button("Disconnect"))
-		{
-			NetImgui::Disconnect();
-		}
+		NetImgui::Disconnect();
 	}
-	else if (NetImgui::IsConnectionPending())
-	{
-		ImGui::TextUnformatted("Status: Waiting Server");
-		if (ImGui::Button("Cancel"))
-		{
-			NetImgui::Disconnect();
-		}
-	}
+
+	CloseServer();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_NetImGui::ResetConfig()
+void FCogEngineWindow_NetImgui::ResetConfig()
 {
 	Super::ResetConfig();
 	Config->Reset();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_NetImGui::RenderHelp()
+void FCogEngineWindow_NetImgui::RenderHelp()
 {
-    ImGui::Text("");
+    ImGui::Text("This window manage the connection to the NetImgui server."
+		"See https://github.com/sammyfreg/netImgui for more info.");
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_NetImGui::RenderTick(float DeltaTime)
+void FCogEngineWindow_NetImgui::RenderTick(float DeltaTime)
 {
 	//------------------------------------------------------
 	// Before auto connecting, wait for NetImgui startup, 
 	// which require imgui context to be initialized
 	//------------------------------------------------------
-	if (HasAlreadyTriedToConnectOnDedicatedServer == false
-		&& Config->AutoConnectOnDedicatedServer
-		&& UCogWindowManager::GetIsNetImguiInitialized()
-		&& IsRunningDedicatedServer())
+	if (HasAlreadyTriedToConnect == false && FCogImguiContext::GetIsNetImguiInitialized())
+	{
+		const ENetMode NetMode = GetWorld()->GetNetMode();
+		const bool ShouldConnect = (Config->AutoConnectOnDedicatedServer && NetMode == NM_DedicatedServer)
+								|| (Config->AutoConnectOnListenServer && NetMode == NM_ListenServer)
+								|| (Config->AutoConnectOnClient && NetMode == NM_Client)
+								|| (Config->AutoConnectOnStandalone && NetMode == NM_Standalone);
+
+		if (ShouldConnect)
 		{
-			ConnectFrom();
-			HasAlreadyTriedToConnectOnDedicatedServer = true;
+			if (Config->AutoRunServer)
+			{
+				ConnectTo();
+			}
+			else
+			{
+				ConnectFrom();
+			}
 		}
+
+		if (Config->AutoRunServer)
+		{
+			RunServer();
+		}
+
+		HasAlreadyTriedToConnect = true;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_NetImGui::RenderContent()
+void FCogEngineWindow_NetImgui::RenderContent()
 {
     Super::RenderContent();
 
 #if NETIMGUI_ENABLED
 
-	if (ImGui::BeginMenuBar())
-	{
-		if (ImGui::BeginMenu("Settings"))
-		{
-			{
-				static char Buffer[256] = "";
-				ImStrncpy(Buffer, TCHAR_TO_ANSI(*Config->ServerName), IM_ARRAYSIZE(Buffer));
-				if (ImGui::InputText("Server Name", Buffer, IM_ARRAYSIZE(Buffer)))
-				{
-					Config->ServerName = FString(Buffer);
-				}
-			}
-			ImGui::InputInt("Server Port", &Config->ServerPort);
-
-			ImGui::Separator();
-
-			{
-				static char Buffer[256] = "";
-				ImStrncpy(Buffer, TCHAR_TO_ANSI(*Config->ClientName), IM_ARRAYSIZE(Buffer));
-				if (ImGui::InputText("Client Name", Buffer, IM_ARRAYSIZE(Buffer)))
-				{
-					Config->ClientName = FString(Buffer);
-				}
-			}
-			ImGui::InputInt("Client Port", &Config->ClientPort);
-
-			ImGui::Separator();
-			ImGui::Checkbox("Auto Listen On Dedicated Server", &Config->AutoConnectOnDedicatedServer);
-
-			ImGui::EndMenu();
-		}
-
-		ImGui::EndMenuBar();
-	}
-
+	//----------------------------------------
+	// Status
+	//----------------------------------------
 	if (NetImgui::IsConnected())
 	{
 		ImGui::TextUnformatted("Status: Connected");
-		if (ImGui::Button("Disconnect"))
+	}
+	else if (NetImgui::IsConnectionPending())
+	{
+		ImGui::TextUnformatted("Status: Waiting Server");
+	}
+	else
+	{
+		ImGui::TextUnformatted("Status: Not Connected");
+	}
+
+	//----------------------------------------
+	// Connection buttons
+	//----------------------------------------
+	if (NetImgui::IsConnected())
+	{
+		if (ImGui::Button("Disconnect", ImVec2(ImGui::GetContentRegionAvail().x, 0)))
 		{
 			NetImgui::Disconnect();
 		}
 	}
 	else if (NetImgui::IsConnectionPending())
 	{
-		ImGui::TextUnformatted("Status: Waiting Server");
-		if (ImGui::Button("Cancel"))
+		if (ImGui::Button("Cancel Connection", ImVec2(ImGui::GetContentRegionAvail().x, 0)))
 		{
 			NetImgui::Disconnect();
 		}
 	}
-	else // No connection
+	else 
 	{
-		ImGui::TextUnformatted("Status: Not Connected");
-
 		if (ImGui::Button("Connect", ImVec2(ImGui::GetContentRegionAvail().x, 0)))
 		{
 			ConnectTo();
@@ -177,55 +185,238 @@ void FCogEngineWindow_NetImGui::RenderContent()
 		}
 	}
 
+	//----------------------------------------
+	// Run/Close server button
+	//----------------------------------------
+	if (FPlatformProcess::IsProcRunning(ServerProcess))
+	{
+		if (ImGui::Button("Close Server", ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+		{
+			CloseServer();
+		}
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("Close the NetImgui server executable.");
+		}
+	}
+	else 
+	{
+		if (ImGui::Button("Run Server", ImVec2(ImGui::GetContentRegionAvail().x, 0)))
+		{
+			RunServer();
+		}
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("Run the NetImgui server executable.");
+		}
+	}
+
+	//----------------------------------------
+	// Settings
+	//----------------------------------------
+	if (ImGui::CollapsingHeader("Settings", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		FCogWindowWidgets::SetNextItemToShortWidth();
+		FCogWindowWidgets::InputText("Server Address", Config->ServerAddress);
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("NetImgui server application address.");
+		}
+
+		FCogWindowWidgets::SetNextItemToShortWidth();
+		ImGui::InputInt("Server Port", &Config->ServerPort);
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("Port of the NetImgui Server application to connect to.");
+		}
+
+		FCogWindowWidgets::SetNextItemToShortWidth();
+		FCogWindowWidgets::InputText("Client Name", Config->ClientName);
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("Client name displayed in the server's clients list.");
+		}
+
+		FCogWindowWidgets::SetNextItemToShortWidth();
+		ImGui::InputInt("Client Port", &Config->ClientPort);
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("Port this client should wait for connection from server application.");
+		}
+
+		ImGui::Checkbox("Auto Connect on Dedicated Server", &Config->AutoConnectOnDedicatedServer);
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("Automatically connect to the NetImgui server when launching on dedicated server mode.");
+		}
+
+		ImGui::Checkbox("Auto Connect on Listen Server", &Config->AutoConnectOnListenServer);
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("Automatically connect to the NetImgui server when launching on listen server mode.");
+		}
+
+		ImGui::Checkbox("Auto Connect on Client", &Config->AutoConnectOnClient);
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("Automatically connect to the NetImgui server when launching on client mode.");
+		}
+
+		ImGui::Checkbox("Auto Connect on Standalone", &Config->AutoConnectOnStandalone);
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("Automatically connect to the NetImgui server when launching on standlone mode.");
+		}
+
+		ImGui::Checkbox("Auto Run Server", &Config->AutoRunServer);
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("Automatically run the NetImgui server executable at startup.");
+		}
+
+		FCogWindowWidgets::SetNextItemToShortWidth();
+		FCogWindowWidgets::InputText("Server Exe Path", Config->ServerExePath);
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("Path to NetImgui server executable path. Used to automatically run the NetImgui server executable.");
+		}
+
+		FCogWindowWidgets::SetNextItemToShortWidth();
+		FCogWindowWidgets::InputText("Server Exe Args", Config->ServerExeArgs);
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("Argument used when launching the NetImgui server executable.");
+		}
+	}
 #endif // #if NETIMGUI_ENABLED
 }
 
+
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_NetImGui::ConnectTo()
+FString FCogEngineWindow_NetImgui::GetClientName()
+{
+	switch (GetWorld()->GetNetMode())
+	{
+	case NM_Standalone:
+		return FString::Printf(TEXT("%s_%s"), *Config->ClientName, TEXT("Standalone"));
+
+	case NM_DedicatedServer:
+		return FString::Printf(TEXT("%s_%s"), *Config->ClientName, TEXT("DedicatedServer"));
+
+	case NM_ListenServer:
+		return FString::Printf(TEXT("%s_%s"), *Config->ClientName, TEXT("ListenServer"));
+
+	case NM_Client:
+		return FString::Printf(TEXT("%s_%s"), *Config->ClientName, TEXT("Client"));
+	}
+
+	return Config->ClientName;
+}
+
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_NetImgui::ConnectTo()
 {
 	FCogImGuiContextScope ImGuiContextScope(GetOwner()->GetContext());
 
-	UE_LOG(LogCogImGui, Verbose, TEXT("FCogEngineWindow_NetImGui::ConnectTo | Client:%s | Server:%s | ServerPort:%d"),
-		*Config->ClientName,
-		*Config->ServerName,
+	const FString ClientName = GetClientName();
+
+	UE_LOG(LogCogImGui, Verbose, TEXT("FCogEngineWindow_NetImgui::ConnectTo | ClientName:%s | ServerAddress:%s | ServerPort:%d"),
+		*ClientName,
+		*Config->ServerAddress,
 		Config->ServerPort);
 
-	const auto clientName = StringCast<ANSICHAR>(*Config->ClientName);
-	const auto serverName = StringCast<ANSICHAR>(*Config->ServerName);
-	NetImgui::ConnectToApp(clientName.Get(), serverName.Get(), Config->ServerPort, nullptr, nullptr);
+	const auto clientName = StringCast<ANSICHAR>(*ClientName);
+	const auto serverAddress = StringCast<ANSICHAR>(*Config->ServerAddress);
+	NetImgui::ConnectToApp(clientName.Get(), serverAddress.Get(), Config->ServerPort, nullptr, nullptr);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_NetImGui::ConnectFrom()
+void FCogEngineWindow_NetImgui::ConnectFrom()
 {
 	FCogImGuiContextScope ImGuiContextScope(GetOwner()->GetContext());
 
-	UE_LOG(LogCogImGui, Verbose, TEXT("FCogEngineWindow_NetImGui::ConnectFrom | Client:%s | ClientPort:%d"),
-		*Config->ClientName,
+	const FString ClientName = GetClientName();
+
+	UE_LOG(LogCogImGui, Verbose, TEXT("FCogEngineWindow_NetImgui::ConnectFrom | ClientName:%s | ClientPort:%d"),
+		*ClientName,
 		Config->ClientPort);
 
-	const auto clientName = StringCast<ANSICHAR>(*Config->ClientName);
+	const auto clientName = StringCast<ANSICHAR>(*ClientName);
 	NetImgui::ConnectFromApp(clientName.Get(), Config->ClientPort, nullptr, nullptr);
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_NetImGui::Disconnect()
+void FCogEngineWindow_NetImgui::Disconnect()
 {
 	FCogImGuiContextScope ImGuiContextScope(GetOwner()->GetContext());
 
-	UE_LOG(LogCogImGui, Verbose, TEXT("FCogEngineWindow_NetImGui::Disconnect"));
+	UE_LOG(LogCogImGui, Verbose, TEXT("FCogEngineWindow_NetImgui::Disconnect"));
 	NetImgui::Disconnect();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogEngineConfig_NetImGui::Reset()
+void FCogEngineWindow_NetImgui::RunServer()
+{
+	if (FPlatformProcess::IsProcRunning(ServerProcess))
+	{
+		return;
+	}
+
+	if (Config->ServerExePath.IsEmpty())
+	{
+		return;
+	}
+
+	ServerProcess = FPlatformProcess::CreateProc(
+		*Config->ServerExePath,
+		*Config->ServerExeArgs,
+		true,
+		false,
+		false,
+		nullptr,
+		0,
+		nullptr,
+		nullptr
+	);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_NetImgui::CloseServer()
+{
+	if (FPlatformProcess::IsProcRunning(ServerProcess) == false)
+	{
+		return;
+	}
+
+	if (Config->ServerExePath.IsEmpty() == false)
+	{
+		FPlatformProcess::TerminateProc(ServerProcess);
+	}
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+// Config
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindowConfig_NetImgui::Reset()
 {
 	Super::Reset();
 
 #if NETIMGUI_ENABLED
-	ClientName = FString("cog");
-	ServerName = FString("localhost");
+
+	ClientName = FString("Cog");
 	ClientPort = NetImgui::kDefaultClientPort;
+	AutoConnectOnDedicatedServer = true;
+	AutoConnectOnListenServer = false;
+	AutoConnectOnClient = false;
+	AutoConnectOnStandalone = false;
+
+	ServerAddress = FString("127.0.0.1");
 	ServerPort = NetImgui::kDefaultServerPort;
+	ServerExePath = FString("C:\\NetImgui\\Server_Exe\\NetImguiServer.exe");
+	ServerExeArgs = FString("");
+	AutoRunServer = false;
+
 #endif
 }

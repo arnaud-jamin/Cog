@@ -65,15 +65,25 @@ public:
 
 	bool BeginFrame(float InDeltaTime);
 
+	void GetCursorPos(ImGuiIO& IO);
+
 	void EndFrame();
 
 	float GetDpiScale() const { return DpiScale; }
 
 	void SetDPIScale(float Value);
 
+	bool GetSkipRendering() const;
+
+	void SetSkipRendering(bool Value);
+
+	ImVec2 GetImguiMousePos();
+
 	TObjectPtr<const UGameViewportClient> GetGameViewport() const { return GameViewport; }
 
 	TSharedPtr<const SCogImguiWidget> GetMainWidget() const { return MainWidget; }
+
+	static bool GetIsNetImguiInitialized() { return bIsNetImguiInitialized; }
 
 private:
 
@@ -161,4 +171,6 @@ private:
 	bool bWantCaptureMouse = false;
 
 	float DpiScale = 1.f;
+	static bool bIsNetImguiInitialized;
+
 };

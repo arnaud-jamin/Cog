@@ -23,8 +23,6 @@ FString UCogWindowManager::LoadLayoutCommand    = TEXT("Cog.LoadLayout");
 FString UCogWindowManager::SaveLayoutCommand    = TEXT("Cog.SaveLayout");
 FString UCogWindowManager::ResetLayoutCommand   = TEXT("Cog.ResetLayout");
 
-bool UCogWindowManager::IsNetImguiInitialized = false;
-
 //--------------------------------------------------------------------------------------------------------------------------
 UCogWindowManager::UCogWindowManager()
 {
@@ -132,15 +130,6 @@ void UCogWindowManager::InitializeInternal()
             }
         }));
 
-
-#if NETIMGUI_ENABLED
-    if (IsNetImguiInitialized == false)
-    {
-        NetImgui::Startup();
-        IsNetImguiInitialized = true;
-    }
-#endif
-
     IsInitialized = true;
 
 }
@@ -158,17 +147,6 @@ void UCogWindowManager::Shutdown()
     {
         Window->PreSaveConfig();
     }
-
-    //------------------------------------------------------------------
-    // NetImgui must be shutdown before imgui as it uses context hooks
-    //------------------------------------------------------------------
-#if NETIMGUI_ENABLED
-    if (IsNetImguiInitialized)
-    {
-        NetImgui::Shutdown();
-        IsNetImguiInitialized = false;
-    }
-#endif
 
     //------------------------------------------------------------------
     // Destroy ImGui before destroying the windows to make sure 
@@ -223,6 +201,9 @@ void UCogWindowManager::Tick(float DeltaTime)
         Window->GameTick(DeltaTime);
     }
 
+    const bool shouldSkipRendering = NetImgui::IsConnected() && bIsSelectionModeActive == false;
+    Context.SetSkipRendering(shouldSkipRendering);
+
     if (Context.BeginFrame(DeltaTime))
     {
         Render(DeltaTime);
@@ -246,19 +227,25 @@ void UCogWindowManager::Render(float DeltaTime)
         FCogWindowWidgets::PushStyleCompact();
     }
 
-    if (bHideAllWindows == false)
+    //----------------------------------------------------------------------
+    // There is no need to have Imgui input enabled if the imgui rendering 
+    // is only done on the NetImgui server. So we disable imgui input.
+    //----------------------------------------------------------------------
+    if (Context.GetEnableInput() && NetImgui::IsConnected() && bIsSelectionModeActive == false)
     {
-        if (Context.GetEnableInput())
-        {
-            RenderMainMenu();
-        }
+        Context.SetEnableInput(false);
+    }
+
+    if ((Context.GetEnableInput() || NetImgui::IsConnected()) && bIsSelectionModeActive == false)
+    {
+        RenderMainMenu();
     }
 
     for (FCogWindow* Window : Windows)
     {
         Window->RenderTick(DeltaTime);
 
-        if (Window->GetIsVisible() && bHideAllWindows == false)
+        if (Window->GetIsVisible() && bIsSelectionModeActive == false)
         {
             if (SettingsWindow->GetSettingsConfig()->bTransparentMode)
             {
@@ -314,10 +301,15 @@ FCogWindow* UCogWindowManager::FindWindowByID(const ImGuiID ID)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::SetHideAllWindows(const bool Value)
+void UCogWindowManager::SetActivateSelectionMode(const bool Value)
 {
-    HideAllWindowsCounter = FMath::Max(HideAllWindowsCounter + (Value ? +1 : -1), 0);
-    bHideAllWindows = HideAllWindowsCounter > 0;
+    SelectionModeActiveCounter = FMath::Max(SelectionModeActiveCounter + (Value ? 1 : -1), 0);
+    bIsSelectionModeActive = SelectionModeActiveCounter > 0;
+
+    if (bIsSelectionModeActive)
+    {
+        Context.SetEnableInput(true);
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -429,7 +421,6 @@ void UCogWindowManager::RenderMainMenu()
             ImGui::Separator();
 
             RenderMenuItem(*LayoutsWindow, "Layouts");
-
             RenderMenuItem(*SettingsWindow, "Settings");
 
             if (ImGui::BeginMenu("Spacing"))
@@ -880,4 +871,3 @@ void UCogWindowManager::DisableInputMode()
     UE_LOG(LogCogImGui, Verbose, TEXT("UCogWindowManager::DisableInputMode"));
     Context.SetEnableInput(false);
 }
-

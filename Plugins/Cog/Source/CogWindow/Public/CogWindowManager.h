@@ -36,6 +36,7 @@ public:
 
     virtual void Tick(float DeltaTime);
 
+
     virtual void AddWindow(FCogWindow* Window, const FString& Name, bool AddToMainMenu = true);
 
     template<class T>
@@ -51,9 +52,9 @@ public:
 
     virtual void SaveLayout(int32 LayoutIndex);
 
-    virtual bool GetHideAllWindows() const { return bHideAllWindows; }
+    virtual bool GetHideAllWindows() const { return bIsSelectionModeActive; }
 
-    virtual void SetHideAllWindows(bool Value);
+    virtual void SetActivateSelectionMode(bool Value);
 
     virtual void ResetAllWindowsConfig();
 
@@ -78,8 +79,6 @@ public:
     static void AddCommand(UPlayerInput* PlayerInput, const FString& Command, const FKey& Key);
 
     static void SortCommands(UPlayerInput* PlayerInput);
-
-    static bool GetIsNetImguiInitialized() { return IsNetImguiInitialized; }
 
 protected:
 
@@ -156,13 +155,11 @@ protected:
 
     int32 LayoutToLoad = -1;
 
-    int32 HideAllWindowsCounter = 0;
+    int32 SelectionModeActiveCounter = 0;
 
-    bool bHideAllWindows = false;
+    bool bIsSelectionModeActive = false;
 
     bool IsInitialized = false;
-
-    static bool IsNetImguiInitialized;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -18,6 +18,7 @@
 #include "imgui_internal.h"
 #include "implot.h"
 #include "Misc/EngineVersionComparison.h"
+#include "NetImgui_Api.h"
 #include "TextureResource.h"
 #include "Widgets/SViewport.h"
 #include "Widgets/SWindow.h"
@@ -51,6 +52,8 @@ FCogImGuiContextScope::
     ImPlot::SetCurrentContext(PrevPlotContext);
 }
 
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogImguiContext::bIsNetImguiInitialized = false;
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::Initialize()
@@ -139,12 +142,31 @@ void FCogImguiContext::Initialize()
         DisplayMetrics.MonitorInfo.Add(monitorInfo);
         OnDisplayMetricsChanged(DisplayMetrics);
     }
+
+#if NETIMGUI_ENABLED
+    if (bIsNetImguiInitialized == false)
+    {
+        NetImgui::Startup();
+        bIsNetImguiInitialized = true;
+    }
+#endif
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::Shutdown()
 {
     FCogImGuiContextScope ImGuiContextScope(ImGuiContext, PlotContext);
+
+    //------------------------------------------------------------------
+    // NetImgui must be shutdown before imgui as it uses context hooks
+    //------------------------------------------------------------------
+#if NETIMGUI_ENABLED
+    if (bIsNetImguiInitialized)
+    {
+        NetImgui::Shutdown();
+        bIsNetImguiInitialized = false;
+    }
+#endif
 
     if (ImGuiViewport* MainViewport = ImGui::GetMainViewport())
     {
@@ -287,7 +309,7 @@ bool FCogImguiContext::BeginFrame(float InDeltaTime)
     //-------------------------------------------------------------------------------------------------------
     // 
     //-------------------------------------------------------------------------------------------------------
-    if (bEnableInput)
+    if (bEnableInput || NetImgui::IsConnected())
     {
         IO.ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
     }
@@ -296,7 +318,7 @@ bool FCogImguiContext::BeginFrame(float InDeltaTime)
         IO.ConfigFlags |= ImGuiConfigFlags_NoMouse;
     }
 
-    if (MainWidget != nullptr)
+    if (MainWidget != nullptr && FSlateApplication::IsInitialized())
     {
         const bool bHasMouse = (IO.ConfigFlags & ImGuiConfigFlags_NoMouse) == 0;
         const bool bUpdateMouseMouseCursor = (IO.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange) == 0;
@@ -305,18 +327,10 @@ bool FCogImguiContext::BeginFrame(float InDeltaTime)
             MainWidget->SetCursor(FCogImguiInputHelper::ToSlateMouseCursor(ImGui::GetMouseCursor()));
         }
 
-        if (FSlateApplication::IsInitialized())
+        if (bEnableInput)
         {
-            const FVector2D& MousePosition = FSlateApplication::Get().GetCursorPos();
-            if (IO.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-            {
-                IO.AddMousePosEvent(MousePosition.X, MousePosition.Y);
-            }
-            else
-            {
-                const FVector2D TransformedMousePosition = MousePosition - MainWidget->GetTickSpaceGeometry().GetAbsolutePosition();
-                IO.AddMousePosEvent(TransformedMousePosition.X, TransformedMousePosition.Y);
-            }
+            const ImVec2 mousePos = GetImguiMousePos();
+            IO.AddMousePosEvent(mousePos.x, mousePos.y);
         }
     }
 
@@ -334,10 +348,27 @@ bool FCogImguiContext::BeginFrame(float InDeltaTime)
     }
 
     ImGui::NewFrame();
+    //if (NetImgui::NewFrame(true) == false)
+    //{
+    //    return false;
+    //}
 
     //DrawDebug();
 
     return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+ImVec2 FCogImguiContext::GetImguiMousePos()
+{
+    const FVector2D& MousePosition = FSlateApplication::Get().GetCursorPos();
+    if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        return ImVec2(MousePosition.X, MousePosition.Y);
+    }
+
+    const FVector2D TransformedMousePosition = MousePosition - MainWidget->GetTickSpaceGeometry().GetAbsolutePosition();
+    return ImVec2(TransformedMousePosition.X, TransformedMousePosition.Y);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -346,6 +377,8 @@ void FCogImguiContext::EndFrame()
     FCogImGuiContextScope ImGuiContextScope(ImGuiContext, PlotContext);
 
     ImGui::Render();
+    //NetImgui::EndFrame();
+
     ImGui_RenderWindow(ImGui::GetMainViewport(), nullptr);
 
     ImGui::UpdatePlatformWindows();
@@ -862,3 +895,16 @@ ULocalPlayer* FCogImguiContext::GetLocalPlayer() const
     ULocalPlayer* LocalPlayer = World->GetFirstLocalPlayerFromController();
     return LocalPlayer;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogImguiContext::GetSkipRendering() const
+{
+    return bSkipRendering;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogImguiContext::SetSkipRendering(bool Value)
+{
+    bSkipRendering = Value;
+}
+

@@ -45,6 +45,10 @@ int32 SCogImguiWidget::OnPaint(
     const FWidgetStyle& WidgetStyle,
     bool bParentEnabled) const
 {
+    if (Context == nullptr || Context->GetSkipRendering())
+    {
+        return LayerId;
+    }
 
     const FSlateRenderTransform Transform(FCogImguiHelper::RoundTranslation(AllottedGeometry.GetAccumulatedRenderTransform().GetTranslation() - FVector2d(DrawData.DisplayPos)));
 

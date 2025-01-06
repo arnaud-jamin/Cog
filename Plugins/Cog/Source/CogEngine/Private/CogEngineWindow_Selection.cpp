@@ -139,7 +139,7 @@ void FCogEngineWindow_Selection::ActivateSelectionMode()
     bSelectionModeActive = true;
     bIsInputEnabledBeforeEnteringSelectionMode = GetOwner()->GetContext().GetEnableInput();
     GetOwner()->GetContext().SetEnableInput(true);
-    GetOwner()->SetHideAllWindows(true);
+    GetOwner()->SetActivateSelectionMode(true);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -161,7 +161,7 @@ void FCogEngineWindow_Selection::DeactivateSelectionMode()
     //--------------------------------------------------------------------------------------------
     GetOwner()->GetContext().SetEnableInput(bIsInputEnabledBeforeEnteringSelectionMode);
 
-    GetOwner()->SetHideAllWindows(false);
+    GetOwner()->SetActivateSelectionMode(false);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -254,7 +254,15 @@ void FCogEngineWindow_Selection::TickSelectionMode()
 
     AActor* HoveredActor = nullptr;
     FVector WorldOrigin, WorldDirection;
-    if (UGameplayStatics::DeprojectScreenToWorld(PlayerController, FCogImguiHelper::ToFVector2D(ImGui::GetMousePos() - ViewportPos), WorldOrigin, WorldDirection))
+    
+    //-----------------------------------------------------------------------------------------------
+    // Do not use imgui mouse pos because when connected to NetImgui, the mouse position is invalid.
+    // See https://github.com/sammyfreg/netImgui/issues/61
+    //-----------------------------------------------------------------------------------------------
+    //ImVec2 mousePos = ImGui::GetMousePos();
+    ImVec2 mousePos = GetOwner()->GetContext().GetImguiMousePos();
+
+    if (UGameplayStatics::DeprojectScreenToWorld(PlayerController, FCogImguiHelper::ToFVector2D(mousePos - ViewportPos), WorldOrigin, WorldDirection))
     {
         //--------------------------------------------------------------------------------------------------------
         // Prioritize another actor than the selected actor unless we only touch the selected actor.

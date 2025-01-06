@@ -104,6 +104,9 @@ public:
     static void ActorFrame(const AActor& Actor);
 
     static void SmallButton(const char* Text, const ImVec4& Color);
+
+    static bool InputText(const char* Text, FString& Value);
+
 };
 
 template<typename EnumType>

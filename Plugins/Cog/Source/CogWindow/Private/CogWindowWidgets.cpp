@@ -1030,3 +1030,18 @@ void FCogWindowWidgets::SmallButton(const char* Text, const ImVec4& Color)
     ImGui::SmallButton(Text);
     ImGui::PopStyleColor(3);
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::InputText(const char* Text, FString& Value)
+{
+    static char Buffer[256] = "";
+    ImStrncpy(Buffer, TCHAR_TO_ANSI(*Value), IM_ARRAYSIZE(Buffer));
+    
+    bool result = ImGui::InputText(Text, Buffer, IM_ARRAYSIZE(Buffer));
+    if (result)
+    {
+        Value = FString(Buffer);
+    }
+
+    return result;
+}
