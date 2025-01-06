@@ -143,7 +143,7 @@ Used to configure the network emulation
 ### NetImgui
 Handle connections to a [NetImgui](https://github.com/sammyfreg/netImgui) server.
 
-![image](https://github.com/user-attachments/assets/b26be5dc-4c37-47f4-8e09-238c633e1bd4)
+![NetImgui](https://github.com/user-attachments/assets/ea1d4a28-4c2f-460c-ac7d-5f6ef8e6e6dd)
 
 The following image shows the editor running along a dedicated server. The NetImgui server displays the dedicated server imgui windows. 
 This can be used to debug the state of the game server. For example the behavior trees are only available on the game server.
