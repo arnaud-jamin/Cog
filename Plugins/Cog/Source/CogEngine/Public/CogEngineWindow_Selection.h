@@ -75,7 +75,7 @@ protected:
 
     bool bSelectionModeActive = false;
 
-    bool bIsInputEnabledBeforeEnteringSelectionMode;
+    bool bIsInputEnabledBeforeEnteringSelectionMode = false;
 
     int32 WaitInputReleased = 0;
 

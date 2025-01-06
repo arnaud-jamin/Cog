@@ -4,6 +4,8 @@
 #include "imgui.h"
 #include "UObject/ReflectedTypeAccessors.h"
 
+class AActor;
+class APawn;
 class FEnumProperty;
 class UCollisionProfile;
 class UEnum;
@@ -91,13 +93,13 @@ public:
 
     static bool CollisionProfileChannels(int32& Channels);
 
-    static bool MenuActorsCombo(const char* StrID, const UWorld& World, TSubclassOf<AActor> ActorClass, const FCogWindowActorContextMenuFunction& ContextMenuFunction = nullptr);
+    static bool MenuActorsCombo(const char* StrID, AActor*& NewSelection, const UWorld& World, TSubclassOf<AActor> ActorClass, const FCogWindowActorContextMenuFunction& ContextMenuFunction = nullptr);
 
-	static bool MenuActorsCombo(const char* StrID, const UWorld& World, const TArray<TSubclassOf<AActor>>& ActorClasses, int32& SelectedActorClassIndex, ImGuiTextFilter* Filter, const APawn* LocalPlayerPawn, const FCogWindowActorContextMenuFunction& ContextMenuFunction = nullptr);
+	static bool MenuActorsCombo(const char* StrID, AActor*& NewSelection, const UWorld& World, const TArray<TSubclassOf<AActor>>& ActorClasses, int32& SelectedActorClassIndex, ImGuiTextFilter* Filter, const APawn* LocalPlayerPawn, const FCogWindowActorContextMenuFunction& ContextMenuFunction = nullptr);
 
-    static bool ActorsListWithFilters(const UWorld& World, const TArray<TSubclassOf<AActor>>& ActorClasses, int32& SelectedActorClassIndex, ImGuiTextFilter* Filter, const APawn* LocalPlayerPawn, const FCogWindowActorContextMenuFunction& ContextMenuFunction = nullptr);
+    static bool ActorsListWithFilters(AActor*& NewSelection, const UWorld& World, const TArray<TSubclassOf<AActor>>& ActorClasses, int32& SelectedActorClassIndex, ImGuiTextFilter* Filter, const APawn* LocalPlayerPawn, const FCogWindowActorContextMenuFunction& ContextMenuFunction = nullptr);
 
-    static bool ActorsList(const UWorld& World, const TSubclassOf<AActor> ActorClass, const ImGuiTextFilter* Filter = nullptr, const APawn* LocalPlayerPawn = nullptr, const FCogWindowActorContextMenuFunction& ContextMenuFunction = nullptr);
+    static bool ActorsList(AActor*& NewSelection, const UWorld& World, const TSubclassOf<AActor> ActorClass, const ImGuiTextFilter* Filter = nullptr, const APawn* LocalPlayerPawn = nullptr, const FCogWindowActorContextMenuFunction& ContextMenuFunction = nullptr);
 
     static void ActorContextMenu(AActor& Selection, const FCogWindowActorContextMenuFunction& ContextMenuFunction);
 

@@ -82,7 +82,7 @@ void ACogDebugReplicator::BeginPlay()
     if (OwnerPlayerController != nullptr && OwnerPlayerController->IsLocalController())
     {
         Server_RequestAllCategoriesVerbosity();
-        Server_SetSelection(FCogDebug::GetSelection());
+        Server_SetSelection(FCogDebug::GetSelection(), FCogDebug::Settings.ReplicateSelection);
         Server_SetIsFilteringBySelection(FCogDebug::GetIsFilteringBySelection());
     }
 }
@@ -210,11 +210,21 @@ void ACogDebugReplicator::Server_SetIsFilteringBySelection_Implementation(bool V
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogDebugReplicator::Server_SetSelection_Implementation(AActor* Value)
+void ACogDebugReplicator::Server_SetSelection_Implementation(AActor* Value, bool ForceSelection)
 {
 #if !UE_BUILD_SHIPPING
 
     ServerSelection = Value;
+
+    if (ForceSelection)
+    {
+        FCogDebug::SetSelection(GetWorld(), Value);
+    }
+    else
+    {
+        FCogDebug::SetSelection(GetWorld(), nullptr);
+    }
+
 
 #endif // !UE_BUILD_SHIPPING
 }

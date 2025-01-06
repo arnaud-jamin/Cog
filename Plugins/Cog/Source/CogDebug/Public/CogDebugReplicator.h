@@ -88,7 +88,7 @@ public:
     AActor* GetServerSelection() const { return ServerSelection.Get(); }
     
     UFUNCTION(Server, Reliable)
-    void Server_SetSelection(AActor* Value);
+    void Server_SetSelection(AActor* Value, bool ForceSelection);
 
     bool IsServerFilteringBySelection() const { return bIsServerFilteringBySelection; }
     

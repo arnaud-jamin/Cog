@@ -106,18 +106,35 @@ int32 FCogDebug::GetPieSessionId()
 #endif
 }
 
+
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebug::SetSelection(const UWorld* World, AActor* Value)
 {
     Selection[GetPieSessionId()] = Value;
 
-    if (World != nullptr && World->GetNetMode() == NM_Client)
+    ReplicateSelection(World, Value);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogDebug::ReplicateSelection(const UWorld* World, AActor* Value)
+{
+    if (World == nullptr)
     {
-        if (ACogDebugReplicator* Replicator = ACogDebugReplicator::GetLocalReplicator(*World))
-        {
-            Replicator->Server_SetSelection(Value);
-        }
+        return;
     }
+
+    ACogDebugReplicator* Replicator = ACogDebugReplicator::GetLocalReplicator(*World);
+    if (Replicator == nullptr)
+    {
+        return;
+    }
+
+    if (Replicator->HasAuthority())
+    {
+        return;
+    }
+
+    Replicator->Server_SetSelection(Value, Settings.ReplicateSelection);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

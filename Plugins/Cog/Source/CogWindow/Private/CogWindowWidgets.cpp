@@ -734,7 +734,7 @@ bool FCogWindowWidgets::CollisionProfileChannels(int32& Channels)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogWindowWidgets::ActorsListWithFilters(const UWorld& World, const TArray<TSubclassOf<AActor>>& ActorClasses, int32& SelectedActorClassIndex, ImGuiTextFilter* Filter, const APawn* LocalPlayerPawn, const FCogWindowActorContextMenuFunction& ContextMenuFunction)
+bool FCogWindowWidgets::ActorsListWithFilters(AActor*& NewSelection, const UWorld& World, const TArray<TSubclassOf<AActor>>& ActorClasses, int32& SelectedActorClassIndex, ImGuiTextFilter* Filter, const APawn* LocalPlayerPawn, const FCogWindowActorContextMenuFunction& ContextMenuFunction)
 {
     TSubclassOf<AActor> SelectedClass = AActor::StaticClass();
     if (ActorClasses.IsValidIndex(SelectedActorClassIndex))
@@ -783,14 +783,14 @@ bool FCogWindowWidgets::ActorsListWithFilters(const UWorld& World, const TArray<
     // Actor List
     //------------------------
     ImGui::BeginChild("ActorsList", ImVec2(-1, -1), false);
-    const bool SelectionChanged = ActorsList(World, SelectedClass, Filter, LocalPlayerPawn, ContextMenuFunction);
+    const bool SelectionChanged = ActorsList(NewSelection, World, SelectedClass, Filter, LocalPlayerPawn, ContextMenuFunction);
     ImGui::EndChild();
 
     return SelectionChanged;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogWindowWidgets::ActorsList(const UWorld& World, const TSubclassOf<AActor> ActorClass, const ImGuiTextFilter* Filter, const APawn* LocalPlayerPawn, const FCogWindowActorContextMenuFunction& ContextMenuFunction)
+bool FCogWindowWidgets::ActorsList(AActor*& NewSelection, const UWorld& World, const TSubclassOf<AActor> ActorClass, const ImGuiTextFilter* Filter, const APawn* LocalPlayerPawn, const FCogWindowActorContextMenuFunction& ContextMenuFunction)
 {
     TArray<AActor*> Actors;
     for (TActorIterator It(&World, ActorClass); It; ++It)
@@ -813,8 +813,8 @@ bool FCogWindowWidgets::ActorsList(const UWorld& World, const TSubclassOf<AActor
         }
     }
 
-    const AActor* OldSelection = FCogDebug::GetSelection();
-    const AActor* NewSelection = OldSelection;
+    AActor* OldSelection = FCogDebug::GetSelection();
+    NewSelection = OldSelection;
 
     ImGuiListClipper Clipper;
     Clipper.Begin(Actors.Num());
@@ -833,7 +833,7 @@ bool FCogWindowWidgets::ActorsList(const UWorld& World, const TSubclassOf<AActor
             const bool bIsSelected = Actor == FCogDebug::GetSelection();
             if (ImGui::Selectable(TCHAR_TO_ANSI(*FCogWindowHelper::GetActorName(*Actor)), bIsSelected))
             {
-                FCogDebug::SetSelection(&World, Actor);
+                //FCogDebug::SetSelection(&World, Actor);
                 NewSelection = Actor;
             }
 
@@ -862,17 +862,17 @@ bool FCogWindowWidgets::ActorsList(const UWorld& World, const TSubclassOf<AActor
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogWindowWidgets::MenuActorsCombo(const char* StrID, const UWorld& World, TSubclassOf<AActor> ActorClass, const FCogWindowActorContextMenuFunction& ContextMenuFunction)
+bool FCogWindowWidgets::MenuActorsCombo(const char* StrID, AActor*& NewSelection, const UWorld& World, TSubclassOf<AActor> ActorClass, const FCogWindowActorContextMenuFunction& ContextMenuFunction)
 {
     int32 SelectedActorClassIndex = 0;
     const TArray ActorClasses = { ActorClass };
 
     AActor* Actor = nullptr;
-    return MenuActorsCombo(StrID, World, ActorClasses, SelectedActorClassIndex, nullptr, nullptr, ContextMenuFunction);
+    return MenuActorsCombo(StrID, NewSelection, World, ActorClasses, SelectedActorClassIndex, nullptr, nullptr, ContextMenuFunction);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogWindowWidgets::MenuActorsCombo(const char* StrID, const UWorld& World, const TArray<TSubclassOf<AActor>>& ActorClasses, int32& SelectedActorClassIndex, ImGuiTextFilter* Filter, const APawn* LocalPlayerPawn, const FCogWindowActorContextMenuFunction& ContextMenuFunction)
+bool FCogWindowWidgets::MenuActorsCombo(const char* StrID, AActor*& NewSelection, const UWorld& World, const TArray<TSubclassOf<AActor>>& ActorClasses, int32& SelectedActorClassIndex, ImGuiTextFilter* Filter, const APawn* LocalPlayerPawn, const FCogWindowActorContextMenuFunction& ContextMenuFunction)
 {
     bool Result = false;
     ImGui::PushID(StrID);
@@ -928,7 +928,7 @@ bool FCogWindowWidgets::MenuActorsCombo(const char* StrID, const UWorld& World, 
     {
         ImGui::BeginChild("Child", ImVec2(Pos2.x - Pos1.x, GetFontWidth() * 40), false);
 
-        Result = ActorsListWithFilters(World, ActorClasses, SelectedActorClassIndex, Filter, LocalPlayerPawn, ContextMenuFunction);
+        Result = ActorsListWithFilters(NewSelection, World, ActorClasses, SelectedActorClassIndex, Filter, LocalPlayerPawn, ContextMenuFunction);
         if (Result)
         {
             ImGui::CloseCurrentPopup();

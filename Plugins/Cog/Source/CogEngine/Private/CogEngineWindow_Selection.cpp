@@ -2,6 +2,7 @@
 
 #include "CogDebug.h"
 #include "CogEngineHelper.h"
+#include "CogEngineReplicator.h"
 #include "CogEngineWindow_ImGui.h"
 #include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
@@ -204,7 +205,14 @@ void FCogEngineWindow_Selection::RenderContent()
         if (ImGui::BeginMenu("Options"))
         {
             ImGui::Checkbox("Save selection", &Config->bReapplySelection);
-            ImGui::Checkbox("Actor Name Use Label", &FCogDebug::Settings.ActorNameUseLabel);
+            ImGui::SetItemTooltip("Should the last selection be saved and reapplied on startup.");
+
+        	ImGui::Checkbox("Actor Name Use Label", &FCogDebug::Settings.ActorNameUseLabel);
+            ImGui::SetItemTooltip("Should actor names be displayed using their label. Labels are more readable.");
+
+        	ImGui::Checkbox("Replicate Selection", &FCogDebug::Settings.ReplicateSelection);
+            ImGui::SetItemTooltip("Should the client replicate its actor selection to the server.");
+
             ImGui::EndMenu();
         }
 
@@ -219,7 +227,14 @@ void FCogEngineWindow_Selection::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogEngineWindow_Selection::DrawSelectionCombo()
 {
-    return FCogWindowWidgets::ActorsListWithFilters(*GetWorld(), ActorClasses, Config->SelectedClassIndex, &Filter, GetLocalPlayerPawn());
+    AActor* NewSelection = nullptr;
+    const bool result = FCogWindowWidgets::ActorsListWithFilters(NewSelection, *GetWorld(), ActorClasses, Config->SelectedClassIndex, &Filter, GetLocalPlayerPawn());
+    if (result)
+    {
+        SetGlobalSelection(NewSelection);
+    }
+
+    return result;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -353,7 +368,8 @@ void FCogEngineWindow_Selection::RenderMainMenuWidget(int32 SubWidgetIndex, floa
     else if (SubWidgetIndex == 1)
     {
         ImGui::SetNextItemWidth(Width);
-        FCogWindowWidgets::MenuActorsCombo("MenuActorSelection", *GetWorld(), ActorClasses, Config->SelectedClassIndex, &Filter, GetLocalPlayerPawn(), [this](AActor& Actor) { RenderActorContextMenu(Actor);  });
+        AActor* NewSelection = nullptr;
+        FCogWindowWidgets::MenuActorsCombo("MenuActorSelection", NewSelection, *GetWorld(), ActorClasses, Config->SelectedClassIndex, &Filter, GetLocalPlayerPawn(), [this](AActor& Actor) { RenderActorContextMenu(Actor);  });
     }
     else if (SubWidgetIndex == 2)
     {

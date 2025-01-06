@@ -84,7 +84,11 @@ void FCogEngineWindow_CollisionTester::RenderContent()
         }
 
         ImGui::SetNextItemWidth(-1);
-        FCogWindowWidgets::MenuActorsCombo("CollisionTesters", *GetWorld(), ACogEngineCollisionTester::StaticClass());
+        AActor* NewSelection = nullptr;
+        if (FCogWindowWidgets::MenuActorsCombo("CollisionTesters", NewSelection, *GetWorld(), ACogEngineCollisionTester::StaticClass()))
+        {
+            FCogDebug::SetSelection(GetWorld(), NewSelection);
+        }
 
         ImGui::EndMenuBar();
     }

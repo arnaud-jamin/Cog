@@ -30,6 +30,9 @@ struct FCogDebugSettings
     bool bIsFilteringBySelection = true;
 
     UPROPERTY(Config)
+    bool ReplicateSelection = true;
+
+    UPROPERTY(Config)
     bool Persistent = false;
 
     UPROPERTY(Config)
@@ -429,9 +432,11 @@ private:
 
     static int32 GetPieSessionId();
 
-    static constexpr uint32 MaxPie = 16;
+    static void ReplicateSelection(const UWorld* World, AActor* Value);
 
     static bool IsDebugActiveForObject_Internal(const UObject* WorldContextObject, const AActor* InSelection, bool InIsFilteringBySelection);
+
+    static constexpr uint32 MaxPie = 16;
 
     static TWeakObjectPtr<AActor> Selection[MaxPie];
 };
