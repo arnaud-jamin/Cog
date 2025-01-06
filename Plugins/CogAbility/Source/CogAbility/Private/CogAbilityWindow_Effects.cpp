@@ -85,7 +85,7 @@ void FCogAbilityWindow_Effects::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Effects::RenderEffectsTable()
 {
-    const UAbilitySystemComponent* AbilitySystemComponent = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetSelection(), true);
+    UAbilitySystemComponent* AbilitySystemComponent = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(GetSelection(), true);
     if (AbilitySystemComponent == nullptr)
     {
         ImGui::TextDisabled("Selection has no ability system component");
@@ -170,7 +170,7 @@ void FCogAbilityWindow_Effects::RenderEffectsTable()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogAbilityWindow_Effects::RenderEffectRow(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffectHandle& ActiveHandle, int32 Index, int32& Selected)
+void FCogAbilityWindow_Effects::RenderEffectRow(UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffectHandle& ActiveHandle, int32 Index, int32& Selected)
 {
     const FActiveGameplayEffect* ActiveEffectPtr = AbilitySystemComponent.GetActiveGameplayEffect(ActiveHandle);
     if (ActiveEffectPtr == nullptr)
@@ -238,6 +238,13 @@ void FCogAbilityWindow_Effects::RenderEffectRow(const UAbilitySystemComponent& A
             }
             ImGui::CloseCurrentPopup();
         }
+
+        if (ImGui::Button("Remove"))
+        {
+            AbilitySystemComponent.RemoveActiveGameplayEffect(ActiveHandle);
+            ImGui::CloseCurrentPopup();
+        }
+
         ImGui::EndPopup();
     }
 
