@@ -171,6 +171,9 @@ private:
 	bool bWantCaptureMouse = false;
 
 	float DpiScale = 1.f;
+
+	bool bSkipRendering = false;
+
 	static bool bIsNetImguiInitialized;
 
 };
