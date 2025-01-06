@@ -633,7 +633,16 @@ void ClientInfo::ContextRestore()
 	if (IsContextOverriden() && ImGui::GetCurrentContext() == mpContext)
 	{
 #ifdef IMGUI_HAS_VIEWPORT
-		ImGui::UpdatePlatformWindows(); // Prevents issue with mismatched frame tracking, when restoring enabled viewport feature
+
+//*************************************************************************************************
+// COG: Disabling the call ImGui::UpdatePlatformWindows() otherwise it gets called twice when
+// disconnecting causing this assert in ImGui::UpdatePlatformWindows():
+//
+//		IM_ASSERT(g.FrameCountPlatformEnded < g.FrameCount);
+//*************************************************************************************************
+
+		//ImGui::UpdatePlatformWindows(); // Prevents issue with mismatched frame tracking, when restoring enabled viewport feature
+
 #endif
 		if( mFontCreationFunction && ImGui::GetIO().Fonts && ImGui::GetIO().Fonts->Fonts.size() > 0)
 		{
