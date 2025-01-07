@@ -7,6 +7,14 @@
 
 class UCogEngineWindowConfig_NetImgui;
 
+UENUM()
+enum class ECogNetImguiAutoConnectionMode : uint8
+{
+    NoAutoConnect,
+    AutoConnect,
+    AutoListen,
+};
+
 class COGENGINE_API FCogEngineWindow_NetImgui : public FCogWindow
 {
     typedef FCogWindow Super;
@@ -41,11 +49,11 @@ protected:
 
 private:
 
-    FString GetClientName();
+    FString GetClientName() const;
 
     TObjectPtr<UCogEngineWindowConfig_NetImgui> Config = nullptr;
 
-    bool HasAlreadyTriedToConnect = false;
+    bool HasStartedAutoConnection = false;
 
     FProcHandle ServerProcess;
 };
@@ -67,16 +75,16 @@ public:
     int32 ClientPort = 8889;
 
     UPROPERTY(Config)
-    bool AutoConnectOnDedicatedServer = true;
+    ECogNetImguiAutoConnectionMode AutoConnectOnDedicatedServer = ECogNetImguiAutoConnectionMode::AutoConnect;
 
     UPROPERTY(Config)
-    bool AutoConnectOnListenServer = false;
+    ECogNetImguiAutoConnectionMode AutoConnectOnListenServer = ECogNetImguiAutoConnectionMode::NoAutoConnect;
 
     UPROPERTY(Config)
-    bool AutoConnectOnClient = false;
+    ECogNetImguiAutoConnectionMode AutoConnectOnClient = ECogNetImguiAutoConnectionMode::NoAutoConnect;
 
     UPROPERTY(Config)
-    bool AutoConnectOnStandalone = false;
+    ECogNetImguiAutoConnectionMode AutoConnectOnStandalone = ECogNetImguiAutoConnectionMode::NoAutoConnect;
 
     UPROPERTY(Config)
     FString ServerAddress = FString("127.0.0.1");
@@ -85,10 +93,13 @@ public:
     int32 ServerPort = 8888;
 
     UPROPERTY(Config)
-    FString ServerExePath = FString("C:\\NetImgui\\Server_Exe\\NetImguiServer.exe");
+    FString ServerDirectory = FString("C:\\NetImgui\\Server_Exe");
 
     UPROPERTY(Config)
-    FString ServerExeArgs = FString("");
+    FString ServerExecutable = FString("NetImguiServer.exe");
+
+    UPROPERTY(Config)
+    FString ServerArguments = FString("");
 
     UPROPERTY(Config)
     bool AutoRunServer = false;
