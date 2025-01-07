@@ -31,10 +31,13 @@ protected:
     virtual void RenderContent() override;
 
     virtual void TryReapplyCheats();
+    APawn* GetCheatInstigator();
 
     virtual bool AddCheat(AActor* ControlledActor, AActor* TargetActor, const FCogAbilityCheat& CheatEffect, bool IsPersistent);
 
-    virtual void RequestCheat(AActor* ControlledActor, AActor* TargetActor, const FCogAbilityCheat& CheatEffect);
+    virtual void RequestCheat(AActor* ControlledActor, AActor* SelectedActor, const FCogAbilityCheat& Cheat, bool ApplyToEnemies, bool ApplyToAllies, bool ApplyToControlled);
+
+    virtual const FCogAbilityCheat* FindCheatByName(const FString& CheatName);
 
     TObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
 

@@ -3,6 +3,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
 #include "CogAbilityDataAsset.h"
+#include "CogImguiHelper.h"
 #include "CogWindowHelper.h"
 #include "Components/SceneComponent.h"
 #include "Engine/World.h"
@@ -30,8 +31,10 @@ ACogAbilityReplicator* ACogAbilityReplicator::GetFirstReplicator(const UWorld& W
 {
     for (TActorIterator<ACogAbilityReplicator> It(&World, StaticClass()); It; ++It)
     {
-        ACogAbilityReplicator* Replicator = *It;
-        return Replicator;
+        if (ACogAbilityReplicator* Replicator = *It)
+        {
+            return Replicator;
+        }
     }
 
     return nullptr;
@@ -95,17 +98,14 @@ void ACogAbilityReplicator::EndPlay(const EEndPlayReason::Type EndPlayReason)
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogAbilityReplicator::Server_ApplyCheat_Implementation(const AActor* CheatInstigator, const TArray<AActor*>& Targets, const FCogAbilityCheat& Cheat) const
 {
-    UAbilitySystemComponent* InstigatorAbilitySystem = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(CheatInstigator, true);
-    if (InstigatorAbilitySystem == nullptr)
-    {
-        return;
-    }
+    UAbilitySystemComponent* DefaultInstigatorAbilitySystem = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(CheatInstigator, true);
 
     for (AActor* Target : Targets)
     {
         UAbilitySystemComponent* TargetAbilitySystem = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Target, true);
         if (TargetAbilitySystem == nullptr)
         {
+            UE_LOG(LogCogImGui, Warning, TEXT("ACogAbilityReplicator::Server_ApplyCheat_Implementation | Target:%s | Invalid Target AbilitySystem"), *GetNameSafe(Target));
             continue;
         }
 
@@ -115,6 +115,12 @@ void ACogAbilityReplicator::Server_ApplyCheat_Implementation(const AActor* Cheat
         }
         else
         {
+            //-----------------------------------------------------------------------------------
+            // When executing a cheat directly on the game server, there is not an obvious
+            // local player to use as the instigator. Instead, we use the target ability system.
+			//-----------------------------------------------------------------------------------
+            UAbilitySystemComponent* InstigatorAbilitySystem = (DefaultInstigatorAbilitySystem != nullptr) ? DefaultInstigatorAbilitySystem  : TargetAbilitySystem;
+
             FGameplayEffectContextHandle ContextHandle = InstigatorAbilitySystem->MakeEffectContext();
             ContextHandle.AddSourceObject(InstigatorAbilitySystem);
             FGameplayEffectSpecHandle SpecHandle = InstigatorAbilitySystem->MakeOutgoingSpec(Cheat.Effect, 1, ContextHandle);

@@ -14,7 +14,6 @@
 #include "HAL/IConsoleManager.h"
 #include "imgui_internal.h"
 #include "Misc/CoreMisc.h"
-#include "Misc/EngineVersionComparison.h"
 #include "NetImgui_Api.h"
 
 FString UCogWindowManager::ToggleInputCommand   = TEXT("Cog.ToggleInput");

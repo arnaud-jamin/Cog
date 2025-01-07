@@ -5,6 +5,7 @@
 #include "CogAbilityReplicator.h"
 #include "CogCommonAllegianceActorInterface.h"
 #include "CogImguiHelper.h"
+#include "CogWindowConsoleCommandManager.h"
 #include "CogWindowWidgets.h"
 #include "EngineUtils.h"
 #include "GameFramework/Character.h"
@@ -21,6 +22,29 @@ void FCogAbilityWindow_Cheats::Initialize()
     Asset = GetAsset<UCogAbilityDataAsset>();
     Config = GetConfig<UCogAbilityConfig_Cheats>();
     AlignmentConfig = GetConfig<UCogAbilityConfig_Alignment>();
+
+    FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(
+        TEXT("Cog.Cheat"),
+        TEXT("Apply a cheat to the selection. Cog.Cheat <CheatName> -Allies -Enemies -Controlled"),
+        GetWorld(),
+        FCogWindowConsoleCommandDelegate::CreateLambda([this](const TArray<FString>& InArgs, UWorld* InWorld)
+            {
+                if (InArgs.Num() > 0)
+                {
+                    if (const FCogAbilityCheat* cheat = FindCheatByName(InArgs[0]))
+                    {
+                        const bool ApplyToEnemies = InArgs.Contains("-Enemies");
+                        const bool ApplyToAllies = InArgs.Contains("-Allies");
+                        const bool ApplyToControlled = InArgs.Contains("-Controlled");
+
+                        RequestCheat(GetLocalPlayerPawn(), GetSelection(), *cheat, ApplyToEnemies, ApplyToAllies, ApplyToControlled);
+                    }
+                    else
+                    {
+                        UE_LOG(LogCogImGui, Warning, TEXT("Cog.Cheat %s | Cheat not found"), *InArgs[0]);
+                    }
+                }
+            }));
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -84,8 +108,8 @@ void FCogAbilityWindow_Cheats::TryReapplyCheats()
         return;
     }
 
-    APawn* LocalPawn = GetLocalPlayerPawn();
-    if (LocalPawn == nullptr)
+    APawn* ControlledActor = GetLocalPlayerPawn();
+    if (ControlledActor == nullptr)
     {
         return;
     }
@@ -96,7 +120,7 @@ void FCogAbilityWindow_Cheats::TryReapplyCheats()
         return;
     }
 
-    TArray<AActor*> Targets { LocalPawn };
+    TArray<AActor*> Targets { ControlledActor };
 
     for (int32 i = Config->AppliedCheats.Num() - 1; i >= 0; i--)
     {
@@ -105,7 +129,7 @@ void FCogAbilityWindow_Cheats::TryReapplyCheats()
         if (const FCogAbilityCheat* Cheat = Asset->PersistentEffects.FindByPredicate(
             [AppliedCheatName](const FCogAbilityCheat& Cheat) { return Cheat.Name == AppliedCheatName; }))
         {
-            Replicator->Server_ApplyCheat(LocalPawn, Targets, *Cheat);
+            Replicator->Server_ApplyCheat(ControlledActor, Targets, *Cheat);
         }
         else
         {
@@ -247,13 +271,17 @@ bool FCogAbilityWindow_Cheats::AddCheat(AActor* ControlledActor, AActor* Selecte
         FCogWindowWidgets::PushBackColor(FCogImguiHelper::ToImVec4(AlignmentConfig->GetEffectColor(Asset, *EffectCDO)));
     }
 
+    const bool IsShiftDown      = (ImGui::GetCurrentContext()->IO.KeyMods & ImGuiMod_Shift) != 0;
+    const bool IsAltDown        = (ImGui::GetCurrentContext()->IO.KeyMods & ImGuiMod_Alt) != 0;
+    const bool IsControlDown    = (ImGui::GetCurrentContext()->IO.KeyMods & ImGuiMod_Ctrl) != 0;
+
     bool bIsPressed = false;
     if (IsPersistent)
     {
         bool isEnabled = ACogAbilityReplicator::IsCheatActive(SelectedActor, Cheat);
         if (ImGui::Checkbox(TCHAR_TO_ANSI(*Cheat.Name), &isEnabled))
         {
-            RequestCheat(ControlledActor, SelectedActor, Cheat);
+            RequestCheat(ControlledActor, SelectedActor, Cheat, IsShiftDown, IsAltDown, IsControlDown);
             bIsPressed = true;
         }
     }
@@ -261,22 +289,18 @@ bool FCogAbilityWindow_Cheats::AddCheat(AActor* ControlledActor, AActor* Selecte
     {
         if (ImGui::Button(TCHAR_TO_ANSI(*Cheat.Name), ImVec2(-1, 0)))
         {
-            RequestCheat(ControlledActor, SelectedActor, Cheat);
+            RequestCheat(ControlledActor, SelectedActor, Cheat, IsShiftDown, IsAltDown, IsControlDown);
             bIsPressed = true;
         }
     }
 
     if (ImGui::IsItemHovered())
     {
-        const bool IsShiftDown = (ImGui::GetCurrentContext()->IO.KeyMods & ImGuiMod_Shift) != 0;
-        const bool IsAltDown = (ImGui::GetCurrentContext()->IO.KeyMods & ImGuiMod_Alt) != 0;
-        const bool IsControlDown = (ImGui::GetCurrentContext()->IO.KeyMods & ImGuiMod_Ctrl) != 0;
-
         ImGui::BeginTooltip();
-        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, IsShiftDown || IsAltDown || IsControlDown ? 0.5f : 1.0f),       "On Selection");
-        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, IsShiftDown ? 1.0f : 0.5f),                                     "On Enemies    [SHIFT]");
-        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, IsAltDown ? 1.0f : 0.5f),                                       "On Allies     [ALT]");
-        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, IsControlDown ? 1.0f : 0.5f),                                   "On Controlled [CTRL]");
+        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, IsShiftDown || IsAltDown || IsControlDown ? 0.5f : 1.0f),   "On Selection");
+        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, IsShiftDown ? 1.0f : 0.5f),                                 "On Enemies    [SHIFT]");
+        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, IsAltDown ? 1.0f : 0.5f),                                   "On Allies     [ALT]");
+        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, IsControlDown ? 1.0f : 0.5f),                               "On Controlled [CTRL]");
         ImGui::EndTooltip();
     }
 
@@ -289,20 +313,16 @@ bool FCogAbilityWindow_Cheats::AddCheat(AActor* ControlledActor, AActor* Selecte
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogAbilityWindow_Cheats::RequestCheat(AActor* ControlledActor, AActor* SelectedActor, const FCogAbilityCheat& Cheat)
+void FCogAbilityWindow_Cheats::RequestCheat(AActor* ControlledActor, AActor* SelectedActor, const FCogAbilityCheat& Cheat, bool ApplyToEnemies, bool ApplyToAllies, bool ApplyToControlled)
 {
-    const bool IsShiftDown = (ImGui::GetCurrentContext()->IO.KeyMods & ImGuiMod_Shift) != 0;
-    const bool IsAltDown = (ImGui::GetCurrentContext()->IO.KeyMods & ImGuiMod_Alt) != 0;
-    const bool IsControlDown = (ImGui::GetCurrentContext()->IO.KeyMods & ImGuiMod_Ctrl) != 0;
-
     TArray<AActor*> Actors;
 
-    if (IsControlDown)
+    if (ApplyToControlled)
     {
         Actors.Add(ControlledActor);
     }
     
-    if (IsShiftDown || IsAltDown)
+    if (ApplyToEnemies || ApplyToAllies)
     {
         for (TActorIterator<ACharacter> It(GetWorld(), ACharacter::StaticClass()); It; ++It)
         {
@@ -315,8 +335,8 @@ void FCogAbilityWindow_Cheats::RequestCheat(AActor* ControlledActor, AActor* Sel
                     Allegiance = AllegianceInterface->GetAllegianceWithOtherActor(ControlledActor);
                 }
 
-                if ((IsShiftDown && (Allegiance == ECogCommonAllegiance::Enemy))
-                    || (IsAltDown && (Allegiance == ECogCommonAllegiance::Friendly)))
+                if ((ApplyToEnemies && (Allegiance == ECogCommonAllegiance::Enemy))
+                    || (ApplyToAllies && (Allegiance == ECogCommonAllegiance::Friendly)))
                 {
                     Actors.Add(OtherActor);
                 }
@@ -324,7 +344,7 @@ void FCogAbilityWindow_Cheats::RequestCheat(AActor* ControlledActor, AActor* Sel
         }
     }
 
-    if ((IsControlDown || IsShiftDown || IsAltDown) == false)
+    if ((ApplyToControlled || ApplyToEnemies || ApplyToAllies) == false)
     {
         Actors.Add(SelectedActor);
     }
@@ -333,4 +353,30 @@ void FCogAbilityWindow_Cheats::RequestCheat(AActor* ControlledActor, AActor* Sel
     {
         Replicator->Server_ApplyCheat(ControlledActor, Actors, Cheat);
     }
+    else
+    {
+        UE_LOG(LogCogImGui, Warning, TEXT("FCogAbilityWindow_Cheats::RequestCheat | Replicator not found"));
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+const FCogAbilityCheat* FCogAbilityWindow_Cheats::FindCheatByName(const FString& CheatName)
+{
+    for (const FCogAbilityCheat& cheat : Asset->PersistentEffects)
+    {
+        if (cheat.Name == CheatName)
+        {
+            return &cheat;
+        }
+    }
+
+    for (const FCogAbilityCheat& cheat : Asset->InstantEffects)
+    {
+        if (cheat.Name == CheatName)
+        {
+            return &cheat;
+        }
+    }
+
+    return nullptr;
 }

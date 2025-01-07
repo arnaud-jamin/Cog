@@ -149,6 +149,7 @@ void FCogWindow::SetIsVisible(const bool Value)
     OnWindowVisibilityChanged(Value);
 }
 
+//--------------------------------------------------------------------------------------------------------------------------
 APawn* FCogWindow::GetLocalPlayerPawn() const
 {
 	const APlayerController* LocalPlayerController = GetLocalPlayerController();
