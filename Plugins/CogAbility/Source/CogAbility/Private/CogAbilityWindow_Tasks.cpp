@@ -160,15 +160,15 @@ void FCogAbilityWindow_Tasks::RenderTasksTable(UAbilitySystemComponent& AbilityS
             continue;
         }
 
-        const char* TaskName = StringCast<ANSICHAR>(*Task->GetName()).Get();
-        bool PassFilter = Filter.PassFilter(TaskName);
+        const auto& TaskName = StringCast<ANSICHAR>(*Task->GetName());
+        bool PassFilter = Filter.PassFilter(TaskName.Get());
 
         if (PassFilter == false)
         {
             if (const UGameplayAbility* Ability = Cast<UGameplayAbility>(Task->GetTaskOwner()))
             {
-                const char* AbilityName = StringCast<ANSICHAR>(*FCogAbilityHelper::CleanupName(Ability->GetName())).Get();
-                PassFilter = Filter.PassFilter(AbilityName);
+                const auto& AbilityName = StringCast<ANSICHAR>(*FCogAbilityHelper::CleanupName(Ability->GetName()));
+                PassFilter = Filter.PassFilter(AbilityName.Get());
             }
         }
 
@@ -228,8 +228,8 @@ void FCogAbilityWindow_Tasks::RenderTasksTable(UAbilitySystemComponent& AbilityS
                 //------------------------
                 ImGui::TableNextColumn();
 
-                const char* TaskName = StringCast<ANSICHAR>(*Task->GetName()).Get();
-                if (ImGui::Selectable(TaskName, SelectedIndex == LineIndex, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap | ImGuiSelectableFlags_AllowDoubleClick))
+                const auto& TaskName = StringCast<ANSICHAR>(*Task->GetName());
+                if (ImGui::Selectable(TaskName.Get(), SelectedIndex == LineIndex, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap | ImGuiSelectableFlags_AllowDoubleClick))
                 {
                     SelectedIndex = LineIndex;
                 }
@@ -287,7 +287,7 @@ void FCogAbilityWindow_Tasks::RenderTaskInfo(const UGameplayTask* Task)
         ImGui::TableNextColumn();
         ImGui::TextColored(TextColor, "Name");
         ImGui::TableNextColumn();
-        ImGui::Text(StringCast<ANSICHAR>(*Task->GetName()).Get());
+        ImGui::Text("%s", StringCast<ANSICHAR>(*Task->GetName()).Get());
 
         //------------------------
 		// Instance Name
@@ -296,7 +296,7 @@ void FCogAbilityWindow_Tasks::RenderTaskInfo(const UGameplayTask* Task)
         ImGui::TableNextColumn();
         ImGui::TextColored(TextColor, "Instance Name");
         ImGui::TableNextColumn();
-        ImGui::Text(StringCast<ANSICHAR>(*Task->GetInstanceName().ToString()).Get());
+        ImGui::Text("%s", StringCast<ANSICHAR>(*Task->GetInstanceName().ToString()).Get());
 
         //------------------------
 		// Owner
@@ -360,7 +360,7 @@ void FCogAbilityWindow_Tasks::RenderTaskInfo(const UGameplayTask* Task)
         ImGui::TextColored(TextColor, "Debug");
         ImGui::TableNextColumn();
         ImGui::PushTextWrapPos(FCogWindowWidgets::GetFontWidth() * 80);
-        ImGui::Text(StringCast<ANSICHAR>(*Task->GetDebugString()).Get());
+        ImGui::Text("%s", StringCast<ANSICHAR>(*Task->GetDebugString()).Get());
 	    ImGui::PopTextWrapPos();
 
         ImGui::EndTable();
@@ -383,7 +383,7 @@ void FCogAbilityWindow_Tasks::RenderTaskOwner(const UGameplayTask* Task)
         OwnerName = GetNameSafe(Object);
     }
 
-    ImGui::Text(StringCast<ANSICHAR>(*OwnerName).Get());
+    ImGui::Text("%s", StringCast<ANSICHAR>(*OwnerName).Get());
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

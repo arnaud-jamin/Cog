@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
-#include "imgui.h"
+#include "UObject/Class.h"
 
 class COGDEBUG_API FCogDebugHelper
 {
