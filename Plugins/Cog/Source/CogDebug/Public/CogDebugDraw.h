@@ -62,6 +62,8 @@ struct COGDEBUG_API FCogDebugDraw
     static void Overlap(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FCollisionShape& Shape, const FVector& Location, const FQuat& Rotation, TArray<FOverlapResult>& OverlapResults, const FCogDebugDrawOverlapParams& Settings);
 
     static void ReplicateShape(const UObject* WorldContextObject, const FCogDebugShape& Shape);
+
+    static void ReplicateHitResults(const UObject* WorldContextObject, const TArray<FHitResult>& HitResults, const FCogDebugDrawLineTraceParams& Settings);
 };
 
 #endif //ENABLE_COG

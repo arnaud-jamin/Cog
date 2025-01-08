@@ -9,6 +9,7 @@
 #include "Engine/World.h"
 #include "imgui.h"
 #include "Misc/CoreMisc.h"
+#include "Misc/Paths.h"
 #include "NetImgui_Api.h"
 
 //--------------------------------------------------------------------------------------------------------------------------

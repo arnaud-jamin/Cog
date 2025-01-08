@@ -338,7 +338,7 @@ void FCogDebug::GetDebugDrawOverlapSettings(FCogDebugDrawOverlapParams& Params)
     Params.NoHitColor = Settings.CollisionQueryNoHitColor;
     Params.DrawHitPrimitives = Settings.CollisionQueryDrawHitPrimitives;
     Params.DrawHitPrimitiveActorsName = Settings.CollisionQueryDrawHitPrimitiveActorsName;
-    Params.HitPrimitiveActorsNameShadow = Settings.CollisionQueryHitPrimitiveActorsNameShadow;
+    Params.DrawHitPrimitiveActorsNameShadow = Settings.CollisionQueryHitPrimitiveActorsNameShadow;
     Params.HitPrimitiveActorsNameSize = Settings.CollisionQueryHitPrimitiveActorsNameSize;
     Params.Persistent = false;
     Params.LifeTime = 0.0f;

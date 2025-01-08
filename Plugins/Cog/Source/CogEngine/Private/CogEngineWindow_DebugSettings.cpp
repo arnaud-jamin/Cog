@@ -80,98 +80,56 @@ void FCogEngineWindow_DebugSettings::RenderContent()
         {
             FCogDebug::SetIsFilteringBySelection(GetWorld(), Config->Data.bIsFilteringBySelection);
         }
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
-        {
-            ImGui::SetTooltip("If checked, only show the debug of the currently selected actor. Otherwise show the debug of all actors.");
-        }
+		ImGui::SetItemTooltip("If checked, only show the debug of the currently selected actor. Otherwise show the debug of all actors.");
 
-        ImGui::Checkbox("Persistent", &Settings.Persistent);
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
-        {
-            ImGui::SetTooltip("Make debug draw always persist");
-        }
+		ImGui::Checkbox("Persistent", &Settings.Persistent);
+		ImGui::SetItemTooltip("Make debug draw always persist");
 
-        ImGui::Checkbox("Actor Name Use Label", &Settings.ActorNameUseLabel);
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
-        {
-            ImGui::SetTooltip("Use the actor label when displaying the actor name.");
-        }
+		ImGui::Checkbox("Actor Name Use Label", &Settings.ActorNameUseLabel);
+		ImGui::SetItemTooltip("Use the actor label when displaying the actor name.");
 
-        ImGui::Checkbox("Text Shadow", &Settings.TextShadow);
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
-        {
-            ImGui::SetTooltip("Show a shadow below debug text.");
-        }
+		ImGui::Checkbox("Text Shadow", &Settings.TextShadow);
+		ImGui::SetItemTooltip("Show a shadow below debug text.");
 
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::Checkbox("Fade 2D", &Settings.Fade2D);
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
-        {
-            ImGui::SetTooltip("Does the 2D debug is fading out.");
-        }
+		FCogWindowWidgets::SetNextItemToShortWidth();
+		ImGui::Checkbox("Fade 2D", &Settings.Fade2D);
+		ImGui::SetItemTooltip("Does the 2D debug is fading out.");
 
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragFloat("Duration", &Settings.Duration, 0.01f, 0.0f, 100.0f, "%.1f");
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
-        {
-            ImGui::SetTooltip("The duration of debug elements.");
-        }
+		FCogWindowWidgets::SetNextItemToShortWidth();
+		ImGui::DragFloat("Duration", &Settings.Duration, 0.01f, 0.0f, 100.0f, "%.1f");
+		ImGui::SetItemTooltip("The duration of debug elements.");
 
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragFloat("Thickness", &Settings.Thickness, 0.05f, 0.0f, 5.0f, "%.1f");
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
-        {
-            ImGui::SetTooltip("The thickness of debug lines.");
-        }
+		FCogWindowWidgets::SetNextItemToShortWidth();
+		ImGui::DragFloat("Thickness", &Settings.Thickness, 0.05f, 0.0f, 5.0f, "%.1f");
+		ImGui::SetItemTooltip("The thickness of debug lines.");
 
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragFloat("Server Thickness", &Settings.ServerThickness, 0.05f, 0.0f, 5.0f, "%.1f");
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
-        {
-            ImGui::SetTooltip("The thickness the server debug lines.");
-        }
+		FCogWindowWidgets::SetNextItemToShortWidth();
+		ImGui::DragFloat("Server Thickness", &Settings.ServerThickness, 0.05f, 0.0f, 5.0f, "%.1f");
+		ImGui::SetItemTooltip("The thickness the server debug lines.");
 
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragFloat("Server Color Mult", &Settings.ServerColorMultiplier, 0.01f, 0.0f, 1.0f, "%.1f");
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
-        {
-            ImGui::SetTooltip("The color multiplier applied to the server debug lines.");
-        }
+		FCogWindowWidgets::SetNextItemToShortWidth();
+		ImGui::DragFloat("Server Color Mult", &Settings.ServerColorMultiplier, 0.01f, 0.0f, 1.0f, "%.1f");
+		ImGui::SetItemTooltip("The color multiplier applied to the server debug lines.");
 
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragInt("Depth Priority", &Settings.DepthPriority, 0.1f, 0, 100);
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
-        {
-            ImGui::SetTooltip("The depth priority of debug elements.");
-        }
+		FCogWindowWidgets::SetNextItemToShortWidth();
+		ImGui::DragInt("Depth Priority", &Settings.DepthPriority, 0.1f, 0, 100);
+		ImGui::SetItemTooltip("The depth priority of debug elements.");
 
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragInt("Segments", &Settings.Segments, 0.1f, 4, 20.0f);
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
-        {
-            ImGui::SetTooltip("The number of segments used for circular shapes.");
-        }
+		FCogWindowWidgets::SetNextItemToShortWidth();
+		ImGui::DragInt("Segments", &Settings.Segments, 0.1f, 4, 20.0f);
+		ImGui::SetItemTooltip("The number of segments used for circular shapes.");
 
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragFloat("Axes Scale", &Settings.AxesScale, 0.1f, 0, 10.0f, "%.1f");
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
-        {
-            ImGui::SetTooltip("The scaling debug axis.");
-        }
+		FCogWindowWidgets::SetNextItemToShortWidth();
+		ImGui::DragFloat("Axes Scale", &Settings.AxesScale, 0.1f, 0, 10.0f, "%.1f");
+		ImGui::SetItemTooltip("The scaling debug axis.");
 
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragFloat("Arrow Size", &Settings.ArrowSize, 1.0f, 0.0f, 200.0f, "%.0f");
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
-        {
-            ImGui::SetTooltip("The size of debug arrows.");
-        }
+		FCogWindowWidgets::SetNextItemToShortWidth();
+		ImGui::DragFloat("Arrow Size", &Settings.ArrowSize, 1.0f, 0.0f, 200.0f, "%.0f");
+		ImGui::SetItemTooltip("The size of debug arrows.");
 
-    	FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragFloat("Text Size", &Settings.TextSize, 0.1f, 0.1f, 5.0f, "%.1f");
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
-        {
-            ImGui::SetTooltip("The size of the debug texts.");
-        }
+		FCogWindowWidgets::SetNextItemToShortWidth();
+		ImGui::DragFloat("Text Size", &Settings.TextSize, 0.1f, 0.1f, 5.0f, "%.1f");
+		ImGui::SetItemTooltip("The size of the debug texts.");
     }
 
 	if (ImGui::CollapsingHeader("Recolor", ImGuiTreeNodeFlags_DefaultOpen))
@@ -183,19 +141,13 @@ void FCogEngineWindow_DebugSettings::RenderContent()
         {
             Settings.RecolorMode = Mode;
         }
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
-        {
-            ImGui::SetTooltip("How the debug element should be recolored.");
-        }
+		ImGui::SetItemTooltip("How the debug element should be recolored.");
 
         if (Settings.RecolorMode != ECogDebugRecolorMode::None)
         {
             FCogWindowWidgets::SetNextItemToShortWidth();
             ImGui::DragFloat("Recolor Intensity", &Settings.RecolorIntensity, 0.01f, 0.0f, 1.0f, "%.2f");
-            if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
-            {
-                ImGui::SetTooltip("How much the debug elements color should be changed.");
-            }
+            ImGui::SetItemTooltip("How much the debug elements color should be changed.");
         }
 
         if (Settings.RecolorMode == ECogDebugRecolorMode::Color)
@@ -206,19 +158,13 @@ void FCogEngineWindow_DebugSettings::RenderContent()
         {
             FCogWindowWidgets::SetNextItemToShortWidth();
             ImGui::DragFloat("Recolor Speed", &Settings.RecolorTimeSpeed, 0.1f, 0.0f, 10.0f, "%.1f");
-            if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
-            {
-                ImGui::SetTooltip("The speed of the recolor.");
-            }
+            ImGui::SetItemTooltip("The speed of the recolor.");
         }
         else if (Settings.RecolorMode == ECogDebugRecolorMode::HueOverFrames)
         {
             FCogWindowWidgets::SetNextItemToShortWidth();
             ImGui::DragInt("Recolor Cycle", &Settings.RecolorFrameCycle, 1, 2, 100);
-            if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
-            {
-                ImGui::SetTooltip("How many frames are used to perform a full hue cycle.");
-            }
+            ImGui::SetItemTooltip("How many frames are used to perform a full hue cycle.");
         }
     }
 
@@ -230,10 +176,7 @@ void FCogEngineWindow_DebugSettings::RenderContent()
 
         FCogWindowWidgets::SetNextItemToShortWidth();
         ImGui::DragFloat("Gizmo Scale", &Settings.GizmoScale, 0.1f, 0.1f, 10.0f, "%.1f");
-        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
-        {
-            ImGui::SetTooltip("The scale of the gizmo.");
-        }
+        ImGui::SetItemTooltip("The scale of the gizmo.");
 
         FCogWindowWidgets::SetNextItemToShortWidth();
         ImGui::DragInt("Z Low", &Settings.GizmoZLow, 0.5f, 0, 1000);
@@ -384,23 +327,47 @@ void FCogEngineWindow_DebugSettings::RenderContent()
     if (ImGui::CollapsingHeader("Collision Query"))
     {
         ImGui::Checkbox("Draw Hit Primitives", &Settings.CollisionQueryDrawHitPrimitives);
-        ImGui::Checkbox("Draw Hit Primitive Actors Name", &Settings.CollisionQueryDrawHitPrimitiveActorsName);
-        ImGui::Checkbox("Prim Hit Primitive Actors Name Shadow", &Settings.CollisionQueryHitPrimitiveActorsNameShadow);
-        ImGui::Checkbox("Draw Hit Shapes", &Settings.CollisionQueryDrawHitShapes);
+        ImGui::SetItemTooltip("Draw the shape of the primitives that have been hit.");
+
+    	ImGui::Checkbox("Draw Hit Primitive Actors Name", &Settings.CollisionQueryDrawHitPrimitiveActorsName);
+        ImGui::SetItemTooltip("Draw the actor name of the primitives that have been hit.");
+
+    	ImGui::Checkbox("Prim Hit Primitive Actors Name Shadow", &Settings.CollisionQueryHitPrimitiveActorsNameShadow);
+        ImGui::SetItemTooltip("Draw the actor name shadow of the primitives that have been hit.");
+
+    	ImGui::Checkbox("Draw Hit Shapes", &Settings.CollisionQueryDrawHitShapes);
+        ImGui::SetItemTooltip("Draw the sweep shape at every impact location.");
+
         ImGui::Checkbox("Draw Hit Location", &Settings.CollisionQueryDrawHitLocation);
+        ImGui::SetItemTooltip("Draw the location of hit results.");
+
         ImGui::Checkbox("Draw Hit Impact Points", &Settings.CollisionQueryDrawHitImpactPoints);
+        ImGui::SetItemTooltip("Draw the impact point of hit results.");
+
         ImGui::Checkbox("Draw Hit Normals", &Settings.CollisionQueryDrawHitNormals);
+        ImGui::SetItemTooltip("Draw the hit normal of hit results.");
+
         ImGui::Checkbox("Draw Hit Impact Normals", &Settings.CollisionQueryDrawHitImpactNormals);
+        ImGui::SetItemTooltip("Draw the hit impact normal of hit results.");
 
         FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragFloat("Primitive Actors Name Size", &Settings.CollisionQueryHitPrimitiveActorsNameSize);
+        ImGui::DragFloat("Primitive Actors Name Size", &Settings.CollisionQueryHitPrimitiveActorsNameSize, 0.1f, 0.5f, 10.0f, "%0.1f");
+        ImGui::SetItemTooltip("Size of the actor name of the primitives that have been hit.");
 
         FCogWindowWidgets::SetNextItemToShortWidth();
-        ImGui::DragFloat("Hit Point Size", &Settings.CollisionQueryHitPointSize);
+        ImGui::DragFloat("Hit Point Size", &Settings.CollisionQueryHitPointSize, 0.5f, 0.0f, 100.0f, "%0.1f");
+        ImGui::SetItemTooltip("Size of the hit result location and impact point.");
 
         FCogImguiHelper::ColorEdit4("Hit Color", Settings.CollisionQueryHitColor, ColorEditFlags);
+        ImGui::SetItemTooltip("Color of the collision query when the query has hit.");
+
         FCogImguiHelper::ColorEdit4("No Hit Color", Settings.CollisionQueryNoHitColor, ColorEditFlags);
+        ImGui::SetItemTooltip("Color of the collision query when the query has not hit.");
+
         FCogImguiHelper::ColorEdit4("Normal Color", Settings.CollisionQueryNormalColor, ColorEditFlags);
+        ImGui::SetItemTooltip("Color of the hit result normal color.");
+
         FCogImguiHelper::ColorEdit4("Impact Normal Color", Settings.CollisionQueryImpactNormalColor, ColorEditFlags);
+        ImGui::SetItemTooltip("Color of the hit result impact normal color.");
     }
 }

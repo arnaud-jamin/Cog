@@ -6,6 +6,10 @@
 #include "DrawDebugHelpers.h"
 #include "Engine/Engine.h"
 #include "Engine/OverlapResult.h"
+#include "PhysicsEngine/PhysicsAsset.h"
+#include "PhysicsEngine/SkeletalBodySetup.h"
+#include "PhysicsEngine/SphylElem.h"
+#include "Runtime/Experimental/Chaos/Private/Chaos/PhysicsObjectInternal.h"
 
 namespace 
 {
@@ -307,9 +311,6 @@ void FCogDebugDrawHelper::DrawHitResults(
     const TArray<FHitResult>& HitResults,
     const FCogDebugDrawLineTraceParams& Settings)
 {
-    TSet<const UPrimitiveComponent*> AlreadyDrawnPrimitives;
-    TSet<const AActor*> AlreadyDrawnActors;
-
     for (const FHitResult& HitResult : HitResults)
     {
         const FColor& HitColor = Settings.HitColor;
@@ -374,33 +375,19 @@ void FCogDebugDrawHelper::DrawHitResults(
                 continue;
             }
 
-            if (AlreadyDrawnPrimitives.Contains(PrimitiveComponent))
-            {
-                continue;
-            }
-
-            AlreadyDrawnPrimitives.Add(PrimitiveComponent);
             const ECollisionChannel CollisionObjectType = PrimitiveComponent->GetCollisionObjectType();
             const FColor PrimitiveColor = Settings.ChannelColors[CollisionObjectType];
-            DrawPrimitiveComponent(*PrimitiveComponent, PrimitiveColor, Settings.Persistent, Settings.LifeTime, Settings.DepthPriority, Settings.Thickness);
-
-            if (Settings.DrawHitPrimitiveActorsName)
-            {
-                const AActor* Actor = PrimitiveComponent->GetOwner();
-                if (Actor == nullptr)
-                {
-                    continue;
-                }
-
-                if (AlreadyDrawnActors.Contains(Actor))
-                {
-                    continue;
-                }
-
-                AlreadyDrawnActors.Add(Actor);
-                const FColor TextColor = PrimitiveColor.WithAlpha(255);
-                DrawDebugString(World, Actor->GetActorLocation(), GetNameSafe(Actor->GetClass()), nullptr, TextColor, 0.0f, Settings.HitPrimitiveActorsNameShadow, Settings.HitPrimitiveActorsNameSize);
-            }
+            DrawPrimitiveComponent(
+                *PrimitiveComponent, 
+                HitResult.PhysicsObject->GetBodyIndex(), 
+                PrimitiveColor, 
+                Settings.Persistent, 
+                Settings.LifeTime, 
+                Settings.DepthPriority, 
+                Settings.Thickness, 
+                Settings.DrawHitPrimitiveActorsName,
+                Settings.DrawHitPrimitiveActorsNameShadow,
+                Settings.HitPrimitiveActorsNameSize);
         }
     }
 }
@@ -488,7 +475,17 @@ void FCogDebugDrawHelper::DrawOverlap(
 	        {
 	            const ECollisionChannel CollisionObjectType = PrimitiveComponent->GetCollisionObjectType();
 	            const FColor PrimitiveColor = Settings.ChannelColors[CollisionObjectType];
-	            DrawPrimitiveComponent(*PrimitiveComponent, PrimitiveColor, Settings.Persistent, Settings.LifeTime, Settings.DepthPriority, Settings.Thickness);
+	            DrawPrimitiveComponent(
+                    *PrimitiveComponent, 
+                    OverlapResult.PhysicsObject->GetBodyIndex(), 
+                    PrimitiveColor, 
+                    Settings.Persistent, 
+                    Settings.LifeTime, 
+                    Settings.DepthPriority, 
+                    Settings.Thickness,
+                    Settings.DrawHitPrimitiveActorsName,
+                    Settings.DrawHitPrimitiveActorsNameShadow,
+                    Settings.HitPrimitiveActorsNameSize);
 	        }
 	    }
     }
@@ -496,12 +493,16 @@ void FCogDebugDrawHelper::DrawOverlap(
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDrawHelper::DrawPrimitiveComponent(
-    const UPrimitiveComponent& PrimitiveComponent, 
-    const FColor& Color, 
-    const bool Persistent, 
-    const float LifeTime, 
-    const uint8 DepthPriority, 
-    const float Thickness)
+    const UPrimitiveComponent& PrimitiveComponent,
+    const int32 BodyIndex,
+    const FColor& Color,
+    const bool Persistent,
+    const float LifeTime,
+    const uint8 DepthPriority,
+    const float Thickness,
+    const bool DrawName,
+    const bool DrawNameShadow,
+    const float DrawNameSize)
 {
     const UWorld* World = PrimitiveComponent.GetWorld();
     if (World == nullptr)
@@ -509,46 +510,131 @@ void FCogDebugDrawHelper::DrawPrimitiveComponent(
         return;
     }
 
-    const UBoxComponent* BoxComponent = Cast<UBoxComponent>(&PrimitiveComponent);;
-    const FCollisionShape Shape = PrimitiveComponent.GetCollisionShape();
-
-    if (Shape.ShapeType == ECollisionShape::Box && BoxComponent == nullptr)
+    if (const USkeletalMeshComponent* SkeletalMeshComponent = Cast<USkeletalMeshComponent>(&PrimitiveComponent))
     {
-        FVector Location;
-        FVector Extent;
-        PrimitiveComponent.Bounds.GetBox().GetCenterAndExtents(Location, Extent);
+        const UPhysicsAsset* PhysicsAsset = SkeletalMeshComponent->GetPhysicsAsset();
+        if (PhysicsAsset->SkeletalBodySetups.IsValidIndex(BodyIndex) == false)
+        {
+	        return;
+        }
 
-        // TODO: this adds padding to prevent Z fight. Maybe add this as a parameter.
-    	Extent += FVector::OneVector;
+        const USkeletalBodySetup* BodySetup = PhysicsAsset->SkeletalBodySetups[BodyIndex];
+        const int32 BoneIndex = SkeletalMeshComponent->GetBoneIndex(BodySetup->BoneName);
+        const FTransform BoneTransform = SkeletalMeshComponent->GetBoneTransform(BoneIndex);
 
-        DrawDebugSolidBox(
-            World,
-            Location,
-            Extent,
-            FQuat::Identity,
-            Color,
-            Persistent,
-            LifeTime,
-            DepthPriority);
+        if (DrawName)
+        {
+            DrawDebugString(World, BoneTransform.GetLocation(), BodySetup->BoneName.ToString(), nullptr, Color.WithAlpha(255), 0.0f, DrawNameShadow, DrawNameSize);
+        }
 
-        DrawDebugBox(
-            World,
-            Location,
-            Extent,
-            FQuat::Identity,
-            Color,
-            Persistent,
-            LifeTime,
-            DepthPriority,
-            Thickness);
+        for (const FKSphereElem& Sphere : BodySetup->AggGeom.SphereElems)
+        {
+            const FTransform transform = Sphere.GetTransform() * BoneTransform;
+            DrawSphere(
+                World,
+                transform.GetLocation(),
+                Sphere.Radius,
+                FCogDebug::GetDebugSegments(),
+                Color,
+                Persistent,
+                LifeTime,
+                DepthPriority,
+                Thickness);
+        }
+
+        for (const FKBoxElem& Box : BodySetup->AggGeom.BoxElems)
+        {
+            const FTransform transform = Box.GetTransform() * BoneTransform;
+
+            DrawDebugBox(
+                World,
+                transform.GetLocation(),
+                FVector(Box.X, Box.Y, Box.Z) * 0.5f,
+                transform.GetRotation(),
+                Color,
+                Persistent,
+                LifeTime,
+                DepthPriority,
+                Thickness);
+        }
+
+        for (const FKSphylElem& Sphy : BodySetup->AggGeom.SphylElems)
+        {
+            const FTransform transform = Sphy.GetTransform() * BoneTransform;
+
+            DrawDebugCapsule(
+                World,
+                transform.GetLocation(),
+                Sphy.Length * 0.5f,
+                Sphy.Radius,
+                transform.GetRotation(),
+                Color,
+                Persistent,
+                LifeTime,
+                DepthPriority,
+                Thickness);
+        }
     }
     else
     {
-        const FVector Location = PrimitiveComponent.GetComponentLocation();
-        const FQuat Rotation = PrimitiveComponent.GetComponentQuat();
-        const FVector Scale = PrimitiveComponent.GetComponentScale();
-        DrawShape(World, Shape, Location, Rotation, Scale, Color, Persistent, LifeTime, DepthPriority, Thickness);
+        const AActor* Actor = PrimitiveComponent.GetOwner();
+
+        const UBoxComponent* BoxComponent = Cast<UBoxComponent>(&PrimitiveComponent);
+        const FCollisionShape Shape = PrimitiveComponent.GetCollisionShape();
+
+        if (Shape.ShapeType == ECollisionShape::Box && BoxComponent == nullptr)
+        {
+            FVector Location;
+            FVector Extent;
+            PrimitiveComponent.Bounds.GetBox().GetCenterAndExtents(Location, Extent);
+
+            if (DrawName)
+            {
+                DrawDebugString(World, Location, GetNameSafe(Actor), nullptr, Color.WithAlpha(255), 0.0f, DrawNameShadow, DrawNameSize);
+            }
+
+            // TODO: this adds padding to prevent Z fight. Maybe add this as a parameter.
+            Extent += FVector::OneVector;
+
+            DrawDebugSolidBox(
+                World,
+                Location,
+                Extent,
+                FQuat::Identity,
+                Color,
+                Persistent,
+                LifeTime,
+                DepthPriority);
+
+            DrawDebugBox(
+                World,
+                Location,
+                Extent,
+                FQuat::Identity,
+                Color,
+                Persistent,
+                LifeTime,
+                DepthPriority,
+                Thickness);
+
+
+        }
+        else
+        {
+            const FVector Location = PrimitiveComponent.GetComponentLocation();
+            const FQuat Rotation = PrimitiveComponent.GetComponentQuat();
+            const FVector Scale = PrimitiveComponent.GetComponentScale();
+
+            if (DrawName)
+            {
+                DrawDebugString(World, Location, GetNameSafe(Actor), nullptr, Color.WithAlpha(255), 0.0f, DrawNameShadow, DrawNameSize);
+            }
+
+            DrawShape(World, Shape, Location, Rotation, Scale, Color, Persistent, LifeTime, DepthPriority, Thickness);
+        }
     }
+
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

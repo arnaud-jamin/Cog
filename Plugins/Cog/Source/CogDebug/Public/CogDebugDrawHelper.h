@@ -17,7 +17,7 @@ struct FCogDebugDrawOverlapParams
     FColor NoHitColor = FColor::Red;
     bool DrawHitPrimitives = true;
     bool DrawHitPrimitiveActorsName = false;
-    bool HitPrimitiveActorsNameShadow = true;
+    bool DrawHitPrimitiveActorsNameShadow = true;
     float HitPrimitiveActorsNameSize = 1.0f;
     mutable bool Persistent = false;
     float LifeTime = 0.0f;
@@ -62,7 +62,7 @@ public:
 
     static void DrawShape(const UWorld* World, const FCollisionShape& InShape, const FVector& Location, const FQuat& Rotation, const FVector& Scale, const FColor& Color, const bool Persistent, const float LifeTime, const uint8 DepthPriority, const float Thickness);
 
-    static void DrawPrimitiveComponent(const UPrimitiveComponent& PrimitiveComponent, const FColor& Color, const bool Persistent, const float LifeTime, const uint8 DepthPriority, const float Thickness);
+    static void DrawPrimitiveComponent(const UPrimitiveComponent& PrimitiveComponent, const int32 BodyIndex, const FColor& Color, const bool Persistent, const float LifeTime, const uint8 DepthPriority, const float Thickness, const bool DrawName = true, const bool DrawNameShadow = true, const float DrawNameSize = 1.0f);
 
     static void DrawOverlap(const UWorld* World, const FCollisionShape& Shape, const FVector& Location, const FQuat& Rotation, TArray<FOverlapResult>& OverlapResults, const FCogDebugDrawOverlapParams& Settings);
 
