@@ -403,6 +403,12 @@ void ACogSampleCharacter::OnAbilityInputStarted(const FInputActionValue& Value, 
 
     Spec->InputPressed = true;
 
+    UGameplayAbility* Ability = Spec->GetPrimaryInstance();
+    if (Ability == nullptr)
+    {
+        return;
+    }
+
     //-----------------------------------------------------
     // Replicate button press if ability is already active
     //-----------------------------------------------------
@@ -414,7 +420,7 @@ void ACogSampleCharacter::OnAbilityInputStarted(const FInputActionValue& Value, 
             AbilitySystem->ServerSetInputPressed(Spec->Handle);
         }
         AbilitySystem->AbilitySpecInputPressed(*Spec);
-        AbilitySystem->InvokeReplicatedEvent(EAbilityGenericReplicatedEvent::InputPressed, Spec->Handle, Spec->ActivationInfo.GetActivationPredictionKey());
+        AbilitySystem->InvokeReplicatedEvent(EAbilityGenericReplicatedEvent::InputPressed, Spec->Handle, Ability->GetCurrentActivationInfo().GetActivationPredictionKey());
     }
     else
     {
@@ -441,7 +447,7 @@ void ACogSampleCharacter::OnAbilityInputCompleted(const FInputActionValue& Value
 
     Spec->InputPressed = false;
 
-    UGameplayAbility* Ability= Spec->GetPrimaryInstance();
+    UGameplayAbility* Ability = Spec->GetPrimaryInstance();
     if (Ability == nullptr)
     {
         return;
@@ -458,7 +464,7 @@ void ACogSampleCharacter::OnAbilityInputCompleted(const FInputActionValue& Value
     }
 
     AbilitySystem->AbilitySpecInputReleased(*Spec);
-    AbilitySystem->InvokeReplicatedEvent(EAbilityGenericReplicatedEvent::InputReleased, Spec->Handle, Spec->ActivationInfo.GetActivationPredictionKey());
+    AbilitySystem->InvokeReplicatedEvent(EAbilityGenericReplicatedEvent::InputReleased, Spec->Handle, Ability->GetCurrentActivationInfo().GetActivationPredictionKey());
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
