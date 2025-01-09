@@ -84,7 +84,7 @@ void FCogWindow::Render(float DeltaTime)
                 ImGui::Checkbox("Hide Menu", &bHideMenu);
             }
 
-            if (ImGui::Button("Reset"))
+            if (ImGui::Button("Reset Settings"))
             {
                 ResetConfig();
             }

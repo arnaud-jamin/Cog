@@ -201,15 +201,13 @@ void FCogInputWindow_Actions::RenderContent()
 	                    ImGui::TableNextColumn();
 	                    ImGui::Text("%s", ActionName.Get());
 
-	                    const ImVec4 ActiveColor(1, 0.8f, 0, 1);
-	                    const ImVec4 InactiveColor(0.3f, 0.3f, 0.3f, 1);
-	                    const ImVec2 ButtonSize(FCogWindowWidgets::GetFontWidth() * 10, 0);
-
 	                    ImGui::TableNextColumn();
 	                    ImGui::BeginDisabled();
 	                    bool Value = ActionValue.Get<bool>();
-	                    ImGui::Checkbox("##Current", &Value);
-	                    ImGui::EndDisabled();
+                        FCogWindowWidgets::PushBackColor(ImVec4(0.8f, 0.8f, 0.8f, 1));
+                        ImGui::Checkbox("##Current", &Value);
+                        FCogWindowWidgets::PopBackColor();
+                        ImGui::EndDisabled();
 
 	                    ImGui::TableNextColumn();
 
@@ -227,6 +225,12 @@ void FCogInputWindow_Actions::RenderContent()
                                 ActionInfo.bPressed = !ActionInfo.bPressed;
                                 ActionInfo.bRepeat = false;
                             }
+                        }
+
+                        if (ImGui::BeginPopupContextItem())
+                        {
+                            ImGui::Checkbox("Repeat", &ActionInfo.bRepeat);
+                            ImGui::EndPopup();
                         }
 
                         if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary | ImGuiHoveredFlags_DelayShort))
@@ -324,7 +328,9 @@ void FCogInputWindow_Actions::DrawAxis(const char* Format, const char* ActionNam
     ImGui::TableNextColumn();
     ImGui::SetNextItemWidth(-1);
     ImGui::BeginDisabled();
+    FCogWindowWidgets::PushBackColor(ImVec4(0.8f, 0.8f, 0.8f, 1));
     ImGui::SliderFloat("##Value", &CurrentValue, -1.0f, 1.0f, "%0.2f");
+    FCogWindowWidgets::PopBackColor();
     ImGui::EndDisabled();
 
     ImGui::TableNextColumn();
