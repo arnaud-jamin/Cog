@@ -1,9 +1,9 @@
-#include "CogInjectActionInfo.h"
+#include "CogInputActionInfo.h"
 
 #include "EnhancedInputSubsystems.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogInjectActionInfo::Inject(UEnhancedInputLocalPlayerSubsystem& EnhancedInput, bool IsTimeToRepeat)
+void FCogInputActionInfo::Inject(UEnhancedInputLocalPlayerSubsystem& EnhancedInput, bool IsTimeToRepeat)
 {
     if (Action == nullptr)
     {

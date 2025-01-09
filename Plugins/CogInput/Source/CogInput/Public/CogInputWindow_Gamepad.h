@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "CogCommonConfig.h"
-#include "CogInjectActionInfo.h"
+#include "CogInputActionInfo.h"
 #include "CogWindow.h"
 #include "imgui.h"
 #include "InputCoreTypes.h"
@@ -37,19 +37,17 @@ protected:
     
     virtual void RenderStick(const FKey& Key2D, const FKey& KeyBool, bool& InvertY, float& Sensitivity, float Amplitude, const ImVec2& Position, float Radius);
     
-    virtual void OnButtonClicked(FCogInjectActionInfo* ActionInfo);
+    virtual void OnButtonClicked(FCogInputActionInfo* ActionInfo);
 
     virtual void RenderMainContextMenu();
 
-    virtual void RenderButtonContextMenu(const FKey& Key, FCogInjectActionInfo* ActionInfoButton);
+    virtual void RenderButtonContextMenu(const FKey& Key, FCogInputActionInfo* ActionInfoButton);
 
-    virtual void RenderStickContextMenu(const FKey& Key, FCogInjectActionInfo* ActionInfo2D, bool& InvertY, float& Sensitivity);
-
-    TObjectPtr<const UCogInputDataAsset> Asset;
+    virtual void RenderStickContextMenu(const FKey& Key, FCogInputActionInfo* ActionInfo2D, bool& InvertY, float& Sensitivity);
 
     TObjectPtr<UCogInputConfig_Gamepad> Config;
 
-    TMap<FKey, FCogInjectActionInfo> Actions;
+    TMap<FKey, FCogInputActionInfo> Actions;
     
     UEnhancedPlayerInput* Input = nullptr;
 

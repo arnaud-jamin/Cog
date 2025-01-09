@@ -77,7 +77,7 @@ public:
     
     static bool ComboboxEnum(const char* Label, const FEnumProperty* EnumProperty, uint8* PointerToEnumValue);
 
-    static bool CheckBoxState(const char* Label, ECheckBoxState& State);
+    static bool CheckBoxState(const char* Label, ECheckBoxState& State, bool ShowTooltip = true);
 
     static bool InputKey(const char* Label, FCogImGuiKeyInfo& KeyInfo);
 

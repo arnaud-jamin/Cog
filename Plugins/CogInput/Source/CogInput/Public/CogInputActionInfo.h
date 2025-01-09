@@ -1,13 +1,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogDebugRob.h"
+#include "EnhancedPlayerInput.h"
 
 class UInputAction;
+class UInputMappingContext;
 class UEnhancedInputLocalPlayerSubsystem;
 
-struct FCogInjectActionInfo
+typedef TMap<TObjectPtr<const UInputMappingContext>, int32> CogInputMappingContextMap;
+DEFINE_PRIVATE_ACCESSOR_VARIABLE(UEnhancedPlayerInput_AppliedInputContexts, UEnhancedPlayerInput, CogInputMappingContextMap, AppliedInputContexts);
+
+struct FCogInputActionInfo
 {
-    const UInputAction* Action = nullptr;
+    TObjectPtr<const UInputAction> Action;
 
     bool bPressed = false;
 
@@ -35,4 +41,13 @@ struct FCogInjectActionInfo
     }
 
     void Inject(UEnhancedInputLocalPlayerSubsystem& EnhancedInput, bool IsTimeToRepeat);
+};
+
+struct FCogInputMappingContextInfo
+{
+    TObjectPtr<const UInputMappingContext> MappingContext;
+
+	int32 Priority = 0;
+
+    TArray<FCogInputActionInfo> Actions;
 };

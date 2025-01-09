@@ -18,14 +18,14 @@ UCogSampleGameplayAbility::UCogSampleGameplayAbility()
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSampleGameplayAbility::PreActivate(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData)
 {
-    COG_LOG_ABILITY(ELogVerbosity::Verbose, this, TEXT("PreActivate"));
+    COG_LOG_ABILITY(ELogVerbosity::Verbose, this, TEXT(""));
     Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSampleGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-    COG_LOG_ABILITY(ELogVerbosity::Verbose, this, TEXT("PredictionKey:%s"), *GetAbilitySystemComponentFromActorInfo_Checked()->ScopedPredictionKey.ToString());
+    COG_LOG_ABILITY(ELogVerbosity::Verbose, this, TEXT(""));
     Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 

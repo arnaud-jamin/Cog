@@ -33,13 +33,13 @@ void FCogWindowWidgets::EndTableTooltip()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogWindowWidgets::ThinSeparatorText(const char* Label)
 {
-	ImGui::PushStyleVar(ImGuiStyleVar_SeparatorTextBorderSize, 2);
-	ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(100, 100, 100, 255));
+    ImGui::PushStyleVar(ImGuiStyleVar_SeparatorTextBorderSize, 2);
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(100, 100, 100, 255));
 
-	ImGui::SeparatorText(Label);
+    ImGui::SeparatorText(Label);
 
     ImGui::PopStyleColor();
-	ImGui::PopStyleVar();
+    ImGui::PopStyleVar();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -226,10 +226,10 @@ void FCogWindowWidgets::AddTextWithShadow(ImDrawList* DrawList, const ImVec2& Po
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogWindowWidgets::SearchBar(ImGuiTextFilter& Filter, float Width /*= -1*/)
 {
-	const ImGuiWindow* Window = FCogImguiHelper::GetCurrentWindow();
-	const ImVec2 Pos1 = Window->DC.CursorPos;
+    const ImGuiWindow* Window = FCogImguiHelper::GetCurrentWindow();
+    const ImVec2 Pos1 = Window->DC.CursorPos;
     Filter.Draw("##Filter", Width);
-	const ImVec2 Pos2 = Window->DC.CursorPosPrevLine;
+    const ImVec2 Pos2 = Window->DC.CursorPosPrevLine;
 
     if (ImGui::IsItemActive() == false && Filter.Filters.empty())
     {
@@ -355,7 +355,7 @@ bool FCogWindowWidgets::ComboboxEnum(const char* Label, UEnum* Enum, int64 Curre
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogWindowWidgets::CheckBoxState(const char* Label, ECheckBoxState& State)
+bool FCogWindowWidgets::CheckBoxState(const char* Label, ECheckBoxState& State, bool ShowTooltip)
 {
     const char* TooltipText = "Invalid";
     
@@ -399,14 +399,14 @@ bool FCogWindowWidgets::CheckBoxState(const char* Label, ECheckBoxState& State)
 
     ImGui::PopStyleColor(5);
 
-    if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
+    if (ShowTooltip)
     {
-        ImGui::SetTooltip("%s", TooltipText);
+        ImGui::SetItemTooltip("%s", TooltipText);
     }
 
-    if (IsPressed)
+    if (IsPressed)  
     {
-        switch (State)
+        switch (State) 
         {
             case ECheckBoxState::Checked:       State = ECheckBoxState::Unchecked; break;
             case ECheckBoxState::Unchecked:     State = ECheckBoxState::Undetermined; break;
@@ -682,7 +682,7 @@ bool FCogWindowWidgets::CollisionProfileChannel(const UCollisionProfile& Collisi
     bool Result = false;
 
     FCogImguiHelper::ColorEdit4("Color", ChannelColor, ImGuiColorEditFlags_NoPicker | ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
-	ImGui::SameLine();
+    ImGui::SameLine();
 
     bool IsCollisionActive = (Channels & ECC_TO_BITFIELD(ChannelIndex)) > 0;
     const FName ChannelName = CollisionProfile.ReturnChannelNameFromContainerIndex(ChannelIndex);
@@ -700,7 +700,7 @@ bool FCogWindowWidgets::CollisionProfileChannel(const UCollisionProfile& Collisi
         }
     }
 
-	return Result;
+    return Result;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -822,7 +822,7 @@ bool FCogWindowWidgets::ActorsList(AActor*& NewSelection, const UWorld& World, c
     {
         for (int32 i = Clipper.DisplayStart; i < Clipper.DisplayEnd; i++)
         {
-	        AActor* Actor = Actors[i];
+            AActor* Actor = Actors[i];
             if (Actor == nullptr)
             {
                 continue;
@@ -880,9 +880,9 @@ bool FCogWindowWidgets::MenuActorsCombo(const char* StrID, AActor*& NewSelection
     const ImVec2 Pos1 = ImGui::GetCursorScreenPos();
     const float Width = FCogImguiHelper::GetNextItemWidth();
 
-	//-----------------------------------
-	// Combo button
-	//-----------------------------------
+    //-----------------------------------
+    // Combo button
+    //-----------------------------------
     {
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
         ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
@@ -920,8 +920,8 @@ bool FCogWindowWidgets::MenuActorsCombo(const char* StrID, AActor*& NewSelection
     }
 
     //-----------------------------------
-	// Popup
-	//-----------------------------------
+    // Popup
+    //-----------------------------------
     const ImVec2 Pos2 = ImGui::GetCursorScreenPos();
     ImGui::SetNextWindowPos(ImVec2(Pos1.x, Pos1.y + ImGui::GetFrameHeight()));
     if (ImGui::BeginPopup("ActorListPopup"))
@@ -946,10 +946,10 @@ bool FCogWindowWidgets::MenuActorsCombo(const char* StrID, AActor*& NewSelection
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogWindowWidgets::ActorContextMenu(AActor& Selection, const FCogWindowActorContextMenuFunction& ContextMenuFunction)
 {
-	if (ContextMenuFunction == nullptr)
-	{
+    if (ContextMenuFunction == nullptr)
+    {
         return;
-	}
+    }
 
     ImGui::SetNextWindowSize(ImVec2(GetFontWidth() * 30, 0));
     if (ImGui::BeginPopupContextItem())
@@ -962,7 +962,7 @@ void FCogWindowWidgets::ActorContextMenu(AActor& Selection, const FCogWindowActo
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogWindowWidgets::ActorFrame(const AActor& Actor)
 {
-	const APlayerController* PlayerController = Actor.GetWorld()->GetFirstPlayerController();
+    const APlayerController* PlayerController = Actor.GetWorld()->GetFirstPlayerController();
     if (PlayerController == nullptr)
     {
         return;

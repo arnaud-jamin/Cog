@@ -1,12 +1,11 @@
 #include "CogInputWindow_Actions.h"
 
-#include "CogInputDataAsset.h"
-#include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/World.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/Pawn.h"
+#include "imgui_internal.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
 
@@ -17,7 +16,6 @@ void FCogInputWindow_Actions::Initialize()
 
     bHasMenu = true;
 
-    Asset = GetAsset<UCogInputDataAsset>();
     Config = GetConfig<UCogInputConfig_Actions>();
 }
 
@@ -26,10 +24,7 @@ void FCogInputWindow_Actions::RenderHelp()
 {
     ImGui::Text(
         "This window displays the current state of each Input Action. "
-        "It can also be used to inject inputs to help debugging. "
-        "The input action are read from a Input Mapping Context defined in '%s' data asset. "
-        , TCHAR_TO_ANSI(*GetNameSafe(Asset.Get()))
-    );
+        "It can also be used to inject inputs to help debugging.");
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -45,12 +40,6 @@ void FCogInputWindow_Actions::RenderContent()
 {
     Super::RenderContent();
 
-    if (Asset == nullptr)
-    {
-        ImGui::TextDisabled("Invalid Asset");
-        return;
-    }
-
     ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
     if (LocalPlayer == nullptr)
     {
@@ -65,122 +54,222 @@ void FCogInputWindow_Actions::RenderContent()
         return;
     }
 
-    if(EnhancedInputSubsystem->GetPlayerInput() == nullptr)
+    UEnhancedPlayerInput* PlayerInput = EnhancedInputSubsystem->GetPlayerInput();
+    if(PlayerInput == nullptr)
     {
         ImGui::TextDisabled("No Player Input");
         return;
     }
-    
+
+    const bool IsControlDown = (ImGui::GetCurrentContext()->IO.KeyMods & ImGuiMod_Ctrl) != 0;
+
     if (ImGui::BeginMenuBar())
     {
         if (ImGui::BeginMenu("Options"))
         {
+            ImGui::Checkbox("Show Header", &Config->ShowHeader);
             ImGui::SliderFloat("##Repeat", &Config->RepeatPeriod, 0.1f, 10.0f, "Repeat: %0.1fs");
             ImGui::EndMenu();
         }
 
         if (ImGui::MenuItem("Reset"))
         {
-            for (FCogInjectActionInfo& ActionInfo : Actions)
+            for (FCogInputMappingContextInfo Mapping : Mappings)
             {
-                ActionInfo.Reset();
+                for (FCogInputActionInfo& Action : Mapping.Actions)
+                {
+                    Action.Reset();
+                }
             }
         }
 
         ImGui::EndMenuBar();
     }
 
-    if (Actions.Num() == 0)
+    //--------------------------------------------------------------------------
+    // Get all the existing mapping. This is not publicly exposed so we rob it.
+	//--------------------------------------------------------------------------
+    TArray<FCogInputMappingContextInfo, TInlineAllocator<8>> AllAppliedMappings;
+    if (const CogInputMappingContextMap* AppliedMappingContexts = &PRIVATE_ACCESS_PTR(PlayerInput, UEnhancedPlayerInput_AppliedInputContexts))
     {
-        for (TObjectPtr<const UInputMappingContext> MappingContext : Asset->MappingContexts)
+        for (auto& kv : *AppliedMappingContexts)
         {
-            for (const FEnhancedActionKeyMapping& Mapping : MappingContext->GetMappings())
-            {
-                if (Mapping.Action != nullptr && Actions.ContainsByPredicate([&Mapping](const FCogInjectActionInfo& ActionInfo) { return Mapping.Action == ActionInfo.Action; }) == false)
-                {
-                    FCogInjectActionInfo& ActionInfo = Actions.AddDefaulted_GetRef();
-                    ActionInfo.Action = Mapping.Action;
-                }
-            }
+            FCogInputMappingContextInfo& MappingInfo = AllAppliedMappings.AddDefaulted_GetRef();
+            MappingInfo.MappingContext = kv.Key;
+            MappingInfo.Priority = kv.Value;
         }
-
-        Actions.Sort([](const FCogInjectActionInfo& Lhs, const FCogInjectActionInfo& Rhs)
-        {
-            return GetNameSafe(Lhs.Action).Compare(GetNameSafe(Rhs.Action)) < 0;
-        });
     }
 
-    if (ImGui::BeginTable("Actions", 3, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize))
+    //--------------------------------------------------------------------------
+	// Remove mappings that are not present anymore.
+    //--------------------------------------------------------------------------
+    for (int32 i = Mappings.Num() - 1; i >= 0; i--)
     {
-        ImGui::TableSetupColumn("Action", ImGuiTableColumnFlags_WidthFixed);
-        ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
-        ImGui::TableSetupColumn("Inject", ImGuiTableColumnFlags_WidthStretch);
-        ImGui::TableHeadersRow();
-
-        int Index = 0;
-
-        for (FCogInjectActionInfo& ActionInfo : Actions)
-        {
-            ImGui::PushID(Index);
-
-            const auto ActionName = StringCast<ANSICHAR>(*ActionInfo.Action->GetName());
-
-            FInputActionValue ActionValue = EnhancedInputSubsystem->GetPlayerInput()->GetActionValue(ActionInfo.Action);
-
-            switch (ActionInfo.Action->ValueType)
+        const FCogInputMappingContextInfo& MappingInfo = Mappings[i];
+        if (AllAppliedMappings.ContainsByPredicate([&MappingInfo](const FCogInputMappingContextInfo& m)
             {
-                case EInputActionValueType::Boolean: 
-                {
-                    ImGui::TableNextRow();
-                    ImGui::TableNextColumn();
-                    ImGui::Text("%s", ActionName.Get());
+                return m.MappingContext == MappingInfo.MappingContext;
+            }))
+        {
+            continue;
+        }
 
-                    const ImVec4 ActiveColor(1, 0.8f, 0, 1);
-                    const ImVec4 InnactiveColor(0.3f, 0.3f, 0.3f, 1);
-                    const ImVec2 ButtonSize(FCogWindowWidgets::GetFontWidth() * 10, 0);
+        Mappings.RemoveAt(i);
+    }
 
-                    ImGui::TableNextColumn();
-                    ImGui::BeginDisabled();
-                    bool Value = ActionValue.Get<bool>();
-                    FCogWindowWidgets::ToggleButton(&Value, "Pressed##Value", "Released##Value", ActiveColor, InnactiveColor, ButtonSize);
-                    ImGui::EndDisabled();
+    //--------------------------------------------------------------------------
+    // Add mappings that were not yet added.
+    //--------------------------------------------------------------------------
+    for (FCogInputMappingContextInfo& MappingInfo : AllAppliedMappings)
+    {
+        //----------------------------------------------------
+		// The mapping was already added
+		//----------------------------------------------------
+        if (Mappings.ContainsByPredicate([&MappingInfo](const FCogInputMappingContextInfo& m) { return m.MappingContext == MappingInfo.MappingContext; }))
+        {
+            continue;
+        }
 
-                    ImGui::TableNextColumn();
-                    FCogWindowWidgets::ToggleButton(&ActionInfo.bPressed, "Pressed##Inject", "Released##Inject", ActiveColor, InnactiveColor, ButtonSize);
-                    ImGui::SameLine();
-                    FCogWindowWidgets::ToggleButton(&ActionInfo.bRepeat, "Repeat", "Repeat", ActiveColor, InnactiveColor, ButtonSize);
-                    break;
-                }
+        //----------------------------------------------------
+		// Add the mapping
+		//----------------------------------------------------
+        FCogInputMappingContextInfo& NewMappingInfo = Mappings.AddDefaulted_GetRef();
+        NewMappingInfo.MappingContext = MappingInfo.MappingContext;
+        NewMappingInfo.Priority = MappingInfo.Priority;
 
-                case EInputActionValueType::Axis1D: 
-                {
-                    const float Value = ActionValue.Get<float>();
-                    DrawAxis("%s", ActionName.Get(), Value, &ActionInfo.X);
-                    break;
-                }
-
-                case EInputActionValueType::Axis2D:
-                {
-                    const FVector2D Value = ActionValue.Get<FVector2D>();
-                    DrawAxis("%s X", ActionName.Get(), Value.X, &ActionInfo.X);
-                    DrawAxis("%s Y", ActionName.Get(), Value.Y, &ActionInfo.Y);
-                    break;
-                }
-
-                case EInputActionValueType::Axis3D:
-                {
-                    const FVector Value = ActionValue.Get<FVector>();
-                    DrawAxis("%s X", ActionName.Get(), Value.X, &ActionInfo.X);
-                    DrawAxis("%s Y", ActionName.Get(), Value.Y, &ActionInfo.Y);
-                    DrawAxis("%s Z", ActionName.Get(), Value.Z, &ActionInfo.Z);
-                    break;
-                }
+        //----------------------------------------------------
+		// Add all the mapping actions
+		//----------------------------------------------------
+        for (const FEnhancedActionKeyMapping& Mapping : NewMappingInfo.MappingContext->GetMappings())
+        {
+            TObjectPtr<const UInputAction> Action = Mapping.Action;
+            if (Action == nullptr)
+            {
+                continue;
             }
 
-            ImGui::PopID();
-            Index++;
+            //----------------------------------------------------
+			// Actions are present multiple time, as many times
+			// as they are mapped to key. We only want to display
+            // the same action once per mapping
+			//----------------------------------------------------
+            if (NewMappingInfo.Actions.ContainsByPredicate([&Action](const FCogInputActionInfo& m){ return m.Action == Action; }))
+            {
+                continue;
+            }
+
+            FCogInputActionInfo& ActionInfo = NewMappingInfo.Actions.AddDefaulted_GetRef();
+            ActionInfo.Action = Mapping.Action;
         }
-        ImGui::EndTable();
+
+        Mappings.Sort([](const FCogInputMappingContextInfo& Lhs, const FCogInputMappingContextInfo& Rhs)
+            {
+                return Lhs.Priority < Rhs.Priority;
+            });
+    }
+
+    int Index = 0;
+
+    for (FCogInputMappingContextInfo& Mapping : Mappings)
+    {
+        const auto MappingName = StringCast<ANSICHAR>(*Mapping.MappingContext.GetName());
+        const bool Open = ImGui::CollapsingHeader(MappingName.Get(), ImGuiTreeNodeFlags_DefaultOpen);
+        if (Open && ImGui::BeginTable("Actions", 3, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize))
+        {
+            ImGui::TableSetupColumn("Action", ImGuiTableColumnFlags_WidthFixed);
+            ImGui::TableSetupColumn("Current", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableSetupColumn("Inject", ImGuiTableColumnFlags_WidthStretch);
+
+            if (Config->ShowHeader)
+            {
+                ImGui::TableHeadersRow();
+            }
+
+            for (FCogInputActionInfo& ActionInfo : Mapping.Actions)
+            {
+                ImGui::PushID(Index);
+
+                const auto ActionName = StringCast<ANSICHAR>(*ActionInfo.Action->GetName());
+
+                FInputActionValue ActionValue = PlayerInput->GetActionValue(ActionInfo.Action);
+
+                switch (ActionInfo.Action->ValueType)
+                {
+	                case EInputActionValueType::Boolean:
+	                {
+	                    ImGui::TableNextRow();
+	                    ImGui::TableNextColumn();
+	                    ImGui::Text("%s", ActionName.Get());
+
+	                    const ImVec4 ActiveColor(1, 0.8f, 0, 1);
+	                    const ImVec4 InactiveColor(0.3f, 0.3f, 0.3f, 1);
+	                    const ImVec2 ButtonSize(FCogWindowWidgets::GetFontWidth() * 10, 0);
+
+	                    ImGui::TableNextColumn();
+	                    ImGui::BeginDisabled();
+	                    bool Value = ActionValue.Get<bool>();
+	                    ImGui::Checkbox("##Current", &Value);
+	                    ImGui::EndDisabled();
+
+	                    ImGui::TableNextColumn();
+
+                        ECheckBoxState State = ActionInfo.bRepeat ? ECheckBoxState::Undetermined : ActionInfo.bPressed ? ECheckBoxState::Checked : ECheckBoxState::Unchecked;
+
+                        if (FCogWindowWidgets::CheckBoxState("##Inject", State, false))
+                        {
+                            if (IsControlDown)
+                            {
+                                ActionInfo.bRepeat = !ActionInfo.bRepeat;
+                                ActionInfo.bPressed = false;
+                            }
+                            else
+                            {
+                                ActionInfo.bPressed = !ActionInfo.bPressed;
+                                ActionInfo.bRepeat = false;
+                            }
+                        }
+
+                        if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary | ImGuiHoveredFlags_DelayShort))
+                        {
+                            ImGui::BeginTooltip();
+                            ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, IsControlDown ? 1.0f : 0.5f), "Repeat [CTRL]");
+                            ImGui::EndTooltip();
+                        }
+
+	                    break;
+	                }
+
+	                case EInputActionValueType::Axis1D:
+	                {
+	                    const float Value = ActionValue.Get<float>();
+	                    DrawAxis("%s", ActionName.Get(), Value, &ActionInfo.X);
+	                    break;
+	                }
+
+	                case EInputActionValueType::Axis2D:
+	                {
+	                    const FVector2D Value = ActionValue.Get<FVector2D>();
+	                    DrawAxis("%s X", ActionName.Get(), Value.X, &ActionInfo.X);
+	                    DrawAxis("%s Y", ActionName.Get(), Value.Y, &ActionInfo.Y);
+	                    break;
+	                }
+
+	                case EInputActionValueType::Axis3D:
+	                {
+	                    const FVector Value = ActionValue.Get<FVector>();
+	                    DrawAxis("%s X", ActionName.Get(), Value.X, &ActionInfo.X);
+	                    DrawAxis("%s Y", ActionName.Get(), Value.Y, &ActionInfo.Y);
+	                    DrawAxis("%s Z", ActionName.Get(), Value.Z, &ActionInfo.Z);
+	                    break;
+	                }
+				}
+
+				ImGui::PopID();
+                Index++;
+            }
+
+            ImGui::EndTable();
+        }
     }
 }
 
@@ -214,9 +303,12 @@ void FCogInputWindow_Actions::RenderTick(float DeltaSeconds)
         IsTimeToRepeat = true;
     }
 
-    for (FCogInjectActionInfo& ActionInfo : Actions)
+    for (FCogInputMappingContextInfo Mapping : Mappings)
     {
-        ActionInfo.Inject(*EnhancedInput, IsTimeToRepeat);
+        for (FCogInputActionInfo& ActionInfo : Mapping.Actions)
+        {
+            ActionInfo.Inject(*EnhancedInput, IsTimeToRepeat);
+        }
     }
 }
 

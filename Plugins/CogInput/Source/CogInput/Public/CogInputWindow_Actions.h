@@ -2,13 +2,12 @@
 
 #include "CoreMinimal.h"
 #include "CogCommonConfig.h"
-#include "CogInjectActionInfo.h"
+#include "CogInputActionInfo.h"
 #include "CogWindow.h"
 #include "CogInputWindow_Actions.generated.h"
 
 class UInputAction;
 class UCogInputConfig_Actions;
-class UCogInputDataAsset;
 
 //--------------------------------------------------------------------------------------------------------------------------
 class COGINPUT_API FCogInputWindow_Actions : public FCogWindow
@@ -35,11 +34,9 @@ private:
 
     float RepeatTime = 0.0f;
 
-    TObjectPtr<const UCogInputDataAsset> Asset = nullptr;
-
     TObjectPtr<UCogInputConfig_Actions> Config = nullptr;
 
-    TArray<FCogInjectActionInfo> Actions;
+    TArray<FCogInputMappingContextInfo> Mappings;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -53,10 +50,14 @@ public:
     UPROPERTY(Config)
     float RepeatPeriod = 0.5f;
 
+    UPROPERTY(Config)
+    bool ShowHeader = true;
+
     virtual void Reset() override
     {
         Super::Reset();
 
         RepeatPeriod = 0.5f;
+        ShowHeader = true;
     }
 };
