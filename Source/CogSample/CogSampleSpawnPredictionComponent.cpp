@@ -47,7 +47,7 @@ FCogSampleSpawnPredictionKey FCogSampleSpawnPredictionKey::MakeFromAbility(const
     FCogSampleSpawnPredictionKey Key;
     Key.Creator = InAbility.GetAvatarActorFromActorInfo() != nullptr ? InAbility.GetAvatarActorFromActorInfo()->GetFName() : FName();
     Key.Ability = InAbility.GetFName();
-    Key.PredictionKey = Spec->ActivationInfo.GetActivationPredictionKey();
+    Key.PredictionKey = InAbility.GetCurrentActivationInfo().GetActivationPredictionKey();
     Key.InstanceIndex = InInstanceIndex;
     Key.GameTime = InAbility.GetWorld()->GetTimeSeconds();
     return Key;

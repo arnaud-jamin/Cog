@@ -12,7 +12,6 @@
 #if ENABLE_COG
 #include "CogAbilityReplicator.h"
 #include "CogDebugDraw.h"
-#include "CogDebugPlot.h"
 #include "CogDebugReplicator.h"
 #include "CogEngineReplicator.h"
 #include "Framework/Application/NavigationConfig.h"

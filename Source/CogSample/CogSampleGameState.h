@@ -36,11 +36,19 @@ private:
     UPROPERTY()
     TObjectPtr<UObject> CogWindowManagerRef = nullptr;
 
+protected:
+    UPROPERTY(Replicated)
+    float _ServerFramerateRaw = 0.0f;
+
 #if ENABLE_COG
 
     void InitializeCog();
 
     TObjectPtr<UCogWindowManager> CogWindowManager = nullptr;
+
+    float _ClientFramerateSmooth = 0.0f;
+
+    float _ServerFramerateSmooth = 0.0f;
 
 #endif //ENABLE_COG
 };

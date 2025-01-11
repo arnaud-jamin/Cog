@@ -310,9 +310,9 @@ protected:
 
 	void Look(const FInputActionValue& Value);
 
-    void OnAbilityInputStarted(const FInputActionValue& Value, int32 Index);
+    void OnAbilityInputStarted(const UInputAction* InputAction, const FInputActionValue& Value, int32 Index);
 
-    void OnAbilityInputCompleted(const FInputActionValue& Value, int32 Index);
+    void OnAbilityInputCompleted(const UInputAction* InputAction, const FInputActionValue& Value, int32 Index);
 
     void ActivateItem(const FInputActionValue& Value, int32 Index);
 

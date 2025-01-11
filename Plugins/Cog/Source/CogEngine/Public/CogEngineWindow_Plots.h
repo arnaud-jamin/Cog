@@ -32,13 +32,11 @@ protected:
 
     void RenderMenu();
 
-    void RenderTimeMarker() const;
-
-    static void RenderValues(FCogDebugPlotEntry& Entry, const char* Label);
+    void RenderValues(FCogDebugPlotEntry& Entry, const char* Label) const;
 
     void RenderEvents(FCogDebugPlotEntry& Entry, const char* Label, const ImVec2& PlotMin, const ImVec2& PlotMax) const;
 
-    static void RenderEventTooltip(const FCogDebugPlotEvent* HoveredEvent, FCogDebugPlotEntry& Entry);
+    static void RenderEventTooltip(const FCogDebugPlotEvent* HoveredEvent, const FCogDebugPlotEntry& Entry);
 
     TObjectPtr<UCogEngineConfig_Plots> Config = nullptr;
 
@@ -60,11 +58,31 @@ public:
     int Rows = 1;
 
     UPROPERTY(Config)
-    float TimeRange = 10.0f;
+    float TimeRange = 20.0f;
+
+    UPROPERTY(Config)
+    bool ShowTimeBarAtGameTime = true;
+
+    UPROPERTY(Config)
+    bool ShowTimeBarAtCursor = true;
+
+    UPROPERTY(Config)
+    bool ShowValueAtCursor = true;
+
+    UPROPERTY(Config)
+    float DragViewSensitivity = 10.0f;
+
+    UPROPERTY(Config)
+    FColor PauseBackgroundColor = FColor(10, 0, 0, 255);
 
     virtual void Reset() override
     {
         Rows = 1;
-        TimeRange = 10.0f;
+        TimeRange = 20.0f;
+        ShowTimeBarAtGameTime = true;
+        ShowTimeBarAtCursor = true;
+        ShowValueAtCursor = true;
+        DragViewSensitivity = 10.0f;
+        PauseBackgroundColor = FColor(10, 0, 0, 255);
     }
 };
