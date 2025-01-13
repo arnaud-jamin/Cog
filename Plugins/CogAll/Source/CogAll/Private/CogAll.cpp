@@ -2,7 +2,6 @@
 
 #include "CogAbilityWindow_Abilities.h"
 #include "CogAbilityWindow_Attributes.h"
-#include "CogAbilityWindow_Cheats.h"
 #include "CogAbilityWindow_Effects.h"
 #include "CogAbilityWindow_Pools.h"
 #include "CogAbilityWindow_Tags.h"
@@ -10,6 +9,7 @@
 #include "CogAbilityWindow_Tweaks.h"
 #include "CogAIWindow_BehaviorTree.h"
 #include "CogAIWindow_Blackboard.h"
+#include "CogEngineWindow_Cheats.h"
 #include "CogEngineWindow_CollisionTester.h"
 #include "CogEngineWindow_CollisionViewer.h"
 #include "CogEngineWindow_CommandBindings.h"
@@ -103,7 +103,9 @@ void Cog::AddAllWindows(UCogWindowManager& CogWindowManager)
 
     CogWindowManager.AddWindow<FCogAbilityWindow_BlockedTags>("Gameplay.Blocking Tags");
 
-    CogWindowManager.AddWindow<FCogAbilityWindow_Cheats>("Gameplay.Cheats");
+    //CogWindowManager.AddWindow<FCogEngineWindow_Cheats>("Gameplay.Cheats");
+
+    CogWindowManager.AddWindow<FCogEngineWindow_Cheats>("Gameplay.Cheats");
 
     CogWindowManager.AddWindow<FCogAbilityWindow_Effects>("Gameplay.Effects");
 

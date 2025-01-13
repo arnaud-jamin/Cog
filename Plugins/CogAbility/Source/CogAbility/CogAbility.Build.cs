@@ -1,5 +1,4 @@
 using UnrealBuildTool;
-using UnrealBuildTool.Rules;
 
 public class CogAbility : ModuleRules
 {
@@ -26,10 +25,11 @@ public class CogAbility : ModuleRules
                 "CogImgui",
                 "CogCommon",
                 "CogDebug",
+                "CogEngine",
                 "CogWindow",
                 "GameplayAbilities",
                 "GameplayTags",
-                "NetCore",
+                "NetCore", 
             }
             );
 			

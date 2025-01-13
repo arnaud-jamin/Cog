@@ -220,3 +220,26 @@ void ACogEngineReplicator::Server_DeleteActor_Implementation(AActor* Actor)
 
 #endif // !UE_BUILD_SHIPPING
 }
+
+
+//--------------------------------------------------------------------------------------------------------------------------
+void ACogEngineReplicator::Server_ApplyCheat_Implementation(const AActor* CheatInstigator, const TArray<AActor*>& Targets, const FCogEngineCheat& Cheat) const
+{
+    if (Cheat.Execution == nullptr)
+    {
+        return;
+    }
+
+    Cheat.Execution->Execute(CheatInstigator, Targets);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+ECogEngineCheat_ActiveState ACogEngineReplicator::IsCheatActiveOnTargets(const TArray<AActor*>& Targets, const FCogEngineCheat& Cheat)
+{
+    if (Cheat.Execution == nullptr)
+    {
+        return ECogEngineCheat_ActiveState::Inactive;
+    }
+
+    return Cheat.Execution->IsActiveOnTargets(Targets);
+}
