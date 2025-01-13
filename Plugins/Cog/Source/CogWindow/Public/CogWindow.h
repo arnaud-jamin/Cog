@@ -76,12 +76,12 @@ public:
     UCogWindowManager* GetOwner() const { return Owner; }
 
     template<class T>
-    T* GetConfig() { return Cast<T>(GetConfig(T::StaticClass())); }
+    T* GetConfig() const { return Cast<T>(GetConfig(T::StaticClass())); }
 
     UCogCommonConfig* GetConfig(const TSubclassOf<UCogCommonConfig> ConfigClass) const;
 
     template<class T>
-    const T* GetAsset() { return Cast<T>(GetAsset(T::StaticClass())); }
+    const T* GetAsset() const { return Cast<T>(GetAsset(T::StaticClass())); }
 
     const UObject* GetAsset(const TSubclassOf<UObject> AssetClass) const;
 
@@ -115,7 +115,7 @@ protected:
 
 protected:
 
-    bool bShowMenu = false;
+    bool bShowMenu = true;
 
     bool bNoPadding = false;
 
