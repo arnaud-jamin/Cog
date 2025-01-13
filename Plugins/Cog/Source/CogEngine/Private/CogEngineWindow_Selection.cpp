@@ -76,7 +76,7 @@ void FCogEngineWindow_Selection::PreSaveConfig()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Selection::TryReapplySelection() const
 {
-	const UWorld* World = GetWorld();
+    const UWorld* World = GetWorld();
     if (World == nullptr)
     {
         return;
@@ -207,10 +207,10 @@ void FCogEngineWindow_Selection::RenderContent()
             ImGui::Checkbox("Save selection", &Config->bReapplySelection);
             ImGui::SetItemTooltip("Should the last selection be saved and reapplied on startup.");
 
-        	ImGui::Checkbox("Actor Name Use Label", &FCogDebug::Settings.ActorNameUseLabel);
+            ImGui::Checkbox("Actor Name Use Label", &FCogDebug::Settings.ActorNameUseLabel);
             ImGui::SetItemTooltip("Should actor names be displayed using their label. Labels are more readable.");
 
-        	ImGui::Checkbox("Replicate Selection", &FCogDebug::Settings.ReplicateSelection);
+            ImGui::Checkbox("Replicate Selection", &FCogDebug::Settings.ReplicateSelection);
             ImGui::SetItemTooltip("Should the client replicate its actor selection to the server.");
 
             ImGui::EndMenu();
@@ -369,7 +369,18 @@ void FCogEngineWindow_Selection::RenderMainMenuWidget(int32 SubWidgetIndex, floa
     {
         ImGui::SetNextItemWidth(Width);
         AActor* NewSelection = nullptr;
-        FCogWindowWidgets::MenuActorsCombo("MenuActorSelection", NewSelection, *GetWorld(), ActorClasses, Config->SelectedClassIndex, &Filter, GetLocalPlayerPawn(), [this](AActor& Actor) { RenderActorContextMenu(Actor);  });
+        if (FCogWindowWidgets::MenuActorsCombo(
+            "MenuActorSelection", 
+            NewSelection, 
+            *GetWorld(), 
+            ActorClasses, 
+            Config->SelectedClassIndex, 
+            &Filter, 
+            GetLocalPlayerPawn(), 
+            [this](AActor& Actor) { RenderActorContextMenu(Actor);  }))
+        {
+            SetGlobalSelection(NewSelection);
+        }
     }
     else if (SubWidgetIndex == 2)
     {
