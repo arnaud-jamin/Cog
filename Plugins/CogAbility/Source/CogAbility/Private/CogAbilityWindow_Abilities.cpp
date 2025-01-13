@@ -357,7 +357,7 @@ bool FCogAbilityWindow_Abilities::RenderAbilitiesTableHeader(UAbilitySystemCompo
         | ImGuiTableFlags_Reorderable
         | ImGuiTableFlags_Hideable))
     {
-        ImGui::TableSetupColumn("##Activation", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("##ActivationCol", ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableSetupScrollFreeze(0, 1);
         ImGui::TableSetupColumn("Ability");
         ImGui::TableSetupColumn("Level");
