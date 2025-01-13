@@ -60,7 +60,7 @@ void FCogWindow::Render(float DeltaTime)
 
     const FString WindowTitle = GetTitle() + "##" + Name;
 
-    if (bHasMenu && bHideMenu == false)
+    if (bHasMenu && bShowMenu)
     {
         WindowFlags |= ImGuiWindowFlags_MenuBar;
     }
@@ -81,7 +81,7 @@ void FCogWindow::Render(float DeltaTime)
         {
             if (bHasMenu)
             {
-                ImGui::Checkbox("Hide Menu", &bHideMenu);
+                ImGui::Checkbox("Show Menu", &bShowMenu);
             }
 
             if (ImGui::Button("Reset Settings"))

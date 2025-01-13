@@ -670,11 +670,15 @@ void* UCogWindowManager::SettingsHandler_ReadOpen(ImGuiContext* Context, ImGuiSe
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::SettingsHandler_ReadLine(ImGuiContext* Context, ImGuiSettingsHandler* Handler, void* Entry, const char* Line)
 {
+    //-----------------------------------------------------------------------------------
+	// Load the visibility of windows. 
+	//-----------------------------------------------------------------------------------
     if (Entry == (void*)1)
     {
         ImGuiID Id;
+        int32 ShowMenu;
 #if PLATFORM_WINDOWS || PLATFORM_MICROSOFT
-        if (sscanf_s(Line, "0x%08X", &Id) == 1)
+        if (sscanf_s(Line, "0x%08X %d", &Id, &ShowMenu) == 2)
 #else
         if (sscanf(Line, "0x%08X", &Id) == 1)
 #endif
@@ -683,9 +687,13 @@ void UCogWindowManager::SettingsHandler_ReadLine(ImGuiContext* Context, ImGuiSet
             if (FCogWindow* Window = Manager->FindWindowByID(Id))
             {
                 Window->SetIsVisible(true);
+                Window->bShowMenu = (ShowMenu > 0);
             }
         }
     }
+    //-----------------------------------------------------------------------------------
+    // Load which widgets are present in the main menu bar and with what order. 
+    //-----------------------------------------------------------------------------------
     else if (Entry == (void*)2)
     {
         ImGuiID Id;
@@ -713,16 +721,28 @@ void UCogWindowManager::SettingsHandler_WriteAll(ImGuiContext* Context, ImGuiSet
 {
     const UCogWindowManager* Manager = (UCogWindowManager*)Handler->UserData;
 
+    //-----------------------------------------------------------------------------------
+	// Save the visibility of windows. Example:
+	//      [Cog][Windows]
+	//	    0xB5D96693
+    //      0xBF3390B5
+	//-----------------------------------------------------------------------------------
     Buffer->appendf("[%s][Windows]\n", Handler->TypeName);
     for (const FCogWindow* Window : Manager->Windows)
     {
         if (Window->GetIsVisible())
         {
-            Buffer->appendf("0x%08X\n", Window->GetID());
+            Buffer->appendf("0x%08X %d\n", Window->GetID(), (int32)Window->bShowMenu);
         }
     }
     Buffer->append("\n");
 
+    //-----------------------------------------------------------------------------------
+	// Save which widgets are present in the main menu bar and with what order. Example:
+    //      [Cog][Widgets]
+    //      0x639F1181 1
+	//      0x52BDE3E0 1
+    //-----------------------------------------------------------------------------------
     Buffer->appendf("[%s][Widgets]\n", Handler->TypeName);
     for (const FCogWindow* Window : Manager->Widgets)
     {

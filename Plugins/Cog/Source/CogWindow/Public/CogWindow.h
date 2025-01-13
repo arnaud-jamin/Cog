@@ -53,7 +53,7 @@ public:
     /** The short name of the window. "Effect" if the window full name is "Gameplay.Character.Effect" */
     const FString& GetName() const { return Name; }
 
-    AActor* GetSelection() { return CurrentSelection.Get(); }
+    AActor* GetSelection() const { return CurrentSelection.Get(); }
 
     void SetSelection(AActor* Actor);
 
@@ -115,7 +115,7 @@ protected:
 
 protected:
 
-    bool bHideMenu = false;
+    bool bShowMenu = false;
 
     bool bNoPadding = false;
 
