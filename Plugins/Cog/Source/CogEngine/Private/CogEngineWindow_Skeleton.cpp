@@ -161,11 +161,11 @@ void FCogEngineWindow_Skeleton::RenderBoneEntry(int32 BoneIndex, bool OpenAllChi
         //------------------------
         if (BoneInfo.Children.Num() > 0 && Filter.IsActive() == false)
         {
-            OpenChildren = ImGui::TreeNodeEx("##Bone", ImGuiSelectableFlags_AllowOverlap | ImGuiTreeNodeFlags_SpanFullWidth);
+            OpenChildren = ImGui::TreeNodeEx("##Bone", ImGuiTreeNodeFlags_AllowOverlap | ImGuiTreeNodeFlags_SpanFullWidth);
         }
         else
         {
-            ImGui::TreeNodeEx("##Bone", ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiSelectableFlags_AllowOverlap | ImGuiTreeNodeFlags_SpanFullWidth);
+            ImGui::TreeNodeEx("##Bone", ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_AllowOverlap | ImGuiTreeNodeFlags_SpanFullWidth);
         }
 
         const bool IsControlDown = ImGui::GetCurrentContext()->IO.KeyCtrl;
