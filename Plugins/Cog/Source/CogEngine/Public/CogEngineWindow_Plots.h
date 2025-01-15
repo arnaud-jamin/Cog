@@ -26,7 +26,7 @@ protected:
 
     virtual void RenderContent() override;
 
-    static void RenderPlotsList(TArray<FCogDebugPlotEntry*>& VisiblePlots);
+    static void RenderPlotsList(const ImVec2& InSize);
 
     void RenderPlots(const TArray<FCogDebugPlotEntry*>& VisiblePlots) const;
 
@@ -75,6 +75,9 @@ public:
     UPROPERTY(Config)
     FColor PauseBackgroundColor = FColor(10, 0, 0, 255);
 
+    UPROPERTY(Config)
+    bool DockPlotList = false;
+
     virtual void Reset() override
     {
         Rows = 1;
@@ -84,5 +87,6 @@ public:
         ShowValueAtCursor = true;
         DragViewSensitivity = 10.0f;
         PauseBackgroundColor = FColor(10, 0, 0, 255);
+        DockPlotList = false;
     }
 };

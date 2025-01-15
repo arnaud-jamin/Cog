@@ -47,28 +47,44 @@ void FCogEngineWindow_Plots::RenderContent()
 {
     Super::RenderContent();
 
+    TArray<FCogDebugPlotEntry*> VisiblePlots;
+    for (FCogDebugPlotEntry& Plot : FCogDebugPlot::Plots)
+    {
+        if (Plot.CurrentYAxis != ImAxis_COUNT && Plot.CurrentRow != INDEX_NONE)
+        {
+            VisiblePlots.Add(&Plot);
+        }
+    }
+
     RenderMenu();
 
-    if (ImGui::BeginTable("PlotTable", 2, ImGuiTableFlags_RowBg 
-                                        | ImGuiTableFlags_Resizable 
-                                        | ImGuiTableFlags_BordersV
-                                        | ImGuiTableFlags_NoPadInnerX
-                                        | ImGuiTableFlags_NoPadOuterX))
+    if (Config->DockPlotList)
     {
+        if (ImGui::BeginTable("PlotTable", 2, ImGuiTableFlags_RowBg
+            | ImGuiTableFlags_Resizable
+            | ImGuiTableFlags_BordersV
+            | ImGuiTableFlags_NoPadInnerX
+            | ImGuiTableFlags_NoPadOuterX))
+        {
 
-        ImGui::TableSetupColumn("PlotsList", ImGuiTableColumnFlags_WidthFixed, FCogWindowWidgets::GetFontWidth() * 20.0f);
-        ImGui::TableSetupColumn("Plots", ImGuiTableColumnFlags_WidthStretch, 0.0f);
-        ImGui::TableNextRow();
+            ImGui::TableSetupColumn("PlotsList", ImGuiTableColumnFlags_WidthFixed, FCogWindowWidgets::GetFontWidth() * 20.0f);
+            ImGui::TableSetupColumn("Plots", ImGuiTableColumnFlags_WidthStretch, 0.0f);
+            ImGui::TableNextRow();
 
-        TArray<FCogDebugPlotEntry*> VisiblePlots;
 
-        ImGui::TableNextColumn();
-        RenderPlotsList(VisiblePlots);
+            ImGui::TableNextColumn();
+            RenderPlotsList(ImVec2(0, -1));
 
-        ImGui::TableNextColumn();
+            ImGui::TableNextColumn();
+            RenderPlots(VisiblePlots);
+
+            ImGui::EndTable();
+        }
+        
+    }
+    else
+    {
         RenderPlots(VisiblePlots);
-
-        ImGui::EndTable();
     }
 
     bApplyTimeScale = false;
@@ -79,6 +95,15 @@ void FCogEngineWindow_Plots::RenderMenu()
 {
     if (ImGui::BeginMenuBar())
     {
+        if (Config->DockPlotList == false)
+        {
+            if (ImGui::BeginMenu("Plots"))
+            {
+                RenderPlotsList(ImVec2(ImGui::GetFontSize() * 15, ImGui::GetFontSize() * 20));
+                ImGui::EndMenu();
+            }
+        }
+
         if (ImGui::BeginMenu("Options"))
         {
             if (ImGui::MenuItem("Clear data"))
@@ -119,6 +144,9 @@ void FCogEngineWindow_Plots::RenderMenu()
             FCogWindowWidgets::SetNextItemToShortWidth();
             ImGui::Checkbox("Show value at cursor", &Config->ShowValueAtCursor);
 
+            FCogWindowWidgets::SetNextItemToShortWidth();
+            ImGui::Checkbox("Dock plots", &Config->DockPlotList);
+
             constexpr ImGuiColorEditFlags ColorEditFlags = ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf;
             FCogImguiHelper::ColorEdit4("Pause background color", Config->PauseBackgroundColor, ColorEditFlags);
             ImGui::SetItemTooltip("Background color of the plot when paused.");
@@ -133,9 +161,9 @@ void FCogEngineWindow_Plots::RenderMenu()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Plots::RenderPlotsList(TArray<FCogDebugPlotEntry*>& VisiblePlots)
+void FCogEngineWindow_Plots::RenderPlotsList(const ImVec2& InSize)
 {
-    if (ImGui::BeginChild("Plots", ImVec2(0, -1)))
+    if (ImGui::BeginChild("Plots", InSize))
     {
         int Index = 0;
 
@@ -143,11 +171,6 @@ void FCogEngineWindow_Plots::RenderPlotsList(TArray<FCogDebugPlotEntry*>& Visibl
 
         for (FCogDebugPlotEntry& Plot : FCogDebugPlot::Plots)
         {
-            if (Plot.CurrentYAxis != ImAxis_COUNT && Plot.CurrentRow != INDEX_NONE)
-            {
-                VisiblePlots.Add(&Plot);
-            }
-
             ImGui::PushID(Index);
 
             ImGui::PushStyleColor(ImGuiCol_Text, Plot.IsEventPlot ? IM_COL32(128, 128, 255, 255) : IM_COL32(255, 255, 255, 255));
@@ -451,17 +474,19 @@ void FCogEngineWindow_Plots::RenderValues(FCogDebugPlotEntry& Entry, const char*
         float Value;
         if (Entry.FindValue(ImPlot::GetPlotMousePos().x, Value))
         {
-            FCogWindowWidgets::BeginTableTooltip();
-            if (ImGui::BeginTable("Params", 2, ImGuiTableFlags_Borders))
+            if (FCogWindowWidgets::BeginTableTooltip())
             {
-                ImGui::TableNextRow();
-                ImGui::TableNextColumn();
-                ImGui::Text("%s", Label);
-                ImGui::TableNextColumn();
-                ImGui::Text("%0.2f", Value);
-                ImGui::EndTable();
+                if (ImGui::BeginTable("Params", 2, ImGuiTableFlags_Borders))
+                {
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%s", Label);
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%0.2f", Value);
+                    ImGui::EndTable();
+                }
+                FCogWindowWidgets::EndTableTooltip();
             }
-            FCogWindowWidgets::EndTableTooltip();
         }
     }
 
@@ -567,72 +592,74 @@ void FCogEngineWindow_Plots::RenderEventTooltip(const FCogDebugPlotEvent* Hovere
 {
     if (ImPlot::IsPlotHovered() && HoveredEvent != nullptr)
     {
-        FCogWindowWidgets::BeginTableTooltip();
-        if (ImGui::BeginTable("Params", 2, ImGuiTableFlags_Borders))
+        if (FCogWindowWidgets::BeginTableTooltip())
         {
-            //------------------------
-            // Event Name
-            //------------------------
-            ImGui::TableNextRow();
-            ImGui::TableNextColumn();
-            ImGui::Text("Name");
-            ImGui::TableNextColumn();
-            ImGui::Text("%s", TCHAR_TO_ANSI(*HoveredEvent->DisplayName));
-
-            //------------------------
-            // Owner Name
-            //------------------------
-            ImGui::TableNextRow();
-            ImGui::TableNextColumn();
-            ImGui::Text("Owner");
-            ImGui::TableNextColumn();
-            ImGui::Text("%s", TCHAR_TO_ANSI(*HoveredEvent->OwnerName));
-
-            //------------------------
-            // Times
-            //------------------------
-            if (HoveredEvent->EndTime != HoveredEvent->StartTime)
+            if (ImGui::BeginTable("Params", 2, ImGuiTableFlags_Borders))
             {
-                const float ActualEndTime = HoveredEvent->GetActualEndTime(Entry);
-                const uint64 ActualEndFrame = HoveredEvent->GetActualEndFrame(Entry);
+                //------------------------
+                // Event Name
+                //------------------------
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("Name");
+                ImGui::TableNextColumn();
+                ImGui::Text("%s", TCHAR_TO_ANSI(*HoveredEvent->DisplayName));
 
+                //------------------------
+                // Owner Name
+                //------------------------
                 ImGui::TableNextRow();
                 ImGui::TableNextColumn();
-                ImGui::Text("Duration");
+                ImGui::Text("Owner");
                 ImGui::TableNextColumn();
-                ImGui::Text("%0.2fs", ActualEndTime - HoveredEvent->StartTime);
+                ImGui::Text("%s", TCHAR_TO_ANSI(*HoveredEvent->OwnerName));
 
-                ImGui::TableNextRow();
-                ImGui::TableNextColumn();
-                ImGui::Text("Frames");
-                ImGui::TableNextColumn();
-                ImGui::Text("%d  [%d-%d]",
-                    (int32)(ActualEndFrame - HoveredEvent->StartFrame),
-                    (int32)(HoveredEvent->StartFrame % 1000),
-                    (int32)(ActualEndFrame % 1000));
-            }
-            else
-            {
-                ImGui::TableNextRow();
-                ImGui::TableNextColumn();
-                ImGui::Text("Frame");
-                ImGui::TableNextColumn();
-                ImGui::Text("%d", (int32)(HoveredEvent->StartFrame % 1000));
-            }
+                //------------------------
+                // Times
+                //------------------------
+                if (HoveredEvent->EndTime != HoveredEvent->StartTime)
+                {
+                    const float ActualEndTime = HoveredEvent->GetActualEndTime(Entry);
+                    const uint64 ActualEndFrame = HoveredEvent->GetActualEndFrame(Entry);
 
-            //------------------------
-            // Params
-            //------------------------
-            for (FCogDebugPlotEventParams Param : HoveredEvent->Params)
-            {
-                ImGui::TableNextRow();
-                ImGui::TableNextColumn();
-                ImGui::Text("%s", TCHAR_TO_ANSI(*Param.Name.ToString()));
-                ImGui::TableNextColumn();
-                ImGui::Text("%s", TCHAR_TO_ANSI(*Param.Value));
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Text("Duration");
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%0.2fs", ActualEndTime - HoveredEvent->StartTime);
+
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Text("Frames");
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%d  [%d-%d]",
+                        (int32)(ActualEndFrame - HoveredEvent->StartFrame),
+                        (int32)(HoveredEvent->StartFrame % 1000),
+                        (int32)(ActualEndFrame % 1000));
+                }
+                else
+                {
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Text("Frame");
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%d", (int32)(HoveredEvent->StartFrame % 1000));
+                }
+
+                //------------------------
+                // Params
+                //------------------------
+                for (FCogDebugPlotEventParams Param : HoveredEvent->Params)
+                {
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%s", TCHAR_TO_ANSI(*Param.Name.ToString()));
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%s", TCHAR_TO_ANSI(*Param.Value));
+                }
+                ImGui::EndTable();
             }
-            ImGui::EndTable();
+            FCogWindowWidgets::EndTableTooltip();
         }
-        FCogWindowWidgets::EndTableTooltip();
     }
 }
