@@ -21,6 +21,10 @@
 			"TargetAllowList": [
 				"Editor"
 			]
+		},
+		{
+			"Name": "AssetSearch",
+			"Enabled": true
 		}
 	]
 }
