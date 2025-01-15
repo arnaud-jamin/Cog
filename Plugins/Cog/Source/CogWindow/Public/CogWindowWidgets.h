@@ -23,9 +23,13 @@ class COGWINDOW_API FCogWindowWidgets
 {
 public:
 
-    static void BeginTableTooltip();
+    static bool BeginTableTooltip();
 
     static void EndTableTooltip();
+
+    static bool BeginItemTableTooltip();
+
+    static void EndItemTableTooltip();
 
     static void ThinSeparatorText(const char* Label);
 
@@ -111,6 +115,11 @@ public:
 
     static bool InputText(const char* Text, FString& Value);
 
+    static bool BeginRightAlign(const char* Id);
+
+    static void EndRightAlign();
+
+    static void MenuItemShortcut(const char* Id, const FString& Text);
 };
 
 template<typename EnumType>

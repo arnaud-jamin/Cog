@@ -5,6 +5,7 @@
 #include "CogWindowManager.h"
 #include "CogWindowWidgets.h"
 #include "imgui.h"
+#include "imgui.h"
 #include "InputCoreTypes.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -77,17 +78,7 @@ void FCogWindow_Settings::RenderContent()
             Context.SetEnableInput(bEnableInput);
         }
         ImGui::SetItemTooltip("Enable ImGui inputs. When enabled the ImGui menu is shown and inputs are forwarded to ImGui.");
-
-        const auto ShortcutText = StringCast<ANSICHAR>(*FCogImguiInputHelper::CommandToString(PlayerInput, UCogWindowManager::ToggleInputCommand));
-        const float ShortcutWidth = (ShortcutText.Get() != nullptr && ShortcutText.Get()[0]) ? ImGui::CalcTextSize(ShortcutText.Get(), NULL).x : 0.0f;
-        if (ShortcutWidth > 0.0f)
-        {
-            ImGui::SameLine();
-            ImGui::SetCursorPosX(ImGui::GetContentRegionAvail().x - ShortcutWidth);
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
-            ImGui::Text("%s", ShortcutText.Get());
-            ImGui::PopStyleColor();
-        }
+        FCogWindowWidgets::MenuItemShortcut("EnableInputShortcut", FCogImguiInputHelper::CommandToString(PlayerInput, UCogWindowManager::ToggleInputCommand));
 
         //-------------------------------------------------------------------------------------------
         bool bShareKeyboard = Context.GetShareKeyboard();

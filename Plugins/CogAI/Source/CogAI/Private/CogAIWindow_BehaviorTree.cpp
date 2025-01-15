@@ -269,68 +269,66 @@ void FCogAIWindow_BehaviorTree::RenderNode(UBehaviorTreeComponent& BehaviorTreeC
         //------------------------
         // Tooltip
         //------------------------
-        if (ImGui::IsItemHovered())
+        if (FCogWindowWidgets::BeginItemTableTooltip())
         {
-            FCogWindowWidgets::BeginTableTooltip();
+	        if (ImGui::BeginTable("Effect", 2, ImGuiTableFlags_Borders))
+	        {
+	            ImGui::TableSetupColumn("Property");
+	            ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
 
-            if (ImGui::BeginTable("Effect", 2, ImGuiTableFlags_Borders))
-            {
-                ImGui::TableSetupColumn("Property");
-                ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+	            const ImVec4 TextColor(1.0f, 1.0f, 1.0f, 0.5f);
 
-                const ImVec4 TextColor(1.0f, 1.0f, 1.0f, 0.5f);
+	            //------------------------
+	            // Name
+	            //------------------------
+	            ImGui::TableNextRow();
+	            ImGui::TableNextColumn();
+	            ImGui::TextColored(TextColor, "Name");
+	            ImGui::TableNextColumn();
+	            ImGui::Text("%s", NodeName.Get());
 
-                //------------------------
-                // Name
-                //------------------------
-                ImGui::TableNextRow();
-                ImGui::TableNextColumn();
-                ImGui::TextColored(TextColor, "Name");
-                ImGui::TableNextColumn();
-                ImGui::Text("%s", NodeName.Get());
+	            //------------------------
+	            // Static Description
+	            //------------------------
+	            ImGui::TableNextRow();
+	            ImGui::TableNextColumn();
+	            ImGui::TextColored(TextColor, "Description");
+	            ImGui::TableNextColumn();
+	            ImGui::Text("%s", TCHAR_TO_ANSI(*Node->GetStaticDescription()));
 
-                //------------------------
-                // Static Description
-                //------------------------
-                ImGui::TableNextRow();
-                ImGui::TableNextColumn();
-                ImGui::TextColored(TextColor, "Description");
-                ImGui::TableNextColumn();
-                ImGui::Text("%s", TCHAR_TO_ANSI(*Node->GetStaticDescription()));
+	            //------------------------
+	            // Runtime Values
+	            //------------------------
+	            TArray<FString> RunTimeValues;
+	            uint8* NodeMemory = BehaviorTreeComponent.GetNodeMemory(Node, BehaviorTreeComponent.GetActiveInstanceIdx());
+	            Node->DescribeRuntimeValues(BehaviorTreeComponent, NodeMemory, EBTDescriptionVerbosity::Detailed, RunTimeValues);
 
-                //------------------------
-                // Runtime Values
-                //------------------------
-                TArray<FString> RunTimeValues;
-                uint8* NodeMemory = BehaviorTreeComponent.GetNodeMemory(Node, BehaviorTreeComponent.GetActiveInstanceIdx());
-                Node->DescribeRuntimeValues(BehaviorTreeComponent, NodeMemory, EBTDescriptionVerbosity::Detailed, RunTimeValues);
+	            for (const FString& RuntimeValue : RunTimeValues)
+	            {
+	                ImGui::TableNextRow();
 
-                for (const FString& RuntimeValue : RunTimeValues)
-                {
-                    ImGui::TableNextRow();
+	                FString Left, Right;
+	                if (RuntimeValue.Split(TEXT(": "), &Left, &Right))
+	                {
+	                    ImGui::TableNextColumn();
+	                    ImGui::TextColored(TextColor, "%s", TCHAR_TO_ANSI(*Left));
 
-                    FString Left, Right;
-                    if (RuntimeValue.Split(TEXT(": "), &Left, &Right))
-                    {
-                        ImGui::TableNextColumn();
-                        ImGui::TextColored(TextColor, "%s", TCHAR_TO_ANSI(*Left));
+	                    ImGui::TableNextColumn();
+	                    ImGui::Text("%s", TCHAR_TO_ANSI(*Right));
+	                }
+	                else
+	                {
+	                    ImGui::TableNextColumn();
+	                    ImGui::TextColored(TextColor, "Value");
+	                    ImGui::TableNextColumn();
+	                    ImGui::Text("%s", TCHAR_TO_ANSI(*RuntimeValue));
+	                }
+	            }
 
-                        ImGui::TableNextColumn();
-                        ImGui::Text("%s", TCHAR_TO_ANSI(*Right));
-                    }
-                    else
-                    {
-                        ImGui::TableNextColumn();
-                        ImGui::TextColored(TextColor, "Value");
-                        ImGui::TableNextColumn();
-                        ImGui::Text("%s", TCHAR_TO_ANSI(*RuntimeValue));
-                    }
-                }
+	            ImGui::EndTable();
+	        }
 
-                ImGui::EndTable();
-            }
-
-            FCogWindowWidgets::EndTableTooltip();
+	        FCogWindowWidgets::EndItemTableTooltip();
         }
 
         //------------------------

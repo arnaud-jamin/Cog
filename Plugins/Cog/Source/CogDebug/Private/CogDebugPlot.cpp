@@ -341,7 +341,7 @@ bool FCogDebugPlotEntry::FindValue(float x, float& y) const
             Index = (i + ValueOffset) % Values.size();
         }
 
-        ImVec2 Point = Values[Index];
+        const ImVec2 Point = Values[Index];
         if (Point.x > x)
         {
             FoundAfter = true;

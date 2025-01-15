@@ -61,10 +61,17 @@ void FCogAbilityWindow_Attributes::RenderContent()
             ImGui::Checkbox("Group by Attribute Set", &Config->GroupByAttributeSet);
             ImGui::Checkbox("Group by Category", &Config->GroupByCategory);
             ImGui::Checkbox("Show Only Modified", &Config->ShowOnlyModified);
+
+            FCogWindowWidgets::SetNextItemToShortWidth();
+            FCogWindowWidgets::InputText("Attribute Set Prefixes", Config->AttributeSetPrefixes);
+            ImGui::SetItemTooltip("Prefixes to remove from the attribute set name. Separate multiple prefixes with the semicolon character ';'");
+
             ImGui::Separator();
             ImGui::ColorEdit4("Positive Color", (float*)&AlignmentConfig->PositiveColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
             ImGui::ColorEdit4("Negative Color", (float*)&AlignmentConfig->NegativeColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
             ImGui::ColorEdit4("Neutral Color", (float*)&AlignmentConfig->NeutralColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("AttributeSet Color", (float*)&Config->AttributeSetColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("Category Color", (float*)&Config->CategoryColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
             ImGui::Separator();
             if (ImGui::MenuItem("Reset"))
             {
@@ -78,10 +85,12 @@ void FCogAbilityWindow_Attributes::RenderContent()
         ImGui::EndMenuBar();
     }
 
-    bool bGroupByAttributeSetValue = Filter.IsActive() == false && Config->ShowOnlyModified == false && Config->GroupByAttributeSet;
-    bool bGroupByCategoryValue = Filter.IsActive() == false && Config->ShowOnlyModified == false && Config->GroupByCategory;
+    const bool bGroupByAttributeSetValue = Filter.IsActive() == false && Config->ShowOnlyModified == false && Config->GroupByAttributeSet;
+    const bool bGroupByCategoryValue = Filter.IsActive() == false && Config->ShowOnlyModified == false && Config->GroupByCategory;
+    const float bShowGroup = bGroupByAttributeSetValue | bGroupByCategoryValue;
+    const float FirstColWidth = ((int32)bGroupByAttributeSetValue + (int32)bGroupByCategoryValue) * ImGui::GetFontSize() * 2;
 
-    if (ImGui::BeginTable("Attributes", 3, ImGuiTableFlags_SizingFixedFit 
+    if (ImGui::BeginTable("Attributes", 5, ImGuiTableFlags_SizingFixedFit 
                                          | ImGuiTableFlags_Resizable 
                                          | ImGuiTableFlags_NoBordersInBodyUntilResize 
                                          | ImGuiTableFlags_ScrollY 
@@ -91,6 +100,8 @@ void FCogAbilityWindow_Attributes::RenderContent()
                                          | ImGuiTableFlags_Hideable))
     {
         ImGui::TableSetupScrollFreeze(0, 1);
+        ImGui::TableSetupColumn("-", ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoHeaderLabel | ImGuiTableColumnFlags_NoResize | ImGuiTableColumnFlags_WidthFixed, FirstColWidth);
+        ImGui::TableSetupColumn("Set", bShowGroup ? ImGuiTableColumnFlags_DefaultHide : ImGuiTableColumnFlags_None);
         ImGui::TableSetupColumn("Attribute");
         ImGui::TableSetupColumn("Base");
         ImGui::TableSetupColumn("Current");
@@ -102,23 +113,46 @@ void FCogAbilityWindow_Attributes::RenderContent()
         //------------------------------------------------------------------------------------------
         // Draw all the attribute sets
         //------------------------------------------------------------------------------------------
-        for (const UAttributeSet* Set : AbilitySystemComponent->GetSpawnedAttributes())
+        for (const UAttributeSet* AttributeSet : AbilitySystemComponent->GetSpawnedAttributes())
         {
+            ImGui::PushID(TCHAR_TO_ANSI(*AttributeSet->GetName()));
+
+            FString AttributeSetName = AttributeSet->GetName();
+            if (Config->AttributeSetPrefixes.IsEmpty() == false)
+            {
+                TArray<FString> Prefixes;
+                Config->AttributeSetPrefixes.ParseIntoArray(Prefixes, TEXT(";"));
+
+                for (const FString& Prefix : Prefixes)
+                {
+                    if (AttributeSetName.RemoveFromStart(Prefix, ESearchCase::IgnoreCase))
+                    {
+                        break;
+                    }
+                }
+            }
+
+            const auto AttributeSetNameStr = StringCast<ANSICHAR>(*AttributeSetName);
+
             //------------------------------------------------------------------------------------------
-            // Add an tree node categories are shown
+            // Add a tree node with the name of the attribute set if grouping by attribute set 
             //------------------------------------------------------------------------------------------
             bool bOpenAttributeSet = true;
             if (bGroupByAttributeSetValue)
             {
                 ImGui::TableNextRow();
                 ImGui::TableNextColumn();
-                bOpenAttributeSet = ImGui::TreeNodeEx(TCHAR_TO_ANSI(*Set->GetName()), ImGuiTreeNodeFlags_SpanFullWidth);
+
+            	ImGui::PushStyleColor(ImGuiCol_Text, FCogImguiHelper::ToImVec4(Config->AttributeSetColor));
+                bOpenAttributeSet = ImGui::TreeNodeEx(AttributeSetNameStr.Get(), ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_SpanAllColumns | ImGuiTreeNodeFlags_LabelSpanAllColumns);
+                ImGui::PopStyleColor();
+
             }
 
             if (bOpenAttributeSet)
             {
                 TArray<FGameplayAttribute> AllAttributes;
-                for (TFieldIterator<FProperty> It(Set->GetClass()); It; ++It)
+                for (TFieldIterator<FProperty> It(AttributeSet->GetClass()); It; ++It)
                 {
                     FGameplayAttribute Attribute = *It;
                     if (Attribute.IsValid())
@@ -176,7 +210,9 @@ void FCogAbilityWindow_Attributes::RenderContent()
                     {
                         ImGui::TableNextRow();
                         ImGui::TableNextColumn();
-                        bOpenCategory = ImGui::TreeNodeEx(TCHAR_TO_ANSI(*It.Key), ImGuiTreeNodeFlags_SpanFullWidth);
+                        ImGui::PushStyleColor(ImGuiCol_Text, FCogImguiHelper::ToImVec4(Config->CategoryColor));
+                        bOpenCategory = ImGui::TreeNodeEx(TCHAR_TO_ANSI(*It.Key), ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_SpanAllColumns | ImGuiTreeNodeFlags_LabelSpanAllColumns);
+                        ImGui::PopStyleColor();
                     }
 
                     if (bOpenCategory)
@@ -201,50 +237,55 @@ void FCogAbilityWindow_Attributes::RenderContent()
                         for (const FGameplayAttribute& Attribute : AttributesInCategory)
                         {
                             if (!Attribute.IsValid())
-                            {
-                                continue;
-                            }
+                            { continue; }
 
-                            const auto AttributeName = StringCast<ANSICHAR>(*Attribute.GetName());
+                            const auto AttributeNameStr = StringCast<ANSICHAR>(*Attribute.GetName());
 
-                            if (Filter.PassFilter(AttributeName.Get()) == false)
-                            {
-                                continue;
-                            }
+                            if (Filter.PassFilter(AttributeNameStr.Get()) == false)
+                            { continue; }
 
                             const float BaseValue = AbilitySystemComponent->GetNumericAttributeBase(Attribute);
                             const float CurrentValue = AbilitySystemComponent->GetNumericAttribute(Attribute);
 
                             if (Config->ShowOnlyModified && FMath::IsNearlyEqual(CurrentValue, BaseValue))
-                            {
-                                continue;
-                            }
+                            { continue; }
+
+                            ImGui::PushID(AttributeNameStr.Get());
 
                             ImGui::TableNextRow();
+
+                            //------------------------
+							// Selectable
+							//------------------------
+                            ImGui::TableNextColumn();
+                            if (ImGui::Selectable("", Selected == Index, ImGuiSelectableFlags_SpanAllColumns))
+                            {
+                                Selected = Index;
+                            }
 
                             const ImVec4 Color = FCogImguiHelper::ToImVec4(AlignmentConfig->GetAttributeColor(*AbilitySystemComponent, Attribute));
                             ImGui::PushStyleColor(ImGuiCol_Text, Color);
 
                             //------------------------
-                            // Name
+							// Attribute Set
+							//------------------------
+                            ImGui::TableNextColumn();
+                            ImGui::Text("%s", AttributeSetNameStr.Get());
+
+                            //------------------------
+                            // Attribute  Name
                             //------------------------
                             ImGui::TableNextColumn();
-                            ImGui::Text("");
-                            ImGui::SameLine();
-                            if (ImGui::Selectable(AttributeName.Get(), Selected == Index, ImGuiSelectableFlags_SpanAllColumns))
-                            {
-                                Selected = Index;
-                            }
+                            ImGui::Text("%s", AttributeNameStr.Get());
                             ImGui::PopStyleColor(1);
 
                             //------------------------
                             // Popup
                             //------------------------
-                            if (ImGui::IsItemHovered())
+                            if (FCogWindowWidgets::BeginItemTableTooltip())
                             {
-                                FCogWindowWidgets::BeginTableTooltip();
-                                DrawAttributeInfo(*AbilitySystemComponent, Attribute);
-                                FCogWindowWidgets::EndTableTooltip();
+								DrawAttributeInfo(*AbilitySystemComponent, AttributeSetNameStr.Get(), Attribute);
+								FCogWindowWidgets::EndItemTableTooltip();
                             }
 
                             ImGui::PushStyleColor(ImGuiCol_Text, Color);
@@ -263,6 +304,8 @@ void FCogAbilityWindow_Attributes::RenderContent()
 
                             ImGui::PopStyleColor(1);
 
+                            ImGui::PopID();
+
                             Index++;
                         }
                     }
@@ -274,10 +317,15 @@ void FCogAbilityWindow_Attributes::RenderContent()
                 }
             }
 
-            if (bOpenAttributeSet && bGroupByAttributeSetValue)
+            if (bGroupByAttributeSetValue)
             {
-                ImGui::TreePop();
+                if (bOpenAttributeSet)
+                {
+                    ImGui::TreePop();
+                }
             }
+
+            ImGui::PopID();
         }
 
         ImGui::EndTable();
@@ -285,17 +333,26 @@ void FCogAbilityWindow_Attributes::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogAbilityWindow_Attributes::DrawAttributeInfo(const UAbilitySystemComponent& AbilitySystemComponent, const FGameplayAttribute& Attribute)
+void FCogAbilityWindow_Attributes::DrawAttributeInfo(const UAbilitySystemComponent& AbilitySystemComponent, const char* AttributeSetName, const FGameplayAttribute& Attribute)
 {
     if (ImGui::BeginTable("Attribute", 2, ImGuiTableFlags_Borders))
     {
-        const ImVec4 TextColor(1.0f, 1.0f, 1.0f, 0.5f);
+	    constexpr ImVec4 TextColor(1.0f, 1.0f, 1.0f, 0.5f);
 
         ImGui::TableSetupColumn("Property");
         ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
 
         const float BaseValue = AbilitySystemComponent.GetNumericAttributeBase(Attribute);
         const float CurrentValue = AbilitySystemComponent.GetNumericAttribute(Attribute);
+
+        //------------------------
+        // Attribute Set
+        //------------------------
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+        ImGui::TextColored(TextColor, "Attribute Set");
+        ImGui::TableNextColumn();
+        ImGui::Text("%s", AttributeSetName);
 
         //------------------------
         // Name
@@ -329,7 +386,7 @@ void FCogAbilityWindow_Attributes::DrawAttributeInfo(const UAbilitySystemCompone
         //------------------------
         // Modifiers
         //------------------------
-        FGameplayEffectQuery Query;
+        const FGameplayEffectQuery Query;
         for (const FActiveGameplayEffectHandle& ActiveHandle : AbilitySystemComponent.GetActiveEffects(Query))
         {
             const FActiveGameplayEffect* ActiveEffect = AbilitySystemComponent.GetActiveGameplayEffect(ActiveHandle);

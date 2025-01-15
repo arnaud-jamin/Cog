@@ -2,11 +2,8 @@
 
 #include "AbilitySystemGlobals.h"
 #include "AbilitySystemComponent.h"
-#include "CogAbilityDataAsset.h"
 #include "CogAbilityHelper.h"
-#include "CogAbilityReplicator.h"
 #include "CogImguiHelper.h"
-#include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
 #include "imgui.h"
 
@@ -177,7 +174,7 @@ void FCogAbilityWindow_Tasks::RenderTasksTable(UAbilitySystemComponent& AbilityS
             continue;
         }
 
-		FilteredTasks.Add(Task);
+        FilteredTasks.Add(Task);
     }
 
     if (Config->SortByName)
@@ -237,11 +234,10 @@ void FCogAbilityWindow_Tasks::RenderTasksTable(UAbilitySystemComponent& AbilityS
                 //------------------------
                 // Popup
                 //------------------------
-                if (ImGui::IsItemHovered())
+                if (FCogWindowWidgets::BeginItemTableTooltip())
                 {
-                    FCogWindowWidgets::BeginTableTooltip();
                     RenderTaskInfo(Task);
-                    FCogWindowWidgets::EndTableTooltip();
+                    FCogWindowWidgets::EndItemTableTooltip();
                 }
 
                 //------------------------
@@ -254,7 +250,7 @@ void FCogAbilityWindow_Tasks::RenderTasksTable(UAbilitySystemComponent& AbilityS
                 // IsTicking
                 //------------------------
                 ImGui::TableNextColumn();
-				ImGui::Text(Task->IsTickingTask() ? "Yes" : "No");
+                ImGui::Text(Task->IsTickingTask() ? "Yes" : "No");
 
                 ImGui::PopID();
             }
@@ -275,7 +271,7 @@ void FCogAbilityWindow_Tasks::RenderTaskInfo(const UGameplayTask* Task)
 
     if (ImGui::BeginTable("Task", 2, ImGuiTableFlags_Borders))
     {
-	    constexpr ImVec4 TextColor(1.0f, 1.0f, 1.0f, 0.5f);
+        constexpr ImVec4 TextColor(1.0f, 1.0f, 1.0f, 0.5f);
 
         ImGui::TableSetupColumn("Property");
         ImGui::TableSetupColumn("Value");
@@ -290,8 +286,8 @@ void FCogAbilityWindow_Tasks::RenderTaskInfo(const UGameplayTask* Task)
         ImGui::Text("%s", StringCast<ANSICHAR>(*Task->GetName()).Get());
 
         //------------------------
-		// Instance Name
-		//------------------------
+        // Instance Name
+        //------------------------
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
         ImGui::TextColored(TextColor, "Instance Name");
@@ -299,8 +295,8 @@ void FCogAbilityWindow_Tasks::RenderTaskInfo(const UGameplayTask* Task)
         ImGui::Text("%s", StringCast<ANSICHAR>(*Task->GetInstanceName().ToString()).Get());
 
         //------------------------
-		// Owner
-		//------------------------
+        // Owner
+        //------------------------
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
         ImGui::TextColored(TextColor, "Ability");
@@ -316,9 +312,9 @@ void FCogAbilityWindow_Tasks::RenderTaskInfo(const UGameplayTask* Task)
         ImGui::TableNextColumn();
         RenderTaskState(Task);
 
-		//------------------------
-		// Priority
-		//------------------------
+        //------------------------
+        // Priority
+        //------------------------
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
         ImGui::TextColored(TextColor, "Priority");
@@ -326,17 +322,17 @@ void FCogAbilityWindow_Tasks::RenderTaskInfo(const UGameplayTask* Task)
         ImGui::Text("%d", (int32)Task->GetPriority());
 
         //------------------------
-		// IsTicking
-		//------------------------
+        // IsTicking
+        //------------------------
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
         ImGui::TextColored(TextColor, "Is Ticking");
         ImGui::TableNextColumn();
         ImGui::Text(Task->IsTickingTask() ? "Yes" : "No");
 
-		//------------------------
-		// IsSimulated
-		//------------------------
+        //------------------------
+        // IsSimulated
+        //------------------------
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
         ImGui::TextColored(TextColor, "Is Simulated");
@@ -344,8 +340,8 @@ void FCogAbilityWindow_Tasks::RenderTaskInfo(const UGameplayTask* Task)
         ImGui::Text(Task->IsSimulatedTask() ? "Yes" : "No");
 
         //------------------------
-		// IsSimulating
-		//------------------------
+        // IsSimulating
+        //------------------------
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
         ImGui::TextColored(TextColor, "Is Simulating");
@@ -353,15 +349,15 @@ void FCogAbilityWindow_Tasks::RenderTaskInfo(const UGameplayTask* Task)
         ImGui::Text(Task->IsSimulating() ? "Yes" : "No");
 
         //------------------------
-		// Debug
-		//------------------------
+        // Debug
+        //------------------------
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
         ImGui::TextColored(TextColor, "Debug");
         ImGui::TableNextColumn();
         ImGui::PushTextWrapPos(FCogWindowWidgets::GetFontWidth() * 80);
         ImGui::Text("%s", StringCast<ANSICHAR>(*Task->GetDebugString()).Get());
-	    ImGui::PopTextWrapPos();
+        ImGui::PopTextWrapPos();
 
         ImGui::EndTable();
     }

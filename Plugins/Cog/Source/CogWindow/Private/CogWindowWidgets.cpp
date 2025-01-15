@@ -14,12 +14,17 @@
 #include "InputCoreTypes.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogWindowWidgets::BeginTableTooltip()
+bool FCogWindowWidgets::BeginTableTooltip()
 {
     ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(4, 4));
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
     ImGui::PushStyleColor(ImGuiCol_PopupBg, IM_COL32(29, 42, 62, 240));
-    ImGui::BeginTooltip();
+    if (ImGui::BeginTooltip() == false)
+    {
+        EndTableTooltip();
+        return false;
+    }
+    return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -28,6 +33,21 @@ void FCogWindowWidgets::EndTableTooltip()
     ImGui::EndTooltip();
     ImGui::PopStyleColor();
     ImGui::PopStyleVar(2);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::BeginItemTableTooltip()
+{
+    if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary | ImGuiHoveredFlags_DelayShort) == false)
+    { return false; }
+
+    return BeginTableTooltip();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogWindowWidgets::EndItemTableTooltip()
+{
+    return EndTableTooltip();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -1044,4 +1064,39 @@ bool FCogWindowWidgets::InputText(const char* Text, FString& Value)
     }
 
     return result;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::BeginRightAlign(const char* Id)
+{
+    if (ImGui::BeginTable(Id, 2, ImGuiTableFlags_SizingFixedFit, ImVec2(-1, 0)))
+    {
+        ImGui::TableSetupColumn("a", ImGuiTableColumnFlags_WidthStretch);
+
+        ImGui::TableNextColumn();
+        ImGui::TableNextColumn();
+        return true;
+    }
+    return false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogWindowWidgets::EndRightAlign()
+{
+	ImGui::EndTable();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogWindowWidgets::MenuItemShortcut(const char* Id, const FString& Text)
+{
+    ImGui::SameLine();
+    if (BeginRightAlign(Id))
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
+        const auto TextStr = StringCast<ANSICHAR>(*Text);
+        ImGui::Text("%s", TextStr.Get());
+        ImGui::PopStyleColor();
+
+        EndRightAlign();
+    }
 }

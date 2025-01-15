@@ -213,11 +213,10 @@ void FCogAbilityWindow_Effects::RenderEffectRow(UAbilitySystemComponent& Ability
     //------------------------
     // Popup
     //------------------------
-    if (ImGui::IsItemHovered())
+    if (FCogWindowWidgets::BeginItemTableTooltip())
     {
-        FCogWindowWidgets::BeginTableTooltip();
         RenderEffectInfo(AbilitySystemComponent, ActiveEffect, Effect);
-        FCogWindowWidgets::EndTableTooltip();
+        FCogWindowWidgets::EndItemTableTooltip();
     }
 
     //------------------------
