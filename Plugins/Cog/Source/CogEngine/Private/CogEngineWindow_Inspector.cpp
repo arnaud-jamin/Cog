@@ -205,6 +205,7 @@ void FCogEngineWindow_Inspector::RenderMenu()
                 ImGui::CloseCurrentPopup();
             }
 
+            ImGui::PushID("Favorites");
             for (Favorite& Favorite : Favorites)
             {
                 const TWeakObjectPtr<UObject>& Object = Favorite.Object;
@@ -214,21 +215,26 @@ void FCogEngineWindow_Inspector::RenderMenu()
                     ImGui::CloseCurrentPopup();
                 }
             }
+            ImGui::PopID();
 
             //-----------------------------------
             // HISTORY
             //-----------------------------------
             ImGui::Spacing();
             ImGui::SeparatorText("HISTORY");
+            ImGui::PushID("History");
             for (int32 i = History.Num() - 1; i >= 0; i--)
             {
+                ImGui::PushID(i);
                 const TWeakObjectPtr<const UObject>& Object = History[i];
                 if (ImGui::MenuItem(TCHAR_TO_ANSI(*GetNameSafe(Object.Get())), nullptr, i == HistoryIndex))
                 {
                     NewHistoryIndex = i;
                     ImGui::CloseCurrentPopup();
                 }
+                ImGui::PopID();
             }
+            ImGui::PopID();
 
             ImGui::EndChild();
             ImGui::EndPopup();
