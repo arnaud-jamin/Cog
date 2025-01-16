@@ -7,13 +7,16 @@
 #include "CogWindowHelper.h"
 #include "Components/PrimitiveComponent.h"
 #include "EngineUtils.h"
-#include "IAssetTools.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerInput.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "InputCoreTypes.h"
+
+#if WITH_EDITOR
+#include "IAssetTools.h"
 #include "Subsystems/AssetEditorSubsystem.h"
+#endif
 
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogWindowWidgets::BeginTableTooltip()
@@ -1125,6 +1128,8 @@ bool FCogWindowWidgets::BrowseToAssetButton(const UObject* InAsset, const ImVec2
     }
     return result;
 
+#else
+    return false;
 #endif
 }
 
@@ -1173,6 +1178,8 @@ bool FCogWindowWidgets::OpenAssetButton(const UObject* InAsset, const ImVec2& In
     }
     return result;
 
+#else
+    return false;
 #endif
 }
 
