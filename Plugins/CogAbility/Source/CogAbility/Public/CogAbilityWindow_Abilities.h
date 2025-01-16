@@ -73,9 +73,9 @@ protected:
 
     virtual void DeactivateAbility(UAbilitySystemComponent& AbilitySystemComponent, FGameplayAbilitySpec& Spec);
 
-    virtual void OpenAbility(const FGameplayAbilitySpecHandle& Handle);
+    virtual void OpenAbilityDetails(const FGameplayAbilitySpecHandle& Handle);
 
-    virtual void CloseAbility(const FGameplayAbilitySpecHandle& Handle);
+    virtual void CloseAbilityDetails(const FGameplayAbilitySpecHandle& Handle);
 
     virtual ImVec4 GetAbilityColor(const UAbilitySystemComponent& AbilitySystemComponent, FGameplayAbilitySpec& Spec);
 

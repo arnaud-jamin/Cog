@@ -40,9 +40,18 @@ public class CogWindow : ModuleRules
                 "NetCore",
             }
 			);
-		
-		
-		DynamicallyLoadedModuleNames.AddRange(
+
+		if (Target.bBuildEditor)
+		{
+			PrivateDependencyModuleNames.AddRange(new string[]
+			{
+				"UnrealEd",
+				"AssetTools"
+            });
+		}
+
+
+        DynamicallyLoadedModuleNames.AddRange(
 			new string[]
 			{
 			}

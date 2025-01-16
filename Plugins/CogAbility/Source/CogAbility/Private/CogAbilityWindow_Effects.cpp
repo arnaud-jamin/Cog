@@ -42,9 +42,9 @@ void FCogAbilityWindow_Effects::ResetConfig()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogAbilityWindow_Effects::RenderTick(float DetlaTime)
+void FCogAbilityWindow_Effects::RenderTick(float DeltaTime)
 {
-    Super::RenderTick(DetlaTime);
+    Super::RenderTick(DeltaTime);
 
     RenderOpenEffects();
 }
@@ -224,8 +224,10 @@ void FCogAbilityWindow_Effects::RenderEffectRow(UAbilitySystemComponent& Ability
     //------------------------
     if (ImGui::BeginPopupContextItem())
     {
+        const ImVec2 ButtonsSize = ImVec2(ImGui::GetFontSize() * 10, 0);
+
         bool bOpen = OpenedEffects.Contains(ActiveHandle);
-        if (ImGui::Checkbox("Open", &bOpen))
+        if (ImGui::Checkbox("Open Details", &bOpen))
         {
             if (bOpen)
             {
@@ -238,11 +240,13 @@ void FCogAbilityWindow_Effects::RenderEffectRow(UAbilitySystemComponent& Ability
             ImGui::CloseCurrentPopup();
         }
 
-        if (ImGui::Button("Remove"))
+        if (ImGui::Button("Remove", ButtonsSize))
         {
             AbilitySystemComponent.RemoveActiveGameplayEffect(ActiveHandle);
             ImGui::CloseCurrentPopup();
         }
+
+        FCogWindowWidgets::OpenObjectAssetButton(EffectPtr, ButtonsSize);
 
         ImGui::EndPopup();
     }

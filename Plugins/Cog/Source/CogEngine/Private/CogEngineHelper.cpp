@@ -18,19 +18,7 @@ void FCogEngineHelper::ActorContextMenu(AActor& Actor)
     FCogWindowWidgets::ThinSeparatorText("Object");
 
 #if WITH_EDITOR
-    const UObject* DefaultObject = Actor.GetClass()->GetDefaultObject();
-    if (DefaultObject == nullptr)
-    {
-        ImGui::BeginDisabled();
-    }
-    if (ImGui::Button("Browse To Asset", ImVec2(-1, 0)))
-    {
-		IAssetTools::Get().SyncBrowserToAssets({ DefaultObject });
-    }
-    if (DefaultObject == nullptr)
-    {
-        ImGui::EndDisabled();
-    }
+    FCogWindowWidgets::OpenObjectAssetButton(&Actor, ImVec2(-1, 0));
 #endif
 
     if (ImGui::Button("Delete", ImVec2(-1, 0)))

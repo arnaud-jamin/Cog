@@ -120,6 +120,15 @@ public:
     static void EndRightAlign();
 
     static void MenuItemShortcut(const char* Id, const FString& Text);
+
+    static bool BrowseToAssetButton(const UObject* InAsset, const ImVec2& InSize = ImVec2(0, 0));
+
+    static bool BrowseToObjectAssetButton(const UObject* InObject, const ImVec2& InSize = ImVec2(0, 0));
+
+    static bool OpenAssetButton(const UObject* InAsset, const ImVec2& InSize = ImVec2(0, 0));
+
+	static bool OpenObjectAssetButton(const UObject* InObject, const ImVec2& InSize = ImVec2(0, 0));
+
 };
 
 template<typename EnumType>

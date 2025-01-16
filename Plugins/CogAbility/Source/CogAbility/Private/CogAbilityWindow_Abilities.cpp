@@ -222,7 +222,7 @@ void FCogAbilityWindow_Abilities::RenderAbilitiesTableAbilityName(UAbilitySystem
                 
         if (ImGui::IsMouseDoubleClicked(0))
         {
-            OpenAbility(Spec.Handle);
+            OpenAbilityDetails(Spec.Handle);
         }
     }
 
@@ -259,7 +259,7 @@ void FCogAbilityWindow_Abilities::RenderAbilitiesTable(UAbilitySystemComponent& 
 {
     TArray<FGameplayAbilitySpec>& Abilities = AbilitySystemComponent.GetActivatableAbilities();
 
-    TArray<FGameplayAbilitySpec> FitleredAbilities;
+    TArray<FGameplayAbilitySpec> FilteredAbilities;
 
     for (FGameplayAbilitySpec& Spec : Abilities)
     {
@@ -280,12 +280,12 @@ void FCogAbilityWindow_Abilities::RenderAbilitiesTable(UAbilitySystemComponent& 
             continue;
         }
         
-        FitleredAbilities.Add(Spec);
+        FilteredAbilities.Add(Spec);
     }
 
     if (Config->SortByName)
     {
-        FitleredAbilities.Sort([](const FGameplayAbilitySpec& Lhs, const FGameplayAbilitySpec& Rhs)
+        FilteredAbilities.Sort([](const FGameplayAbilitySpec& Lhs, const FGameplayAbilitySpec& Rhs)
         {
             return Lhs.Ability.GetName().Compare(Rhs.Ability.GetName()) < 0;
         });
@@ -296,7 +296,7 @@ void FCogAbilityWindow_Abilities::RenderAbilitiesTable(UAbilitySystemComponent& 
         static int SelectedIndex = -1;
         int Index = 0;
 
-        for (FGameplayAbilitySpec& Spec : FitleredAbilities)
+        for (FGameplayAbilitySpec& Spec : FilteredAbilities)
         {
             UGameplayAbility* Ability = Spec.GetPrimaryInstance();
             if (Ability == nullptr)
@@ -474,36 +474,45 @@ void FCogAbilityWindow_Abilities::RenderAbilityContextMenu(UAbilitySystemCompone
     if (ImGui::BeginPopupContextItem())
     {
         bool bOpen = OpenedAbilities.Contains(Spec.Handle);
-        if (ImGui::Checkbox("Open", &bOpen))
+        if (ImGui::Checkbox("Open Details", &bOpen))
         {
             if (bOpen)
             {
-                OpenAbility(Spec.Handle);
+                OpenAbilityDetails(Spec.Handle);
             }
             else
             {
-                CloseAbility(Spec.Handle);
+                CloseAbilityDetails(Spec.Handle);
             }
             ImGui::CloseCurrentPopup();
         }
 
-        if (ImGui::Button("Remove"))
+        const ImVec2 ButtonsSize= ImVec2(ImGui::GetFontSize() * 10, 0);
+
+        if (ImGui::Button("Cancel", ButtonsSize))
+        {
+            AbilitySystemComponent.CancelAbilityHandle(Spec.Handle);
+        }
+
+        if (ImGui::Button("Remove", ButtonsSize))
         {
             AbilityHandleToRemove = Spec.Handle;
         }
+
+        FCogWindowWidgets::OpenObjectAssetButton(Spec.Ability, ButtonsSize);
 
         ImGui::EndPopup();
     }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogAbilityWindow_Abilities::OpenAbility(const FGameplayAbilitySpecHandle& Handle)
+void FCogAbilityWindow_Abilities::OpenAbilityDetails(const FGameplayAbilitySpecHandle& Handle)
 {
     OpenedAbilities.AddUnique(Handle);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogAbilityWindow_Abilities::CloseAbility(const FGameplayAbilitySpecHandle& Handle)
+void FCogAbilityWindow_Abilities::CloseAbilityDetails(const FGameplayAbilitySpecHandle& Handle)
 {
     OpenedAbilities.Remove(Handle);
 }

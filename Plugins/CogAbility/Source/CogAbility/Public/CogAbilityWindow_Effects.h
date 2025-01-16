@@ -32,7 +32,7 @@ protected:
 
     virtual void RenderContent() override;
 
-    virtual void RenderTick(float DetlaTime) override;
+    virtual void RenderTick(float DeltaTime) override;
 
     virtual void ResetConfig() override;
 

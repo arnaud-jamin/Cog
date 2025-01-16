@@ -7,11 +7,13 @@
 #include "CogWindowHelper.h"
 #include "Components/PrimitiveComponent.h"
 #include "EngineUtils.h"
+#include "IAssetTools.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerInput.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "InputCoreTypes.h"
+#include "Subsystems/AssetEditorSubsystem.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogWindowWidgets::BeginTableTooltip()
@@ -1100,3 +1102,99 @@ void FCogWindowWidgets::MenuItemShortcut(const char* Id, const FString& Text)
         EndRightAlign();
     }
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::BrowseToAssetButton(const UObject* InAsset, const ImVec2& InSize)
+{
+#if WITH_EDITOR
+
+    if (InAsset == nullptr)
+    {
+        ImGui::BeginDisabled();
+    }
+
+	const bool result = ImGui::Button("Browse To Asset", InSize);
+    if (result)
+    {
+        IAssetTools::Get().SyncBrowserToAssets({ InAsset });
+    }
+
+    if (InAsset == nullptr)
+    {
+        ImGui::EndDisabled();
+    }
+    return result;
+
+#endif
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::BrowseToObjectAssetButton(const UObject* InObject, const ImVec2& InSize)
+{
+#if WITH_EDITOR
+
+    const UObject* ObjectAsset = nullptr;
+	if (InObject != nullptr && InObject->GetClass() != nullptr)
+	{
+        ObjectAsset = InObject->GetClass()->ClassGeneratedBy;
+	}
+
+    return BrowseToAssetButton(ObjectAsset, InSize);
+
+#else
+    return false;
+#endif
+
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::OpenAssetButton(const UObject* InAsset, const ImVec2& InSize)
+{
+#if WITH_EDITOR
+
+    UAssetEditorSubsystem* editorSubsystem = GEditor->GetEditorSubsystem<UAssetEditorSubsystem>();
+    if (InAsset == nullptr || editorSubsystem == nullptr)
+    {
+        ImGui::BeginDisabled();
+    }
+
+	const bool result = ImGui::Button("Open Asset", InSize);
+    if (result)
+    {
+        if (editorSubsystem != nullptr)
+        {
+			editorSubsystem->OpenEditorForAsset(InAsset);
+        }
+    }
+
+    if (InAsset == nullptr)
+    {
+        ImGui::EndDisabled();
+    }
+    return result;
+
+#endif
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::OpenObjectAssetButton(const UObject* InObject, const ImVec2& InSize)
+{
+#if WITH_EDITOR
+
+    const UObject* ObjectAsset = nullptr;
+    if (InObject != nullptr && InObject->GetClass() != nullptr)
+    {
+        ObjectAsset = InObject->GetClass()->ClassGeneratedBy;
+    }
+
+    return OpenAssetButton(ObjectAsset, InSize);
+
+#else
+    return false;
+#endif
+
+}
+
+
+
+  
