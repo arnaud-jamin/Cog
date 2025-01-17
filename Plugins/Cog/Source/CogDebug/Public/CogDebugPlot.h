@@ -57,7 +57,6 @@ struct COGDEBUG_API FCogDebugPlotEntry
     FCogDebugPlotEvent& AddEvent(const FCogDebugPlotEntry& OwnwePlot, FString OwnerName, bool IsInstant, const FName EventId, const int32 Row, const FColor& Color);
     FCogDebugPlotEvent& StopEvent(const FName EventId);
     void UpdateTime(const UWorld* World);
-    int32 FindFreeRow() const;
     FCogDebugPlotEvent* GetLastEvent();
     FCogDebugPlotEvent* FindLastEventByName(FName EventId);
 
@@ -109,14 +108,24 @@ private:
     friend struct FCogDebugPlotEntry;
 
     static void ResetLastAddedEvent();
-    static FCogDebugPlotEntry* RegisterPlot(const UObject* Owner, const FName PlotName, bool IsEventPlot);
-    FCogDebugPlotEventParams* PlotEventAddParam(const FName Name);
+
+	static FCogDebugPlotEntry* RegisterPlot(const UObject* Owner, const FName PlotName, bool IsEventPlot);
+    
     static FCogDebugPlotEvent* GetLastAddedEvent();
 
+    static void OccupyRow(const int32 Row);
+
+    static void FreeRow(const int32 Row);
+
+    static int32 FindFreeEventRow();
+
     static FName LastAddedEventPlotName;
-    static int32 LastAddedEventIndex;
+
+	static int32 LastAddedEventIndex;
 
     static FCogDebugPlotEvent DefaultEvent;
+
+    static TMap<int32, int32> OccupiedRowMap;
 };
 
 #endif //ENABLE_COG

@@ -106,11 +106,6 @@ void FCogEngineWindow_Plots::RenderMenu()
 
         if (ImGui::BeginMenu("Options"))
         {
-            if (ImGui::MenuItem("Clear data"))
-            {
-                FCogDebugPlot::Clear();
-            }
-
             if (ImGui::MenuItem("Reset"))
             {
                 FCogDebugPlot::Pause = false;
@@ -152,6 +147,11 @@ void FCogEngineWindow_Plots::RenderMenu()
             ImGui::SetItemTooltip("Background color of the plot when paused.");
 
             ImGui::EndMenu();
+        }
+
+        if (ImGui::MenuItem("Clear"))
+        {
+            FCogDebugPlot::Clear();
         }
 
         FCogWindowWidgets::ToggleMenuButton(&FCogDebugPlot::Pause, "Pause", ImVec4(1.0f, 0.0f, 0.0f, 1.0f));

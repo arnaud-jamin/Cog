@@ -1,7 +1,6 @@
 #include "CogDebugPlot.h"
 
 #include "CogDebug.h"
-#include "CogDebugDraw.h"
 #include "CogDebugHelper.h"
 #include "CogImguiHelper.h"
 #include "Engine/Engine.h"
@@ -13,6 +12,7 @@ bool FCogDebugPlot::IsVisible = false;
 bool FCogDebugPlot::Pause = false;
 FName FCogDebugPlot::LastAddedEventPlotName = NAME_None;
 int32 FCogDebugPlot::LastAddedEventIndex = INDEX_NONE;
+TMap<int32, int32> FCogDebugPlot::OccupiedRowMap;
 
 //--------------------------------------------------------------------------------------------------------------------------
 // FCogPlotEvent
@@ -131,10 +131,9 @@ FCogDebugPlotEvent& FCogDebugPlotEntry::AddEvent(
         Events.Reserve(200);
     }
 
-    //-----------------------------------------------------------------------
-    // We currently having two events with the same name at the same time.
-    // So we stop the current one if any exist.
-    //-----------------------------------------------------------------------
+    //----------------------------
+    // Stop if any already exist.
+    //----------------------------
     StopEvent(EventId);
 
     FCogDebugPlotEvent* Event = nullptr;
@@ -159,7 +158,12 @@ FCogDebugPlotEvent& FCogDebugPlotEntry::AddEvent(
     Event->EndTime = IsInstant ? OwnwePlot.Time : 0.0f;
     Event->StartFrame = OwnwePlot.Frame;
     Event->EndFrame = IsInstant ? OwnwePlot.Frame : 0.0f;
-    Event->Row = (Row == FCogDebugPlot::AutoRow) ? OwnwePlot.FindFreeRow() : Row;
+    Event->Row = (Row == FCogDebugPlot::AutoRow) ? FCogDebugPlot::FindFreeEventRow() : Row;
+
+    if (IsInstant == false)
+    {
+        FCogDebugPlot::OccupyRow(Event->Row);
+    }
 
     MaxRow = FMath::Max(Event->Row, MaxRow);
 
@@ -187,6 +191,8 @@ FCogDebugPlotEvent& FCogDebugPlotEntry::StopEvent(const FName EventId)
     {
         Event->EndTime = Time;
         Event->EndFrame = Frame;
+
+		FCogDebugPlot::FreeRow(Event->Row);
     }
 
     return *Event;
@@ -237,54 +243,6 @@ FCogDebugPlotEvent* FCogDebugPlotEntry::FindLastEventByName(FName EventId)
     }
 
     return nullptr;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-int32 FCogDebugPlotEntry::FindFreeRow() const
-{
-    static float InstantTimeThreshold = 1.0f;
-    static float TotalTimeThreshold = 10.0f;
-    TSet<int32> OccupiedRows;
-
-    for (int32 i = Events.Num() - 1; i >= 0; --i)
-    {
-        int32 Index = i;
-        if (EventOffset != 0)
-        {
-            Index = (i + EventOffset) % Events.Num();
-        }
-        const FCogDebugPlotEvent& Event = Events[Index];
-
-        if (Event.EndTime != 0.0f && Time > Event.EndTime + TotalTimeThreshold)
-        {
-            break;
-        }
-
-        if (Event.StartTime == Event.EndTime && Time > Event.EndTime + InstantTimeThreshold)
-        {
-            continue;
-        }
-
-        if (Event.EndTime != 0.0f)
-        {
-            continue;
-        }
-
-        OccupiedRows.Add(Event.Row);
-    }
-
-    int32 FreeRow = 0;
-    while (true)
-    {
-        if (OccupiedRows.Contains(FreeRow) == false)
-        {
-            break;
-        }
-
-        FreeRow++;
-    }
-
-    return FreeRow;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -368,6 +326,7 @@ bool FCogDebugPlotEntry::FindValue(float x, float& y) const
 void FCogDebugPlot::Reset()
 {
     Plots.Empty();
+    OccupiedRowMap.Empty();
     Pause = false;
     ResetLastAddedEvent();
 }
@@ -375,11 +334,12 @@ void FCogDebugPlot::Reset()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugPlot::Clear()
 {
-    for (FCogDebugPlotEntry& Entry : FCogDebugPlot::Plots)
+    for (FCogDebugPlotEntry& Entry : Plots)
     {
         Entry.Clear();
     }
 
+    OccupiedRowMap.Empty();
     ResetLastAddedEvent();
 }
 
@@ -522,3 +482,45 @@ FCogDebugPlotEvent& FCogDebugPlot::PlotEventToggle(const UObject* WorldContextOb
         return PlotEventStop(WorldContextObject, PlotName, EventId);
     }
 }
+
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogDebugPlot::OccupyRow(const int32 Row)
+{
+    if (int32* RowOccupation = OccupiedRowMap.Find(Row))
+    {
+        (*RowOccupation)++;
+    }
+    else
+    {
+        OccupiedRowMap.Add(Row, 1);
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogDebugPlot::FreeRow(const int32 Row)
+{
+    if (int32* RowOccupation = OccupiedRowMap.Find(Row))
+    {
+        (*RowOccupation)--;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+int32 FCogDebugPlot::FindFreeEventRow() 
+{
+    constexpr int32 MaxRows = 100;
+
+    int32 FreeRow = 0;
+    for (; FreeRow < MaxRows; ++FreeRow)
+    {
+        const int32* Occupation = OccupiedRowMap.Find(FreeRow);
+        if (Occupation == nullptr || *Occupation == 0)
+        {
+            break;
+        }
+    }
+
+    return FreeRow;
+}
+

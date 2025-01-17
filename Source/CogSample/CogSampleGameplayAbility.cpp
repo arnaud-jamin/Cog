@@ -8,6 +8,10 @@
 #include "CogSamplePlayerController.h"
 #include "CogSampleSpawnPredictionComponent.h"
 
+#if ENABLE_COG
+#include "CogDebugPlot.h"
+#endif
+
 //--------------------------------------------------------------------------------------------------------------------------
 UCogSampleGameplayAbility::UCogSampleGameplayAbility()
 {
@@ -18,8 +22,24 @@ UCogSampleGameplayAbility::UCogSampleGameplayAbility()
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSampleGameplayAbility::PreActivate(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData)
 {
+#if ENABLE_COG
+
     COG_LOG_ABILITY(ELogVerbosity::Verbose, this, TEXT(""));
+
+    FCogDebugPlot::PlotEventStart(this, "Ability", GetFName())
+		.AddParam("Name", GetNameSafe(this))
+		.AddParam("Owner", GetNameSafe(ActorInfo->OwnerActor.Get()))
+		.AddParam("Avatar", GetNameSafe(ActorInfo->AvatarActor.Get()))
+		.AddParam("Player Controller", GetNameSafe(ActorInfo->PlayerController.Get()))
+		.AddParam("Prediction Key", ActivationInfo.GetActivationPredictionKey().ToString())
+		.AddParam("Event Tag", TriggerEventData ? *TriggerEventData->EventTag.ToString() : FString("None"))
+		.AddParam("Event Magnitude", TriggerEventData ? TriggerEventData->EventMagnitude : 0.0f);
+
+#endif
+
     Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
+
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -33,7 +53,14 @@ void UCogSampleGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 void UCogSampleGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
     Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+
+#if ENABLE_COG
+
     COG_LOG_ABILITY(ELogVerbosity::Verbose, this, TEXT(""));
+
+    FCogDebugPlot::PlotEventStop(this, "Ability", GetFName());
+
+#endif
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
