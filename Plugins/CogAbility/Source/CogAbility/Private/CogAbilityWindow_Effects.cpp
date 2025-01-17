@@ -280,7 +280,7 @@ void FCogAbilityWindow_Effects::RenderEffectRow(UAbilitySystemComponent& Ability
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Effects::RenderEffectInfo(const UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffect& ActiveEffect, const UGameplayEffect& Effect)
 {
-    if (ImGui::BeginTable("Effect", 2, ImGuiTableFlags_Borders))
+    if (ImGui::BeginTable("Effect", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable))
     {
         constexpr ImVec4 TextColor(1.0f, 1.0f, 1.0f, 0.5f);
 

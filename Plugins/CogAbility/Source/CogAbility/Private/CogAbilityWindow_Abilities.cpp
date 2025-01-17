@@ -155,19 +155,23 @@ void FCogAbilityWindow_Abilities::RenderAbilitiesMenu(AActor* Selection)
 
             ImGui::Separator();
 
-            RenderAbilitiesMenuFilters();
-
-            ImGui::Separator();
+            ImGui::Checkbox("Sort by Name", &Config->SortByName);
 
             RenderAbilitiesMenuColorSettings();
 
             ImGui::Separator();
 
-            if (ImGui::MenuItem("Reset"))
+            if (ImGui::MenuItem("Reset Settings"))
             {
                 ResetConfig();
             }
 
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Filters"))
+        {
+            RenderAbilitiesMenuFilters();
             ImGui::EndMenu();
         }
 
@@ -180,11 +184,10 @@ void FCogAbilityWindow_Abilities::RenderAbilitiesMenu(AActor* Selection)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Abilities::RenderAbilitiesMenuFilters()
 {
-    ImGui::Checkbox("Sort by Name", &Config->SortByName);
-    ImGui::Checkbox("Show Active", &Config->ShowActive);
-    ImGui::Checkbox("Show Inactive", &Config->ShowInactive);
-    ImGui::Checkbox("Show Pressed", &Config->ShowPressed);
-    ImGui::Checkbox("Show Blocked", &Config->ShowBlocked);
+    ImGui::Checkbox("Active", &Config->ShowActive);
+    ImGui::Checkbox("Inactive", &Config->ShowInactive);
+    ImGui::Checkbox("Pressed", &Config->ShowPressed);
+    ImGui::Checkbox("Blocked", &Config->ShowBlocked);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -487,7 +490,7 @@ void FCogAbilityWindow_Abilities::RenderAbilityContextMenu(UAbilitySystemCompone
             ImGui::CloseCurrentPopup();
         }
 
-        const ImVec2 ButtonsSize= ImVec2(ImGui::GetFontSize() * 10, 0);
+        const ImVec2 ButtonsSize = ImVec2(ImGui::GetFontSize() * 10, 0);
 
         if (ImGui::Button("Cancel", ButtonsSize))
         {
@@ -543,7 +546,7 @@ void FCogAbilityWindow_Abilities::RenderAbilityInfo(const UAbilitySystemComponen
         return;
     }
 
-    if (ImGui::BeginTable("Ability", 2, ImGuiTableFlags_Borders))
+    if (ImGui::BeginTable("Ability", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable))
     {
         constexpr ImVec4 TextColor(1.0f, 1.0f, 1.0f, 0.5f);
 
