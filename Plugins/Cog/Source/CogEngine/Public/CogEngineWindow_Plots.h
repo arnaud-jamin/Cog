@@ -26,15 +26,17 @@ protected:
 
     virtual void RenderContent() override;
 
-    static void RenderPlotsList(const ImVec2& InSize);
+    virtual void RenderAllEntriesNames(const ImVec2& InSize);
 
-    void RenderPlots(const TArray<FCogDebugPlotEntry*>& VisiblePlots) const;
+    virtual void RenderEntryName(const int Index, FCogDebugPlotEntry& Entry);
 
-    void RenderMenu();
+    virtual void RenderPlots(const TArray<FCogDebugPlotEntry*>& VisiblePlots) const;
 
-    void RenderValues(FCogDebugPlotEntry& Entry, const char* Label) const;
+    virtual void RenderMenu();
 
-    void RenderEvents(FCogDebugPlotEntry& Entry, const char* Label, const ImVec2& PlotMin, const ImVec2& PlotMax) const;
+    virtual void RenderValues(FCogDebugPlotEntry& Entry, const char* Label) const;
+
+    virtual void RenderEvents(FCogDebugPlotEntry& Entry, const char* Label, const ImVec2& PlotMin, const ImVec2& PlotMax) const;
 
     static void RenderEventTooltip(const FCogDebugPlotEvent* HoveredEvent, const FCogDebugPlotEntry& Entry);
 
@@ -70,13 +72,13 @@ public:
     bool ShowValueAtCursor = true;
 
     UPROPERTY(Config)
-    float DragViewSensitivity = 10.0f;
+    float DragPauseSensitivity = 10.0f;
 
     UPROPERTY(Config)
     FColor PauseBackgroundColor = FColor(10, 0, 0, 255);
 
     UPROPERTY(Config)
-    bool DockPlotList = false;
+    bool DockEntries = false;
 
     virtual void Reset() override
     {
@@ -85,8 +87,8 @@ public:
         ShowTimeBarAtGameTime = true;
         ShowTimeBarAtCursor = true;
         ShowValueAtCursor = true;
-        DragViewSensitivity = 10.0f;
+        DragPauseSensitivity = 10.0f;
         PauseBackgroundColor = FColor(10, 0, 0, 255);
-        DockPlotList = false;
+        DockEntries = false;
     }
 };

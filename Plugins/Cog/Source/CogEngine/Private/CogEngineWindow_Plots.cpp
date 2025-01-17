@@ -16,6 +16,8 @@ void FCogEngineWindow_Plots::Initialize()
     bNoPadding = true;
 
     Config = GetConfig<UCogEngineConfig_Plots>();
+
+	FCogDebugPlot::Clear();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -50,15 +52,23 @@ void FCogEngineWindow_Plots::RenderContent()
     TArray<FCogDebugPlotEntry*> VisiblePlots;
     for (FCogDebugPlotEntry& Plot : FCogDebugPlot::Plots)
     {
-        if (Plot.CurrentYAxis != ImAxis_COUNT && Plot.CurrentRow != INDEX_NONE)
+        if (Plot.YAxis != ImAxis_COUNT && Plot.GraphIndex != INDEX_NONE)
         {
             VisiblePlots.Add(&Plot);
         }
     }
 
+    for (FCogDebugPlotEntry& Event : FCogDebugPlot::Events)
+    {
+        if (Event.YAxis != ImAxis_COUNT && Event.GraphIndex != INDEX_NONE)
+        {
+            VisiblePlots.Add(&Event);
+        }
+    }
+
     RenderMenu();
 
-    if (Config->DockPlotList)
+    if (Config->DockEntries)
     {
         if (ImGui::BeginTable("PlotTable", 2, ImGuiTableFlags_RowBg
             | ImGuiTableFlags_Resizable
@@ -73,7 +83,7 @@ void FCogEngineWindow_Plots::RenderContent()
 
 
             ImGui::TableNextColumn();
-            RenderPlotsList(ImVec2(0, -1));
+            RenderAllEntriesNames(ImVec2(0, -1));
 
             ImGui::TableNextColumn();
             RenderPlots(VisiblePlots);
@@ -95,11 +105,11 @@ void FCogEngineWindow_Plots::RenderMenu()
 {
     if (ImGui::BeginMenuBar())
     {
-        if (Config->DockPlotList == false)
+        if (Config->DockEntries == false)
         {
-            if (ImGui::BeginMenu("Plots"))
+            if (ImGui::BeginMenu("Entries"))
             {
-                RenderPlotsList(ImVec2(ImGui::GetFontSize() * 15, ImGui::GetFontSize() * 20));
+                RenderAllEntriesNames(ImVec2(ImGui::GetFontSize() * 15, ImGui::GetFontSize() * 20));
                 ImGui::EndMenu();
             }
         }
@@ -122,13 +132,13 @@ void FCogEngineWindow_Plots::RenderMenu()
             }
             
             FCogWindowWidgets::SetNextItemToShortWidth();
-            if (ImGui::SliderFloat("Time range", &Config->TimeRange, 1.0f, 30.0f, "%0.1f"))
+            if (ImGui::SliderFloat("Time range", &Config->TimeRange, 1.0f, 100.0f, "%0.1f"))
             {
                 bApplyTimeScale = true;
             }
 
             FCogWindowWidgets::SetNextItemToShortWidth();
-            ImGui::SliderFloat("Drag view sensitivity", &Config->DragViewSensitivity, 1.0f, 50.0f, "%0.0f");
+            ImGui::SliderFloat("Drag pause sensitivity", &Config->DragPauseSensitivity, 1.0f, 50.0f, "%0.0f");
 
             FCogWindowWidgets::SetNextItemToShortWidth();
             ImGui::Checkbox("Show time bar at game time", &Config->ShowTimeBarAtGameTime);
@@ -140,7 +150,7 @@ void FCogEngineWindow_Plots::RenderMenu()
             ImGui::Checkbox("Show value at cursor", &Config->ShowValueAtCursor);
 
             FCogWindowWidgets::SetNextItemToShortWidth();
-            ImGui::Checkbox("Dock plots", &Config->DockPlotList);
+            ImGui::Checkbox("Dock entries", &Config->DockEntries);
 
             constexpr ImGuiColorEditFlags ColorEditFlags = ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf;
             FCogImguiHelper::ColorEdit4("Pause background color", Config->PauseBackgroundColor, ColorEditFlags);
@@ -161,48 +171,90 @@ void FCogEngineWindow_Plots::RenderMenu()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Plots::RenderPlotsList(const ImVec2& InSize)
+void FCogEngineWindow_Plots::RenderEntryName(const int Index, FCogDebugPlotEntry& Entry)
 {
-    if (ImGui::BeginChild("Plots", InSize))
+	ImGui::PushID(Index);
+
+	const bool IsAssignedToRow = Entry.GraphIndex != INDEX_NONE;
+	if (ImGui::Selectable(TCHAR_TO_ANSI(*Entry.Name.ToString()), IsAssignedToRow, ImGuiSelectableFlags_AllowDoubleClick))
+	{
+		if (IsAssignedToRow)
+		{
+            Entry.ResetGraphAndAxis();
+		}
+		else
+		{
+            Entry.AssignGraphAndAxis(0, ImAxis_Y1);
+		}
+	}
+
+	if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+	{
+		const auto EntryName = StringCast<ANSICHAR>(*Entry.Name.ToString());
+		ImGui::SetDragDropPayload("DragAndDrop", EntryName.Get(), EntryName.Length() + 1);
+		ImGui::Text("%s", EntryName.Get());
+		ImGui::EndDragDropSource();
+	}
+
+	ImGui::PopID();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_Plots::RenderAllEntriesNames(const ImVec2& InSize)
+{
+    if (ImGui::BeginChild("Entries", InSize))
     {
-        int Index = 0;
-
-        ImGui::Indent(6);
-
-        for (FCogDebugPlotEntry& Plot : FCogDebugPlot::Plots)
+        if (Config->DockEntries)
         {
-            ImGui::PushID(Index);
-
-            ImGui::PushStyleColor(ImGuiCol_Text, Plot.IsEventPlot ? IM_COL32(128, 128, 255, 255) : IM_COL32(255, 255, 255, 255));
-
-            const bool IsAssignedToRow = Plot.CurrentRow != INDEX_NONE;
-            if (ImGui::Selectable(TCHAR_TO_ANSI(*Plot.Name.ToString()), IsAssignedToRow, ImGuiSelectableFlags_AllowDoubleClick))
-            {
-                if (IsAssignedToRow)
-                {
-                    Plot.ResetAxis();
-                }
-                else
-                {
-                    Plot.AssignAxis(0, ImAxis_Y1);
-                }
-            }
-
-            ImGui::PopStyleColor();
-
-            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
-            {
-                const auto EntryName = StringCast<ANSICHAR>(*Plot.Name.ToString());
-                ImGui::SetDragDropPayload("DragAndDrop", EntryName.Get(), EntryName.Length() + 1);
-                ImGui::Text("%s", EntryName.Get());
-                ImGui::EndDragDropSource();
-            }
-
-            ImGui::PopID();
-            Index++;
+            ImGui::Indent(6);
         }
 
-        ImGui::Unindent();
+        int Index = 0;
+
+        ImGui::PushStyleColor(ImGuiCol_Header, IM_COL32(66, 66, 66, 79));
+        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, IM_COL32(62, 62, 62, 204));
+        ImGui::PushStyleColor(ImGuiCol_HeaderActive, IM_COL32(86, 86, 86, 255));
+        if (ImGui::CollapsingHeader("Events", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+			if (FCogDebugPlot::Events.IsEmpty())
+			{
+				ImGui::TextDisabled("No event added yet");
+			}
+            else
+            {
+	            for (FCogDebugPlotEntry& Event : FCogDebugPlot::Events)
+	            {
+	                RenderEntryName(Index, Event);
+	                Index++;
+	            }
+            }
+        }
+        ImGui::PopStyleColor(3);
+
+        ImGui::PushStyleColor(ImGuiCol_Header, IM_COL32(66, 66, 66, 79));
+        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, IM_COL32(62, 62, 62, 204));
+        ImGui::PushStyleColor(ImGuiCol_HeaderActive, IM_COL32(86, 86, 86, 255));
+        if (ImGui::CollapsingHeader("Plots", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            if (FCogDebugPlot::Plots.IsEmpty())
+            {
+                ImGui::TextDisabled("No plot added yet");
+            }
+            else
+            {
+		        for (FCogDebugPlotEntry& Plot : FCogDebugPlot::Plots)
+		        {
+		            RenderEntryName(Index, Plot);
+		            Index++;
+		        }
+            }
+        }
+        ImGui::PopStyleColor(3);
+
+        if (Config->DockEntries)
+        {
+            ImGui::Unindent();
+        }
     }
     ImGui::EndChild();
 
@@ -210,9 +262,9 @@ void FCogEngineWindow_Plots::RenderPlotsList(const ImVec2& InSize)
     {
         if (const ImGuiPayload* Payload = ImGui::AcceptDragDropPayload("DragAndDrop"))
         {
-            if (FCogDebugPlotEntry* Plot = FCogDebugPlot::FindPlot(FName((const char*)Payload->Data)))
+            if (FCogDebugPlotEntry* Plot = FCogDebugPlot::FindEntry(FName((const char*)Payload->Data)))
             {
-                Plot->ResetAxis();
+                Plot->ResetGraphAndAxis();
             }
         }
         ImGui::EndDragDropTarget();
@@ -246,9 +298,9 @@ void FCogEngineWindow_Plots::RenderPlots(const TArray<FCogDebugPlotEntry*>& Visi
 
                     for (const FCogDebugPlotEntry* PlotPtr : VisiblePlots)
                     {
-                        HasPlotOnAxisY1 |= PlotPtr->CurrentYAxis == ImAxis_Y1 && PlotPtr->CurrentRow == PlotIndex;
-                        HasPlotOnAxisY2 |= PlotPtr->CurrentYAxis == ImAxis_Y2 && PlotPtr->CurrentRow == PlotIndex;
-                        HasPlotOnAxisY3 |= PlotPtr->CurrentYAxis == ImAxis_Y3 && PlotPtr->CurrentRow == PlotIndex;
+                        HasPlotOnAxisY1 |= PlotPtr->YAxis == ImAxis_Y1 && PlotPtr->GraphIndex == PlotIndex;
+                        HasPlotOnAxisY2 |= PlotPtr->YAxis == ImAxis_Y2 && PlotPtr->GraphIndex == PlotIndex;
+                        HasPlotOnAxisY3 |= PlotPtr->YAxis == ImAxis_Y3 && PlotPtr->GraphIndex == PlotIndex;
                     }
 
                     ImPlot::SetupAxis(ImAxis_X1, nullptr, ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoGridLines);
@@ -297,12 +349,12 @@ void FCogEngineWindow_Plots::RenderPlots(const TArray<FCogDebugPlotEntry*>& Visi
                             if (PlotPtr == nullptr)
                             { continue; }
 
-                            if (PlotPtr->CurrentRow != PlotIndex)
+                            if (PlotPtr->GraphIndex != PlotIndex)
                             { continue; }
 
                             if (PlotPtr->IsEventPlot)
                             {
-                                ImPlot::SetupAxisLimits(PlotPtr->CurrentYAxis, 0, PlotPtr->MaxRow + 2, ImGuiCond_Always);
+                                ImPlot::SetupAxisLimits(PlotPtr->YAxis, 0, PlotPtr->MaxRow + 2, ImGuiCond_Always);
                             }
                         }
                     }
@@ -322,7 +374,7 @@ void FCogEngineWindow_Plots::RenderPlots(const TArray<FCogDebugPlotEntry*>& Visi
                         && ImGui::GetDragDropPayload() == nullptr)
                     {
                         const ImVec2 Drag = ImGui::GetMouseDragDelta(0);
-                        if (FMath::Abs(Drag.x) > Config->DragViewSensitivity)
+                        if (FMath::Abs(Drag.x) > Config->DragPauseSensitivity)
                         {
                             FCogDebugPlot::Pause = true;
                         }
@@ -366,10 +418,10 @@ void FCogEngineWindow_Plots::RenderPlots(const TArray<FCogDebugPlotEntry*>& Visi
                         { continue; }
 
                         FCogDebugPlotEntry& Plot = *PlotPtr;
-                        if (Plot.CurrentRow != PlotIndex)
+                        if (Plot.GraphIndex != PlotIndex)
                         { continue; }
 
-                        ImPlot::SetAxis(Plot.CurrentYAxis);
+                        ImPlot::SetAxis(Plot.YAxis);
 
                         ImPlot::SetNextLineStyle(IMPLOT_AUTO_COL);
                         const auto Label = StringCast<ANSICHAR>(*Plot.Name.ToString());
@@ -408,9 +460,9 @@ void FCogEngineWindow_Plots::RenderPlots(const TArray<FCogDebugPlotEntry*>& Visi
                     {
                         if (const ImGuiPayload* Payload = ImGui::AcceptDragDropPayload("DragAndDrop"))
                         {
-                            if (FCogDebugPlotEntry* Plot = FCogDebugPlot::FindPlot(FName((const char*)Payload->Data)))
+                            if (FCogDebugPlotEntry* Plot = FCogDebugPlot::FindEntry(FName((const char*)Payload->Data)))
                             {
-                                Plot->AssignAxis(PlotIndex, ImAxis_Y1);
+                                Plot->AssignGraphAndAxis(PlotIndex, ImAxis_Y1);
                             }
                         }
                         ImPlot::EndDragDropTarget();
@@ -425,9 +477,9 @@ void FCogEngineWindow_Plots::RenderPlots(const TArray<FCogDebugPlotEntry*>& Visi
                         {
                             if (const ImGuiPayload* Payload = ImGui::AcceptDragDropPayload("DragAndDrop"))
                             {
-                                if (FCogDebugPlotEntry* Plot = FCogDebugPlot::FindPlot(FName((const char*)Payload->Data)))
+                                if (FCogDebugPlotEntry* Plot = FCogDebugPlot::FindEntry(FName((const char*)Payload->Data)))
                                 {
-                                    Plot->AssignAxis(PlotIndex, y);
+                                    Plot->AssignGraphAndAxis(PlotIndex, y);
                                 }
                             }
                             ImPlot::EndDragDropTarget();
@@ -441,9 +493,9 @@ void FCogEngineWindow_Plots::RenderPlots(const TArray<FCogDebugPlotEntry*>& Visi
                     {
                         if (const ImGuiPayload* Payload = ImGui::AcceptDragDropPayload("DragAndDrop"))
                         {
-                            if (FCogDebugPlotEntry* Plot = FCogDebugPlot::FindPlot(FName((const char*)Payload->Data)))
+                            if (FCogDebugPlotEntry* Plot = FCogDebugPlot::FindEntry(FName((const char*)Payload->Data)))
                             {
-                                Plot->AssignAxis(PlotIndex, ImAxis_Y1);
+                                Plot->AssignGraphAndAxis(PlotIndex, ImAxis_Y1);
                             }
                         }
                         ImPlot::EndDragDropTarget();
@@ -514,13 +566,7 @@ void FCogEngineWindow_Plots::RenderEvents(FCogDebugPlotEntry& Entry, const char*
     const ImVec2 Mouse = ImGui::GetMousePos();
     ImDrawList* PlotDrawList = ImPlot::GetPlotDrawList();
 
-    //--------------------------------------------------------------------
-    // Update plot time for events as events are not pushed every frames
-    //--------------------------------------------------------------------
-    Entry.UpdateTime(GetWorld());
-
     ImPlot::PushPlotClipRect();
-
 
     //----------------------------------------------------------------
     // Plot line only to make the plotter move in time and auto scale
