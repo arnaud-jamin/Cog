@@ -17,7 +17,7 @@ void FCogEngineWindow_Plots::Initialize()
 
     Config = GetConfig<UCogEngineConfig_Plots>();
 
-	FCogDebugPlot::Clear();
+    FCogDebugPlot::Clear();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -173,30 +173,30 @@ void FCogEngineWindow_Plots::RenderMenu()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Plots::RenderEntryName(const int Index, FCogDebugPlotEntry& Entry)
 {
-	ImGui::PushID(Index);
+    ImGui::PushID(Index);
 
-	const bool IsAssignedToRow = Entry.GraphIndex != INDEX_NONE;
-	if (ImGui::Selectable(TCHAR_TO_ANSI(*Entry.Name.ToString()), IsAssignedToRow, ImGuiSelectableFlags_AllowDoubleClick))
-	{
-		if (IsAssignedToRow)
-		{
+    const bool IsAssignedToRow = Entry.GraphIndex != INDEX_NONE;
+    if (ImGui::Selectable(TCHAR_TO_ANSI(*Entry.Name.ToString()), IsAssignedToRow, ImGuiSelectableFlags_AllowDoubleClick))
+    {
+        if (IsAssignedToRow)
+        {
             Entry.ResetGraphAndAxis();
-		}
-		else
-		{
+        }
+        else
+        {
             Entry.AssignGraphAndAxis(0, ImAxis_Y1);
-		}
-	}
+        }
+    }
 
-	if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
-	{
-		const auto EntryName = StringCast<ANSICHAR>(*Entry.Name.ToString());
-		ImGui::SetDragDropPayload("DragAndDrop", EntryName.Get(), EntryName.Length() + 1);
-		ImGui::Text("%s", EntryName.Get());
-		ImGui::EndDragDropSource();
-	}
+    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+    {
+        const auto EntryName = StringCast<ANSICHAR>(*Entry.Name.ToString());
+        ImGui::SetDragDropPayload("DragAndDrop", EntryName.Get(), EntryName.Length() + 1);
+        ImGui::Text("%s", EntryName.Get());
+        ImGui::EndDragDropSource();
+    }
 
-	ImGui::PopID();
+    ImGui::PopID();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -211,30 +211,23 @@ void FCogEngineWindow_Plots::RenderAllEntriesNames(const ImVec2& InSize)
 
         int Index = 0;
 
-        ImGui::PushStyleColor(ImGuiCol_Header, IM_COL32(66, 66, 66, 79));
-        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, IM_COL32(62, 62, 62, 204));
-        ImGui::PushStyleColor(ImGuiCol_HeaderActive, IM_COL32(86, 86, 86, 255));
-        if (ImGui::CollapsingHeader("Events", ImGuiTreeNodeFlags_DefaultOpen))
+        if (FCogWindowWidgets::DarkCollapsingHeader("Events", ImGuiTreeNodeFlags_DefaultOpen))
         {
-			if (FCogDebugPlot::Events.IsEmpty())
-			{
-				ImGui::TextDisabled("No event added yet");
-			}
+            if (FCogDebugPlot::Events.IsEmpty())
+            {
+                ImGui::TextDisabled("No event added yet");
+            }
             else
             {
-	            for (FCogDebugPlotEntry& Event : FCogDebugPlot::Events)
-	            {
-	                RenderEntryName(Index, Event);
-	                Index++;
-	            }
+                for (FCogDebugPlotEntry& Event : FCogDebugPlot::Events)
+                {
+                    RenderEntryName(Index, Event);
+                    Index++;
+                }
             }
         }
-        ImGui::PopStyleColor(3);
 
-        ImGui::PushStyleColor(ImGuiCol_Header, IM_COL32(66, 66, 66, 79));
-        ImGui::PushStyleColor(ImGuiCol_HeaderHovered, IM_COL32(62, 62, 62, 204));
-        ImGui::PushStyleColor(ImGuiCol_HeaderActive, IM_COL32(86, 86, 86, 255));
-        if (ImGui::CollapsingHeader("Plots", ImGuiTreeNodeFlags_DefaultOpen))
+        if (FCogWindowWidgets::DarkCollapsingHeader("Plots", ImGuiTreeNodeFlags_DefaultOpen))
         {
             if (FCogDebugPlot::Plots.IsEmpty())
             {
@@ -242,14 +235,13 @@ void FCogEngineWindow_Plots::RenderAllEntriesNames(const ImVec2& InSize)
             }
             else
             {
-		        for (FCogDebugPlotEntry& Plot : FCogDebugPlot::Plots)
-		        {
-		            RenderEntryName(Index, Plot);
-		            Index++;
-		        }
+                for (FCogDebugPlotEntry& Plot : FCogDebugPlot::Plots)
+                {
+                    RenderEntryName(Index, Plot);
+                    Index++;
+                }
             }
         }
-        ImGui::PopStyleColor(3);
 
         if (Config->DockEntries)
         {

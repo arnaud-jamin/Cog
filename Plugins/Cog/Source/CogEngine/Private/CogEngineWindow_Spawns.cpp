@@ -56,14 +56,10 @@ void FCogEngineWindow_Spawns::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Spawns::RenderSpawnGroup(ACogEngineReplicator& Replicator, const FCogEngineSpawnGroup& SpawnGroup)
 {
-	ImGui::PushStyleColor(ImGuiCol_Header,          IM_COL32(66, 66, 66, 79));
-    ImGui::PushStyleColor(ImGuiCol_HeaderHovered,   IM_COL32(62, 62, 62, 204));
-    ImGui::PushStyleColor(ImGuiCol_HeaderActive,    IM_COL32(86, 86, 86, 255));
-
-    if (ImGui::CollapsingHeader(TCHAR_TO_ANSI(*SpawnGroup.Name), ImGuiTreeNodeFlags_DefaultOpen))
+    if (FCogWindowWidgets::DarkCollapsingHeader(TCHAR_TO_ANSI(*SpawnGroup.Name), ImGuiTreeNodeFlags_DefaultOpen))
     {
-	    int32 GroupIndex = 0;
-	    ImGui::PushID(GroupIndex);
+        int32 GroupIndex = 0;
+        ImGui::PushID(GroupIndex);
 
         const bool PushColor = (SpawnGroup.Color != FColor::Transparent);
         if (PushColor)
@@ -92,8 +88,6 @@ void FCogEngineWindow_Spawns::RenderSpawnGroup(ACogEngineReplicator& Replicator,
         ImGui::PopID();
         GroupIndex++;
     }
-
-    ImGui::PopStyleColor(3);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -117,7 +111,7 @@ bool FCogEngineWindow_Spawns::RenderSpawnAsset(ACogEngineReplicator& Replicator,
     if (ImGui::Button(TCHAR_TO_ANSI(*EntryName), ImVec2(-1, 0)))
     {
         IsPressed = true;
-		Replicator.Server_Spawn(SpawnEntry);
+        Replicator.Server_Spawn(SpawnEntry);
     }
 
     ImGui::PopStyleVar(1);

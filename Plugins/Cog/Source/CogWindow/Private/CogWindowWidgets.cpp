@@ -68,6 +68,17 @@ void FCogWindowWidgets::ThinSeparatorText(const char* Label)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::DarkCollapsingHeader(const char* InLabel, ImGuiTreeNodeFlags InFlags)
+{
+    ImGui::PushStyleColor(ImGuiCol_Header, IM_COL32(66, 66, 66, 79));
+    ImGui::PushStyleColor(ImGuiCol_HeaderHovered, IM_COL32(62, 62, 62, 204));
+    ImGui::PushStyleColor(ImGuiCol_HeaderActive, IM_COL32(86, 86, 86, 255));
+    const bool open = ImGui::CollapsingHeader(InLabel, InFlags);
+    ImGui::PopStyleColor(3);
+    return open;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void FCogWindowWidgets::ProgressBarCentered(float Fraction, const ImVec2& Size, const char* Overlay)
 {
     ImGuiWindow* window = FCogImguiHelper::GetCurrentWindow();
@@ -1088,7 +1099,7 @@ bool FCogWindowWidgets::BeginRightAlign(const char* Id)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogWindowWidgets::EndRightAlign()
 {
-	ImGui::EndTable();
+    ImGui::EndTable();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -1116,7 +1127,7 @@ bool FCogWindowWidgets::BrowseToAssetButton(const UObject* InAsset, const ImVec2
         ImGui::BeginDisabled();
     }
 
-	const bool result = ImGui::Button("Browse To Asset", InSize);
+    const bool result = ImGui::Button("Browse To Asset", InSize);
     if (result)
     {
         IAssetTools::Get().SyncBrowserToAssets({ InAsset });
@@ -1139,10 +1150,10 @@ bool FCogWindowWidgets::BrowseToObjectAssetButton(const UObject* InObject, const
 #if WITH_EDITOR
 
     const UObject* ObjectAsset = nullptr;
-	if (InObject != nullptr && InObject->GetClass() != nullptr)
-	{
+    if (InObject != nullptr && InObject->GetClass() != nullptr)
+    {
         ObjectAsset = InObject->GetClass()->ClassGeneratedBy;
-	}
+    }
 
     return BrowseToAssetButton(ObjectAsset, InSize);
 
@@ -1163,12 +1174,12 @@ bool FCogWindowWidgets::OpenAssetButton(const UObject* InAsset, const ImVec2& In
         ImGui::BeginDisabled();
     }
 
-	const bool result = ImGui::Button("Open Asset", InSize);
+    const bool result = ImGui::Button("Open Asset", InSize);
     if (result)
     {
         if (editorSubsystem != nullptr)
         {
-			editorSubsystem->OpenEditorForAsset(InAsset);
+            editorSubsystem->OpenEditorForAsset(InAsset);
         }
     }
 
@@ -1204,4 +1215,5 @@ bool FCogWindowWidgets::OpenObjectAssetButton(const UObject* InObject, const ImV
 
 
 
-  
+
+

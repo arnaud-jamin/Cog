@@ -54,19 +54,19 @@ void FCogAbilityWindow_Attributes::RenderTick(float DeltaTime)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Attributes::FormatAttributeSetName(FString& AttributeSetName)
 {
-	if (Config->AttributeSetPrefixes.IsEmpty() == false)
-	{
-		TArray<FString> Prefixes;
-		Config->AttributeSetPrefixes.ParseIntoArray(Prefixes, TEXT(";"));
+    if (Config->AttributeSetPrefixes.IsEmpty() == false)
+    {
+        TArray<FString> Prefixes;
+        Config->AttributeSetPrefixes.ParseIntoArray(Prefixes, TEXT(";"));
 
-		for (const FString& Prefix : Prefixes)
-		{
-			if (AttributeSetName.RemoveFromStart(Prefix, ESearchCase::IgnoreCase))
-			{
-				break;
-			}
-		}
-	}
+        for (const FString& Prefix : Prefixes)
+        {
+            if (AttributeSetName.RemoveFromStart(Prefix, ESearchCase::IgnoreCase))
+            {
+                break;
+            }
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -143,13 +143,13 @@ void FCogAbilityWindow_Attributes::RenderContent()
         //------------------------------------------------------------------------------------------
         for (const UAttributeSet* AttributeSet : AbilitySystemComponent->GetSpawnedAttributes())
         {
-			if (AttributeSet == nullptr)
-			{ continue; }
+            if (AttributeSet == nullptr)
+            { continue; }
 
             ImGui::PushID(TCHAR_TO_ANSI(*AttributeSet->GetName()));
 
             FString AttributeSetName = AttributeSet->GetName();
-        	FormatAttributeSetName(AttributeSetName);
+            FormatAttributeSetName(AttributeSetName);
             const auto AttributeSetNameStr = StringCast<ANSICHAR>(*AttributeSetName);
 
             //------------------------------------------------------------------------------------------
@@ -161,7 +161,7 @@ void FCogAbilityWindow_Attributes::RenderContent()
                 ImGui::TableNextRow();
                 ImGui::TableNextColumn();
 
-            	ImGui::PushStyleColor(ImGuiCol_Text, FCogImguiHelper::ToImVec4(Config->AttributeSetColor));
+                ImGui::PushStyleColor(ImGuiCol_Text, FCogImguiHelper::ToImVec4(Config->AttributeSetColor));
                 bOpenAttributeSet = ImGui::TreeNodeEx(AttributeSetNameStr.Get(), ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_SpanAllColumns | ImGuiTreeNodeFlags_LabelSpanAllColumns);
                 ImGui::PopStyleColor();
 
@@ -273,8 +273,8 @@ void FCogAbilityWindow_Attributes::RenderContent()
                             ImGui::TableNextRow();
 
                             //------------------------
-							// Selectable
-							//------------------------
+                            // Selectable
+                            //------------------------
                             ImGui::TableNextColumn();
                             if (ImGui::Selectable("", Selected == Index, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick))
                             {
@@ -304,8 +304,8 @@ void FCogAbilityWindow_Attributes::RenderContent()
                             ImGui::PushStyleColor(ImGuiCol_Text, Color);
 
                             //------------------------
-							// Attribute Set
-							//------------------------
+                            // Attribute Set
+                            //------------------------
                             ImGui::TableNextColumn();
                             ImGui::Text("%s", AttributeSetNameStr.Get());
 
@@ -364,22 +364,22 @@ void FCogAbilityWindow_Attributes::RenderContent()
 void FCogAbilityWindow_Attributes::RenderAttributeDetails(const UAbilitySystemComponent& AbilitySystemComponent, const char* AttributeSetName, const FGameplayAttribute& Attribute, bool IsForTooltip)
 {
     ImGuiTableFlags TableFlags = IsForTooltip ? ImGuiTableFlags_Borders
-										      : ImGuiTableFlags_Borders | ImGuiTableFlags_NoBordersInBodyUntilResize | ImGuiTableFlags_Resizable;
+                                              : ImGuiTableFlags_Borders | ImGuiTableFlags_NoBordersInBodyUntilResize | ImGuiTableFlags_Resizable;
 
     const float BaseValue = AbilitySystemComponent.GetNumericAttributeBase(Attribute);
     const float CurrentValue = AbilitySystemComponent.GetNumericAttribute(Attribute);
 
     if (ImGui::BeginTable("Details", 2, TableFlags))
     {
-	    constexpr ImVec4 TextColor(1.0f, 1.0f, 1.0f, 0.5f);
+        constexpr ImVec4 TextColor(1.0f, 1.0f, 1.0f, 0.5f);
 
         ImGui::TableSetupColumn("Property");
         ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
 
         if (IsForTooltip == false)
         {
-		    ImGui::TableHeadersRow();
-		}
+            ImGui::TableHeadersRow();
+        }
 
         //------------------------
         // Attribute Set
@@ -443,14 +443,10 @@ void FCogAbilityWindow_Attributes::RenderAttributeDetails(const UAbilitySystemCo
 
             if (ModInfo.Attribute == Attribute)
             {
-                ImGui::PushStyleColor(ImGuiCol_Header, IM_COL32(66, 66, 66, 79));
-                ImGui::PushStyleColor(ImGuiCol_HeaderHovered, IM_COL32(62, 62, 62, 204));
-                ImGui::PushStyleColor(ImGuiCol_HeaderActive, IM_COL32(86, 86, 86, 255));
-
                 char Buffer[128];
                 ImFormatString(Buffer, IM_ARRAYSIZE(Buffer), "Modifier %d", ModifierIndex);
 
-                if (ImGui::CollapsingHeader(Buffer, ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen))
+                if (FCogWindowWidgets::DarkCollapsingHeader(Buffer, ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen))
                 {
                     if (ImGui::BeginTable("Details", 2, TableFlags))
                     {
@@ -460,8 +456,8 @@ void FCogAbilityWindow_Attributes::RenderAttributeDetails(const UAbilitySystemCo
                         ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
 
                         ImGui::TableNextRow();
-	                    ImGui::TableNextColumn();
-	                    ImGui::TextColored(TextColor, "Effect");
+                        ImGui::TableNextColumn();
+                        ImGui::TextColored(TextColor, "Effect");
                         ImGui::TableNextColumn();
                         ImGui::Text("%s", TCHAR_TO_ANSI(*FCogAbilityHelper::CleanupName(GetNameSafe(ActiveEffect->Spec.Def))));
 
@@ -479,20 +475,20 @@ void FCogAbilityWindow_Attributes::RenderAttributeDetails(const UAbilitySystemCo
 
                         if (ModInfo.SourceTags.RequireTags.IsEmpty() == false)
                         {
-	                        ImGui::TableNextRow();
-	                        ImGui::TableNextColumn();
-	                        ImGui::TextColored(TextColor, "SourceTags - Require");
-	                        ImGui::TableNextColumn();
-	                        FCogAbilityHelper::RenderTagContainer(ModInfo.SourceTags.RequireTags, false);
+                            ImGui::TableNextRow();
+                            ImGui::TableNextColumn();
+                            ImGui::TextColored(TextColor, "SourceTags - Require");
+                            ImGui::TableNextColumn();
+                            FCogAbilityHelper::RenderTagContainer(ModInfo.SourceTags.RequireTags, false);
                         }
 
                         if (ModInfo.SourceTags.IgnoreTags.IsEmpty() == false)
                         {
-	                        ImGui::TableNextRow();
-	                        ImGui::TableNextColumn();
-	                        ImGui::TextColored(TextColor, "SourceTags - Ignore");
-	                        ImGui::TableNextColumn();
-	                        FCogAbilityHelper::RenderTagContainer(ModInfo.SourceTags.IgnoreTags, false);
+                            ImGui::TableNextRow();
+                            ImGui::TableNextColumn();
+                            ImGui::TextColored(TextColor, "SourceTags - Ignore");
+                            ImGui::TableNextColumn();
+                            FCogAbilityHelper::RenderTagContainer(ModInfo.SourceTags.IgnoreTags, false);
                         }
 
                         if (ModInfo.SourceTags.TagQuery.IsEmpty() == false)
@@ -507,20 +503,20 @@ void FCogAbilityWindow_Attributes::RenderAttributeDetails(const UAbilitySystemCo
 
                         if (ModInfo.TargetTags.RequireTags.IsEmpty() == false)
                         {
-	                        ImGui::TableNextRow();
-	                        ImGui::TableNextColumn();
-	                        ImGui::TextColored(TextColor, "TargetTags - Require");
-	                        ImGui::TableNextColumn();
-	                        FCogAbilityHelper::RenderTagContainer(ModInfo.TargetTags.RequireTags, false);
+                            ImGui::TableNextRow();
+                            ImGui::TableNextColumn();
+                            ImGui::TextColored(TextColor, "TargetTags - Require");
+                            ImGui::TableNextColumn();
+                            FCogAbilityHelper::RenderTagContainer(ModInfo.TargetTags.RequireTags, false);
                         }
 
                         if (ModInfo.TargetTags.IgnoreTags.IsEmpty() == false)
                         {
-	                        ImGui::TableNextRow();
-	                        ImGui::TableNextColumn();
-	                        ImGui::TextColored(TextColor, "TargetTags - Ignore");
-	                        ImGui::TableNextColumn();
-	                        FCogAbilityHelper::RenderTagContainer(ModInfo.TargetTags.IgnoreTags, false);
+                            ImGui::TableNextRow();
+                            ImGui::TableNextColumn();
+                            ImGui::TextColored(TextColor, "TargetTags - Ignore");
+                            ImGui::TableNextColumn();
+                            FCogAbilityHelper::RenderTagContainer(ModInfo.TargetTags.IgnoreTags, false);
                         }
 
                         if (ModInfo.TargetTags.TagQuery.IsEmpty() == false)
@@ -536,8 +532,6 @@ void FCogAbilityWindow_Attributes::RenderAttributeDetails(const UAbilitySystemCo
                         ImGui::EndTable();
                     }
                 }
-
-                ImGui::PopStyleColor(3);
 
                 ModifierIndex++;
             }
@@ -564,7 +558,7 @@ void FCogAbilityWindow_Attributes::RenderOpenAttributes()
     {
         const FGameplayAttribute& Attribute = OpenedAttributes[i];
 
-    	FString AttributeSetName = Attribute.GetAttributeSetClass()->GetFName().ToString();
+        FString AttributeSetName = Attribute.GetAttributeSetClass()->GetFName().ToString();
         FormatAttributeSetName(AttributeSetName);
 
         const FString WindowName = AttributeSetName + FString(" - ") + Attribute.GetName();

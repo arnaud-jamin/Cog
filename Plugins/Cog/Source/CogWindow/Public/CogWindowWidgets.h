@@ -33,6 +33,8 @@ public:
 
     static void ThinSeparatorText(const char* Label);
 
+    static bool DarkCollapsingHeader(const char* InLabel, ImGuiTreeNodeFlags InFlags);
+
     static void ProgressBarCentered(float Fraction, const ImVec2& Size, const char* Overlay);
 
     static bool ToggleMenuButton(bool* Value, const char* Text, const ImVec4& TrueColor);
@@ -101,7 +103,7 @@ public:
 
     static bool MenuActorsCombo(const char* StrID, AActor*& NewSelection, const UWorld& World, TSubclassOf<AActor> ActorClass, const FCogWindowActorContextMenuFunction& ContextMenuFunction = nullptr);
 
-	static bool MenuActorsCombo(const char* StrID, AActor*& NewSelection, const UWorld& World, const TArray<TSubclassOf<AActor>>& ActorClasses, int32& SelectedActorClassIndex, ImGuiTextFilter* Filter, const APawn* LocalPlayerPawn, const FCogWindowActorContextMenuFunction& ContextMenuFunction = nullptr);
+    static bool MenuActorsCombo(const char* StrID, AActor*& NewSelection, const UWorld& World, const TArray<TSubclassOf<AActor>>& ActorClasses, int32& SelectedActorClassIndex, ImGuiTextFilter* Filter, const APawn* LocalPlayerPawn, const FCogWindowActorContextMenuFunction& ContextMenuFunction = nullptr);
 
     static bool ActorsListWithFilters(AActor*& NewSelection, const UWorld& World, const TArray<TSubclassOf<AActor>>& ActorClasses, int32& SelectedActorClassIndex, ImGuiTextFilter* Filter, const APawn* LocalPlayerPawn, const FCogWindowActorContextMenuFunction& ContextMenuFunction = nullptr);
 
@@ -127,7 +129,7 @@ public:
 
     static bool OpenAssetButton(const UObject* InAsset, const ImVec2& InSize = ImVec2(0, 0));
 
-	static bool OpenObjectAssetButton(const UObject* InObject, const ImVec2& InSize = ImVec2(0, 0));
+    static bool OpenObjectAssetButton(const UObject* InObject, const ImVec2& InSize = ImVec2(0, 0));
 
 };
 

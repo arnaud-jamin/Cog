@@ -157,9 +157,9 @@ void FCogEngineWindow_Cheats::TryReapplyCheats()
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogEngineWindow_Cheats::DrawTable()
 {
-	const bool Open = ImGui::BeginTable("Cheats", 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize);
-	ImGui::TableSetupColumn("Toggle", ImGuiTableColumnFlags_WidthStretch);
-	ImGui::TableSetupColumn("Instant", ImGuiTableColumnFlags_WidthStretch);
+    const bool Open = ImGui::BeginTable("Cheats", 2, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize);
+    ImGui::TableSetupColumn("Toggle", ImGuiTableColumnFlags_WidthStretch);
+    ImGui::TableSetupColumn("Instant", ImGuiTableColumnFlags_WidthStretch);
     return Open;
 }
 
@@ -203,7 +203,7 @@ void FCogEngineWindow_Cheats::RenderContent()
                 ImGui::BeginDisabled();
             }
 
-        	ImGui::Checkbox("Reapply Cheats Between Launches", &Config->bReapplyCheatsBetweenLaunches);
+            ImGui::Checkbox("Reapply Cheats Between Launches", &Config->bReapplyCheatsBetweenLaunches);
             if (Config->bReapplyCheatsBetweenPlays == false)
             {
                 ImGui::EndDisabled();
@@ -232,7 +232,7 @@ void FCogEngineWindow_Cheats::RenderContent()
                 {
                     if (IsSelected)
                     {
-						Config->SelectedCategories.Add(CheatCategory.Name);
+                        Config->SelectedCategories.Add(CheatCategory.Name);
                     }
                     else
                     {
@@ -254,7 +254,7 @@ void FCogEngineWindow_Cheats::RenderContent()
     if (Config->bGroupByCategories == false && Config->bUseTwoColumns)
     {
         OpenTable = DrawTable();
-	}
+    }
     
     for (const FCogEngineCheatCategory& CheatCategory : Asset->CheatCategories)
     {
@@ -266,73 +266,67 @@ void FCogEngineWindow_Cheats::RenderContent()
         bool Open = true;
         if (Config->bGroupByCategories)
         {
-            ImGui::PushStyleColor(ImGuiCol_Header, IM_COL32(66, 66, 66, 79));
-            ImGui::PushStyleColor(ImGuiCol_HeaderHovered, IM_COL32(62, 62, 62, 204));
-            ImGui::PushStyleColor(ImGuiCol_HeaderActive, IM_COL32(86, 86, 86, 255));
+            Open = FCogWindowWidgets::DarkCollapsingHeader(CategoryStr.Get(), ImGuiTreeNodeFlags_DefaultOpen);
 
-            Open = ImGui::CollapsingHeader(CategoryStr.Get(), ImGuiTreeNodeFlags_DefaultOpen);
-
-            ImGui::PopStyleColor(3);
-
-			if (Open && Config->bUseTwoColumns)
-			{
-				DrawTable();
-			}
+            if (Open && Config->bUseTwoColumns)
+            {
+                DrawTable();
+            }
         }
 
 
-	    if (Open)
-	    {
+        if (Open)
+        {
             if (Config->bUseTwoColumns)
             {
-	    		ImGui::TableNextRow();
-				ImGui::TableNextColumn();
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
             }
 
-	        int Index = 0;
-	        for (const FCogEngineCheat& Cheat : CheatCategory.PersistentEffects)
-	        {
-	            AddCheat(Index, ControlledActor, SelectedActor, Cheat, true);
-	            Index++;
-	        }
+            int Index = 0;
+            for (const FCogEngineCheat& Cheat : CheatCategory.PersistentEffects)
+            {
+                AddCheat(Index, ControlledActor, SelectedActor, Cheat, true);
+                Index++;
+            }
 
-	        //----------------------------------------------------------------------------
-	        // Update the config of applied cheat to reapply them on the next launch. 
-	        // We do not update them only when the user input is pressed because
-	        // the state of the cheat is lagging when connected to a server. 
-	        // So we check if the array should be updated all the time.
-	        //----------------------------------------------------------------------------
-	        if (SelectedActor == ControlledActor)
-	        {
-	            for (const FCogEngineCheat& Cheat : CheatCategory.PersistentEffects)
-	            {
-	                TArray<AActor*> Targets = { SelectedActor };
-	                if (ACogEngineReplicator::IsCheatActiveOnTargets(Targets, Cheat) == ECogEngineCheat_ActiveState::Active)
-	                {
-	                    Config->AppliedCheats.AddUnique(Cheat.Name);
-	                }
-	                else
-	                {
-	                    Config->AppliedCheats.Remove(Cheat.Name);
-	                }
-	            }
-	        }
+            //----------------------------------------------------------------------------
+            // Update the config of applied cheat to reapply them on the next launch. 
+            // We do not update them only when the user input is pressed because
+            // the state of the cheat is lagging when connected to a server. 
+            // So we check if the array should be updated all the time.
+            //----------------------------------------------------------------------------
+            if (SelectedActor == ControlledActor)
+            {
+                for (const FCogEngineCheat& Cheat : CheatCategory.PersistentEffects)
+                {
+                    TArray<AActor*> Targets = { SelectedActor };
+                    if (ACogEngineReplicator::IsCheatActiveOnTargets(Targets, Cheat) == ECogEngineCheat_ActiveState::Active)
+                    {
+                        Config->AppliedCheats.AddUnique(Cheat.Name);
+                    }
+                    else
+                    {
+                        Config->AppliedCheats.Remove(Cheat.Name);
+                    }
+                }
+            }
 
-	        ImGui::TableNextColumn();
+            ImGui::TableNextColumn();
 
-	        Index = 0;
-	        for (const FCogEngineCheat& Cheat : CheatCategory.InstantEffects)
-	        {
-	            AddCheat(Index, ControlledActor, SelectedActor, Cheat, false);
-	            Index++;
-	        }
+            Index = 0;
+            for (const FCogEngineCheat& Cheat : CheatCategory.InstantEffects)
+            {
+                AddCheat(Index, ControlledActor, SelectedActor, Cheat, false);
+                Index++;
+            }
 
             if (Config->bGroupByCategories && Config->bUseTwoColumns)
             {
-				ImGui::EndTable();
+                ImGui::EndTable();
             }
-	    }
-	}
+        }
+    }
 
     if (OpenTable)
     {
@@ -350,7 +344,7 @@ bool FCogEngineWindow_Cheats::AddCheat(const int32 Index, AActor* ControlledActo
 
     ImGui::PushID(Index);
 
-	FCogWindowWidgets::PushBackColor(FCogImguiHelper::ToImVec4(Cheat.CustomColor));
+    FCogWindowWidgets::PushBackColor(FCogImguiHelper::ToImVec4(Cheat.CustomColor));
 
     const bool IsShiftDown      = (ImGui::GetCurrentContext()->IO.KeyMods & ImGuiMod_Shift) != 0;
     const bool IsAltDown        = (ImGui::GetCurrentContext()->IO.KeyMods & ImGuiMod_Alt) != 0;
@@ -386,7 +380,7 @@ bool FCogEngineWindow_Cheats::AddCheat(const int32 Index, AActor* ControlledActo
         ImGui::EndTooltip();
     }
 
-	FCogWindowWidgets::PopBackColor();
+    FCogWindowWidgets::PopBackColor();
 
     ImGui::PopID();
 
@@ -455,19 +449,19 @@ const FCogEngineCheat* FCogEngineWindow_Cheats::FindCheatByName(const FString& C
 
         if (OnlyPersistentCheats)
         {
-	        continue;
+            continue;
         }
 
-	    for (const FCogEngineCheat& Cheat : CheatCategory.InstantEffects)
-	    {
-	        if (Cheat.Name == CheatName)
-	        {
-	            return &Cheat;
-	        }
-	    }
+        for (const FCogEngineCheat& Cheat : CheatCategory.InstantEffects)
+        {
+            if (Cheat.Name == CheatName)
+            {
+                return &Cheat;
+            }
+        }
 
 
-	}
+    }
 
     return nullptr;
 }
