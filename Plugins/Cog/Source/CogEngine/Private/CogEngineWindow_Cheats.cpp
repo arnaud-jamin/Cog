@@ -59,6 +59,9 @@ void FCogEngineWindow_Cheats::Initialize()
             }));
 
 
+    if (Asset == nullptr)
+    { return; }
+
     for (const FCogEngineCheatCategory& CheatCategory : Asset->CheatCategories)
     {
         for (const FCogEngineCheat& Cheat : CheatCategory.PersistentEffects)
@@ -219,22 +222,7 @@ void FCogEngineWindow_Cheats::RenderContent()
 
         ImGui::SetNextItemWidth(ImGui::GetFontSize() * 7);
 
-        FString CategoryPreview;
-    	if (Config->SelectedCategories.Num() == 0)
-        {
-            CategoryPreview = "None";
-        }
-        else if (Config->SelectedCategories.Num() == 1)
-        {
-            CategoryPreview = *Config->SelectedCategories.CreateIterator();
-        }
-        else
-        {
-            CategoryPreview = "Multiple";
-        }
-
-        const auto CategoryPreviewStr = StringCast<ANSICHAR>(*CategoryPreview);
-        if (ImGui::BeginCombo("##Categories", CategoryPreviewStr.Get()))
+        if (ImGui::BeginMenu("Filters"))
         {
             for (const FCogEngineCheatCategory& CheatCategory : Asset->CheatCategories)
             {
@@ -252,7 +240,7 @@ void FCogEngineWindow_Cheats::RenderContent()
                     }
                 }
             }
-            ImGui::EndCombo();
+            ImGui::EndMenu();
         }
 
         FCogWindowWidgets::SearchBar(Filter);
