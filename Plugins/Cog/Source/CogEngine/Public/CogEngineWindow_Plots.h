@@ -57,7 +57,10 @@ class UCogEngineConfig_Plots : public UCogCommonConfig
 public:
 
     UPROPERTY(Config)
-    int Rows = 1;
+    int NumGraphs = 1;
+
+    UPROPERTY(Config)
+    int NumYAxis = 1;
 
     UPROPERTY(Config)
     float TimeRange = 20.0f;
@@ -82,7 +85,7 @@ public:
 
     virtual void Reset() override
     {
-        Rows = 1;
+        NumGraphs = 1;
         TimeRange = 20.0f;
         ShowTimeBarAtGameTime = true;
         ShowTimeBarAtCursor = true;

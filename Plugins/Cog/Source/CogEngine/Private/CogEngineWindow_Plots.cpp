@@ -126,11 +126,14 @@ void FCogEngineWindow_Plots::RenderMenu()
             ImGui::Separator();
 
             FCogWindowWidgets::SetNextItemToShortWidth();
-            if (ImGui::SliderInt("Rows", &Config->Rows, 1, 5))
+            if (ImGui::SliderInt("Num Graphs", &Config->NumGraphs, 1, 5))
             {
                 bApplyTimeScale = true;
             }
-            
+
+            FCogWindowWidgets::SetNextItemToShortWidth();
+            ImGui::SliderInt("Num YAxis", &Config->NumYAxis, 0, 3);
+
             FCogWindowWidgets::SetNextItemToShortWidth();
             if (ImGui::SliderFloat("Time range", &Config->TimeRange, 1.0f, 100.0f, "%0.1f"))
             {
@@ -278,9 +281,9 @@ void FCogEngineWindow_Plots::RenderPlots(const TArray<FCogDebugPlotEntry*>& Visi
             ImPlot::PushStyleColor(ImPlotCol_PlotBg, FCogImguiHelper::ToImVec4(Config->PauseBackgroundColor));
         }
 
-        if (ImPlot::BeginSubplots("", Config->Rows, 1, ImVec2(-1, -1), SubplotsFlags, RowRatios, ColRatios))
+        if (ImPlot::BeginSubplots("", Config->NumGraphs, 1, ImVec2(-1, -1), SubplotsFlags, RowRatios, ColRatios))
         {
-            for (int PlotIndex = 0; PlotIndex < Config->Rows; ++PlotIndex)
+            for (int PlotIndex = 0; PlotIndex < Config->NumGraphs; ++PlotIndex)
             {
                 if (ImPlot::BeginPlot("##Plot", ImVec2(-1, 250)))
                 {
@@ -296,9 +299,21 @@ void FCogEngineWindow_Plots::RenderPlots(const TArray<FCogDebugPlotEntry*>& Visi
                     }
 
                     ImPlot::SetupAxis(ImAxis_X1, nullptr, ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoGridLines);
-                    ImPlot::SetupAxis(ImAxis_Y1, HasPlotOnAxisY1 ? "" : "[drop here]", (HasPlotOnAxisY1 ? ImPlotAxisFlags_None : (ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoGridLines)) | ImPlotAxisFlags_AutoFit);
-                    ImPlot::SetupAxis(ImAxis_Y2, HasPlotOnAxisY2 ? "" : "[drop here]", (HasPlotOnAxisY2 ? ImPlotAxisFlags_None : (ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoGridLines)) | ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_Opposite);
-                    ImPlot::SetupAxis(ImAxis_Y3, HasPlotOnAxisY3 ? "" : "[drop here]", (HasPlotOnAxisY3 ? ImPlotAxisFlags_None : (ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoGridLines)) | ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_Opposite);
+
+                    if (Config->NumYAxis > 0)
+                    {
+                		ImPlot::SetupAxis(ImAxis_Y1, HasPlotOnAxisY1 ? "" : "[drop here]", (HasPlotOnAxisY1 ? ImPlotAxisFlags_None : (ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoGridLines)) | ImPlotAxisFlags_AutoFit);
+                    }
+
+                    if (Config->NumYAxis > 1)
+                    {
+                		ImPlot::SetupAxis(ImAxis_Y2, HasPlotOnAxisY2 ? "" : "[drop here]", (HasPlotOnAxisY2 ? ImPlotAxisFlags_None : (ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoGridLines)) | ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_Opposite);
+					}
+
+                    if (Config->NumYAxis > 2)
+                    {
+                		ImPlot::SetupAxis(ImAxis_Y3, HasPlotOnAxisY3 ? "" : "[drop here]", (HasPlotOnAxisY3 ? ImPlotAxisFlags_None : (ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_NoGridLines)) | ImPlotAxisFlags_AutoFit | ImPlotAxisFlags_Opposite);
+					}
 
                     //--------------------------------------------------------------------------------------------------
                     // Set the initial X axis range. After, it is automatically updated to move with the current time.
