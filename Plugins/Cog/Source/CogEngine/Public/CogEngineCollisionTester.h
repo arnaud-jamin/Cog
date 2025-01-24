@@ -125,8 +125,8 @@ public:
     FColor ImpactNormalColor = FColor::Cyan;
 
     UPROPERTY(EditAnywhere)
-    USceneComponent* StartComponent = nullptr;
+    TObjectPtr<USceneComponent> StartComponent;
 
     UPROPERTY(EditAnywhere)
-    USceneComponent* EndComponent = nullptr;
+    TObjectPtr<USceneComponent> EndComponent;
 };

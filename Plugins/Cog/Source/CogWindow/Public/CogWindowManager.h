@@ -134,10 +134,10 @@ protected:
     static FString ResetLayoutCommand;
 
     UPROPERTY()
-    mutable TArray<UCogCommonConfig*> Configs;
+    mutable TArray<TObjectPtr<UCogCommonConfig>> Configs;
 
     UPROPERTY()
-    mutable TArray<const UObject*> Assets;
+    mutable TArray<TObjectPtr<const UObject>> Assets;
 
     UPROPERTY(Config)
     bool bShowMainMenu = false;
