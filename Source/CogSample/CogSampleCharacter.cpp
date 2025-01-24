@@ -292,6 +292,7 @@ void ACogSampleCharacter::RegisterToAbilitySystemEvents()
     // Register to Tag change events
     //----------------------------------------
     GhostTagDelegateHandle = AbilitySystem->RegisterGameplayTagEvent(Tag_Status_Ghost, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &ACogSampleCharacter::OnGhostTagNewOrRemoved);
+    GhostTagDelegateHandle = AbilitySystem->RegisterGameplayTagEvent(Tag_Status_Invisible, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &ACogSampleCharacter::OnInvisibleTagNewOrRemoved);
 
     //----------------------------------------
     // Register to Attribute change events
@@ -323,6 +324,7 @@ void ACogSampleCharacter::UnregisterFromAbilitySystemEvents()
     // Unregister to Tags events
     //----------------------------------------
     AbilitySystem->UnregisterGameplayTagEvent(GhostTagDelegateHandle, Tag_Status_Ghost, EGameplayTagEventType::NewOrRemoved);
+    AbilitySystem->UnregisterGameplayTagEvent(GhostTagDelegateHandle, Tag_Status_Invisible, EGameplayTagEventType::NewOrRemoved);
 
     //----------------------------------------
     // Unregister to GameplayEffect events
@@ -683,6 +685,20 @@ void ACogSampleCharacter::OnGhostTagNewOrRemoved(const FGameplayTag InTag, int32
             }
         }
     }
+
+#endif //UE_WITH_CHEAT_MANAGER
+}
+
+
+// ----------------------------------------------------------------------------------------------------------------
+void ACogSampleCharacter::OnInvisibleTagNewOrRemoved(const FGameplayTag InTag, int32 NewCount)
+{
+#if UE_WITH_CHEAT_MANAGER
+
+    check(InTag == Tag_Status_Invisible);
+
+    bool bHasInvisibleTags = NewCount > 0;
+    SetActorHiddenInGame(bHasInvisibleTags);
 
 #endif //UE_WITH_CHEAT_MANAGER
 }

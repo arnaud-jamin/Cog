@@ -338,6 +338,8 @@ protected:
 
     void OnGhostTagNewOrRemoved(const FGameplayTag InTag, int32 NewCount);
 
+    void OnInvisibleTagNewOrRemoved(const FGameplayTag InTag, int32 NewCount);
+
     void OnScaleAttributeChanged(const FOnAttributeChangeData& Data);
 
     void UpdateActiveAbilitySlots();
