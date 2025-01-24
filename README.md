@@ -331,13 +331,13 @@ public class CogSample : ModuleRules
 ```
 
 
-- In the class of your choice (in the sample we use the GameState class) add a reference to the CogWindowManager:
+- In the class of your choice add a reference to the CogWindowManager (in the sample we use the GameState class):
 ```cpp
 // ACogSampleGameState.h
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogCommon.h"
+#include "CogCommon.h" 
 #include "GameFramework/GameStateBase.h"
 #include "CogSampleGameState.generated.h"
 
@@ -347,8 +347,6 @@ UCLASS()
 class ACogSampleGameState : public AGameStateBase
 {
     GENERATED_BODY()
-
-    [...]
 
     // To make sure it doesn't get garbage collected.
     UPROPERTY()
@@ -360,8 +358,16 @@ class ACogSampleGameState : public AGameStateBase
 };
 ```
 
+- In the cpp file, add the following includes:
+```cpp
+// ACogSampleGameState.cpp
+#if ENABLE_COG
+#include "CogAll.h"
+#include "CogWindowManager.h"
+#endif //ENABLE_COG
+```
 
-- Instantiate the CogWindowManager and add some windows:
+- Instantiate CogWindowManager and add some windows:
 ```cpp
 // ACogSampleGameState.cpp
 void ACogSampleGameState::BeginPlay()
@@ -372,20 +378,34 @@ void ACogSampleGameState::BeginPlay()
     CogWindowManager = NewObject<UCogWindowManager>(this);
     CogWindowManagerRef = CogWindowManager;
 
-    // Add all the built-in windows
+    // Add all the built-in windows. 
     Cog::AddAllWindows(*CogWindowManager);
 
-    // Add a custom window
-    CogWindowManager->AddWindow<FCogSampleWindow_Team>("Gameplay.Team");
+    // Optionally, add more custom windows from your own project
+    // CogWindowManager->AddWindow<FCogSampleWindow_Team>("Gameplay.Team");
 
-    [...]
 #endif //ENABLE_COG
 }
 ```
 
-- Tick the CogWindowManager:
+- Shutdown CogWindowManager:
 ```cpp
+// ACogSampleGameState.cpp
+void ACogSampleGameState::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    Super::EndPlay(EndPlayReason);
 
+#if ENABLE_COG
+    if (CogWindowManager != nullptr)
+    {
+        CogWindowManager->Shutdown();
+    }
+#endif //ENABLE_COG
+}
+```
+
+- Tick CogWindowManager:
+```cpp
 // ACogSampleGameState.cpp
 ACogSampleGameState::ACogSampleGameState(const FObjectInitializer & ObjectInitializer)
     : Super(ObjectInitializer)
@@ -394,8 +414,6 @@ ACogSampleGameState::ACogSampleGameState(const FObjectInitializer & ObjectInitia
     PrimaryActorTick.bCanEverTick = true;
     PrimaryActorTick.SetTickFunctionEnable(true);
     PrimaryActorTick.bStartWithTickEnabled = true;
-    
-    [...]
 }
 
 void ACogSampleGameState::Tick(float DeltaSeconds)
@@ -408,10 +426,16 @@ void ACogSampleGameState::Tick(float DeltaSeconds)
 }
 ```
 
-
-
 - In your PlayerController class, spawn the Cog Replicators. The Replicator are used to communicate between the client and the server, for example to apply cheats, spawn actors, etc.
 ```cpp
+
+#if ENABLE_COG
+#include "CogAbilityReplicator.h"
+#include "CogDebugDraw.h"
+#include "CogDebugReplicator.h"
+#include "CogEngineReplicator.h"
+#endif //ENABLE_COG
+
 void ACogSamplePlayerController::BeginPlay()
 {
     Super::BeginPlay();
@@ -430,10 +454,8 @@ void ACogSamplePlayerController::BeginPlay()
 // CogSampleCharacter.h
 UCLASS(config=Game)
 class ACogSampleCharacter : public ACharacter
-    [...]
     , public ICogCommonDebugFilteredActorInterface
     , public ICogCommonAllegianceActorInterface
-    [...]
 ```
 
 ```cpp
@@ -445,7 +467,6 @@ class ACogSamplePlayerController
 ```
 
 - In Unreal Editor create and configure the following Data Assets:
-  - CogAbilityDataAsset
   - CogAIDataAsset
   - CogEngineDataAsset
   - CogInputDataAsset
