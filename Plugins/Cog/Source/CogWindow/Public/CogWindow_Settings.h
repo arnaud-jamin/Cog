@@ -2,7 +2,9 @@
 
 #include "CoreMinimal.h"
 #include "CogCommonConfig.h"
+#include "CogImguiKeyInfo.h"
 #include "CogWindow.h"
+#include "GameFramework/PlayerInput.h"
 #include "CogWindow_Settings.generated.h"
 
 class UCogEngineConfig_Settings;
@@ -29,6 +31,8 @@ protected:
     virtual void PreSaveConfig() override;
 
     virtual void ResetConfig() override;
+
+    virtual void RenderShortcut(const char* Label, FCogImGuiKeyInfo& KeyInfo);
 
     TObjectPtr<UCogWindowConfig_Settings> Config = nullptr;
 };
@@ -75,6 +79,21 @@ public:
     UPROPERTY(Config)
     bool bNavEnableKeyboard = false;
 
+    UPROPERTY(Config)
+    bool bResolveShortcutsConflicts = true;
+    
+    UPROPERTY(Config)
+    FCogImGuiKeyInfo ToggleImguiInputShortcut =  FCogImGuiKeyInfo(EKeys::F1);
+
+    UPROPERTY(Config)
+    FCogImGuiKeyInfo ToggleSelectionShortcut = FCogImGuiKeyInfo(EKeys::F5);
+
+    UPROPERTY(Config)
+    TArray<FCogImGuiKeyInfo> LoadLayoutShortcuts = { FCogImGuiKeyInfo(EKeys::F2), FCogImGuiKeyInfo(EKeys::F3), FCogImGuiKeyInfo(EKeys::F4), FCogImGuiKeyInfo()};
+
+    UPROPERTY(Config)
+    TArray<FCogImGuiKeyInfo> SaveLayoutShortcuts = { FCogImGuiKeyInfo(), FCogImGuiKeyInfo(), FCogImGuiKeyInfo(), FCogImGuiKeyInfo()};
+    
     //UPROPERTY(Config)
     //bool bNavEnableGamepad = false;
 
@@ -97,5 +116,10 @@ public:
         bNavEnableKeyboard = false;
         //bNavEnableGamepad = false;
         //bNavNoCaptureInput = true;
+
+        ToggleImguiInputShortcut =  FCogImGuiKeyInfo(EKeys::F1);
+        ToggleSelectionShortcut = FCogImGuiKeyInfo(EKeys::F5);
+        LoadLayoutShortcuts = { FCogImGuiKeyInfo(EKeys::F2), FCogImGuiKeyInfo(EKeys::F3), FCogImGuiKeyInfo(EKeys::F4), FCogImGuiKeyInfo()};
+        SaveLayoutShortcuts = { FCogImGuiKeyInfo(), FCogImGuiKeyInfo(), FCogImGuiKeyInfo(), FCogImGuiKeyInfo()};
     }
 };

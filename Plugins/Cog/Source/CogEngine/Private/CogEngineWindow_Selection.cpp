@@ -9,6 +9,7 @@
 #include "CogWindowConsoleCommandManager.h"
 #include "CogWindowManager.h"
 #include "CogWindowWidgets.h"
+#include "CogWindow_Settings.h"
 #include "Components/PrimitiveComponent.h"
 #include "EngineUtils.h"
 #include "GameFramework/Character.h"
@@ -35,7 +36,7 @@ void FCogEngineWindow_Selection::Initialize()
         GetWorld(),
         FCogWindowConsoleCommandDelegate::CreateLambda([this](const TArray<FString>& InArgs, UWorld* InWorld)
         {
-            ToggleSelectionMode();
+            GetOwner()->SetActivateSelectionMode(!GetOwner()->GetActivateSelectionMode());
         }));
 
     TryReapplySelection();
@@ -122,47 +123,9 @@ TSubclassOf<AActor> FCogEngineWindow_Selection::GetSelectedActorClass() const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Selection::ToggleSelectionMode()
-{
-    if (bSelectionModeActive)
-    {
-        DeactivateSelectionMode();
-    }
-    else
-    {
-        ActivateSelectionMode();
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Selection::ActivateSelectionMode()
-{
-    bSelectionModeActive = true;
-    bIsInputEnabledBeforeEnteringSelectionMode = GetOwner()->GetContext().GetEnableInput();
-    GetOwner()->GetContext().SetEnableInput(true);
-    GetOwner()->SetActivateSelectionMode(true);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-
 void FCogEngineWindow_Selection::HackWaitInputRelease()
 {
     WaitInputReleased = 1;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Selection::DeactivateSelectionMode()
-{
-    bSelectionModeActive = false;
-
-    //--------------------------------------------------------------------------------------------
-    // We can enter selection mode by a command, and ImGui might not have the input focus
-    // When in selection mode we need ImGui to have the input focus
-    // When leaving selection mode we want to leave it as it was before
-    //--------------------------------------------------------------------------------------------
-    GetOwner()->GetContext().SetEnableInput(bIsInputEnabledBeforeEnteringSelectionMode);
-
-    GetOwner()->SetActivateSelectionMode(false);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -175,7 +138,7 @@ void FCogEngineWindow_Selection::RenderTick(float DeltaTime)
         SetGlobalSelection(GetLocalPlayerPawn());
     }
 
-    if (bSelectionModeActive)
+    if (GetOwner()->GetActivateSelectionMode())
     {
         TickSelectionMode();
     }
@@ -198,7 +161,7 @@ void FCogEngineWindow_Selection::RenderContent()
     {
         if (ImGui::MenuItem("Pick"))
         {
-            ActivateSelectionMode();
+            GetOwner()->SetActivateSelectionMode(true);
             //HackWaitInputRelease();
         }
 
@@ -242,14 +205,14 @@ void FCogEngineWindow_Selection::TickSelectionMode()
 {
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
     {
-        DeactivateSelectionMode();
+        GetOwner()->SetActivateSelectionMode(false);
         return;
     }
 
     APlayerController* PlayerController = GetLocalPlayerController();
     if (PlayerController == nullptr)
     {
-        DeactivateSelectionMode();
+        GetOwner()->SetActivateSelectionMode(false);
         return;
     }
 
@@ -309,7 +272,7 @@ void FCogEngineWindow_Selection::TickSelectionMode()
         FCogWindowWidgets::ActorFrame(*HoveredActor);
     }
 
-    if (bSelectionModeActive)
+    if (GetOwner()->GetActivateSelectionMode())
     {
         if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
         {
@@ -320,7 +283,7 @@ void FCogEngineWindow_Selection::TickSelectionMode()
                     SetGlobalSelection(HoveredActor);
                 }
 
-                DeactivateSelectionMode();
+                GetOwner()->SetActivateSelectionMode(false);
             }
             else
             {
@@ -357,7 +320,7 @@ void FCogEngineWindow_Selection::RenderMainMenuWidget(int32 SubWidgetIndex, floa
 
         if (ImGui::Button("Pick", ImVec2(Width, 0)))
         {
-            ActivateSelectionMode();
+            GetOwner()->SetActivateSelectionMode(true);
             HackWaitInputRelease();
         }
         RenderPickButtonTooltip();
@@ -422,7 +385,7 @@ void FCogEngineWindow_Selection::RenderPickButtonTooltip()
 {
     if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
     {
-        const FString Shortcut = FCogImguiInputHelper::CommandToString(*GetWorld(), ToggleSelectionModeCommand);
+        const FString Shortcut = FCogImguiInputHelper::KeyInfoToString(GetOwner()->GetSettings()->ToggleSelectionShortcut);
         ImGui::SetTooltip("Enter picking mode to pick an actor on screen. %s", TCHAR_TO_ANSI(*Shortcut));
     }
 }

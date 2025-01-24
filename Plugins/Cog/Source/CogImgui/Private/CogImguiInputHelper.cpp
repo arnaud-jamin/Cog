@@ -95,6 +95,18 @@ bool FCogImguiInputHelper::IsCheckBoxStateMatchingValue(ECheckBoxState CheckBoxS
     const bool Result = (CheckBoxState == ECheckBoxState::Undetermined) || ((CheckBoxState == ECheckBoxState::Checked) == bValue);
     return Result;
 }
+    
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogImguiInputHelper::IsCheckBoxStateMatchingKeybindModifier(ECheckBoxState InCheckBoxState, bool InRequireModifier, bool InIgnoreModifier)
+{
+    switch (InCheckBoxState)
+    {
+        case ECheckBoxState::Undetermined: return true;
+        case ECheckBoxState::Checked: return InRequireModifier && InIgnoreModifier == false;
+        case ECheckBoxState::Unchecked: return InRequireModifier == false && InIgnoreModifier;
+    }
+    return false;
+}
 
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogImguiInputHelper::IsKeyEventMatchingKeyInfo(const FKeyEvent& KeyEvent, const FCogImGuiKeyInfo& KeyInfo)
@@ -164,6 +176,18 @@ void FCogImguiInputHelper::KeyInfoToKeyBind(const FCogImGuiKeyInfo& KeyInfo, FKe
     BREAK_CHECKBOX_STATE(KeyInfo.Ctrl, KeyBind.Control, KeyBind.bIgnoreCtrl);
     BREAK_CHECKBOX_STATE(KeyInfo.Alt, KeyBind.Alt, KeyBind.bIgnoreAlt);
     BREAK_CHECKBOX_STATE(KeyInfo.Cmd, KeyBind.Cmd, KeyBind.bIgnoreCmd);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogImguiInputHelper::IsKeyBindMatchingKeyInfo(const FKeyBind& InKeyBind, const FCogImGuiKeyInfo& InKeyInfo)
+{
+    const bool Result = (InKeyInfo.Key == InKeyBind.Key)
+        && IsCheckBoxStateMatchingKeybindModifier(InKeyInfo.Shift, InKeyBind.Shift, InKeyBind.bIgnoreShift)
+        && IsCheckBoxStateMatchingKeybindModifier(InKeyInfo.Ctrl, InKeyBind.Control, InKeyBind.bIgnoreCtrl)
+        && IsCheckBoxStateMatchingKeybindModifier(InKeyInfo.Alt, InKeyBind.Alt, InKeyBind.bIgnoreAlt)
+        && IsCheckBoxStateMatchingKeybindModifier(InKeyInfo.Cmd, InKeyBind.Cmd, InKeyBind.bIgnoreCmd);
+
+    return Result;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -304,32 +328,67 @@ FString FCogImguiInputHelper::CommandToString(const UPlayerInput* PlayerInput, c
 //--------------------------------------------------------------------------------------------------------------------------
 FString FCogImguiInputHelper::KeyBindToString(const FKeyBind& KeyBind)
 {
-    FString Result;
+    FString Result = "[";
     if (KeyBind.Alt)
     {
-        Result = Result.Append("Alt ");
+        Result += FString("Alt ");
     }
 
     if (KeyBind.Shift)
     {
-        Result = Result.Append("Shift ");
+        Result += FString("Shift ");
     }
 
     if (KeyBind.Control)
     {
-        Result = Result.Append("Ctrl ");
+        Result += FString("Ctrl ");
     }
 
     if (KeyBind.Cmd)
     {
-        Result = Result.Append("Cmd ");
+        Result += FString("Cmd ");
     }
 
-    Result = Result.Printf(TEXT("[%s]"), *KeyBind.Key.ToString());
+    Result += KeyBind.Key.ToString();
+    Result += FString("]");
 
     return Result;
 }
 
+//--------------------------------------------------------------------------------------------------------------------------
+FString FCogImguiInputHelper::KeyInfoToString(const FCogImGuiKeyInfo& InKeyInfo)
+{
+    if (InKeyInfo == FKey())
+    {
+        return FString("");
+    }
+    
+    FString Result = "[";
+    if (InKeyInfo.Alt == ECheckBoxState::Checked)
+    {
+        Result += FString("Alt ");
+    }
+
+    if (InKeyInfo.Shift  == ECheckBoxState::Checked)
+    {
+        Result += FString("Shift ");
+    }
+
+    if (InKeyInfo.Ctrl  == ECheckBoxState::Checked)
+    {
+        Result += FString("Ctrl ");
+    }
+
+    if (InKeyInfo.Cmd  == ECheckBoxState::Checked)
+    {
+        Result += FString("Cmd ");
+    }
+
+    Result += InKeyInfo.Key.ToString();
+    Result += FString("]");
+    
+    return Result;
+}
 
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogImguiInputHelper::IsKeyEventMatchingKeyBind(const FKeyEvent& KeyEvent, const FKeyBind& KeyBind)
@@ -360,6 +419,22 @@ bool FCogImguiInputHelper::IsKeyEventMatchingKeyBind(const FKeyEvent& KeyEvent, 
     {
         return true;
     }
+
+    return false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogImguiInputHelper::IsKeyInfoPressed(const UPlayerInput* PlayerInput, const FCogImGuiKeyInfo& InKeyInfo)
+{
+    const bool bKeyPressed = PlayerInput->WasJustPressed(InKeyInfo.Key);
+    if (bKeyPressed == false)
+    { return false; }
+    
+    if (IsCheckBoxStateMatchingValue(InKeyInfo.Ctrl, PlayerInput->IsCtrlPressed())
+        && IsCheckBoxStateMatchingValue(InKeyInfo.Shift, PlayerInput->IsShiftPressed())
+        && IsCheckBoxStateMatchingValue(InKeyInfo.Alt, PlayerInput->IsAltPressed())
+        && IsCheckBoxStateMatchingValue(InKeyInfo.Cmd, PlayerInput->IsCmdPressed()))
+    { return true; }
 
     return false;
 }

@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "CogImguiContext.h"
+#include "CogWindow_Settings.h"
 #include "imgui.h"
 #include "CogWindowManager.generated.h"
 
@@ -25,8 +26,6 @@ class COGWINDOW_API UCogWindowManager : public UObject
 public:
 
     UCogWindowManager();
-
-    virtual void PostInitProperties() override;
 
     virtual void Shutdown();
 
@@ -56,11 +55,11 @@ public:
 
     virtual void SetActivateSelectionMode(bool Value);
 
+    virtual bool GetActivateSelectionMode() const;
+
     virtual void ResetAllWindowsConfig();
 
-    virtual bool RegisterDefaultCommandBindings();
-    
-    const FCogWindow_Settings* GetSettingsWindow() const { return SettingsWindow; }
+    const UCogWindowConfig_Settings* GetSettings() const { return Settings.Get(); }
 
     UCogCommonConfig* GetConfig(const TSubclassOf<UCogCommonConfig> ConfigClass);
 
@@ -79,6 +78,8 @@ public:
     static void AddCommand(UPlayerInput* PlayerInput, const FString& Command, const FKey& Key);
 
     static void SortCommands(UPlayerInput* PlayerInput);
+
+    void DisableConflictingCommands() const;
 
 protected:
 
@@ -107,6 +108,8 @@ protected:
     virtual void ToggleInputMode();
 
     virtual void DisableInputMode();
+    
+    virtual void HandleInputs();
 
     static void SettingsHandler_ClearAll(ImGuiContext* ctx, ImGuiSettingsHandler*);
 
@@ -117,6 +120,8 @@ protected:
     static void SettingsHandler_ReadLine(ImGuiContext*, ImGuiSettingsHandler*, void* entry, const char* line);
 
     static void SettingsHandler_WriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler, ImGuiTextBuffer* buf);
+
+    static void DisableConflictingCommand(UPlayerInput* InPlayerInput, const FCogImGuiKeyInfo& InShortcut);
 
     static FString ToggleInputCommand;
 
@@ -135,8 +140,8 @@ protected:
     mutable TArray<const UObject*> Assets;
 
     UPROPERTY(Config)
-    bool bRegisterDefaultCommands = true;
-
+    bool bShowMainMenu = false;
+    
     FCogImguiContext Context;
 
     TArray<FCogWindow*> Windows;
@@ -148,6 +153,8 @@ protected:
     TArray<FCogWindow*> SpaceWindows;
 
     FCogWindow_Settings* SettingsWindow = nullptr;
+    
+    TWeakObjectPtr<UCogWindowConfig_Settings> Settings;
 
     FCogWindow_Layouts* LayoutsWindow = nullptr;
 
@@ -156,6 +163,8 @@ protected:
     int32 LayoutToLoad = -1;
 
     int32 SelectionModeActiveCounter = 0;
+    
+    bool bIsInputEnabledBeforeEnteringSelectionMode = false;
 
     bool bIsSelectionModeActive = false;
 
@@ -176,7 +185,7 @@ template<class T>
 T* UCogWindowManager::GetConfig()
 {
     static_assert(TPointerIsConvertibleFromTo<T, const UCogCommonConfig>::Value);
-    return Cast<T>(&GetConfig(T::StaticClass()));
+    return Cast<T>(GetConfig(T::StaticClass()));
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

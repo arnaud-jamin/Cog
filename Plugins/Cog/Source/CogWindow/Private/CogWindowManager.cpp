@@ -28,28 +28,6 @@ UCogWindowManager::UCogWindowManager()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::PostInitProperties()
-{
-    Super::PostInitProperties();
-
-    //if (bRegisterDefaultCommands)
-    //{
-    //    if (RegisterDefaultCommandBindings())
-    //    {
-    //        bRegisterDefaultCommands = false;
-    //    }
-    //}
-
-    //-------------------------------------------------------------------------------
-    // Currently always register default commands. 
-    // Since UE5.4, the ini files must have this to be saved:
-    // [SectionsToSave]
-    // bCanSaveAllSections = True
-    //-------------------------------------------------------------------------------
-    RegisterDefaultCommandBindings();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::InitializeInternal()
 {
     Context.Initialize();
@@ -72,6 +50,12 @@ void UCogWindowManager::InitializeInternal()
     SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 3", false));
     SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 4", false));
 
+    Settings = GetConfig<UCogWindowConfig_Settings>();
+    if (Settings->bResolveShortcutsConflicts)
+    {
+        DisableConflictingCommands();
+    }
+    
     LayoutsWindow = AddWindow<FCogWindow_Layouts>("Window.Layouts", false);
     SettingsWindow = AddWindow<FCogWindow_Settings>("Window.Settings", false);
 
@@ -182,7 +166,7 @@ void UCogWindowManager::Tick(float DeltaTime)
     {
         return;
     }
-
+    
     if (IsInitialized == false)
     {
         InitializeInternal();
@@ -205,6 +189,7 @@ void UCogWindowManager::Tick(float DeltaTime)
 
     if (Context.BeginFrame(DeltaTime))
     {
+        HandleInputs();
         Render(DeltaTime);
         Context.EndFrame();
     }
@@ -214,13 +199,12 @@ void UCogWindowManager::Tick(float DeltaTime)
 void UCogWindowManager::Render(float DeltaTime)
 {
     FCogImGuiContextScope ImGuiContextScope(Context);
-
+    
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0, 0, 0, 0));
     ImGui::DockSpaceOverViewport(0, nullptr, ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingOverCentralNode | ImGuiDockNodeFlags_AutoHideTabBar);
     ImGui::PopStyleColor(1);
 
-
-    const bool bCompactSaved = SettingsWindow->GetSettingsConfig()->bCompactMode;
+    const bool bCompactSaved = Settings->bCompactMode;
     if (bCompactSaved)
     {
         FCogWindowWidgets::PushStyleCompact();
@@ -246,7 +230,7 @@ void UCogWindowManager::Render(float DeltaTime)
 
         if (Window->GetIsVisible() && bIsSelectionModeActive == false)
         {
-            if (SettingsWindow->GetSettingsConfig()->bTransparentMode)
+            if (Settings->bTransparentMode)
             {
                 ImGui::SetNextWindowBgAlpha(0.35f);
             }
@@ -268,8 +252,8 @@ void UCogWindowManager::AddWindow(FCogWindow* Window, const FString& Name, const
 {
     Window->SetFullName(Name);
     Window->SetOwner(this);
-    Window->Initialize();
     Windows.Add(Window);
+    Window->Initialize();
 
     if (Window->HasWidget())
     {
@@ -297,18 +281,6 @@ FCogWindow* UCogWindowManager::FindWindowByID(const ImGuiID ID)
         }
     }
     return nullptr;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::SetActivateSelectionMode(const bool Value)
-{
-    SelectionModeActiveCounter = FMath::Max(SelectionModeActiveCounter + (Value ? 1 : -1), 0);
-    bIsSelectionModeActive = SelectionModeActiveCounter > 0;
-
-    if (bIsSelectionModeActive)
-    {
-        Context.SetEnableInput(true);
-    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -414,9 +386,7 @@ void UCogWindowManager::RenderMainMenu()
             {
                 CloseAllWindows();
             }
-
-
-
+            
             ImGui::Separator();
 
             RenderMenuItem(*LayoutsWindow, "Layouts");
@@ -570,7 +540,7 @@ void UCogWindowManager::RenderOptionMenu(FMenu& Menu)
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::RenderMenuItem(FCogWindow& Window, const char* MenuItemName)
 {
-    if (SettingsWindow->GetSettingsConfig()->bShowWindowsInMainMenu)
+    if (Settings->bShowWindowsInMainMenu)
     {
         ImGui::SetNextWindowSizeConstraints(
             ImVec2(FCogWindowWidgets::GetFontWidth() * 40, ImGui::GetTextLineHeightWithSpacing() * 5),
@@ -604,7 +574,7 @@ void UCogWindowManager::RenderMenuItem(FCogWindow& Window, const char* MenuItemN
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::RenderMenuItemHelp(FCogWindow& Window)
 {
-    if (SettingsWindow->GetSettingsConfig()->bShowHelp)
+    if (Settings->bShowHelp)
     {
         ImGui::SameLine();
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() - FCogWindowWidgets::GetFontWidth() * 3.0f);
@@ -761,31 +731,6 @@ void UCogWindowManager::ResetAllWindowsConfig()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogWindowManager::RegisterDefaultCommandBindings()
-{
-    if (GetWorld() == nullptr)
-    {
-        return false;
-    }
-
-    UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*GetWorld());
-    if (PlayerInput == nullptr)
-    {
-        return false;
-    }
-
-    AddCommand(PlayerInput, "Cog.ToggleInput", EKeys::F1);
-    AddCommand(PlayerInput, "Cog.LoadLayout 1", EKeys::F2);
-    AddCommand(PlayerInput, "Cog.LoadLayout 2", EKeys::F3);
-    AddCommand(PlayerInput, "Cog.LoadLayout 3", EKeys::F4);
-    AddCommand(PlayerInput, "Cog.ToggleSelectionMode", EKeys::F5);
-
-    SortCommands(PlayerInput);
-    PlayerInput->SaveConfig();
-    return true;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::AddCommand(UPlayerInput* PlayerInput, const FString& Command, const FKey& Key)
 {
     if (PlayerInput == nullptr)
@@ -889,4 +834,96 @@ void UCogWindowManager::DisableInputMode()
 {
     UE_LOG(LogCogImGui, Verbose, TEXT("UCogWindowManager::DisableInputMode"));
     Context.SetEnableInput(false);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogWindowManager::HandleInputs()
+{
+    const UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*GetWorld());
+    if (PlayerInput == nullptr)
+    { return; }
+
+    if (ImGui::GetIO().WantTextInput)
+    { return; }
+
+    if (FCogImguiInputHelper::IsKeyInfoPressed(PlayerInput, Settings->ToggleImguiInputShortcut))
+    {
+        ToggleInputMode();
+    }
+    else if (FCogImguiInputHelper::IsKeyInfoPressed(PlayerInput, Settings->ToggleSelectionShortcut))
+    {
+        SetActivateSelectionMode(!GetActivateSelectionMode());
+    }
+    for (int i = 0; i < Settings->LoadLayoutShortcuts.Num(); ++i)
+    {
+        if (FCogImguiInputHelper::IsKeyInfoPressed(PlayerInput, Settings->LoadLayoutShortcuts[i]))
+        {
+            LoadLayout(i);
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogWindowManager::SetActivateSelectionMode(const bool Value)
+{
+    SelectionModeActiveCounter = FMath::Max(SelectionModeActiveCounter + (Value ? 1 : -1), 0);
+    bIsSelectionModeActive = SelectionModeActiveCounter > 0;
+
+    if (bIsSelectionModeActive)
+    {
+        bIsInputEnabledBeforeEnteringSelectionMode = GetContext().GetEnableInput();
+
+        Context.SetEnableInput(true);
+    }
+    else
+    {
+        GetContext().SetEnableInput(bIsInputEnabledBeforeEnteringSelectionMode);
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool UCogWindowManager::GetActivateSelectionMode() const
+{
+    return SelectionModeActiveCounter > 0;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogWindowManager::DisableConflictingCommands() const
+{
+    if (GetWorld() == nullptr)
+    { return; }
+
+    UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*GetWorld());
+    if (PlayerInput == nullptr)
+    { return; }
+
+    DisableConflictingCommand(PlayerInput, Settings->ToggleImguiInputShortcut);
+    DisableConflictingCommand(PlayerInput, Settings->ToggleSelectionShortcut);
+    
+    for (int32 i = 0; i < Settings->LoadLayoutShortcuts.Num(); ++i)
+    {
+        DisableConflictingCommand(PlayerInput, Settings->LoadLayoutShortcuts[i]);
+    }
+
+    for (int32 i = 0; i < Settings->SaveLayoutShortcuts.Num(); ++i)
+    {
+        DisableConflictingCommand(PlayerInput, Settings->SaveLayoutShortcuts[i]);
+    }
+
+    PlayerInput->SaveConfig();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogWindowManager::DisableConflictingCommand(UPlayerInput* InPlayerInput, const FCogImGuiKeyInfo& InShortcut)
+{
+    if (InPlayerInput == nullptr)
+    { return; }
+
+    for (FKeyBind& KeyBind :InPlayerInput->DebugExecBindings)
+    {
+        if (FCogImguiInputHelper::IsKeyBindMatchingKeyInfo(KeyBind, InShortcut))
+        {
+            KeyBind.bDisabled = true;
+        }
+    }
 }

@@ -459,8 +459,12 @@ bool FCogWindowWidgets::InputKey(const char* Label, FCogImGuiKeyInfo& KeyInfo)
     ImGui::PushID(Label);
    
     ImGui::AlignTextToFramePadding();
-    ImGui::TextUnformatted(Label);
+    ImGui::BeginDisabled();
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 10);
+    ImGui::InputText("##Shortcut", const_cast<char*>(Label), IM_ARRAYSIZE(Label));
+    ImGui::EndDisabled();
 
+    ImGui::SameLine();
     const bool HasChanged = InputKey(KeyInfo);
 
     ImGui::PopID();
@@ -471,17 +475,28 @@ bool FCogWindowWidgets::InputKey(const char* Label, FCogImGuiKeyInfo& KeyInfo)
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogWindowWidgets::InputKey(FCogImGuiKeyInfo& KeyInfo)
 {
-    static TArray<FKey> AllKeys;
-    if (AllKeys.IsEmpty())
-    {
-        EKeys::GetAllKeys(AllKeys);
-    }
-    
     bool HasKeyChanged = false;
 
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 6);
     if (ImGui::BeginCombo("##Key", TCHAR_TO_ANSI(*KeyInfo.Key.ToString()), ImGuiComboFlags_HeightLarge))
     {
+        {
+            bool IsSelected = KeyInfo.Key == FKey();
+            if (ImGui::Selectable("None", IsSelected))
+            {
+                KeyInfo.Key = FKey();
+                HasKeyChanged = true;
+            }
+        }
+
+        ImGui::Separator();
+        
+        static TArray<FKey> AllKeys;
+        if (AllKeys.IsEmpty())
+        {
+            EKeys::GetAllKeys(AllKeys);
+        }
+        
         for (int32 i = 0; i < AllKeys.Num(); ++i)
         {
             const FKey Key = AllKeys[i];
@@ -523,6 +538,27 @@ bool FCogWindowWidgets::KeyBind(FKeyBind& KeyBind)
     const auto Str = StringCast<ANSICHAR>(*KeyBind.Command);
     ImStrncpy(Buffer, Str.Get(), IM_ARRAYSIZE(Buffer));
 
+    bool Disable = !KeyBind.bDisabled; 
+    if (ImGui::Checkbox("##Disable", &Disable))
+    {
+        KeyBind.bDisabled = !Disable;
+    }
+    if (KeyBind.bDisabled)
+    {
+        ImGui::SetItemTooltip("Enable command");
+    }
+    else
+    {
+        ImGui::SetItemTooltip("Disable command");
+    }        
+
+    if (KeyBind.bDisabled)
+    {
+        ImGui::BeginDisabled();
+    }
+
+    ImGui::SameLine();
+
     bool HasChanged = false;
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 15);
     if (ImGui::InputText("##Command", Buffer, IM_ARRAYSIZE(Buffer)))
@@ -533,7 +569,7 @@ bool FCogWindowWidgets::KeyBind(FKeyBind& KeyBind)
 
     FCogImGuiKeyInfo KeyInfo;
     FCogImguiInputHelper::KeyBindToKeyInfo(KeyBind, KeyInfo);
-
+       
     ImGui::SameLine();
     if (InputKey(KeyInfo))
     {
@@ -541,6 +577,11 @@ bool FCogWindowWidgets::KeyBind(FKeyBind& KeyBind)
         FCogImguiInputHelper::KeyInfoToKeyBind(KeyInfo, KeyBind);
     }
 
+    if (KeyBind.bDisabled)
+    {
+        ImGui::EndDisabled();
+    }
+        
     return HasChanged;
 }
 

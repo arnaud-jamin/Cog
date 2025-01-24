@@ -5,7 +5,7 @@
 #include "CogWindowManager.h"
 #include "CogWindowWidgets.h"
 #include "imgui.h"
-#include "imgui.h"
+#include "imgui_internal.h"
 #include "InputCoreTypes.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -78,7 +78,7 @@ void FCogWindow_Settings::RenderContent()
             Context.SetEnableInput(bEnableInput);
         }
         ImGui::SetItemTooltip("Enable ImGui inputs. When enabled the ImGui menu is shown and inputs are forwarded to ImGui.");
-        FCogWindowWidgets::MenuItemShortcut("EnableInputShortcut", FCogImguiInputHelper::CommandToString(PlayerInput, UCogWindowManager::ToggleInputCommand));
+        FCogWindowWidgets::MenuItemShortcut("EnableInputShortcut", FCogImguiInputHelper::KeyInfoToString(Config->ToggleImguiInputShortcut));
 
         //-------------------------------------------------------------------------------------------
         bool bShareKeyboard = Context.GetShareKeyboard();
@@ -121,12 +121,16 @@ void FCogWindow_Settings::RenderContent()
         //-------------------------------------------------------------------------------------------
         ImGui::CheckboxFlags("Keyboard Navigation", &IO.ConfigFlags, ImGuiConfigFlags_NavEnableKeyboard);
         ImGui::SetItemTooltip("Use the keyboard to navigate in ImGui windows with the following keys : Tab, Directional Arrows, Space, Enter.");
+
+        //-------------------------------------------------------------------------------------------
+        //ImGui::CheckboxFlags("Gamepad Navigation", &IO.ConfigFlags, ImGuiConfigFlags_NavEnableGamepad);
+        //ImGui::SetItemTooltip("Use the gamepad to navigate in ImGui windows.");
+
+        //-------------------------------------------------------------------------------------------
+        ImGui::Checkbox("Disable Conflicting Commands", &Config->bResolveShortcutsConflicts);
+        ImGui::SetItemTooltip("Disable the existing Unreal command shortcuts mapped to same shortcuts Cog is using. Typically, if the F1 shortcut is used to toggle Inputs, the Unreal wireframe command will get disabled.");
     }
-
-    //-------------------------------------------------------------------------------------------
-    //ImGui::CheckboxFlags("Gamepad Navigation", &IO.ConfigFlags, ImGuiConfigFlags_NavEnableGamepad);
-    //ImGui::SetItemTooltip("Use the gamepad to navigate in ImGui windows.");
-
+    
     //-------------------------------------------------------------------------------------------
     if (ImGui::CollapsingHeader("Window", ImGuiTreeNodeFlags_DefaultOpen))
     {
@@ -164,6 +168,30 @@ void FCogWindow_Settings::RenderContent()
     }
 
     //-------------------------------------------------------------------------------------------
+    if (ImGui::CollapsingHeader("Shortcuts", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        RenderShortcut("Toggle ImGui Input", Config->ToggleImguiInputShortcut);
+        RenderShortcut("Toggle Selection", Config->ToggleSelectionShortcut);
+        
+        ImGui::Separator();
+
+        char Buffer[32];
+        
+        for (int32 i = 0; i < Config->LoadLayoutShortcuts.Num(); ++i)
+        {
+            ImFormatString(Buffer, IM_ARRAYSIZE(Buffer), "Load Layout  %d", i + 1);
+            RenderShortcut(Buffer, Config->LoadLayoutShortcuts[i]);
+        }
+
+        ImGui::Separator();
+        for (int32 i = 0; i < Config->SaveLayoutShortcuts.Num(); ++i)
+        {
+            ImFormatString(Buffer, IM_ARRAYSIZE(Buffer), "Save Layout  %d", i + 1);
+            RenderShortcut(Buffer, Config->SaveLayoutShortcuts[i]);
+        }
+    }
+    
+    //-------------------------------------------------------------------------------------------
     if (ImGui::CollapsingHeader("Config"))
     {
         if (ImGui::Button("Reset All Windows Config", ImVec2(-1.0f, 0.0f)))
@@ -197,4 +225,16 @@ void FCogWindow_Settings::SetDPIScale(float Value) const
 {
     Config->DPIScale = Value;
     GetOwner()->GetContext().SetDPIScale(Config->DPIScale);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogWindow_Settings::RenderShortcut(const char* Label, FCogImGuiKeyInfo& KeyInfo)
+{
+    if (FCogWindowWidgets::InputKey(Label, KeyInfo))
+    {
+        if (Config->bResolveShortcutsConflicts)
+        {
+            GetOwner()->DisableConflictingCommands();
+        }
+    }
 }

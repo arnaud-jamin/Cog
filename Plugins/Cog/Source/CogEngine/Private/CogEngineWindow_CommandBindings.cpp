@@ -50,17 +50,11 @@ void FCogEngineWindow_CommandBindings::RenderContent()
 
     ImGui::SameLine();
     if (FCogWindowWidgets::ButtonWithTooltip(
-        "Register Default Commands", 
-        "Register the default commands used to control Cog:\n\n"
-            "[Tab]  Cog.ToggleInput\n"
-            "[F1]   Cog.LoadLayout 1\n"
-            "[F2]   Cog.LoadLayout 2\n"
-            "[F3]   Cog.LoadLayout 3\n"
-            "[F4]   Cog.LoadLayout 4\n"
-            "[F5]   Cog.ToggleSelectionMode\n"
+        "Disable Conflicting Commands", 
+        "Disable the existing Unreal command shortcuts mapped to same shortcuts Cog is using. Typically, if the F1 shortcut is used to toggle Inputs, the Unreal wireframe command will get disabled."
     ))
     {
-        GetOwner()->RegisterDefaultCommandBindings();
+        GetOwner()->DisableConflictingCommands();
     }
 
     for (FKeyBind& KeyBind : PlayerInput->DebugExecBindings)
@@ -78,7 +72,6 @@ void FCogEngineWindow_CommandBindings::RenderContent()
         {
             PlayerInput->SaveConfig();
         }
-
 
         ImGui::PopID();
         Index++;

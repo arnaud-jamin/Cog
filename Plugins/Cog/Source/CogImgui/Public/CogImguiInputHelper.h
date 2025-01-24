@@ -28,9 +28,15 @@ public:
 
     static bool IsCheckBoxStateMatchingValue(ECheckBoxState CheckBoxState, bool bValue);
 
+    static bool IsCheckBoxStateMatchingKeybindModifier(ECheckBoxState InCheckBoxState, bool InRequireModifier, bool InIgnoreModifier);
+
     static bool IsKeyEventMatchingKeyInfo(const FKeyEvent& KeyEvent, const FCogImGuiKeyInfo& InputChord);
 
+    static bool IsKeyBindMatchingKeyInfo(const FKeyBind& InKeyBind, const FCogImGuiKeyInfo& InKeyInfo);
+
     static bool IsKeyEventMatchingKeyBind(const FKeyEvent& KeyEvent, const FKeyBind& KeyBind);
+
+    static bool IsKeyInfoPressed(const UPlayerInput* PlayerInput, const FCogImGuiKeyInfo& InKeyInfo);
 
     static ECheckBoxState MakeCheckBoxState(uint8 RequireValue, uint8 IgnoreValue);
 
@@ -55,6 +61,8 @@ public:
     static FString CommandToString(const UPlayerInput* PlayerInput, const FString& Command);
 
     static FString KeyBindToString(const FKeyBind& KeyBind);
+
+    static FString KeyInfoToString(const FCogImGuiKeyInfo& InKeyInfo);
 
     static bool IsMouseInsideMainViewport();
 

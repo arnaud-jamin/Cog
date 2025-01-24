@@ -23,8 +23,6 @@ public:
 
     virtual void Shutdown() override;
 
-    bool GetIsSelecting() const { return bSelectionModeActive; }
-
     const TArray<TSubclassOf<AActor>>& GetActorClasses() const { return ActorClasses; }
 
     void SetActorClasses(const TArray<TSubclassOf<AActor>>& Value) { ActorClasses = Value; }
@@ -32,12 +30,6 @@ public:
     ETraceTypeQuery GetTraceType() const { return TraceType; }
 
     void SetTraceType(ETraceTypeQuery Value) { TraceType = Value; }
-
-    virtual void ActivateSelectionMode();
-
-    virtual void DeactivateSelectionMode();
-
-    virtual void ToggleSelectionMode();
 
 protected:
 
@@ -72,8 +64,6 @@ protected:
     void TickSelectionMode();
 
     FVector LastSelectedActorLocation = FVector::ZeroVector;
-
-    bool bSelectionModeActive = false;
 
     bool bIsInputEnabledBeforeEnteringSelectionMode = false;
 
