@@ -476,4 +476,6 @@ class ACogSamplePlayerController
 
 ![Data Assets](https://github.com/user-attachments/assets/7382b272-7561-45ca-9401-05107198657a)
 
+- Reference the added Data Assets in the projet Asset Manager for them to be found in package mode:
+![Data Assets](https://github.com/user-attachments/assets/39d0fcc2-1e82-4bb7-aa5e-0661ed9ab58b)
 
