@@ -169,6 +169,11 @@ FReply SCogImguiWidget::HandleKeyEvent(const FKeyEvent& KeyEvent, bool Down)
         return FReply::Unhandled();
     }
 
+    if (IO.WantTextInput == false)
+    {
+	    return FReply::Unhandled();
+    }
+
     return FReply::Handled();
 }
 
