@@ -467,13 +467,16 @@ class ACogSamplePlayerController
 ```
 
 - In Unreal Editor create and configure the following Data Assets:
-  - CogAIDataAsset
+  - CogAbilityDataAsset
   - CogEngineDataAsset
-  - CogInputDataAsset
   
-![Data Assets](https://github.com/arnaud-jamin/Cog/assets/13844285/88384138-2ba7-43cf-a275-82f40503338e)
+![Data Assets](https://github.com/user-attachments/assets/4dcbd8c6-e0de-44a0-bcb2-29c76f165029)
 
-![Data Assets](https://github.com/arnaud-jamin/Cog/assets/13844285/cbda8065-c921-41a6-b06e-4302d8c72989)
+![Data Assets](https://github.com/user-attachments/assets/aea5a38e-fca4-44b7-b8e6-bee397ef5242)
 
-![Data Assets](https://github.com/arnaud-jamin/Cog/assets/13844285/1f4f3255-4104-4dfc-ab9e-fd34335c0289)
+![Data Assets](https://github.com/user-attachments/assets/7382b272-7561-45ca-9401-05107198657a)
+
+- Reference the added Data Assets in the projet Asset Manager for them to be found in package mode:
+
+![Data Assets](https://github.com/user-attachments/assets/39d0fcc2-1e82-4bb7-aa5e-0661ed9ab58b)
 
