@@ -7,7 +7,6 @@
 #include "CogSampleProjectileComponent.h"
 #include "CogSampleTargetAcquisition.h"
 #include "GameFramework/PlayerState.h"
-#include "Net/UnrealNetwork.h"
 
 #if ENABLE_COG
 #include "CogAbilityReplicator.h"
@@ -164,9 +163,9 @@ void ACogSamplePlayerController::TickTargeting(float DeltaSeconds)
             return;
         }
     
-        TArray<AActor*> TagretToIgnore;
+        TArray<AActor*> TargetToIgnore;
         FCogSampleTargetAcquisitionResult Result;
-        TargetAcquisition->FindBestTarget(this, TagretToIgnore, nullptr, true, FVector2D::ZeroVector, false, Result);
+        TargetAcquisition->FindBestTarget(this, TargetToIgnore, nullptr, true, FVector2D::ZeroVector, false, Result);
         SetTarget(Result.Target);
     }
 
@@ -205,14 +204,14 @@ void ACogSamplePlayerController::Server_SetTarget_Implementation(AActor* Value)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-const ACogSamplePlayerController* ACogSamplePlayerController::GetFirstLocalPlayerControllerConst(UObject* WorldContextObject)
+const ACogSamplePlayerController* ACogSamplePlayerController::GetFirstLocalPlayerControllerConst(const UObject* WorldContextObject)
 {
     const ACogSamplePlayerController* PlayerController = GetFirstLocalPlayerController(WorldContextObject);
     return PlayerController;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ACogSamplePlayerController* ACogSamplePlayerController::GetFirstLocalPlayerController(UObject* WorldContextObject)
+ACogSamplePlayerController* ACogSamplePlayerController::GetFirstLocalPlayerController(const UObject* WorldContextObject)
 {
     UWorld* const World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
     if (World == nullptr)

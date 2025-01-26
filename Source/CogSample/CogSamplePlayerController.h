@@ -25,9 +25,9 @@ class ACogSamplePlayerController
 
 public:
     
-    static const ACogSamplePlayerController* GetFirstLocalPlayerControllerConst(UObject* WorldContextObject);
+    static const ACogSamplePlayerController* GetFirstLocalPlayerControllerConst(const UObject* WorldContextObject);
 
-    static ACogSamplePlayerController* GetFirstLocalPlayerController(UObject* WorldContextObject);
+    static ACogSamplePlayerController* GetFirstLocalPlayerController(const UObject* WorldContextObject);
 
     ACogSamplePlayerController();
 
