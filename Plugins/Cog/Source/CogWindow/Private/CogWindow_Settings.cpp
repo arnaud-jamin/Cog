@@ -77,8 +77,8 @@ void FCogWindow_Settings::RenderContent()
         {
             Context.SetEnableInput(bEnableInput);
         }
-        ImGui::SetItemTooltip("Enable ImGui inputs. When enabled the ImGui menu is shown and inputs are forwarded to ImGui.");
-        FCogWindowWidgets::MenuItemShortcut("EnableInputShortcut", FCogImguiInputHelper::KeyInfoToString(Config->ToggleImguiInputShortcut));
+        FCogWindowWidgets::ItemTooltipWrappedText("Enable ImGui inputs. When enabled the ImGui menu is shown and inputs are forwarded to ImGui.");
+        FCogWindowWidgets::MenuItemShortcut("EnableInputShortcut", FCogImguiInputHelper::KeyInfoToString(Config->ToggleImGuiInputShortcut));
 
         //-------------------------------------------------------------------------------------------
         bool bShareKeyboard = Context.GetShareKeyboard();
@@ -86,7 +86,7 @@ void FCogWindow_Settings::RenderContent()
         {
             Context.SetShareKeyboard(bShareKeyboard);
         }
-        ImGui::SetItemTooltip("Forward the keyboard inputs to the game when ImGui does not need them.");
+        FCogWindowWidgets::ItemTooltipWrappedText("Forward the keyboard inputs to the game when ImGui does not need them.");
 
         //-------------------------------------------------------------------------------------------
         bool bShareMouse = Context.GetShareMouse();
@@ -94,7 +94,7 @@ void FCogWindow_Settings::RenderContent()
         {
             Context.SetShareMouse(bShareMouse);
         }
-        ImGui::SetItemTooltip("Forward mouse inputs to the game when ImGui does not need them.");
+        FCogWindowWidgets::ItemTooltipWrappedText("Forward mouse inputs to the game when ImGui does not need them.");
 
         //-------------------------------------------------------------------------------------------
         if (bShareMouse == false)
@@ -107,7 +107,7 @@ void FCogWindow_Settings::RenderContent()
         {
             Context.SetShareMouseWithGameplay(bShareMouseWithGameplay);
         }
-        ImGui::SetItemTooltip("When disabled, mouse inputs are only forwarded to game menus. "
+        FCogWindowWidgets::ItemTooltipWrappedText("When disabled, mouse inputs are only forwarded to game menus. "
         "When enabled, mouse inputs are also forwarded to the gameplay. Note that this mode: \n" 
         "  - Force the cursor to be visible.\n"
         "  - Prevent the interaction of Cog's transform gizmos.\n"
@@ -120,15 +120,21 @@ void FCogWindow_Settings::RenderContent()
 
         //-------------------------------------------------------------------------------------------
         ImGui::CheckboxFlags("Keyboard Navigation", &IO.ConfigFlags, ImGuiConfigFlags_NavEnableKeyboard);
-        ImGui::SetItemTooltip("Use the keyboard to navigate in ImGui windows with the following keys : Tab, Directional Arrows, Space, Enter.");
+        FCogWindowWidgets::ItemTooltipWrappedText("Use the keyboard to navigate in ImGui windows with the following keys : Tab, Directional Arrows, Space, Enter.");
 
         //-------------------------------------------------------------------------------------------
         //ImGui::CheckboxFlags("Gamepad Navigation", &IO.ConfigFlags, ImGuiConfigFlags_NavEnableGamepad);
-        //ImGui::SetItemTooltip("Use the gamepad to navigate in ImGui windows.");
+        //FCogWindowWidgets::ItemTooltipWrappedText("Use the gamepad to navigate in ImGui windows.");
 
         //-------------------------------------------------------------------------------------------
-        ImGui::Checkbox("Disable Conflicting Commands", &Config->bResolveShortcutsConflicts);
-        ImGui::SetItemTooltip("Disable the existing Unreal command shortcuts mapped to same shortcuts Cog is using. Typically, if the F1 shortcut is used to toggle Inputs, the Unreal wireframe command will get disabled.");
+        ImGui::Checkbox("Disable Conflicting Commands", &Config->bDisableConflictingCommands);
+        FCogWindowWidgets::ItemTooltipWrappedText("Disable the existing Unreal command shortcuts mapped to same shortcuts Cog is using. Typically, if the F1 shortcut is used to toggle Inputs, the Unreal wireframe command will get disabled.");
+
+        //-------------------------------------------------------------------------------------------
+        ImGui::Checkbox("Disable shortcuts when ImGui want text input", &Config->bDisableShortcutsWhenImGuiWantTextInput);
+        FCogWindowWidgets::ItemTooltipWrappedText("Disable Cog's shortcuts (ToggleInput, ToggleSelectionMode, LoadLayout, ...) when ImGui want text input."
+				" This can be required if the shortcuts are mapped by keys generating a text input (letters, or Backspace for example)."
+                " This is not required if the shortcuts are set to keys such as F1 or F2.");
     }
     
     //-------------------------------------------------------------------------------------------
@@ -138,19 +144,19 @@ void FCogWindow_Settings::RenderContent()
         {
             FCogImguiHelper::SetFlags(IO.ConfigFlags, ImGuiConfigFlags_ViewportsEnable, Config->bEnableViewports);
         }
-        ImGui::SetItemTooltip("Enable moving ImGui windows outside of the main viewport.");
+        FCogWindowWidgets::ItemTooltipWrappedText("Enable moving ImGui windows outside of the main viewport.");
 
         //-------------------------------------------------------------------------------------------
         ImGui::Checkbox("Compact Mode", &Config->bCompactMode);
-        ImGui::SetItemTooltip("Enable compact mode.");
+        FCogWindowWidgets::ItemTooltipWrappedText("Enable compact mode.");
     
         //-------------------------------------------------------------------------------------------
         ImGui::Checkbox("Show Windows In Main Menu", &Config->bShowWindowsInMainMenu);
-        ImGui::SetItemTooltip("Show the content of the windows when hovering the window menu item.");
+        FCogWindowWidgets::ItemTooltipWrappedText("Show the content of the windows when hovering the window menu item.");
 
         //-------------------------------------------------------------------------------------------
         ImGui::Checkbox("Show Help", &Config->bShowHelp);
-        ImGui::SetItemTooltip("Show windows help on the window menu items.");
+        FCogWindowWidgets::ItemTooltipWrappedText("Show windows help on the window menu items.");
 
         //-------------------------------------------------------------------------------------------
         FCogWindowWidgets::SetNextItemToShortWidth();
@@ -170,7 +176,7 @@ void FCogWindow_Settings::RenderContent()
     //-------------------------------------------------------------------------------------------
     if (ImGui::CollapsingHeader("Shortcuts", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        RenderShortcut("Toggle ImGui Input", Config->ToggleImguiInputShortcut);
+        RenderShortcut("Toggle ImGui Input", Config->ToggleImGuiInputShortcut);
         RenderShortcut("Toggle Selection", Config->ToggleSelectionShortcut);
         
         ImGui::Separator();
@@ -232,9 +238,6 @@ void FCogWindow_Settings::RenderShortcut(const char* Label, FCogImGuiKeyInfo& Ke
 {
     if (FCogWindowWidgets::InputKey(Label, KeyInfo))
     {
-        if (Config->bResolveShortcutsConflicts)
-        {
-            GetOwner()->DisableConflictingCommands();
-        }
+        GetOwner()->OnShortcutsDefined();
     }
 }

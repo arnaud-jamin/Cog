@@ -41,6 +41,18 @@ void FCogWindowWidgets::EndTableTooltip()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void FCogWindowWidgets::ItemTooltipWrappedText(const char* InText)
+{
+    if (ImGui::BeginItemTooltip())
+    {
+        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+        ImGui::TextUnformatted(InText);
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 bool FCogWindowWidgets::BeginItemTableTooltip()
 {
     if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary | ImGuiHoveredFlags_DelayShort) == false)

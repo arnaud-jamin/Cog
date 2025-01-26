@@ -80,10 +80,13 @@ public:
     bool bNavEnableKeyboard = false;
 
     UPROPERTY(Config)
-    bool bResolveShortcutsConflicts = true;
-    
+    bool bDisableConflictingCommands = true;
+
     UPROPERTY(Config)
-    FCogImGuiKeyInfo ToggleImguiInputShortcut =  FCogImGuiKeyInfo(EKeys::F1);
+    bool bDisableShortcutsWhenImGuiWantTextInput = false;
+
+    UPROPERTY(Config)
+    FCogImGuiKeyInfo ToggleImGuiInputShortcut =  FCogImGuiKeyInfo(EKeys::F1);
 
     UPROPERTY(Config)
     FCogImGuiKeyInfo ToggleSelectionShortcut = FCogImGuiKeyInfo(EKeys::F5);
@@ -114,10 +117,13 @@ public:
         bShareMouse = false;
         bShareKeyboard = false;
         bNavEnableKeyboard = false;
+         bDisableConflictingCommands = true;
+        bDisableShortcutsWhenImGuiWantTextInput = false;
         //bNavEnableGamepad = false;
         //bNavNoCaptureInput = true;
 
-        ToggleImguiInputShortcut =  FCogImGuiKeyInfo(EKeys::F1);
+
+        ToggleImGuiInputShortcut =  FCogImGuiKeyInfo(EKeys::F1);
         ToggleSelectionShortcut = FCogImGuiKeyInfo(EKeys::F5);
         LoadLayoutShortcuts = { FCogImGuiKeyInfo(EKeys::F2), FCogImGuiKeyInfo(EKeys::F3), FCogImGuiKeyInfo(EKeys::F4), FCogImGuiKeyInfo()};
         SaveLayoutShortcuts = { FCogImGuiKeyInfo(), FCogImGuiKeyInfo(), FCogImGuiKeyInfo(), FCogImGuiKeyInfo()};

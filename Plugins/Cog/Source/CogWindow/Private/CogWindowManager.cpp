@@ -51,10 +51,7 @@ void UCogWindowManager::InitializeInternal()
     SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 4", false));
 
     Settings = GetConfig<UCogWindowConfig_Settings>();
-    if (Settings->bResolveShortcutsConflicts)
-    {
-        DisableConflictingCommands();
-    }
+    OnShortcutsDefined();
     
     LayoutsWindow = AddWindow<FCogWindow_Layouts>("Window.Layouts", false);
     SettingsWindow = AddWindow<FCogWindow_Settings>("Window.Settings", false);
@@ -843,10 +840,10 @@ void UCogWindowManager::HandleInputs()
     if (PlayerInput == nullptr)
     { return; }
 
-    if (ImGui::GetIO().WantTextInput)
+    if (Settings->bDisableShortcutsWhenImGuiWantTextInput && ImGui::GetIO().WantTextInput)
     { return; }
 
-    if (FCogImguiInputHelper::IsKeyInfoPressed(PlayerInput, Settings->ToggleImguiInputShortcut))
+    if (FCogImguiInputHelper::IsKeyInfoPressed(PlayerInput, Settings->ToggleImGuiInputShortcut))
     {
         ToggleInputMode();
     }
@@ -888,42 +885,15 @@ bool UCogWindowManager::GetActivateSelectionMode() const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::DisableConflictingCommands() const
+void UCogWindowManager::OnShortcutsDefined() const
 {
     if (GetWorld() == nullptr)
     { return; }
 
-    UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*GetWorld());
-    if (PlayerInput == nullptr)
-    { return; }
-
-    DisableConflictingCommand(PlayerInput, Settings->ToggleImguiInputShortcut);
-    DisableConflictingCommand(PlayerInput, Settings->ToggleSelectionShortcut);
+    TArray Shortcuts = { Settings->ToggleImGuiInputShortcut, Settings->ToggleSelectionShortcut };
+    Shortcuts.Append(Settings->LoadLayoutShortcuts);
+    Shortcuts.Append(Settings->SaveLayoutShortcuts);
     
-    for (int32 i = 0; i < Settings->LoadLayoutShortcuts.Num(); ++i)
-    {
-        DisableConflictingCommand(PlayerInput, Settings->LoadLayoutShortcuts[i]);
-    }
-
-    for (int32 i = 0; i < Settings->SaveLayoutShortcuts.Num(); ++i)
-    {
-        DisableConflictingCommand(PlayerInput, Settings->SaveLayoutShortcuts[i]);
-    }
-
-    PlayerInput->SaveConfig();
+    FCogImguiInputHelper::SetShortcuts(*GetWorld(), Shortcuts, Settings->bDisableConflictingCommands);
 }
 
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::DisableConflictingCommand(UPlayerInput* InPlayerInput, const FCogImGuiKeyInfo& InShortcut)
-{
-    if (InPlayerInput == nullptr)
-    { return; }
-
-    for (FKeyBind& KeyBind :InPlayerInput->DebugExecBindings)
-    {
-        if (FCogImguiInputHelper::IsKeyBindMatchingKeyInfo(KeyBind, InShortcut))
-        {
-            KeyBind.bDisabled = true;
-        }
-    }
-}

@@ -79,7 +79,7 @@ public:
 
     static void SortCommands(UPlayerInput* PlayerInput);
 
-    void DisableConflictingCommands() const;
+    void OnShortcutsDefined() const;
 
 protected:
 

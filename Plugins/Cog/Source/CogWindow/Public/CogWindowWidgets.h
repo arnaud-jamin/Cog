@@ -27,6 +27,8 @@ public:
 
     static void EndTableTooltip();
 
+    static void ItemTooltipWrappedText(const char* InText);
+    
     static bool BeginItemTableTooltip();
 
     static void EndItemTableTooltip();

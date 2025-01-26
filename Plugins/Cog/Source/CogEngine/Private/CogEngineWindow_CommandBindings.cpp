@@ -54,7 +54,7 @@ void FCogEngineWindow_CommandBindings::RenderContent()
         "Disable the existing Unreal command shortcuts mapped to same shortcuts Cog is using. Typically, if the F1 shortcut is used to toggle Inputs, the Unreal wireframe command will get disabled."
     ))
     {
-        GetOwner()->DisableConflictingCommands();
+        GetOwner()->OnShortcutsDefined();
     }
 
     for (FKeyBind& KeyBind : PlayerInput->DebugExecBindings)

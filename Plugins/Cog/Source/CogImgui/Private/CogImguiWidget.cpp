@@ -152,7 +152,7 @@ FReply SCogImguiWidget::HandleKeyEvent(const FKeyEvent& KeyEvent, bool Down)
         return FReply::Unhandled();
     }
 
-    if (FCogImguiInputHelper::IsKeyEventHandled(Context->GetGameViewport()->GetWorld(), KeyEvent) == false)
+    if (FCogImguiInputHelper::IsTopPriorityKeyEvent(Context->GetGameViewport()->GetWorld(), KeyEvent))
     {
         return FReply::Unhandled();
     }
@@ -169,10 +169,10 @@ FReply SCogImguiWidget::HandleKeyEvent(const FKeyEvent& KeyEvent, bool Down)
         return FReply::Unhandled();
     }
 
-    if (IO.WantTextInput == false)
-    {
-	    return FReply::Unhandled();
-    }
+    // if (IO.WantTextInput == false)
+    // {
+    //     return FReply::Unhandled();
+    // }
 
     return FReply::Handled();
 }
