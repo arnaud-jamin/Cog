@@ -37,6 +37,15 @@ protected:
     TObjectPtr<UCogWindowConfig_Settings> Config = nullptr;
 };
 
+//--------------------------------------------------------------------------------------------------------------------------
+UENUM()
+enum class ECogWidgetAlignment
+{
+    Left = 0,
+    Center = 1,
+    Right = 2,
+    Manual = 3
+};
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS(Config = Cog)
@@ -85,6 +94,12 @@ public:
     UPROPERTY(Config)
     bool bDisableShortcutsWhenImGuiWantTextInput = false;
 
+    UPROPERTY(Config)
+    ECogWidgetAlignment WidgetAlignment = ECogWidgetAlignment::Right;
+
+    UPROPERTY(Config)
+    bool ShowWidgetBorders = false;
+    
     UPROPERTY(Config)
     FCogImGuiKeyInfo ToggleImGuiInputShortcut =  FCogImGuiKeyInfo(EKeys::F1);
 

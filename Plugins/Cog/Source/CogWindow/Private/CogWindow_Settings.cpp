@@ -174,6 +174,68 @@ void FCogWindow_Settings::RenderContent()
     }
 
     //-------------------------------------------------------------------------------------------
+    if (ImGui::CollapsingHeader("Widgets (?)", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        FCogWindowWidgets::ItemTooltipWrappedText("Widgets appear in the main menu bar.");
+        
+        ImGui::Checkbox("Show Widget Borders", &Config->ShowWidgetBorders);
+        FCogWindowWidgets::ItemTooltipWrappedText("Should a border be visible between widgets.");
+        
+        FCogWindowWidgets::SetNextItemToShortWidth();
+        FCogWindowWidgets::ComboboxEnum("Widgets Alignment", Config->WidgetAlignment);
+        FCogWindowWidgets::ItemTooltipWrappedText("How the widgets should be aligned in the main menu bar.");
+
+        if (ImGui::BeginChild("Widgets", ImVec2(0, ImGui::GetFontSize() * 10), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeY, ImGuiWindowFlags_MenuBar))
+        {
+            if (ImGui::BeginMenuBar())
+            {
+                ImGui::TextUnformatted("Widgets visibility and ordering");
+                ImGui::SameLine();
+                FCogWindowWidgets::HelpMarker("Drag and drop the widget names to reorder them.");
+                ImGui::EndMenuBar();
+            }
+            
+            TArray<FCogWindow*>& Widgets = GetOwner()->Widgets;
+            for (int32 i = 0; i < Widgets.Num(); ++i)
+            {
+                FCogWindow* Window = Widgets[i];
+
+                ImGui::PushID(i);
+
+                bool Visible = Window->GetIsWidgetVisible();
+                if (ImGui::Checkbox("##Visibility", &Visible))
+                {
+                    Window->SetIsWidgetVisible(Visible);
+                }
+                
+                ImGui::SameLine();
+                ImGui::Selectable(TCHAR_TO_ANSI(*Window->GetName()), false, ImGuiSelectableFlags_SpanAvailWidth);
+                {
+                    Window->SetIsWidgetVisible(Visible);
+                }
+                if (ImGui::IsItemHovered())
+                {
+                    ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeNS);
+                }
+
+                if (ImGui::IsItemActive() && ImGui::IsItemHovered() == false)
+                {
+                    const int iNext = i + (ImGui::GetMouseDragDelta(0).y < 0.f ? -1 : 1);
+                    if (iNext >= 0 && iNext < Widgets.Num())
+                    {
+                        Widgets[i] = Widgets[iNext];
+                        Widgets[iNext] = Window;
+                        ImGui::ResetMouseDragDelta();
+                    }
+                }
+
+                ImGui::PopID();
+            }
+        }
+        ImGui::EndChild();
+    }
+    
+    //-------------------------------------------------------------------------------------------
     if (ImGui::CollapsingHeader("Shortcuts", ImGuiTreeNodeFlags_DefaultOpen))
     {
         RenderShortcut("Toggle ImGui Input", Config->ToggleImGuiInputShortcut);

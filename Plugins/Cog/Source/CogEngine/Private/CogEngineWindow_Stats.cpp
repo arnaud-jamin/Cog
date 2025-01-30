@@ -17,7 +17,7 @@ void FCogEngineWindow_Stats::Initialize()
 {
     Super::Initialize();
 
-    bHasWidget = true;
+    bHasWidget = 2;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -64,30 +64,14 @@ void FCogEngineWindow_Stats::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-float FCogEngineWindow_Stats::GetMainMenuWidgetWidth(const int32 SubWidgetIndex, float MaxWidth)
+void FCogEngineWindow_Stats::RenderMainMenuWidget()
 {
     const APlayerController* PlayerController = GetLocalPlayerController();
     const UNetConnection* Connection = PlayerController != nullptr ? PlayerController->GetNetConnection() : nullptr;
-
-    switch (SubWidgetIndex)
-    {
-        case 0: return FCogWindowWidgets::GetFontWidth() * 8;
-        case 1: return Connection != nullptr ? FCogWindowWidgets::GetFontWidth() * 7 : 0.0f;
-        case 2: return Connection != nullptr ? FCogWindowWidgets::GetFontWidth() * 7 : 0.0f;
-    }
-
-    return -1;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Stats::RenderMainMenuWidget(const int32 SubWidgetIndex, const float Width)
-{
-    switch (SubWidgetIndex)
-    {
-        case 0: RenderMainMenuWidgetFramerate(Width); break;
-        case 1: RenderMainMenuWidgetPing(Width); break;
-        case 2: RenderMainMenuWidgetPacketLoss(Width); break;
-    }
+    
+    RenderMainMenuWidgetFramerate(FCogWindowWidgets::GetFontWidth() * 8);
+    RenderMainMenuWidgetPing(Connection != nullptr ? FCogWindowWidgets::GetFontWidth() * 7 : 0.0f); 
+    RenderMainMenuWidgetPacketLoss(Connection != nullptr ? FCogWindowWidgets::GetFontWidth() * 7 : 0.0f); 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -96,22 +80,12 @@ void FCogEngineWindow_Stats::RenderMainMenuWidgetFramerate(const float Width)
     extern ENGINE_API float GAverageFPS;
     const int32 Fps = (int32)GAverageFPS;
 
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
-    ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
     ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(0, 0, 0, 0));
     ImGui::PushStyleColor(ImGuiCol_Text, GetFpsColor(Fps));
-
-    if (ImGui::Button(TCHAR_TO_ANSI(*FString::Printf(TEXT("%3dfps###FramerateButton"), Fps)), ImVec2(Width, 0.0f)))
-    {
-        ImGui::OpenPopup("FrameratePopup");
-    }
-
+    const bool Open = ImGui::BeginMenu(TCHAR_TO_ANSI(*FString::Printf(TEXT("%3dfps###FramerateButton"), Fps)));
     ImGui::PopStyleColor(2);
-    ImGui::PopStyleVar(2);
 
-    ImGui::SetItemTooltip("Framerate");
-
-    if (ImGui::BeginPopup("FrameratePopup"))
+    if (Open)
     {
         ImGui::Text("Fps");
         ImGui::SameLine();
@@ -123,8 +97,10 @@ void FCogEngineWindow_Stats::RenderMainMenuWidgetFramerate(const float Width)
             GEngine->SetMaxFPS(MaxFps);
         }
 
-        ImGui::EndPopup();
+        ImGui::EndMenu();
     }
+
+    ImGui::SetItemTooltip("Framerate");
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -138,25 +114,15 @@ void FCogEngineWindow_Stats::RenderMainMenuWidgetPing(const float Width)
     }
 
     const float Ping = PlayerState->GetPingInMilliseconds();
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
-    ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
     ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(0, 0, 0, 0));
     ImGui::PushStyleColor(ImGuiCol_Text, GetPingColor(Ping));
-
-    if (ImGui::Button(TCHAR_TO_ANSI(*FString::Printf(TEXT("%3dms###PingButton"), (int32)Ping)), ImVec2(Width, 0.0f)))
-    {
-        ImGui::OpenPopup("PingPopup");
-    }
-
+    const bool Open = ImGui::BeginMenu(TCHAR_TO_ANSI(*FString::Printf(TEXT("%3dms###PingButton"), (int32)Ping)));
     ImGui::PopStyleColor(2);
-    ImGui::PopStyleVar(2);
-
     ImGui::SetItemTooltip("Ping");
 
 #if DO_ENABLE_NET_TEST
-    if (ImGui::BeginPopup("PingPopup"))
+    if (Open)
     {
-
         FWorldContext& WorldContext = GEngine->GetWorldContextFromWorldChecked(GetWorld());
         if (WorldContext.ActiveNetDrivers.Num() > 0)
         {
@@ -171,9 +137,11 @@ void FCogEngineWindow_Stats::RenderMainMenuWidgetPing(const float Width)
                 SelectedNetDriver->NetDriver->SetPacketSimulationSettings(Settings);
             }
         }
-        ImGui::EndPopup();
+
+        ImGui::EndMenu();
     }
 #endif //DO_ENABLE_NET_TEST
+
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -208,7 +176,6 @@ void FCogEngineWindow_Stats::RenderMainMenuWidgetPacketLoss(const float Width)
 #if DO_ENABLE_NET_TEST
     if (ImGui::BeginPopup("PacketLossPopup"))
     {
-
         FWorldContext& WorldContext = GEngine->GetWorldContextFromWorldChecked(GetWorld());
         if (WorldContext.ActiveNetDrivers.Num() > 0)
         {

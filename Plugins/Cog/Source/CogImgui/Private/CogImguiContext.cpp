@@ -25,8 +25,8 @@
 
 static UPlayerInput* GetPlayerInput(const UWorld* World);
 
-FCogImGuiContextScope::
-FCogImGuiContextScope(FCogImguiContext& CogImguiContext)
+//--------------------------------------------------------------------------------------------------------------------------
+FCogImGuiContextScope::FCogImGuiContextScope(FCogImguiContext& CogImguiContext)
 {
     PrevContext = ImGui::GetCurrentContext();
     PrevPlotContext = ImPlot::GetCurrentContext();
@@ -35,8 +35,8 @@ FCogImGuiContextScope(FCogImguiContext& CogImguiContext)
     ImPlot::SetCurrentContext(CogImguiContext.PlotContext);
 }
 
-FCogImGuiContextScope::
-FCogImGuiContextScope(ImGuiContext* GuiCtx, ImPlotContext* PlotCtx)
+//--------------------------------------------------------------------------------------------------------------------------
+FCogImGuiContextScope::FCogImGuiContextScope(ImGuiContext* GuiCtx, ImPlotContext* PlotCtx)
 {
     PrevContext = ImGui::GetCurrentContext();
     PrevPlotContext = ImPlot::GetCurrentContext();
@@ -45,8 +45,8 @@ FCogImGuiContextScope(ImGuiContext* GuiCtx, ImPlotContext* PlotCtx)
     ImPlot::SetCurrentContext(PlotCtx);
 }
 
-FCogImGuiContextScope::
-~FCogImGuiContextScope()
+//--------------------------------------------------------------------------------------------------------------------------
+FCogImGuiContextScope::~FCogImGuiContextScope()
 {
     ImGui::SetCurrentContext(PrevContext);
     ImPlot::SetCurrentContext(PrevPlotContext);
@@ -298,11 +298,14 @@ bool FCogImguiContext::BeginFrame(float InDeltaTime)
         //-------------------------------------------------------------------------------------------------------
         // Refresh modifiers otherwise, when pressing ALT-TAB, the Alt modifier is always true
         //-------------------------------------------------------------------------------------------------------
-        FModifierKeysState ModifierKeys = FSlateApplication::Get().GetModifierKeys();
-        if (ModifierKeys.IsControlDown() != IO.KeyCtrl) { IO.AddKeyEvent(ImGuiMod_Ctrl, ModifierKeys.IsControlDown()); }
-        if (ModifierKeys.IsShiftDown() != IO.KeyShift) { IO.AddKeyEvent(ImGuiMod_Shift, ModifierKeys.IsShiftDown()); }
-        if (ModifierKeys.IsAltDown() != IO.KeyAlt) { IO.AddKeyEvent(ImGuiMod_Alt, ModifierKeys.IsAltDown()); }
-        if (ModifierKeys.IsCommandDown() != IO.KeySuper) { IO.AddKeyEvent(ImGuiMod_Super, ModifierKeys.IsCommandDown()); }
+        if (bEnableInput)
+        {
+            FModifierKeysState ModifierKeys = FSlateApplication::Get().GetModifierKeys();
+            if (ModifierKeys.IsControlDown() != IO.KeyCtrl) { IO.AddKeyEvent(ImGuiMod_Ctrl, ModifierKeys.IsControlDown()); }
+            if (ModifierKeys.IsShiftDown() != IO.KeyShift) { IO.AddKeyEvent(ImGuiMod_Shift, ModifierKeys.IsShiftDown()); }
+            if (ModifierKeys.IsAltDown() != IO.KeyAlt) { IO.AddKeyEvent(ImGuiMod_Alt, ModifierKeys.IsAltDown()); }
+            if (ModifierKeys.IsCommandDown() != IO.KeySuper) { IO.AddKeyEvent(ImGuiMod_Super, ModifierKeys.IsCommandDown()); }
+        }
     }
 
     //-------------------------------------------------------------------------------------------------------
@@ -685,6 +688,8 @@ static UPlayerInput* GetPlayerInput(const UWorld* World)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::SetEnableInput(bool Value)
 {
+    FCogImGuiContextScope ImGuiContextScope(ImGuiContext, PlotContext);
+
     bEnableInput = Value; 
 
     if (FSlateApplication::IsInitialized() == false)
@@ -715,6 +720,14 @@ void FCogImguiContext::SetEnableInput(bool Value)
         {
             LocalPlayer->GetSlateOperations().CaptureMouse(GameViewport->GetGameViewportWidget().ToSharedRef());
         }
+
+        //---------------------------------------------------------------------------------
+        // Make sure no keys stay down after disabling inputs
+        //---------------------------------------------------------------------------------
+        ImGuiIO& IO = ImGui::GetIO();
+        IO.ClearInputMouse();
+        IO.ClearEventsQueue();
+        IO.ClearInputKeys();
     }
 
     RefreshMouseCursor();

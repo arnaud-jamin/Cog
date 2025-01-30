@@ -235,7 +235,7 @@ void UCogWindowManager::Render(float DeltaTime)
             Window->Render(DeltaTime);
         }
     }
-
+    
     if (bCompactSaved)
     {
         FCogWindowWidgets::PopStyleCompact();
@@ -370,6 +370,8 @@ void UCogWindowManager::RenderMainMenu()
 {
     const UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*GetWorld());
 
+    IsRenderingInMainMenu = true;
+
     if (ImGui::BeginMainMenuBar())
     {
         for (FMenu& Menu : MainMenu.SubMenus)
@@ -402,115 +404,106 @@ void UCogWindowManager::RenderMainMenu()
                 ImGui::EndMenu();
             }
 
-            if (ImGui::BeginMenu("Widgets"))
-            {
-                for (int32 i = 0; i < Widgets.Num(); ++i)
-                {
-                    FCogWindow* Window = Widgets[i];
-
-                    ImGui::PushID(i);
-
-                    bool Visible = Window->GetIsWidgetVisible();
-                    if (ImGui::Checkbox(TCHAR_TO_ANSI(*Window->GetName()), &Visible))
-                    {
-                        Window->SetIsWidgetVisible(Visible);
-                    }
-
-                    if (ImGui::IsItemActive() && ImGui::IsItemHovered() == false)
-                    {
-	                    const int iNext = i + (ImGui::GetMouseDragDelta(0).y < 0.f ? -1 : 1);
-                        if (iNext >= 0 && iNext < Widgets.Num())
-                        {
-                            Widgets[i] = Widgets[iNext];
-                            Widgets[iNext] = Window;
-                            ImGui::ResetMouseDragDelta();
-                        }
-                    }
-
-                    if (i == 0)
-                    {
-                        ImGui::SameLine();
-                        FCogWindowWidgets::HelpMarker("Drag and drop the widget names to reorder them.");
-                    }
-
-                    ImGui::PopID();
-                }
-
-                ImGui::EndMenu();
-            }
-            
             ImGui::EndMenu();
         }
 
-        const float MinCursorX = ImGui::GetCursorPosX();
-        float CursorX = ImGui::GetWindowWidth();
-        
-        //------------------------------------------------------------
-        // Render in reverse order because it makes more sense 
-        // when looking at the widget ordered list in the UI.
-        //------------------------------------------------------------
-        for (int32 WindowIndex = Widgets.Num() - 1;  WindowIndex >= 0; WindowIndex--)
-        {
-            FCogWindow* Window = Widgets[WindowIndex];
-
-            if (Window->GetIsWidgetVisible() == false)
-            {
-                continue;
-            }
-
-            TArray<float> SubWidgetsWidths;
-            float SimCursorX = CursorX;
-            for (int32 SubWidgetIndex = 0; ; ++SubWidgetIndex)
-            {
-                const float MaxWidth = SimCursorX - MinCursorX;
-                float SubWidgetWidth = Window->GetMainMenuWidgetWidth(SubWidgetIndex, MaxWidth);
-                if (SubWidgetWidth == -1)
-                {
-                    break;
-                }
-
-                SimCursorX -= SubWidgetWidth;
-                SubWidgetsWidths.Add(SubWidgetWidth);
-            }
-
-            bool Stop = false;
-            for (int32 SubWidgetIndex = SubWidgetsWidths.Num() - 1; SubWidgetIndex >= 0; SubWidgetIndex--)
-            {
-                const float SubWidgetWidth = SubWidgetsWidths[SubWidgetIndex];
-                const float MaxWidth = CursorX - MinCursorX;
-
-                //-------------------------------------------
-                // Bypass this subwidget if its width is 0
-                //-------------------------------------------
-                if (SubWidgetWidth == 0)
-                {
-                    continue;
-                }
-
-                //-------------------------------------------
-                // Stop drawing if there is not enough room
-                //-------------------------------------------
-                if (SubWidgetWidth > MaxWidth)
-                {
-                    Stop = true;
-                    break;
-                }
-
-                CursorX -= SubWidgetWidth;
-                ImGui::SetCursorPosX(CursorX);
-                
-                Window->RenderMainMenuWidget(SubWidgetIndex, SubWidgetWidth);
-            }
-
-            if (Stop)
-            {
-                break;
-            }
-
-            CursorX -= ImGui::GetStyle().ItemSpacing.x;
-        }
+        RenderWidgets();
 
         ImGui::EndMainMenuBar();
+    }
+
+    IsRenderingInMainMenu = false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogWindowManager::RenderWidgets()
+{
+    int32 numVisibleWidgets = 0;
+    for (int i = 0; i < Widgets.Num(); ++i)
+    {
+        FCogWindow* Window = Widgets[i];
+        if (Window->GetIsWidgetVisible())
+        {
+            numVisibleWidgets++;
+        }
+    }
+
+    if (numVisibleWidgets == 0)
+    { return; }
+    
+    int32 numColumns = numVisibleWidgets;
+
+    if (Settings->WidgetAlignment == ECogWidgetAlignment::Right)
+    {
+        numColumns++;
+    }
+    else if (Settings->WidgetAlignment == ECogWidgetAlignment::Center)
+    {
+        numColumns += 2;
+    }
+
+    
+    ImGuiTableFlags Flags = ImGuiTableFlags_None;
+    if (Settings->ShowWidgetBorders)
+    {
+        Flags |= ImGuiTableFlags_BordersInnerV;
+        if (Settings->WidgetAlignment == ECogWidgetAlignment::Left)
+        {
+            Flags |= ImGuiTableFlags_BordersOuterV;
+        }
+    } 
+
+    if (Settings->WidgetAlignment == ECogWidgetAlignment::Manual)
+    {
+        Flags |= ImGuiTableFlags_Resizable;
+        if (Settings->ShowWidgetBorders == false)
+        {
+            Flags |= ImGuiTableFlags_NoBordersInBodyUntilResize;
+        }
+    }
+    
+    if (ImGui::BeginTable("Widgets", numColumns, Flags))
+    {
+        if (Settings->WidgetAlignment == ECogWidgetAlignment::Right || Settings->WidgetAlignment == ECogWidgetAlignment::Center)
+        {
+            ImGui::TableSetupColumn("Stretch", ImGuiTableColumnFlags_WidthStretch);
+        }
+        
+        for (int i = 0; i < numVisibleWidgets; ++i)
+        {
+            ImGui::TableSetupColumn("Fixed", ImGuiTableColumnFlags_WidthFixed);
+        }
+
+        if (Settings->WidgetAlignment == ECogWidgetAlignment::Center)
+        {
+            ImGui::TableSetupColumn("Stretch", ImGuiTableColumnFlags_WidthStretch);
+        }
+        
+        ImGui::TableNextRow();
+
+        if (Settings->WidgetAlignment == ECogWidgetAlignment::Right || Settings->WidgetAlignment == ECogWidgetAlignment::Center)
+        {
+            ImGui::TableNextColumn();
+        }
+
+        for (int i = 0; i < Widgets.Num(); ++i)
+        {
+            FCogWindow* Window = Widgets[i];
+            if (Window->GetIsWidgetVisible() == false)
+            { continue; }
+            
+            ImGui::TableNextColumn();
+            ImGui::AlignTextToFramePadding();
+            ImGui::SetCursorPosY(ImGui::GetCursorPosY() - 2);
+            Window->RenderMainMenuWidget();
+        }
+
+        if (Settings->WidgetAlignment == ECogWidgetAlignment::Center)
+        {
+            ImGui::TableNextColumn();
+        }
+        
+        ImGui::EndTable();
     }
 }
 
@@ -553,7 +546,7 @@ void UCogWindowManager::RenderMenuItem(FCogWindow& Window, const char* MenuItemN
         {
             Window.SetIsVisible(!Window.GetIsVisible());
         }
-
+        
         RenderMenuItemHelp(Window);
     }
     else

@@ -243,7 +243,7 @@ void FCogEngineWindow_Cheats::RenderContent()
             ImGui::EndMenu();
         }
 
-        FCogWindowWidgets::SearchBar(Filter);
+        FCogWindowWidgets::SearchBar("##Filter", Filter);
 
         ImGui::EndMenuBar();
     }

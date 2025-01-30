@@ -75,11 +75,14 @@ public:
 
     FCogImguiContext& GetContext() { return Context; }
 
+
     static void AddCommand(UPlayerInput* PlayerInput, const FString& Command, const FKey& Key);
 
     static void SortCommands(UPlayerInput* PlayerInput);
 
     void OnShortcutsDefined() const;
+
+    bool IsRenderingMainMenu() const { return IsRenderingInMainMenu; }
 
 protected:
 
@@ -110,6 +113,8 @@ protected:
     virtual void DisableInputMode();
     
     virtual void HandleInputs();
+
+    virtual void RenderWidgets();
 
     static void SettingsHandler_ClearAll(ImGuiContext* ctx, ImGuiSettingsHandler*);
 
@@ -169,6 +174,8 @@ protected:
     bool bIsSelectionModeActive = false;
 
     bool IsInitialized = false;
+    
+    bool IsRenderingInMainMenu = false;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------

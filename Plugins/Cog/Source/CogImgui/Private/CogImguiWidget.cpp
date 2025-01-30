@@ -118,6 +118,11 @@ FReply SCogImguiWidget::OnKeyChar(const FGeometry& MyGeometry, const FCharacterE
 {
     FCogImGuiContextScope ImGuiContextScope(*Context);
 
+    if (Context->GetEnableInput() == false)
+    {
+        return FReply::Unhandled();
+    }
+    
     ImGuiIO& IO = ImGui::GetIO();
     IO.AddInputCharacter(FCogImguiInputHelper::CastInputChar(CharacterEvent.GetCharacter()));
 

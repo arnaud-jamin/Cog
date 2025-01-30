@@ -108,7 +108,7 @@ void FCogAbilityWindow_Attributes::RenderContent()
             ImGui::EndMenu();
         }
 
-        FCogWindowWidgets::SearchBar(Filter);
+        FCogWindowWidgets::SearchBar("##Filter", Filter);
 
         ImGui::EndMenuBar();
     }
@@ -280,7 +280,7 @@ void FCogAbilityWindow_Attributes::RenderContent()
                             {
                                 Selected = Index;
 
-                                if (ImGui::IsMouseDoubleClicked(0))
+                                if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
                                 {
                                     OpenAttributeDetails(Attribute);
                                 }

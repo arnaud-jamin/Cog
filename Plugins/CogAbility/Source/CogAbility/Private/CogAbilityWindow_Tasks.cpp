@@ -98,7 +98,7 @@ void FCogAbilityWindow_Tasks::RenderTaskMenu(AActor* Selection)
             ImGui::EndMenu();
         }
 
-        FCogWindowWidgets::SearchBar(Filter);
+        FCogWindowWidgets::SearchBar("##Filter", Filter);
 
         ImGui::EndMenuBar();
     }

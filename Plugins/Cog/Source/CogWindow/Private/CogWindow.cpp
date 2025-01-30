@@ -69,7 +69,7 @@ void FCogWindow::Render(float DeltaTime)
     {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
     }
-
+    
     if (ImGui::Begin(TCHAR_TO_ANSI(*WindowTitle), &bIsVisible, WindowFlags))
     {
         if (bNoPadding)
@@ -204,4 +204,10 @@ const UObject* FCogWindow::GetAsset(const TSubclassOf<UObject> AssetClass) const
 UWorld* FCogWindow::GetWorld() const
 {
     return Owner->GetWorld();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindow::IsWindowRenderedInMainMenu()
+{
+    return Owner->IsRenderingMainMenu();
 }

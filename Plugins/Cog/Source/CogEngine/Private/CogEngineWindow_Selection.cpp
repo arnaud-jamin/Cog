@@ -15,6 +15,7 @@
 #include "GameFramework/Character.h"
 #include "HAL/IConsoleManager.h"
 #include "imgui.h"
+#include "imgui_internal.h"
 #include "Kismet/GameplayStatics.h"
 
 FString FCogEngineWindow_Selection::ToggleSelectionModeCommand = TEXT("Cog.ToggleSelectionMode");
@@ -25,7 +26,7 @@ void FCogEngineWindow_Selection::Initialize()
     Super::Initialize();
 
     bHasMenu = true;
-    bHasWidget = true;
+    bHasWidget = 2;
     ActorClasses = { AActor::StaticClass(), ACharacter::StaticClass() };
 
     Config = GetConfig<UCogEngineConfig_Selection>();
@@ -294,77 +295,30 @@ void FCogEngineWindow_Selection::TickSelectionMode()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-float FCogEngineWindow_Selection::GetMainMenuWidgetWidth(int32 SubWidgetIndex, float MaxWidth)
+void FCogEngineWindow_Selection::RenderMainMenuWidget()
 {
-    switch (SubWidgetIndex)
+    if (ImGui::MenuItem("Pick"))
     {
-        case 0: return FCogWindowWidgets::GetFontWidth() * 6;
-        case 1: return FMath::Min(FMath::Max(MaxWidth, FCogWindowWidgets::GetFontWidth() * 10), FCogWindowWidgets::GetFontWidth() * 30);
-        case 2: return FCogWindowWidgets::GetFontWidth() * 3;
+        GetOwner()->SetActivateSelectionMode(true);
+        HackWaitInputRelease();
     }
+    RenderPickButtonTooltip();
 
-    return -1.0f;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Selection::RenderMainMenuWidget(int32 SubWidgetIndex, float Width)
-{
-    //-----------------------------------
-    // Pick Button
-    //-----------------------------------
-    if (SubWidgetIndex == 0)
+    //TODO: Could be replaced by a BeginMenu
+    
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 15);
+    AActor* NewSelection = nullptr;
+    if (FCogWindowWidgets::MenuActorsCombo(
+        "MenuActorSelection", 
+        NewSelection, 
+        *GetWorld(), 
+        ActorClasses, 
+        Config->SelectedClassIndex, 
+        &Filter, 
+        GetLocalPlayerPawn(), 
+        [this](AActor& Actor) { RenderActorContextMenu(Actor);  }))
     {
-        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
-        ImGui::PushStyleVar(ImGuiStyleVar_FrameBorderSize, 1.0f);
-        ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(0, 0, 0, 0));
-
-        if (ImGui::Button("Pick", ImVec2(Width, 0)))
-        {
-            GetOwner()->SetActivateSelectionMode(true);
-            HackWaitInputRelease();
-        }
-        RenderPickButtonTooltip();
-
-        ImGui::PopStyleColor(1);
-        ImGui::PopStyleVar(2);
-    }
-    else if (SubWidgetIndex == 1)
-    {
-        ImGui::SetNextItemWidth(Width);
-        AActor* NewSelection = nullptr;
-        if (FCogWindowWidgets::MenuActorsCombo(
-            "MenuActorSelection", 
-            NewSelection, 
-            *GetWorld(), 
-            ActorClasses, 
-            Config->SelectedClassIndex, 
-            &Filter, 
-            GetLocalPlayerPawn(), 
-            [this](AActor& Actor) { RenderActorContextMenu(Actor);  }))
-        {
-            SetGlobalSelection(NewSelection);
-        }
-    }
-    else if (SubWidgetIndex == 2)
-    {
-        //-----------------------------------
-        // Reset Button
-        //-----------------------------------
-        {
-            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
-            ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(0, 0, 0, 0));
-            if (ImGui::Button("X", ImVec2(Width, 0)))
-            {
-                SetGlobalSelection(nullptr);
-                ImGui::CloseCurrentPopup();
-            }
-            if (ImGui::IsItemHovered())
-            {
-                ImGui::SetTooltip("Reset the selection to the controlled actor.");
-            }
-            ImGui::PopStyleColor(1);
-            ImGui::PopStyleVar(1);
-        }
+        SetGlobalSelection(NewSelection);
     }
 }
 

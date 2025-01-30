@@ -38,10 +38,7 @@ public:
     virtual void GameTick(float DeltaTime);
 
     /**  */
-    virtual float GetMainMenuWidgetWidth(int32 SubWidgetIndex, float MaxWidth) { return -1.0f; }
-
-    /**  */
-    virtual void RenderMainMenuWidget(int32 SubWidgetIndex, float Width) {}
+    virtual void RenderMainMenuWidget() {}
 
     ImGuiID GetID() const { return ID; }
 
@@ -61,7 +58,7 @@ public:
 
     void SetIsVisible(bool Value);
 
-    bool HasWidget() const { return bHasWidget; }
+    int32 HasWidget() const { return bHasWidget; }
 
     bool GetIsWidgetVisible() const { return bIsWidgetVisible; }
 
@@ -107,6 +104,8 @@ protected:
 
     virtual void OnSelectionChanged(AActor* OldSelection, AActor* NewSelection) {}
 
+    virtual bool IsWindowRenderedInMainMenu();
+    
     APawn* GetLocalPlayerPawn() const;
 
     APlayerController* GetLocalPlayerController() const;
@@ -123,7 +122,7 @@ protected:
 
     bool bIsVisible = false;
 
-    bool bHasWidget = false;
+    int32 bHasWidget = 0;
 
     bool bIsWidgetVisible = false;
 

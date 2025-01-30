@@ -41,15 +41,17 @@ void FCogWindowWidgets::EndTableTooltip()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogWindowWidgets::ItemTooltipWrappedText(const char* InText)
+bool FCogWindowWidgets::ItemTooltipWrappedText(const char* InText)
 {
-    if (ImGui::BeginItemTooltip())
-    {
-        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-        ImGui::TextUnformatted(InText);
-        ImGui::PopTextWrapPos();
-        ImGui::EndTooltip();
-    }
+    bool result = ImGui::BeginItemTooltip();
+    if (result == false)
+    { return false; }
+    
+    ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+    ImGui::TextUnformatted(InText);
+    ImGui::PopTextWrapPos();
+    ImGui::EndTooltip();
+    return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -272,26 +274,19 @@ void FCogWindowWidgets::AddTextWithShadow(ImDrawList* DrawList, const ImVec2& Po
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogWindowWidgets::SearchBar(ImGuiTextFilter& Filter, float Width /*= -1*/)
+bool FCogWindowWidgets::SearchBar(const char* InLabel, ImGuiTextFilter& InFilter, float InWidth /*= -1*/)
 {
-    const ImGuiWindow* Window = FCogImguiHelper::GetCurrentWindow();
-    const ImVec2 Pos1 = Window->DC.CursorPos;
-    Filter.Draw("##Filter", Width);
-    const ImVec2 Pos2 = Window->DC.CursorPosPrevLine;
-
-    if (ImGui::IsItemActive() == false && Filter.Filters.empty())
+    if (InWidth != 0.0f)
     {
-        static const char* Text = "Search";
-        const float Height = ImGui::GetFrameHeight();
-        const ImGuiContext& g = *ImGui::GetCurrentContext();
-        const ImVec2 Min = Pos1 + ImVec2(g.Style.ItemSpacing.x, 0.0f);
-        const ImVec2 Max = Pos2 + ImVec2(-g.Style.ItemSpacing.x, Height);
-        const ImRect BB(Min, Max);
-        const ImVec2 TextSize = ImGui::CalcTextSize(Text, nullptr);
-        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 255, 128));
-        ImGui::RenderTextClipped(Min, Max, Text, nullptr, &TextSize, ImVec2(0.0f, 0.5f), &BB);
-        ImGui::PopStyleColor();
+        ImGui::SetNextItemWidth(InWidth);
     }
+    //
+    bool value_changed = ImGui::InputTextWithHint(InLabel, "Search", InFilter.InputBuf, IM_ARRAYSIZE(InFilter.InputBuf));
+    if (value_changed)
+    {
+        InFilter.Build();
+    }
+    return value_changed;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -859,7 +854,7 @@ bool FCogWindowWidgets::ActorsListWithFilters(AActor*& NewSelection, const UWorl
     if (Filter != nullptr)
     {
         ImGui::SameLine();
-        SearchBar(*Filter);
+        SearchBar("##Filter", *Filter);
         AddSeparator = true;
     }
 
@@ -1121,15 +1116,30 @@ void FCogWindowWidgets::SmallButton(const char* Text, const ImVec4& Color)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogWindowWidgets::InputText(const char* Text, FString& Value)
+bool FCogWindowWidgets::InputText(const char* Text, FString& Value, ImGuiInputTextFlags InFlags, ImGuiInputTextCallback InCallback, void* InUserData)
 {
-    static char Buffer[256] = "";
-    ImStrncpy(Buffer, TCHAR_TO_ANSI(*Value), IM_ARRAYSIZE(Buffer));
+    static char ValueBuffer[256] = "";
+    ImStrncpy(ValueBuffer, TCHAR_TO_ANSI(*Value), IM_ARRAYSIZE(ValueBuffer));
     
-    bool result = ImGui::InputText(Text, Buffer, IM_ARRAYSIZE(Buffer));
+    bool result = ImGui::InputText(Text, ValueBuffer, IM_ARRAYSIZE(ValueBuffer), InFlags, InCallback, InUserData);
     if (result)
     {
-        Value = FString(Buffer);
+        Value = FString(ValueBuffer);
+    }
+
+    return result;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::InputTextWithHint(const char* InText, const char* InHint, FString& InValue, ImGuiInputTextFlags InFlags, ImGuiInputTextCallback InCallback, void* InUserData)
+{
+    static char ValueBuffer[256] = "";
+    ImStrncpy(ValueBuffer, TCHAR_TO_ANSI(*InValue), IM_ARRAYSIZE(ValueBuffer));
+
+    bool result = ImGui::InputTextWithHint(InText, InHint, ValueBuffer, IM_ARRAYSIZE(ValueBuffer), InFlags, InCallback, InUserData);
+    if (result)
+    {
+        InValue = FString(ValueBuffer);
     }
 
     return result;
@@ -1142,6 +1152,7 @@ bool FCogWindowWidgets::BeginRightAlign(const char* Id)
     {
         ImGui::TableSetupColumn("a", ImGuiTableColumnFlags_WidthStretch);
 
+        ImGui::TableNextRow();
         ImGui::TableNextColumn();
         ImGui::TableNextColumn();
         return true;
@@ -1266,7 +1277,48 @@ bool FCogWindowWidgets::OpenObjectAssetButton(const UObject* InObject, const ImV
 
 }
 
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogWindowWidgets::RenderClosebutton(const ImVec2& InPos)
+{
+    ImGuiContext& g = *GImGui;
+    ImGuiWindow* window = g.CurrentWindow;
 
+    // Tweak 1: Shrink hit-testing area if button covers an abnormally large proportion of the visible region. That's in order to facilitate moving the window away. (#3825)
+    // This may better be applied as a general hit-rect reduction mechanism for all widgets to ensure the area to move window is always accessible?
+    const ImRect bb(InPos, InPos + ImVec2(g.FontSize, g.FontSize));
+    
+    ImU32 cross_col = ImGui::GetColorU32(ImGuiCol_Text);
+    ImVec2 cross_center = bb.GetCenter() - ImVec2(0.5f, 0.5f);
+    float cross_extent = g.FontSize * 0.5f * 0.7071f - 1.0f;
+    window->DrawList->AddLine(cross_center + ImVec2(+cross_extent, +cross_extent), cross_center + ImVec2(-cross_extent, -cross_extent), cross_col, 1.0f);
+    window->DrawList->AddLine(cross_center + ImVec2(+cross_extent, -cross_extent), cross_center + ImVec2(-cross_extent, +cross_extent), cross_col, 1.0f);
+}
 
-
-
+// //--------------------------------------------------------------------------------------------------------------------------
+// bool ImGui::ArrowButtonEx(const char* str_id, ImGuiDir dir, ImVec2 size, ImGuiButtonFlags flags)
+// {
+//     ImGuiContext& g = *GImGui;
+//     ImGuiWindow* window = GetCurrentWindow();
+//     if (window->SkipItems)
+//         return false;
+//
+//     const ImGuiID id = window->GetID(str_id);
+//     const ImRect bb(window->DC.CursorPos, window->DC.CursorPos + size);
+//     const float default_size = GetFrameHeight();
+//     ItemSize(size, (size.y >= default_size) ? g.Style.FramePadding.y : -1.0f);
+//     if (!ItemAdd(bb, id))
+//         return false;
+//
+//     bool hovered, held;
+//     bool pressed = ButtonBehavior(bb, id, &hovered, &held, flags);
+//
+//     // Render
+//     const ImU32 bg_col = GetColorU32((held && hovered) ? ImGuiCol_ButtonActive : hovered ? ImGuiCol_ButtonHovered : ImGuiCol_Button);
+//     const ImU32 text_col = GetColorU32(ImGuiCol_Text);
+//     RenderNavCursor(bb, id);
+//     RenderFrame(bb.Min, bb.Max, bg_col, true, g.Style.FrameRounding);
+//     RenderArrow(window->DrawList, bb.Min + ImVec2(ImMax(0.0f, (size.x - g.FontSize) * 0.5f), ImMax(0.0f, (size.y - g.FontSize) * 0.5f)), text_col, dir);
+//
+//     IMGUI_TEST_ENGINE_ITEM_INFO(id, str_id, g.LastItemData.StatusFlags);
+//     return pressed;
+// }

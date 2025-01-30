@@ -27,7 +27,7 @@ public:
 
     static void EndTableTooltip();
 
-    static void ItemTooltipWrappedText(const char* InText);
+    static bool ItemTooltipWrappedText(const char* InText);
     
     static bool BeginItemTableTooltip();
 
@@ -61,7 +61,7 @@ public:
 
     static void AddTextWithShadow(ImDrawList* DrawList, const ImVec2& Position, ImU32 Color, const char* TextBegin, const char* TextEnd = NULL);
 
-    static void SearchBar(ImGuiTextFilter& Filter, float Width = -1.0f);
+    static bool SearchBar(const char* InLabel, ImGuiTextFilter& InFilter, float InWidth = -1.0f);
 
     static void PushBackColor(const ImVec4& Color);
 
@@ -90,7 +90,7 @@ public:
     static bool InputKey(const char* Label, FCogImGuiKeyInfo& KeyInfo);
 
     static bool InputKey(FCogImGuiKeyInfo& KeyInfo);
-
+    
     static bool KeyBind(FKeyBind& KeyBind);
 
     static bool ButtonWithTooltip(const char* Text, const char* Tooltip);
@@ -117,7 +117,9 @@ public:
 
     static void SmallButton(const char* Text, const ImVec4& Color);
 
-    static bool InputText(const char* Text, FString& Value);
+    static bool InputText(const char* Text, FString& Value,  ImGuiInputTextFlags InFlags = 0, ImGuiInputTextCallback InCallback = nullptr, void* InUserData = nullptr);
+
+    static bool InputTextWithHint(const char* InText, const char* InHint, FString& InValue, ImGuiInputTextFlags InFlags = 0, ImGuiInputTextCallback InCallback = nullptr, void* InUserData = nullptr);
 
     static bool BeginRightAlign(const char* Id);
 
@@ -132,6 +134,8 @@ public:
     static bool OpenAssetButton(const UObject* InAsset, const ImVec2& InSize = ImVec2(0, 0));
 
     static bool OpenObjectAssetButton(const UObject* InObject, const ImVec2& InSize = ImVec2(0, 0));
+
+    static void RenderClosebutton(const ImVec2& InPos);
 
 };
 

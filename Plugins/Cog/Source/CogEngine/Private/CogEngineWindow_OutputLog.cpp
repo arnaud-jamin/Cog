@@ -184,7 +184,7 @@ void FCogEngineWindow_OutputLog::RenderContent()
             ImGui::EndCombo();
         }
 
-        FCogWindowWidgets::SearchBar(Filter);
+        FCogWindowWidgets::SearchBar("##Filter", Filter);
 
         ImGui::EndMenuBar();
     }

@@ -22,29 +22,6 @@ void FCogAbilityWindow_Cheats::Initialize()
     Asset = GetAsset<UCogAbilityDataAsset>();
     Config = GetConfig<UCogAbilityConfig_Cheats>();
     AlignmentConfig = GetConfig<UCogAbilityConfig_Alignment>();
-
-    FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(
-        TEXT("Cog.Cheat"),
-        TEXT("Apply a cheat to the selection. Cog.Cheat <CheatName> -Allies -Enemies -Controlled"),
-        GetWorld(),
-        FCogWindowConsoleCommandDelegate::CreateLambda([this](const TArray<FString>& InArgs, UWorld* InWorld)
-            {
-                if (InArgs.Num() > 0)
-                {
-                    if (const FCogAbilityCheat* cheat = FindCheatByName(InArgs[0]))
-                    {
-                        const bool ApplyToEnemies = InArgs.Contains("-Enemies");
-                        const bool ApplyToAllies = InArgs.Contains("-Allies");
-                        const bool ApplyToControlled = InArgs.Contains("-Controlled");
-
-                        RequestCheat(GetLocalPlayerPawn(), GetSelection(), *cheat, ApplyToEnemies, ApplyToAllies, ApplyToControlled);
-                    }
-                    else
-                    {
-                        UE_LOG(LogCogImGui, Warning, TEXT("Cog.Cheat %s | Cheat not found"), *InArgs[0]);
-                    }
-                }
-            }));
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
