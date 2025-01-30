@@ -13,6 +13,7 @@
 #include "CogEngineWindow_CollisionTester.h"
 #include "CogEngineWindow_CollisionViewer.h"
 #include "CogEngineWindow_CommandBindings.h"
+#include "CogEngineWindow_Console.h"
 #include "CogEngineWindow_DebugSettings.h"
 #include "CogEngineWindow_ImGui.h"
 #include "CogEngineWindow_Inspector.h"
@@ -50,6 +51,8 @@ void Cog::AddAllWindows(UCogWindowManager& CogWindowManager)
     CogWindowManager.AddWindow<FCogEngineWindow_CollisionViewer>("Engine.Collision Viewer");
 
     CogWindowManager.AddWindow<FCogEngineWindow_CommandBindings>("Engine.Command Bindings");
+
+    CogWindowManager.AddWindow<FCogEngineWindow_Console>("Engine.Console");
 
     CogWindowManager.AddWindow<FCogEngineWindow_DebugSettings>("Engine.Debug Settings");
 
@@ -102,8 +105,6 @@ void Cog::AddAllWindows(UCogWindowManager& CogWindowManager)
     CogWindowManager.AddWindow<FCogAbilityWindow_Attributes>("Gameplay.Attributes");
 
     CogWindowManager.AddWindow<FCogAbilityWindow_BlockedTags>("Gameplay.Blocking Tags");
-
-    //CogWindowManager.AddWindow<FCogEngineWindow_Cheats>("Gameplay.Cheats");
 
     CogWindowManager.AddWindow<FCogEngineWindow_Cheats>("Gameplay.Cheats");
 
