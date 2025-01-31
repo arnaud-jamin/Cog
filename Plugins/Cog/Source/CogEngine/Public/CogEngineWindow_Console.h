@@ -18,6 +18,7 @@ protected:
     virtual void RenderHelp() override;
 
     virtual void Initialize() override;
+    void RenderCommandList();
 
     virtual void RenderMainMenuWidget() override;
     
@@ -30,10 +31,11 @@ private:
     static FString GetConsoleCommandHelp(const FString& InCommandName);
 
     void RenderConsoleTextInput();
+    void HandleInputs();
 
     void RenderCommand(const FString& CommandName, int32 Index);
     
-    void RefreshVisibleCommands();
+    void RefreshCommandList();
 
     int OnTextInputCallback(ImGuiInputTextCallbackData* InData);
 
@@ -43,19 +45,23 @@ private:
     
     FString SelectedCommand;
 
-    TArray<FString> VisibleCommands;
+    TArray<FString> CommandList;
     
-    TArray<FString> VisibleHistory;
-
+    int32 NumHistoryCommands = 0;
+    
     FString CurrentUserInput;
     
-    bool bScroll = false;
+    int32 bScrollDirection = 0;
 
     bool bRequestTextInputFocus = false;
     
     bool bIsWindowFocused = false;
     
+    bool bShowCommandsInWidget = false;
+    
     TWeakObjectPtr<UCogEngineConfig_Console> Config;
+
+    ImGuiInputTextFlags TextInputState;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -73,11 +79,15 @@ public:
     bool ShowConsoleInputInMenuBar = false;
 
     UPROPERTY(Config)
+    bool UseClipper = false;
+    
+    UPROPERTY(Config)
     int32 NumHistoryCommands = 10;
 
     UPROPERTY(Config)
     int32 CompletionMinimumCharacters = 0;
 
+    
     UPROPERTY(Config)
     FVector4f HistoryColor = FVector4f(1.0f, 1.0f, 1.0f, 0.5f);
     

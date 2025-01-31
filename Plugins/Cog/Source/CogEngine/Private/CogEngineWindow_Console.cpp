@@ -26,7 +26,7 @@ void FCogEngineWindow_Console::Initialize()
     bHasMenu = true;
     bHasWidget = 1;
     
-    RefreshVisibleCommands();
+    RefreshCommandList();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -46,24 +46,29 @@ void FCogEngineWindow_Console::RenderContent()
         {
             if (ImGui::Checkbox("Sort Commands", &Config->SortCommands))
             {
-                RefreshVisibleCommands();
+                RefreshCommandList();
             }
 
             if (ImGui::Checkbox("Show Console Input In Menu Bar", &Config->ShowConsoleInputInMenuBar))
             {
-                RefreshVisibleCommands();
+                RefreshCommandList();
+            }
+            
+            if (ImGui::Checkbox("Use Clipper", &Config->UseClipper))
+            {
+                RefreshCommandList();
             }
             
             FCogWindowWidgets::SetNextItemToShortWidth();
             if (ImGui::SliderInt("Num History Commands", &Config->NumHistoryCommands, 0, 100))
             {
-                RefreshVisibleCommands();
+                RefreshCommandList();
             }
 
             FCogWindowWidgets::SetNextItemToShortWidth();
             if (ImGui::SliderInt("Completion Minimum Characters", &Config->CompletionMinimumCharacters, 0, 3))
             {
-                RefreshVisibleCommands();
+                RefreshCommandList();
             }
 
             ImGui::ColorEdit4("History Color", (float*)&Config->HistoryColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
@@ -76,7 +81,9 @@ void FCogEngineWindow_Console::RenderContent()
             ImGui::SetNextItemWidth(-1);
             RenderConsoleTextInput();
         }
-        
+
+        //ImGui::Text("%d", SelectedCommandIndex);
+
         ImGui::EndMenuBar();
     }
 
@@ -87,107 +94,34 @@ void FCogEngineWindow_Console::RenderContent()
         ImGui::SetNextItemWidth(-1);
         RenderConsoleTextInput();
     }
-    
-    const float Indent = ImGui::GetFontSize() * 0.5f;
-    int32 Index = 0;
 
     if (ImGui::BeginChild("Commands", ImVec2(0.0f, -1.0f), ImGuiChildFlags_NavFlattened))
     {
+        const float Indent = ImGui::GetFontSize() * 0.5f;
         ImGui::Indent(Indent);
 
-        for (const FString& CommandName : VisibleHistory)
+        RenderCommandList();
+
+        if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows))
         {
-            ImGui::PushStyleColor(ImGuiCol_Text, FCogImguiHelper::ToImVec4(Config->HistoryColor));
-            ImGui::PushID(Index);
-            RenderCommand(CommandName, Index);
-            ImGui::PopID();
-            ImGui::PopStyleColor();
-
-            Index++;
-        }
-
-        if (Index > 1)
-        {
-            ImGui::Separator();
-        }
-
-        ImGuiListClipper Clipper;
-        Clipper.Begin(VisibleCommands.Num());
-
-        // int32 ClipperIndex = 0;
-        // while (Clipper.Step())
-        // {
-        //     for (ClipperIndex = Clipper.DisplayStart; ClipperIndex < Clipper.DisplayEnd; ClipperIndex++)
-        //     {
-        //         if (VisibleCommands.IsValidIndex(ClipperIndex))
-        //         {
-        //             ImGui::PushID(Index);
-        //             const FString& CommandName = VisibleCommands[ClipperIndex];
-        //             RenderCommand(CommandName, Index);
-        //             if (SelectedCommandIndex == Index)
-        //             {
-        //                 SelectedCommand = CommandName;
-        //             }
-        //             ImGui::PopID();
-        //             Index++;
-        //         }
-        //     }
-        // }
-        //
-        // Clipper.End();
-        //
-        // // If any is available, draw an additional command below the clipper to be able to scroll when pressing bottom
-        // if (VisibleCommands.IsValidIndex(ClipperIndex + 1))
-        // {
-        //     const FString& Command = VisibleCommands[ClipperIndex + 1];
-        //     RenderCommand(Command, Index);
-        //     Index++;
-        // }
+            if (bIsWindowFocused == false)
+            {
+                bRequestTextInputFocus = true;
+            }
+            bIsWindowFocused = true;
         
-        for (const FString& CommandName : VisibleCommands)
+            HandleInputs();
+        }
+        else
         {
-            RenderCommand(CommandName, Index);
-            Index++;
+            bIsWindowFocused = false;
         }
         
         ImGui::Unindent(Indent);
     }
+    
     ImGui::EndChild();
 
-    if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows))
-    {
-        if (bIsWindowFocused == false)
-        {
-            bRequestTextInputFocus = true;
-        }
-        bIsWindowFocused = true;
-        
-        if (ImGui::IsKeyPressed(ImGuiKey_DownArrow))
-        {
-            SelectedCommandIndex += 1;
-            bScroll = true;
-
-            if (SelectedCommandIndex >= Index)
-            {
-                SelectedCommandIndex = 0;
-            }
-        }
-        else if (ImGui::IsKeyPressed(ImGuiKey_UpArrow))
-        {
-            SelectedCommandIndex -= 1;
-            bScroll = true;
-
-            if (SelectedCommandIndex < 0)
-            {
-                SelectedCommandIndex = Index - 1;
-            }
-        }
-    }
-    else
-    {
-        bIsWindowFocused = false;
-    }
-    
     // ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.2f, 0.2f, 0.2f, 0.5f));
     // if (ImGui::BeginChild("Description", ImVec2(0.0f, ImGui::GetContentRegionAvail().y)))
     // {
@@ -222,9 +156,9 @@ void FCogEngineWindow_Console::RenderConsoleTextInput()
 
     ImGui::SetItemDefaultFocus();
     
-    if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows)
-        && ImGui::IsItemActive() == false
+    if (ImGui::IsItemActive() == false
         && bRequestTextInputFocus
+        && ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows)
         && IsWindowRenderedInMainMenu() == false)
     {
         ImGui::SetKeyboardFocusHere(-1);
@@ -235,6 +169,77 @@ void FCogEngineWindow_Console::RenderConsoleTextInput()
         bRequestTextInputFocus = false;
     }
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_Console::HandleInputs()
+{
+    if (ImGui::IsKeyPressed(ImGuiKey_DownArrow))
+    {
+        SelectedCommandIndex += 1;
+        bScrollDirection = -1;
+
+        if (SelectedCommandIndex >= CommandList.Num())
+        {
+            SelectedCommandIndex = 0;
+        }
+    }
+    else if (ImGui::IsKeyPressed(ImGuiKey_UpArrow))
+    {
+        SelectedCommandIndex -= 1;
+        bScrollDirection = 1;
+
+        if (SelectedCommandIndex < 0)
+        {
+            SelectedCommandIndex = CommandList.Num() - 1;
+            //ImGui::SetScrollHereY(1.0f);
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_Console::RenderCommandList()
+{
+    int32 Index = 0;
+
+    ImGuiListClipper Clipper;
+    Clipper.Begin(CommandList.Num());
+    while (Clipper.Step())
+    {
+        const int32 Start = Config->UseClipper ? Clipper.DisplayStart : 0;
+        const int32 End = Config->UseClipper ? Clipper.DisplayEnd : CommandList.Num();
+        
+        for (Index = Start; Index < End; Index++)
+        {
+            if (CommandList.IsValidIndex(Index))
+            {
+                ImGui::PushID(Index);
+                const FString& CommandName = CommandList[Index];
+
+                RenderCommand(CommandName, Index);
+
+                if (SelectedCommandIndex == Index)
+                {
+                    SelectedCommand = CommandName;
+                }
+                ImGui::PopID();
+            }
+        }
+
+        if (Config->UseClipper == false)
+        {
+            break;
+        }
+    }
+    Clipper.End();
+
+    // If any is available, draw an additional command below the clipper to be able to scroll when pressing bottom
+    if (CommandList.IsValidIndex(Index + 1))
+    {
+        const FString& Command = CommandList[Index + 1];
+        RenderCommand(Command, Index);
+    }
+}
+
 
 //--------------------------------------------------------------------------------------------------------------------------
 FString FCogEngineWindow_Console::GetConsoleCommandHelp(const FString& InCommandName)
@@ -262,6 +267,11 @@ void FCogEngineWindow_Console::RenderCommand(const FString& CommandName, const i
 
     // ImGui::Text("%d - ", Index);
     // ImGui::SameLine();
+
+    if (Index < NumHistoryCommands)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, FCogImguiHelper::ToImVec4(Config->HistoryColor));
+    }
     
     if (ImGui::Selectable(CommandNameStr.Get(), &IsSelected, ImGuiSelectableFlags_AllowDoubleClick))
     {
@@ -273,13 +283,18 @@ void FCogEngineWindow_Console::RenderCommand(const FString& CommandName, const i
         }
     }
 
+    if (Index < NumHistoryCommands)
+    {
+        ImGui::PopStyleColor();
+    }    
+    
     if (IsSelected)
     {
         SelectedCommand = CommandName;
-        if (bScroll)
+        if (bScrollDirection != 0)
         {
             ImGui::SetScrollHereY(1.0f);
-            bScroll = false;
+            bScrollDirection = 0;
         }
     }
 
@@ -296,17 +311,9 @@ void FCogEngineWindow_Console::RenderCommand(const FString& CommandName, const i
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Console::RefreshVisibleCommands()
+void FCogEngineWindow_Console::RefreshCommandList()
 {
-    auto OnConsoleObject = [this](const TCHAR *InName, const IConsoleObject* InConsoleObject)
-    {
-        if (InConsoleObject->TestFlags(ECVF_Unregistered) || InConsoleObject->TestFlags(ECVF_ReadOnly))
-        { return; }
-
-        VisibleCommands.Add(InName);
-    };
-
-    FString CommandStart = CurrentUserInput;
+    FString CurrentUserInputWithoutArgs = CurrentUserInput;
 
     //------------------------------------------------------------------------------------------------------
     // Split the user input with spaces tp get the first part of the command so the completion is made on
@@ -316,24 +323,15 @@ void FCogEngineWindow_Console::RefreshVisibleCommands()
     CurrentUserInput.ParseIntoArrayWS(UserInputSplitWithSpaces);
     if (UserInputSplitWithSpaces.Num() > 0)
     {
-        CommandStart = UserInputSplitWithSpaces[0];
+        CurrentUserInputWithoutArgs = UserInputSplitWithSpaces[0];
     }
         
-    VisibleCommands.Empty();
-    if (CommandStart.Len() >= Config->CompletionMinimumCharacters)
-    {
-        IConsoleManager::Get().ForEachConsoleObjectThatStartsWith(FConsoleObjectVisitor::CreateLambda(OnConsoleObject), *CommandStart);
-    }
-
-    if (Config->SortCommands)
-    {
-        VisibleCommands.Sort();
-    }
+    CommandList.Empty();
 
     TArray<FString> AllHistory;
     IConsoleManager::Get().GetConsoleHistory(TEXT(""), AllHistory);
 
-    VisibleHistory.Empty();
+    NumHistoryCommands = 0;
     for (int32 i = AllHistory.Num() - 1; i >= 0; i--)
     {
         FString Command = AllHistory[i];
@@ -343,11 +341,33 @@ void FCogEngineWindow_Console::RefreshVisibleCommands()
         if (CurrentUserInput.IsEmpty() == false && Command.StartsWith(CurrentUserInput) == false)
         { continue; }
 
-        if (VisibleHistory.Num() >= Config->NumHistoryCommands)
+        if (CommandList.Num() >= Config->NumHistoryCommands)
         { break; }
 
-        VisibleHistory.Add(Command);
+        CommandList.Add(Command);
+        NumHistoryCommands++;
     }
+
+    TArray<FString> Commands; 
+    if (CurrentUserInputWithoutArgs.Len() >= Config->CompletionMinimumCharacters)
+    {
+        auto OnConsoleObject = [&](const TCHAR *InName, const IConsoleObject* InConsoleObject)
+        {
+            if (InConsoleObject->TestFlags(ECVF_Unregistered) || InConsoleObject->TestFlags(ECVF_ReadOnly))
+            { return; }
+
+            Commands.Add(InName);
+        };
+
+        IConsoleManager::Get().ForEachConsoleObjectThatStartsWith(FConsoleObjectVisitor::CreateLambda(OnConsoleObject), *CurrentUserInputWithoutArgs);
+    }
+
+    if (Config->SortCommands)
+    {
+        Commands.Sort();
+    }
+
+    CommandList.Append(Commands);
 
     SelectedCommandIndex = 0;
 }
@@ -362,11 +382,13 @@ int FCogEngineWindow_Console::OnTextInputCallback(ImGuiInputTextCallbackData* In
         InData->DeleteChars(0, InData->BufTextLen);
         InData->InsertChars(0, CommandStr.Get());
         InData->InsertChars(InData->CursorPos, " ");
+        TextInputState = ImGuiInputTextFlags_CallbackCompletion;
     }
     else  if (InData->EventFlag == ImGuiInputTextFlags_CallbackEdit)
     {
         CurrentUserInput = FString(InData->Buf);
-        RefreshVisibleCommands();        
+        RefreshCommandList();      
+        TextInputState = ImGuiInputTextFlags_CallbackCompletion;  
     }
 
     return 0;
@@ -385,7 +407,7 @@ void FCogEngineWindow_Console::ExecuteCommand(const FString& InCommand)
     FString CleanupCommand = InCommand.TrimEnd(); 
     if (CleanupCommand.IsEmpty() == false)
     {
-        if (VisibleHistory.Num() == 0 || (VisibleHistory.Last() != CleanupCommand))
+        //if (VisibleHistory.Num() == 0 || (VisibleHistory.Last() != CleanupCommand))
         {
             IConsoleManager::Get().AddConsoleHistoryEntry(TEXT(""), *CleanupCommand);
         }
@@ -394,13 +416,58 @@ void FCogEngineWindow_Console::ExecuteCommand(const FString& InCommand)
     }    
 
     CurrentUserInput = FString();
-    RefreshVisibleCommands();
+    RefreshCommandList();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Console::RenderMainMenuWidget()
 {
-    ImGui::SetNextItemWidth(100);
+    const ImGuiContext& g = *GImGui;
+    const ImGuiStyle& Style = g.Style;
+    const ImGuiWindow* Window = ImGui::GetCurrentWindow();
+    ImVec2 TooltipPos = Window->DC.CursorPos;
+    TooltipPos.y += Window->MenuBarHeight;
+
+    const float Width = ImGui::GetFontSize() * 20;
+    
+    ImGui::SetNextItemWidth(Width);
     RenderConsoleTextInput();
+
+    const bool IsTextInputActive = ImGui::IsItemActive();
+    if (ImGui::IsItemActivated())
+    {
+        bShowCommandsInWidget = true;    
+    }
+    
+    if (bShowCommandsInWidget)
+    {
+        ImGui::SetNextWindowBgAlpha(g.Style.Colors[ImGuiCol_PopupBg].w * 0.60f);
+        ImGui::SetNextWindowSize(ImVec2(Width, ImGui::GetFontSize() * 30), ImGuiCond_Always);
+        ImGui::SetNextWindowPos(TooltipPos, ImGuiCond_Always);
+        ImGuiWindowFlags flags =
+            ImGuiWindowFlags_NoTitleBar
+            //| ImGuiWindowFlags_NoNav
+            | ImGuiWindowFlags_NoMove;
+            //| ImGuiWindowFlags_NoBringToFrontOnFocus
+            //| ImGuiWindowFlags_NoFocusOnAppearing;
+
+        if (ImGui::Begin("ConsoleTooltip", 0, flags))
+        {
+            RenderCommandList();
+            HandleInputs();
+
+            const bool IsWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
+            if (IsWindowFocused)
+            {
+                bRequestTextInputFocus = true;
+            }
+            
+            if (IsTextInputActive == false && IsWindowFocused == false)
+            {
+                bShowCommandsInWidget = false;
+            }
+        }
+        ImGui::End();
+    }
 }
     
