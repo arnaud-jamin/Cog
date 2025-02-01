@@ -17,7 +17,8 @@ void FCogEngineWindow_Stats::Initialize()
 {
     Super::Initialize();
 
-    bHasWidget = 2;
+    bHasWidget = true;
+    bIsWidgetVisible = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -18,7 +18,6 @@ protected:
     virtual void RenderHelp() override;
 
     virtual void Initialize() override;
-    void RenderCommandList();
 
     virtual void RenderMainMenuWidget() override;
     
@@ -26,17 +25,24 @@ protected:
 
 private:
 
-    static int OnTextInputCallbackStub(ImGuiInputTextCallbackData* InData);
 
     static FString GetConsoleCommandHelp(const FString& InCommandName);
 
-    void RenderConsoleTextInput();
+    void RenderMenu();
 
-    void RenderCommand(const FString& CommandName, int32 Index);
-    
-    void RefreshCommandList();
+    void RenderInput();
 
     int OnTextInputCallback(ImGuiInputTextCallbackData* InData);
+
+    static int OnTextInputCallbackStub(ImGuiInputTextCallbackData* InData);
+
+    void RenderCommandList();
+
+    void RenderCommand(const FString& CommandName, int32 Index);
+
+    void RefreshCommandList();
+
+    void RenderCommandHelp();
 
     void ExecuteCommand(const FString& InCommand);
 
@@ -50,12 +56,14 @@ private:
     
     bool bScroll = false;
 
-    bool bRequestTextInputFocus = false;
+    bool bRequestInputFocus = false;
     
     bool bIsWindowFocused = false;
     
     bool bPopupCommandListOnWidgetMode = false;
-    
+
+    ImGuiID InputIdOnWidgetMode = 0;
+
     bool bIsRenderingWidget = false;
     
     bool bSetBufferToSelectedCommand = false;
@@ -75,8 +83,14 @@ public:
     bool SortCommands = false;
 
     UPROPERTY(Config)
-    bool ShowConsoleInputInMenuBar = false;
+    bool DockInputInMenuBar = false;
 
+    UPROPERTY(Config)
+    bool FocusWidgetWhenAppearing = true;
+
+    UPROPERTY(Config)
+    int32 WidgetWidth = 200;
+    
     UPROPERTY(Config)
     bool UseClipper = false;
     
@@ -84,11 +98,11 @@ public:
     int32 NumHistoryCommands = 10;
 
     UPROPERTY(Config)
-    int32 CompletionMinimumCharacters = 0;
-
+    int32 CompletionMinimumCharacters = 1;
     
     UPROPERTY(Config)
     FVector4f HistoryColor = FVector4f(1.0f, 1.0f, 1.0f, 0.5f);
+
     
     UCogEngineConfig_Console()
     {
@@ -100,9 +114,11 @@ public:
         Super::Reset();
 
         SortCommands = false;
+        DockInputInMenuBar = false;
+        FocusWidgetWhenAppearing = true;
+        UseClipper = false;
         NumHistoryCommands = 10;
-        CompletionMinimumCharacters = 0;
-        ShowConsoleInputInMenuBar = false;
+        CompletionMinimumCharacters = 1;
         HistoryColor = FVector4f(1.0f, 1.0f, 1.0f, 0.5f);
     }
 };

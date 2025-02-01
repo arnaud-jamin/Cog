@@ -26,7 +26,8 @@ void FCogEngineWindow_Selection::Initialize()
     Super::Initialize();
 
     bHasMenu = true;
-    bHasWidget = 2;
+    bHasWidget = true;
+    bIsWidgetVisible = true;
     ActorClasses = { AActor::StaticClass(), ACharacter::StaticClass() };
 
     Config = GetConfig<UCogEngineConfig_Selection>();

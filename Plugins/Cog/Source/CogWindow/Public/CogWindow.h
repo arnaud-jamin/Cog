@@ -58,7 +58,7 @@ public:
 
     void SetIsVisible(bool Value);
 
-    int32 HasWidget() const { return bHasWidget; }
+    bool HasWidget() const { return bHasWidget; }
 
     bool GetIsWidgetVisible() const { return bIsWidgetVisible; }
 
@@ -122,7 +122,7 @@ protected:
 
     bool bIsVisible = false;
 
-    int32 bHasWidget = 0;
+    bool bHasWidget = false;
 
     bool bIsWidgetVisible = false;
 
