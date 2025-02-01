@@ -31,7 +31,6 @@ private:
     static FString GetConsoleCommandHelp(const FString& InCommandName);
 
     void RenderConsoleTextInput();
-    void HandleInputs();
 
     void RenderCommand(const FString& CommandName, int32 Index);
     
@@ -41,27 +40,27 @@ private:
 
     void ExecuteCommand(const FString& InCommand);
 
-    int32 SelectedCommandIndex = 0;
+    int32 SelectedCommandIndex = -1;
     
-    FString SelectedCommand;
-
     TArray<FString> CommandList;
     
     int32 NumHistoryCommands = 0;
     
     FString CurrentUserInput;
     
-    int32 bScrollDirection = 0;
+    bool bScroll = false;
 
     bool bRequestTextInputFocus = false;
     
     bool bIsWindowFocused = false;
     
-    bool bShowCommandsInWidget = false;
+    bool bPopupCommandListOnWidgetMode = false;
+    
+    bool bIsRenderingWidget = false;
+    
+    bool bSetBufferToSelectedCommand = false;
     
     TWeakObjectPtr<UCogEngineConfig_Console> Config;
-
-    ImGuiInputTextFlags TextInputState;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------

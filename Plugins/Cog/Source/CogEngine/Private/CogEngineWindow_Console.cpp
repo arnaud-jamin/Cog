@@ -25,6 +25,7 @@ void FCogEngineWindow_Console::Initialize()
     bNoPadding = true;
     bHasMenu = true;
     bHasWidget = 1;
+    SelectedCommandIndex = -1;
     
     RefreshCommandList();
 }
@@ -95,28 +96,14 @@ void FCogEngineWindow_Console::RenderContent()
         RenderConsoleTextInput();
     }
 
-    if (ImGui::BeginChild("Commands", ImVec2(0.0f, -1.0f), ImGuiChildFlags_NavFlattened))
+    const ImVec2 Size = IsWindowRenderedInMainMenu() ? ImVec2(0, ImGui::GetFontSize() * 20) : ImVec2(0.0f, -1.0f);
+    if (ImGui::BeginChild("Commands", Size, ImGuiChildFlags_NavFlattened))
     {
         const float Indent = ImGui::GetFontSize() * 0.5f;
         ImGui::Indent(Indent);
 
         RenderCommandList();
 
-        if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows))
-        {
-            if (bIsWindowFocused == false)
-            {
-                bRequestTextInputFocus = true;
-            }
-            bIsWindowFocused = true;
-        
-            HandleInputs();
-        }
-        else
-        {
-            bIsWindowFocused = false;
-        }
-        
         ImGui::Unindent(Indent);
     }
     
@@ -146,7 +133,9 @@ void FCogEngineWindow_Console::RenderConsoleTextInput()
         ImGuiInputTextFlags_EnterReturnsTrue
         | ImGuiInputTextFlags_EscapeClearsAll
         | ImGuiInputTextFlags_CallbackCompletion
-        | ImGuiInputTextFlags_CallbackEdit;
+        | ImGuiInputTextFlags_CallbackHistory
+        | ImGuiInputTextFlags_CallbackEdit
+        | ImGuiInputTextFlags_CallbackAlways;
     
     if (FCogWindowWidgets::InputTextWithHint("##Command", "Command", CurrentUserInput, InputFlags, &OnTextInputCallbackStub, this))
     {
@@ -155,45 +144,108 @@ void FCogEngineWindow_Console::RenderConsoleTextInput()
     }
 
     ImGui::SetItemDefaultFocus();
+
+    //-------------------------------------------------------------------------------------------------
+    // In Widget mode, do not want to show the command list as soon as the input text has focus,
+    // but wait  for the user to click on the input text (or interact with it). This is because
+    // we want the text input to always have focus so the user can directly type text if he wants to,
+    // but if he doesn't the command list should not clutter the screen.
+    //-------------------------------------------------------------------------------------------------
+    if (bIsRenderingWidget && ImGui::IsItemActive() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+    {
+        bPopupCommandListOnWidgetMode = true;
+    }
     
     if (ImGui::IsItemActive() == false
         && bRequestTextInputFocus
-        && ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows)
-        && IsWindowRenderedInMainMenu() == false)
+        /*&& ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows)*/
+        /*&& IsWindowRenderedInMainMenu() == false*/)
     {
         ImGui::SetKeyboardFocusHere(-1);
+        //bRequestTextInputFocus = false;
     }
 
     if (ImGui::IsItemActive())
     {
-        bRequestTextInputFocus = false;
+         bRequestTextInputFocus = false;
     }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Console::HandleInputs()
+int FCogEngineWindow_Console::OnTextInputCallback(ImGuiInputTextCallbackData* InData)
 {
-    if (ImGui::IsKeyPressed(ImGuiKey_DownArrow))
+    bool DoCompletion = false;
+    if (InData->EventFlag == ImGuiInputTextFlags_CallbackHistory)
     {
-        SelectedCommandIndex += 1;
-        bScrollDirection = -1;
+        DoCompletion = true;
 
-        if (SelectedCommandIndex >= CommandList.Num())
+        if (InData->EventKey == ImGuiKey_UpArrow)
         {
-            SelectedCommandIndex = 0;
+            SelectedCommandIndex -= 1;
+            bScroll = true;
+
+            if (SelectedCommandIndex < 0)
+            {
+                SelectedCommandIndex = CommandList.Num() - 1;
+            }
+        }
+        else if (InData->EventKey == ImGuiKey_DownArrow)
+        {
+            SelectedCommandIndex += 1;
+            bScroll = true;
+
+            if (SelectedCommandIndex >= CommandList.Num())
+            {
+                SelectedCommandIndex = 0;
+            }
         }
     }
-    else if (ImGui::IsKeyPressed(ImGuiKey_UpArrow))
+    else if (InData->EventFlag == ImGuiInputTextFlags_CallbackCompletion)
     {
-        SelectedCommandIndex -= 1;
-        bScrollDirection = 1;
+        DoCompletion = true;
+    }
+    else  if (InData->EventFlag == ImGuiInputTextFlags_CallbackEdit)
+    {
+        CurrentUserInput = FString(InData->Buf);
+        RefreshCommandList();      
 
-        if (SelectedCommandIndex < 0)
+        if (bIsRenderingWidget)
         {
-            SelectedCommandIndex = CommandList.Num() - 1;
-            //ImGui::SetScrollHereY(1.0f);
+            bPopupCommandListOnWidgetMode = true;
         }
     }
+    else if (InData->EventFlag == ImGuiInputTextFlags_CallbackAlways)
+    {
+        if (bSetBufferToSelectedCommand)
+        {
+            DoCompletion = true;
+            bSetBufferToSelectedCommand = false;
+        }
+    }
+
+    if (DoCompletion && CommandList.IsValidIndex(SelectedCommandIndex))
+    {
+        const FString SelectedCommand = CommandList[SelectedCommandIndex];
+        const FString CleanupSelectedCommand = SelectedCommand.TrimEnd(); 
+        const auto& CommandStr = StringCast<ANSICHAR>(*CleanupSelectedCommand);
+        InData->DeleteChars(0, InData->BufTextLen);
+        InData->InsertChars(0, CommandStr.Get());
+        InData->InsertChars(InData->CursorPos, " ");
+
+        if (bIsRenderingWidget)
+        {
+            bPopupCommandListOnWidgetMode = true;
+        }
+    }
+    
+    return 0;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+int FCogEngineWindow_Console::OnTextInputCallbackStub(ImGuiInputTextCallbackData* InData)
+{
+    FCogEngineWindow_Console& ConsoleWindow	= *static_cast<FCogEngineWindow_Console*>(InData->UserData);
+    return ConsoleWindow.OnTextInputCallback(InData);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -214,13 +266,7 @@ void FCogEngineWindow_Console::RenderCommandList()
             {
                 ImGui::PushID(Index);
                 const FString& CommandName = CommandList[Index];
-
                 RenderCommand(CommandName, Index);
-
-                if (SelectedCommandIndex == Index)
-                {
-                    SelectedCommand = CommandName;
-                }
                 ImGui::PopID();
             }
         }
@@ -272,29 +318,39 @@ void FCogEngineWindow_Console::RenderCommand(const FString& CommandName, const i
     {
         ImGui::PushStyleColor(ImGuiCol_Text, FCogImguiHelper::ToImVec4(Config->HistoryColor));
     }
+
+    ImGuiSelectableFlags Flags =
+        ImGuiSelectableFlags_AllowDoubleClick   // Double click executes the selected command
+        | ImGuiSelectableFlags_SelectOnClick;   // Need to focus the console text input right away, otherwise the Selectable take back the focus on mouse release 
     
-    if (ImGui::Selectable(CommandNameStr.Get(), &IsSelected, ImGuiSelectableFlags_AllowDoubleClick))
+    if (ImGui::Selectable(CommandNameStr.Get(), &IsSelected,  Flags))
     {
         SelectedCommandIndex = Index;
-        CurrentUserInput = CommandName;
+        bRequestTextInputFocus = true;
+        bSetBufferToSelectedCommand = true;
+        
         if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
         {
             ExecuteCommand(CommandName);
         }
     }
-
+    
     if (Index < NumHistoryCommands)
     {
         ImGui::PopStyleColor();
-    }    
+    }
+
+    if (NumHistoryCommands > 0 && Index == NumHistoryCommands - 1)
+    {
+        ImGui::Separator();
+    }
     
     if (IsSelected)
     {
-        SelectedCommand = CommandName;
-        if (bScrollDirection != 0)
+        if (bScroll)
         {
             ImGui::SetScrollHereY(1.0f);
-            bScrollDirection = 0;
+            bScroll = false;
         }
     }
 
@@ -369,36 +425,10 @@ void FCogEngineWindow_Console::RefreshCommandList()
 
     CommandList.Append(Commands);
 
-    SelectedCommandIndex = 0;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-int FCogEngineWindow_Console::OnTextInputCallback(ImGuiInputTextCallbackData* InData)
-{
-    if (InData->EventFlag == ImGuiInputTextFlags_CallbackCompletion)
-    {
-        FString CleanupCommand = SelectedCommand.TrimEnd(); 
-        const auto& CommandStr = StringCast<ANSICHAR>(*CleanupCommand);
-        InData->DeleteChars(0, InData->BufTextLen);
-        InData->InsertChars(0, CommandStr.Get());
-        InData->InsertChars(InData->CursorPos, " ");
-        TextInputState = ImGuiInputTextFlags_CallbackCompletion;
-    }
-    else  if (InData->EventFlag == ImGuiInputTextFlags_CallbackEdit)
-    {
-        CurrentUserInput = FString(InData->Buf);
-        RefreshCommandList();      
-        TextInputState = ImGuiInputTextFlags_CallbackCompletion;  
-    }
-
-    return 0;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-int FCogEngineWindow_Console::OnTextInputCallbackStub(ImGuiInputTextCallbackData* InData)
-{
-    FCogEngineWindow_Console& ConsoleWindow	= *static_cast<FCogEngineWindow_Console*>(InData->UserData);
-    return ConsoleWindow.OnTextInputCallback(InData);
+    //-------------------------------------------------------------------------------------
+    // Reset to -1 so the next down arrow will select the first entry in history/command
+    //-------------------------------------------------------------------------------------
+    SelectedCommandIndex = -1;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -415,6 +445,11 @@ void FCogEngineWindow_Console::ExecuteCommand(const FString& InCommand)
         GEngine->DeferredCommands.Add(CleanupCommand);
     }    
 
+    if (bIsRenderingWidget)
+    {
+        bPopupCommandListOnWidgetMode = false;
+    }
+    
     CurrentUserInput = FString();
     RefreshCommandList();
 }
@@ -422,52 +457,50 @@ void FCogEngineWindow_Console::ExecuteCommand(const FString& InCommand)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Console::RenderMainMenuWidget()
 {
+    bIsRenderingWidget = true;
+    
     const ImGuiContext& g = *GImGui;
     const ImGuiStyle& Style = g.Style;
     const ImGuiWindow* Window = ImGui::GetCurrentWindow();
     ImVec2 TooltipPos = Window->DC.CursorPos;
     TooltipPos.y += Window->MenuBarHeight;
 
-    const float Width = ImGui::GetFontSize() * 20;
-    
-    ImGui::SetNextItemWidth(Width);
+    ImGui::SetNextItemWidth(-1);
     RenderConsoleTextInput();
+    const float Width = ImGui::GetItemRectSize().x;
 
-    const bool IsTextInputActive = ImGui::IsItemActive();
-    if (ImGui::IsItemActivated())
+    if (ImGui::IsWindowAppearing())
     {
-        bShowCommandsInWidget = true;    
+        bRequestTextInputFocus = true;
     }
     
-    if (bShowCommandsInWidget)
+    const bool IsTextInputActive = ImGui::IsItemActive();
+    
+    if (bPopupCommandListOnWidgetMode)
     {
-        ImGui::SetNextWindowBgAlpha(g.Style.Colors[ImGuiCol_PopupBg].w * 0.60f);
-        ImGui::SetNextWindowSize(ImVec2(Width, ImGui::GetFontSize() * 30), ImGuiCond_Always);
+        ImGui::SetNextWindowBgAlpha(g.Style.Colors[ImGuiCol_PopupBg].w * 0.90f);
+        ImGui::SetNextWindowSize(ImVec2(Width, ImGui::GetFontSize() * 30), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowPos(TooltipPos, ImGuiCond_Always);
+
         ImGuiWindowFlags flags =
             ImGuiWindowFlags_NoTitleBar
-            //| ImGuiWindowFlags_NoNav
-            | ImGuiWindowFlags_NoMove;
-            //| ImGuiWindowFlags_NoBringToFrontOnFocus
-            //| ImGuiWindowFlags_NoFocusOnAppearing;
+            | ImGuiWindowFlags_NoMove
+            | ImGuiWindowFlags_NoFocusOnAppearing; // We want the console input text to keep the focus.
 
-        if (ImGui::Begin("ConsoleTooltip", 0, flags))
+        if (ImGui::Begin("ConsoleTooltip", nullptr, flags))
         {
-            RenderCommandList();
-            HandleInputs();
+            RenderCommandList();    
 
-            const bool IsWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows);
-            if (IsWindowFocused)
+            const bool IsWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootWindow  | ImGuiFocusedFlags_NoPopupHierarchy);
+
+            if (IsTextInputActive == false && IsWindowFocused == false && bRequestTextInputFocus == false)
             {
-                bRequestTextInputFocus = true;
-            }
-            
-            if (IsTextInputActive == false && IsWindowFocused == false)
-            {
-                bShowCommandsInWidget = false;
+                bPopupCommandListOnWidgetMode = false;
             }
         }
         ImGui::End();
     }
+
+    bIsRenderingWidget = false;
 }
     

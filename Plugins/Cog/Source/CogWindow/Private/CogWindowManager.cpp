@@ -372,7 +372,16 @@ void UCogWindowManager::RenderMainMenu()
 
     IsRenderingInMainMenu = true;
 
-    if (ImGui::BeginMainMenuBar())
+    //-----------------------------------------------------------------------------------------------
+    // Prevent having a small gap on the right of the main menu, where some widgets are displayed
+    //-----------------------------------------------------------------------------------------------
+    ImGui::PushStyleVarX(ImGuiStyleVar_WindowPadding, 0.0f);
+    
+    const bool ShowMainMenu = ImGui::BeginMainMenuBar();
+    
+    ImGui::PopStyleVar();
+
+    if (ShowMainMenu)
     {
         for (FMenu& Menu : MainMenu.SubMenus)
         {
@@ -406,42 +415,46 @@ void UCogWindowManager::RenderMainMenu()
 
             ImGui::EndMenu();
         }
-
+        
         RenderWidgets();
-
         ImGui::EndMainMenuBar();
-    }
-
+    }    
+    
     IsRenderingInMainMenu = false;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::RenderWidgets()
 {
-    int32 numVisibleWidgets = 0;
+    int32 NumVisibleWidgets = 0;
     for (int i = 0; i < Widgets.Num(); ++i)
     {
         FCogWindow* Window = Widgets[i];
         if (Window->GetIsWidgetVisible())
         {
-            numVisibleWidgets++;
+            NumVisibleWidgets++;
         }
     }
 
-    if (numVisibleWidgets == 0)
+    if (NumVisibleWidgets == 0)
     { return; }
     
-    int32 numColumns = numVisibleWidgets;
+    const bool AddLeftColumn = Settings->WidgetAlignment == ECogWidgetAlignment::Right
+                    || Settings->WidgetAlignment == ECogWidgetAlignment::Manual
+                    || Settings->WidgetAlignment == ECogWidgetAlignment::Center;
 
-    if (Settings->WidgetAlignment == ECogWidgetAlignment::Right)
-    {
-        numColumns++;
-    }
-    else if (Settings->WidgetAlignment == ECogWidgetAlignment::Center)
-    {
-        numColumns += 2;
-    }
+    const bool AddRightColumn = Settings->WidgetAlignment == ECogWidgetAlignment::Center;
 
+    int32 NumColumns = NumVisibleWidgets;
+    if (AddLeftColumn)
+    {
+        NumColumns++;
+    }
+    
+    if (AddRightColumn)
+    {
+        NumColumns ++;
+    }
     
     ImGuiTableFlags Flags = ImGuiTableFlags_None;
     if (Settings->ShowWidgetBorders)
@@ -461,27 +474,29 @@ void UCogWindowManager::RenderWidgets()
             Flags |= ImGuiTableFlags_NoBordersInBodyUntilResize;
         }
     }
+
+    ImGui::PushStyleVarX(ImGuiStyleVar_CellPadding, 0.0f);
     
-    if (ImGui::BeginTable("Widgets", numColumns, Flags))
+    if (ImGui::BeginTable("Widgets", NumColumns, Flags))
     {
-        if (Settings->WidgetAlignment == ECogWidgetAlignment::Right || Settings->WidgetAlignment == ECogWidgetAlignment::Center)
+        if (AddLeftColumn)
         {
             ImGui::TableSetupColumn("Stretch", ImGuiTableColumnFlags_WidthStretch);
         }
         
-        for (int i = 0; i < numVisibleWidgets; ++i)
+        for (int i = 0; i < NumVisibleWidgets; ++i)
         {
             ImGui::TableSetupColumn("Fixed", ImGuiTableColumnFlags_WidthFixed);
         }
 
-        if (Settings->WidgetAlignment == ECogWidgetAlignment::Center)
+        if (AddRightColumn)
         {
             ImGui::TableSetupColumn("Stretch", ImGuiTableColumnFlags_WidthStretch);
         }
         
         ImGui::TableNextRow();
 
-        if (Settings->WidgetAlignment == ECogWidgetAlignment::Right || Settings->WidgetAlignment == ECogWidgetAlignment::Center)
+        if (AddLeftColumn)
         {
             ImGui::TableNextColumn();
         }
@@ -498,13 +513,15 @@ void UCogWindowManager::RenderWidgets()
             Window->RenderMainMenuWidget();
         }
 
-        if (Settings->WidgetAlignment == ECogWidgetAlignment::Center)
+        if (AddRightColumn)
         {
             ImGui::TableNextColumn();
         }
         
         ImGui::EndTable();
     }
+
+    ImGui::PopStyleVar();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
