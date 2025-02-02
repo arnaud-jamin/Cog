@@ -68,16 +68,22 @@ void FCogEngineWindow_Console::RenderMainMenuWidget()
     TooltipPos.y += Window->MenuBarHeight;
 
     ImGui::SetNextItemWidth(Config->WidgetWidth);
-    RenderInput();
 
+    RenderInput();
+    const bool IsTextInputActive = ImGui::IsItemActive();
+    
     if (Config->FocusWidgetWhenAppearing && ImGui::IsWindowAppearing())
     {
         SelectedCommandIndex = -1;
         RefreshCommandList();
         ImGui::ActivateItemByID(InputIdOnWidgetMode);
     }
-    
-    const bool IsTextInputActive = ImGui::IsItemActive();
+
+    if (ImGui::BeginPopupContextItem())
+    {
+        RenderMenu();
+        ImGui::EndPopup();
+    }
     
     if (bPopupCommandListOnWidgetMode)
     {
@@ -110,12 +116,6 @@ void FCogEngineWindow_Console::RenderMainMenuWidget()
         }
         ImGui::End();
         ImGui::PopStyleVar();
-    }
-    
-    if (ImGui::BeginPopupContextWindow())
-    {
-        RenderMenu();
-        ImGui::EndPopup();
     }
 
     bIsRenderingWidget = false;
