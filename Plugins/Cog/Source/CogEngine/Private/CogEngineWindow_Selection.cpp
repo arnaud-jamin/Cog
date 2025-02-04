@@ -292,7 +292,7 @@ void FCogEngineWindow_Selection::RenderMainMenuWidget()
 {
     ImGui::PushStyleVarX(ImGuiStyleVar_ItemSpacing, 0);
     ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(0, 0, 0, 0));
-    if (FCogWindowWidgets::PickButton("##Pick", ImVec2(20, 20)))
+    if (FCogWindowWidgets::PickButton("##Pick", ImVec2(ImGui::GetFrameHeight(), ImGui::GetFrameHeight())))
     {
         GetOwner()->SetActivateSelectionMode(true);
         HackWaitInputRelease();

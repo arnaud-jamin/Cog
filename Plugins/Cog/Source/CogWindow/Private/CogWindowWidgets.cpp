@@ -1361,14 +1361,10 @@ bool FCogWindowWidgets::PickButton(const char* InLabel, const ImVec2& InSize, Im
     ImGui::RenderNavCursor(bb, id);
     ImGui::RenderFrame(bb.Min, bb.Max, bg_col, true, g.Style.FrameRounding);
 
-    ImVec2 pos = bb.Min + ImVec2(ImMax(0.0f, (InSize.x - g.FontSize) * 0.5f), ImMax(0.0f, (InSize.y - g.FontSize) * 0.5f));
-    float scale = 1.0f;
-    
-    const float h = window->DrawList->_Data->FontSize * 1.00f;
-    float r = h * 0.40f * scale;
-    ImVec2 center = pos + ImVec2(h * 0.50f, h * 0.50f * scale);
-    window->DrawList->AddCircle(center, r, text_col, 0, 1);
-    window->DrawList->AddCircleFilled(center, r * 0.3f, text_col);
+    const ImVec2 center = bb.GetCenter();
+    const float radius = window->DrawList->_Data->FontSize;
+    window->DrawList->AddCircle(center, radius * 0.4f, text_col, 0, 1);
+    window->DrawList->AddCircleFilled(center, radius * 0.15f, text_col);
 
     return pressed;
 }

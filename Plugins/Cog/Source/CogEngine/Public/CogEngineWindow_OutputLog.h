@@ -65,7 +65,7 @@ private:
 
     FCogLogOutputDevice OutputDevice;
 
-    TWeakObjectPtr<UCogEngineConfig_OutputLog> Config = nullptr;
+    TWeakObjectPtr<UCogEngineConfig_OutputLog> Config;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
