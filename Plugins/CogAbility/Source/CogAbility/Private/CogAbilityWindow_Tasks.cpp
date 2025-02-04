@@ -27,14 +27,6 @@ void FCogAbilityWindow_Tasks::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogAbilityWindow_Tasks::ResetConfig()
-{
-    Super::ResetConfig();
-
-    Config->Reset();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Tasks::RenderTick(float DetlaTime)
 {
     Super::RenderTick(DetlaTime);

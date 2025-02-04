@@ -287,17 +287,19 @@ EMouseCursor::Type FCogImguiInputHelper::ToSlateMouseCursor(ImGuiMouseCursor Mou
 {
     switch (MouseCursor)
     {
-    case ImGuiMouseCursor_Arrow:        return EMouseCursor::Default;
-    case ImGuiMouseCursor_TextInput:    return EMouseCursor::TextEditBeam;
-    case ImGuiMouseCursor_ResizeAll:    return EMouseCursor::CardinalCross;
-    case ImGuiMouseCursor_ResizeNS:     return  EMouseCursor::ResizeUpDown;
-    case ImGuiMouseCursor_ResizeEW:     return  EMouseCursor::ResizeLeftRight;
-    case ImGuiMouseCursor_ResizeNESW:   return  EMouseCursor::ResizeSouthWest;
-    case ImGuiMouseCursor_ResizeNWSE:   return  EMouseCursor::ResizeSouthEast;
+        case ImGuiMouseCursor_Arrow:        return EMouseCursor::Default;
+        case ImGuiMouseCursor_TextInput:    return EMouseCursor::TextEditBeam;
+        case ImGuiMouseCursor_ResizeAll:    return EMouseCursor::CardinalCross;
+        case ImGuiMouseCursor_ResizeNS:     return  EMouseCursor::ResizeUpDown;
+        case ImGuiMouseCursor_ResizeEW:     return  EMouseCursor::ResizeLeftRight;
+        case ImGuiMouseCursor_ResizeNESW:   return  EMouseCursor::ResizeSouthWest;
+        case ImGuiMouseCursor_ResizeNWSE:   return  EMouseCursor::ResizeSouthEast;
+        case ImGuiMouseCursor_Hand:         return  EMouseCursor::Hand;
+        case ImGuiMouseCursor_NotAllowed:   return  EMouseCursor::SlashedCircle;
 
-    case ImGuiMouseCursor_None:
-    default:
-        return EMouseCursor::None;
+        case ImGuiMouseCursor_None:
+        default:
+            return EMouseCursor::None;
     }
 }
 

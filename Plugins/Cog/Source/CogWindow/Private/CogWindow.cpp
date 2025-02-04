@@ -53,6 +53,25 @@ bool FCogWindow::CheckEditorVisibility()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+ void FCogWindow::RenderMainMenuWidget()
+{
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogWindow::RenderContextMenu()
+{
+    if (bHasMenu)
+    {
+        ImGui::Checkbox("Show Menu", &bShowMenu);
+    }
+
+    if (ImGui::Button("Reset Settings", ImVec2(-1, 0)))
+    {
+        ResetConfig();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void FCogWindow::Render(float DeltaTime)
 {
     ImGuiWindowFlags WindowFlags = 0;
@@ -79,16 +98,7 @@ void FCogWindow::Render(float DeltaTime)
 
         if (ImGui::BeginPopupContextWindow())
         {
-            if (bHasMenu)
-            {
-                ImGui::Checkbox("Show Menu", &bShowMenu);
-            }
-
-            if (ImGui::Button("Reset Settings"))
-            {
-                ResetConfig();
-            }
-
+            RenderContextMenu();
             ImGui::EndPopup();
         }
 
@@ -139,7 +149,6 @@ void FCogWindow::SetSelection(AActor* NewSelection)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-
 void FCogWindow::SetIsVisible(const bool Value)
 {
     if (bIsVisible == Value)
@@ -189,9 +198,28 @@ ULocalPlayer* FCogWindow::GetLocalPlayer() const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogCommonConfig* FCogWindow::GetConfig(const TSubclassOf<UCogCommonConfig> ConfigClass) const
+UCogCommonConfig* FCogWindow::GetConfig(const TSubclassOf<UCogCommonConfig>& InConfigClass, bool InResetConfigOnRequest) const
 {
-    return GetOwner()->GetConfig(ConfigClass);
+    UCogCommonConfig* Config = GetOwner()->GetConfig(InConfigClass);
+
+    if (Config != nullptr && InResetConfigOnRequest)
+    {
+        ConfigsToResetOnRequest.AddUnique(Config);
+    }
+
+    return Config;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogWindow::ResetConfig()
+{
+    for (auto& Config : ConfigsToResetOnRequest)
+    {
+        if (Config != nullptr)
+        {
+            Config->Reset();
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -211,3 +239,4 @@ bool FCogWindow::IsWindowRenderedInMainMenu()
 {
     return Owner->IsRenderingMainMenu();
 }
+

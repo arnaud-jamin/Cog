@@ -30,8 +30,6 @@ protected:
 
     virtual void PreSaveConfig() override;
 
-    virtual void ResetConfig() override;
-
     virtual void RenderShortcut(const char* Label, FCogImGuiKeyInfo& KeyInfo);
 
     TObjectPtr<UCogWindowConfig_Settings> Config = nullptr;

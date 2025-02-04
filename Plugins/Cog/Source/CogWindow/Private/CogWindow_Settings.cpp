@@ -50,14 +50,6 @@ void FCogWindow_Settings::PreSaveConfig()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogWindow_Settings::ResetConfig()
-{
-    Super::ResetConfig();
-
-    Config->Reset();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void FCogWindow_Settings::RenderContent()
 {
     const UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*GetWorld());

@@ -1,6 +1,7 @@
 #include "CogEngineWindow_NetEmulation.h"
 
 #include "CogEngineWindow_Stats.h"
+#include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
 #include "Engine/Engine.h"
 #include "Engine/NetConnection.h"
@@ -14,6 +15,25 @@
 void FCogEngineWindow_NetEmulation::RenderHelp()
 {
     ImGui::Text("This window is used to configure the network emulation.");
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_NetEmulation::Initialize()
+{
+    Super::Initialize();
+    
+    Config = GetConfig<UCogEngineWindowConfig_Stats>();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_NetEmulation::RenderContextMenu()
+{
+    Config->RenderColorConfig();
+    Config->RenderPingConfig();
+    Config->RenderPacketLossConfig();
+    
+    ImGui::Separator();
+    FCogWindow::RenderContextMenu();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -42,7 +62,7 @@ void FCogEngineWindow_NetEmulation::DrawStats()
         const float Ping = PlayerState->GetPingInMilliseconds();
         ImGui::Text("Ping            ");
         ImGui::SameLine();
-        ImGui::TextColored(FCogEngineWindow_Stats::GetPingColor(Ping), "%0.0fms", Ping);
+        ImGui::TextColored(Config->GetPingColor(Ping), "%0.0fms", Ping);
     }
 
     if (UNetConnection* Connection = PlayerController->GetNetConnection())
@@ -50,12 +70,12 @@ void FCogEngineWindow_NetEmulation::DrawStats()
         const float OutPacketLost = Connection->GetOutLossPercentage().GetAvgLossPercentage() * 100.0f;
         ImGui::Text("Packet Loss Out ");
         ImGui::SameLine();
-        ImGui::TextColored(FCogEngineWindow_Stats::GetPacketLossColor(OutPacketLost), "%0.0f%%", OutPacketLost);
+        ImGui::TextColored(Config->GetPacketLossColor(OutPacketLost), "%0.0f%%", OutPacketLost);
 
         const float InPacketLost = Connection->GetInLossPercentage().GetAvgLossPercentage() * 100.0f;
         ImGui::Text("Packet Loss In  ");
         ImGui::SameLine();
-        ImGui::TextColored(FCogEngineWindow_Stats::GetPacketLossColor(InPacketLost), "%0.0f%%", InPacketLost);
+        ImGui::TextColored(Config->GetPacketLossColor(InPacketLost), "%0.0f%%", InPacketLost);
     }
 }
 

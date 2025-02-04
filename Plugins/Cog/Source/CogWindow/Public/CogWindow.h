@@ -24,7 +24,7 @@ public:
 
     virtual void Shutdown() {}
 
-    virtual void ResetConfig() {}
+    virtual void ResetConfig();
 
     virtual void PreSaveConfig() {}
 
@@ -38,7 +38,7 @@ public:
     virtual void GameTick(float DeltaTime);
 
     /**  */
-    virtual void RenderMainMenuWidget() {}
+    virtual void RenderMainMenuWidget();
 
     ImGuiID GetID() const { return ID; }
 
@@ -73,9 +73,9 @@ public:
     UCogWindowManager* GetOwner() const { return Owner; }
 
     template<class T>
-    T* GetConfig() const { return Cast<T>(GetConfig(T::StaticClass())); }
+    T* GetConfig(bool InResetConfigOnRequest = true) const { return Cast<T>(GetConfig(T::StaticClass(), InResetConfigOnRequest)); }
 
-    UCogCommonConfig* GetConfig(const TSubclassOf<UCogCommonConfig> ConfigClass) const;
+    UCogCommonConfig* GetConfig(const TSubclassOf<UCogCommonConfig>& InConfigClass, bool InResetConfigOnRequest = true) const;
 
     template<class T>
     const T* GetAsset() const { return Cast<T>(GetAsset(T::StaticClass())); }
@@ -100,6 +100,8 @@ protected:
 
     virtual bool CheckEditorVisibility();
     
+    virtual void RenderContextMenu();
+
     virtual void OnWindowVisibilityChanged(bool NewVisibility) { }
 
     virtual void OnSelectionChanged(AActor* OldSelection, AActor* NewSelection) {}
@@ -141,5 +143,7 @@ protected:
     TWeakObjectPtr<AActor> CurrentSelection;
 
     TWeakObjectPtr<AActor> OverridenSelection;
+
+    mutable TArray<TWeakObjectPtr<UCogCommonConfig>> ConfigsToResetOnRequest;
 };
 

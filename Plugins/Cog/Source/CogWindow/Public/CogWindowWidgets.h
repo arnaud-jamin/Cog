@@ -28,6 +28,10 @@ public:
     static void EndTableTooltip();
 
     static bool ItemTooltipWrappedText(const char* InText);
+
+    static bool BeginItemTooltipWrappedText();
+
+    static void EndItemTooltipWrappedText();
     
     static bool BeginItemTableTooltip();
 
@@ -47,9 +51,9 @@ public:
 
     static bool MultiChoiceButton(const char* Label, bool IsSelected, const ImVec2& Size = ImVec2(0, 0));
 
-    static bool MultiChoiceButtonsInt(TArray<int32>& Values, int32& Value, const ImVec2& Size = ImVec2(0, 0));
+    static bool MultiChoiceButtonsInt(TArray<int32>& Values, int32& Value, const ImVec2& Size = ImVec2(0, 0), bool InInline = true);
 
-    static bool MultiChoiceButtonsFloat(TArray<float>& Values, float& Value, const ImVec2& Size = ImVec2(0, 0));
+    static bool MultiChoiceButtonsFloat(TArray<float>& InValues, float& InValue, const ImVec2& InSize = ImVec2(0, 0), bool InInline = true);
 
     static void SliderWithReset(const char* Name, float* Value, float Min, float Max, const float& ResetValue, const char* Format);
 
@@ -135,8 +139,20 @@ public:
 
     static bool OpenObjectAssetButton(const UObject* InObject, const ImVec2& InSize = ImVec2(0, 0));
 
-    static void RenderClosebutton(const ImVec2& InPos);
+    static void RenderCloseButton(const ImVec2& InPos);
 
+    static bool PickButton(const char* InLabel, const ImVec2& InSize, ImGuiButtonFlags InFlags = ImGuiButtonFlags_None);
+
+    static FString RemoveFirstZero(const FString& InText);
+
+    static FString FormatSmallFloat(float InValue);
+
+    static void FloatArray(const char* InLabel, TArray<float>& InArray, int32 InMaxEntries = 0, const ImVec2& Size = ImVec2(0, 0));
+    
+    static void IntArray(const char* InLabel, TArray<int>& InArray, int32 InMaxEntries = 0, const ImVec2& Size = ImVec2(0, 0));
+
+    template<typename T>
+    static bool ScalarArray(const char* InLabel, ImGuiDataType InDataType, TArray<T>& InArray, int32 InMaxEntries = 0, const ImVec2& Size = ImVec2(0, 0));
 };
 
 template<typename EnumType>
@@ -156,4 +172,44 @@ template<typename EnumType>
 bool FCogWindowWidgets::ComboboxEnum(const char* Label, EnumType& Value)
 {
     return ComboboxEnum(Label, Value, Value);
+}
+
+template<typename T>
+ bool FCogWindowWidgets::ScalarArray(const char* InLabel, ImGuiDataType InDataType, TArray<T>& InArray, int32 InMaxEntries, const ImVec2& Size)
+{
+    bool Result = false;
+    ImGui::PushID(InLabel);
+
+    if (ImGui::BeginChild("##Entries", Size, ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeY, ImGuiWindowFlags_MenuBar))
+    {
+        if (ImGui::BeginMenuBar())
+        {
+            ImGui::TextUnformatted(InLabel);
+
+            int32 NumEntries = InArray.Num();
+            SetNextItemToShortWidth();
+            if (ImGui::SliderInt("##Size", &NumEntries, 0, InMaxEntries))
+            {
+                InArray.SetNum(NumEntries);
+                Result = true;
+            }
+            ImGui::EndMenuBar();
+        }
+            
+        for (int32 i = 0; i < InArray.Num(); i++)
+        {
+            ImGui::PushID(i);
+            ImGui::SetNextItemWidth(-1);
+            if (ImGui::InputScalar("##Entry", InDataType, &InArray[i]))
+            {
+                Result = true;
+            }
+            ImGui::PopID();
+        }
+    }
+    ImGui::EndChild();
+
+    ImGui::PopID();
+
+    return Result;
 }

@@ -1,5 +1,6 @@
 #include "CogEngineWindow_Stats.h"
 
+#include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
 #include "Engine/Engine.h"
 #include "Engine/NetConnection.h"
@@ -8,9 +9,7 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerState.h"
 
-ImVec4 StatRedColor(1.0f, 0.4f, 0.3f, 1.0f);
-ImVec4 StatOrangeColor(1.0f, 0.7f, 0.4f, 1.0f);
-ImVec4 StatGreenColor(0.5f, 1.0f, 0.6f, 1.0f);
+
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Stats::Initialize()
@@ -19,6 +18,8 @@ void FCogEngineWindow_Stats::Initialize()
 
     bHasWidget = true;
     bIsWidgetVisible = true;
+
+    Config = GetConfig<UCogEngineWindowConfig_Stats>();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -30,6 +31,15 @@ void FCogEngineWindow_Stats::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_Stats::RenderContextMenu()
+{
+    Config->RenderAllConfigs();
+    
+    ImGui::Separator();
+    FCogWindow::RenderContextMenu();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Stats::RenderContent()
 {
     Super::RenderContent();
@@ -37,7 +47,7 @@ void FCogEngineWindow_Stats::RenderContent()
     extern ENGINE_API float GAverageFPS;
     ImGui::Text("FPS             ");
     ImGui::SameLine();
-    ImGui::TextColored(GetFpsColor(GAverageFPS), "%0.0f", GAverageFPS);
+    ImGui::TextColored(Config->GetFpsColor(GAverageFPS), "%0.0f", GAverageFPS);
 
     if (const APlayerController* PlayerController = GetLocalPlayerController())
     {
@@ -46,7 +56,7 @@ void FCogEngineWindow_Stats::RenderContent()
             const float Ping = PlayerState->GetPingInMilliseconds();
             ImGui::Text("Ping            ");
             ImGui::SameLine();
-            ImGui::TextColored(GetPingColor(Ping), "%0.0fms", Ping);
+            ImGui::TextColored(Config->GetPingColor(Ping), "%0.0fms", Ping);
         }
 
         if (const UNetConnection* Connection = PlayerController->GetNetConnection())
@@ -54,12 +64,12 @@ void FCogEngineWindow_Stats::RenderContent()
             const float OutPacketLost = Connection->GetOutLossPercentage().GetAvgLossPercentage() * 100.0f;
             ImGui::Text("Packet Loss Out ");
             ImGui::SameLine();
-            ImGui::TextColored(GetPacketLossColor(OutPacketLost), "%0.0f%%", OutPacketLost);
+            ImGui::TextColored(Config->GetPacketLossColor(OutPacketLost), "%0.0f%%", OutPacketLost);
 
             const float InPacketLost = Connection->GetInLossPercentage().GetAvgLossPercentage() * 100.0f;
             ImGui::Text("Packet Loss In  ");
             ImGui::SameLine();
-            ImGui::TextColored(GetPacketLossColor(InPacketLost), "%0.0f%%", InPacketLost);
+            ImGui::TextColored(Config->GetPacketLossColor(InPacketLost), "%0.0f%%", InPacketLost);
         }
     }
 }
@@ -68,129 +78,169 @@ void FCogEngineWindow_Stats::RenderContent()
 void FCogEngineWindow_Stats::RenderMainMenuWidget()
 {
     const APlayerController* PlayerController = GetLocalPlayerController();
-    const UNetConnection* Connection = PlayerController != nullptr ? PlayerController->GetNetConnection() : nullptr;
     
-    RenderMainMenuWidgetFramerate(FCogWindowWidgets::GetFontWidth() * 8);
-    RenderMainMenuWidgetPing(Connection != nullptr ? FCogWindowWidgets::GetFontWidth() * 7 : 0.0f); 
-    RenderMainMenuWidgetPacketLoss(Connection != nullptr ? FCogWindowWidgets::GetFontWidth() * 7 : 0.0f); 
+    RenderMainMenuWidgetFrameRate();
+
+    const UNetConnection* Connection = PlayerController != nullptr ? PlayerController->GetNetConnection() : nullptr;
+    if (Connection != nullptr)
+    {
+        RenderMainMenuWidgetPing();
+        
+        RenderMainMenuWidgetPacketLoss();
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Stats::RenderMainMenuWidgetFramerate(const float Width)
+void FCogEngineWindow_Stats::RenderMainMenuWidgetFrameRate()
 {
     extern ENGINE_API float GAverageFPS;
-    const int32 Fps = (int32)GAverageFPS;
+    const int32 Fps = static_cast<int32>(GAverageFPS);
 
-    ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(0, 0, 0, 0));
-    ImGui::PushStyleColor(ImGuiCol_Text, GetFpsColor(Fps));
-    const bool Open = ImGui::BeginMenu(TCHAR_TO_ANSI(*FString::Printf(TEXT("%3dfps###FramerateButton"), Fps)));
-    ImGui::PopStyleColor(2);
+    ImGui::PushStyleColor(ImGuiCol_Text, Config->GetFpsColor(Fps));
+    const bool Open = ImGui::BeginMenu(TCHAR_TO_ANSI(*FString::Printf(TEXT("%3dfps###FrameRateButton"), Fps)));
+    const float Width = ImGui::GetItemRectSize().x;
+    ImGui::PopStyleColor(1);
 
-    if (Open)
+    if (ImGui::BeginPopupContextItem())
     {
-        ImGui::Text("Fps");
-        ImGui::SameLine();
-
-        int32 MaxFps = GEngine->GetMaxFPS();
-        TArray<int32> Values{ 0, 10, 20, 30, 60, 120 };
-        if (FCogWindowWidgets::MultiChoiceButtonsInt(Values, MaxFps, ImVec2(3.5f * FCogWindowWidgets::GetFontWidth(), 0)))
-        {
-            GEngine->SetMaxFPS(MaxFps);
-        }
-
-        ImGui::EndMenu();
+        Config->RenderColorConfig();
+        Config->RenderFrameRateConfig();
+        Super::RenderContextMenu();
+        ImGui::EndPopup();
     }
 
-    ImGui::SetItemTooltip("Framerate");
+    if (Open == false)
+    {
+        ImGui::SetItemTooltip("Frame Rate");
+    }
+    
+    if (Open)
+    {
+        const int32 MaxFps = GEngine->GetMaxFPS();
+        for (int32 i = 0; i < Config->FrameRates.Num(); ++i)
+        {
+            ImGui::PushID(i);
+            const float Value = Config->FrameRates[i];
+            const auto ValueText = StringCast<ANSICHAR>(*FCogWindowWidgets::FormatSmallFloat(Value));
+            if (ImGui::Selectable(ValueText.Get(), Value == MaxFps, ImGuiSelectableFlags_None, ImVec2(Width, 0)))
+            {
+                GEngine->SetMaxFPS(Value);
+            }
+            ImGui::PopID();
+        }
+        
+        ImGui::EndMenu();
+    }
 }
 
+
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Stats::RenderMainMenuWidgetPing(const float Width)
+void FCogEngineWindow_Stats::RenderMainMenuWidgetPing()
 {
     const APlayerController* PlayerController = GetLocalPlayerController();
     const APlayerState* PlayerState = PlayerController != nullptr ? PlayerController->GetPlayerState<APlayerState>() : nullptr;
     if (PlayerState == nullptr)
+    { return; }
+
+    const int32 Ping = static_cast<int32>(PlayerState->GetPingInMilliseconds());
+    ImGui::PushStyleColor(ImGuiCol_Text, Config->GetPingColor(Ping));
+    const bool Open = ImGui::BeginMenu(TCHAR_TO_ANSI(*FString::Printf(TEXT("%3dms###PingButton"), Ping)));
+    const float Width = ImGui::GetItemRectSize().x;
+    ImGui::PopStyleColor(1);
+    
+    if (ImGui::BeginPopupContextItem())
     {
-        return;
+        Config->RenderColorConfig();
+        Config->RenderPingConfig();
+        Super::RenderContextMenu();
+        ImGui::EndPopup();
     }
 
-    const float Ping = PlayerState->GetPingInMilliseconds();
-    ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(0, 0, 0, 0));
-    ImGui::PushStyleColor(ImGuiCol_Text, GetPingColor(Ping));
-    const bool Open = ImGui::BeginMenu(TCHAR_TO_ANSI(*FString::Printf(TEXT("%3dms###PingButton"), (int32)Ping)));
-    ImGui::PopStyleColor(2);
-    ImGui::SetItemTooltip("Ping");
-
+    if (Open == false)
+    {
+        ImGui::SetItemTooltip("Ping");
+    }
+    
 #if DO_ENABLE_NET_TEST
     if (Open)
     {
         FWorldContext& WorldContext = GEngine->GetWorldContextFromWorldChecked(GetWorld());
         if (WorldContext.ActiveNetDrivers.Num() > 0)
         {
-            ImGui::Text("Ping");
-            ImGui::SameLine();
-
             const FNamedNetDriver* SelectedNetDriver = &WorldContext.ActiveNetDrivers[0];
             FPacketSimulationSettings Settings = SelectedNetDriver->NetDriver->PacketSimulationSettings;
-            TArray<int32> Values{ 0, 50, 100, 200, 500, 1000 };
-            if (FCogWindowWidgets::MultiChoiceButtonsInt(Values, Settings.PktIncomingLagMin, ImVec2(4.5f * FCogWindowWidgets::GetFontWidth(), 0)))
+            
+            for (int32 i = 0; i < Config->Pings.Num(); ++i)
             {
-                SelectedNetDriver->NetDriver->SetPacketSimulationSettings(Settings);
+                ImGui::PushID(i);
+                const float Value = Config->Pings[i];
+                const auto ValueText = StringCast<ANSICHAR>(*FCogWindowWidgets::FormatSmallFloat(Value));
+                if (ImGui::Selectable(ValueText.Get(), Value == Settings.PktIncomingLagMin, ImGuiSelectableFlags_None, ImVec2(Width, 0)))
+                {
+                    Settings.PktIncomingLagMin = Value;
+                    SelectedNetDriver->NetDriver->SetPacketSimulationSettings(Settings);
+                }
+                
+                ImGui::PopID();
             }
         }
-
         ImGui::EndMenu();
     }
 #endif //DO_ENABLE_NET_TEST
-
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Stats::RenderMainMenuWidgetPacketLoss(const float Width)
+void FCogEngineWindow_Stats::RenderMainMenuWidgetPacketLoss()
 {
     const APlayerController* PlayerController = GetLocalPlayerController();
     const UNetConnection* Connection = PlayerController != nullptr ? PlayerController->GetNetConnection() : nullptr;
     if (Connection == nullptr)
-    {
-        return;
-    }
+    { return; }
 
     const float OutPacketLost = Connection->GetOutLossPercentage().GetAvgLossPercentage() * 100.0f;
     const float InPacketLost = Connection->GetInLossPercentage().GetAvgLossPercentage() * 100.0f;
     const float TotalPacketLost = (OutPacketLost + InPacketLost) / 2;
 
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.0f, 0.0f));
-    ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
-    ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(0, 0, 0, 0));
-    ImGui::PushStyleColor(ImGuiCol_Text, GetPacketLossColor(TotalPacketLost));
+    ImGui::PushStyleColor(ImGuiCol_Text, Config->GetPacketLossColor(TotalPacketLost));
+    const bool Open = ImGui::BeginMenu(TCHAR_TO_ANSI(*FString::Printf(TEXT("%2d%% ###PacketLossButton"), (int32)TotalPacketLost)));
+    const float Width = ImGui::GetItemRectSize().x;
+    ImGui::PopStyleColor(1);
 
-    if (ImGui::Button(TCHAR_TO_ANSI(*FString::Printf(TEXT("%2d%%###PacketLossButton"), (int32)TotalPacketLost)), ImVec2(Width, 0.0f)))
+    if (ImGui::BeginPopupContextItem())
     {
-        ImGui::OpenPopup("PacketLossPopup");
+        Config->RenderColorConfig();
+        Config->RenderPacketLossConfig();
+        Super::RenderContextMenu();
+        ImGui::EndPopup();
     }
-
-    ImGui::PopStyleColor(2);
-    ImGui::PopStyleVar(2);
-
-    ImGui::SetItemTooltip("Packet Loss");
-
+    
+    if (Open == false)
+    {
+        ImGui::SetItemTooltip("Packet Loss");
+    }
+    
 #if DO_ENABLE_NET_TEST
-    if (ImGui::BeginPopup("PacketLossPopup"))
+    if (Open)
     {
         FWorldContext& WorldContext = GEngine->GetWorldContextFromWorldChecked(GetWorld());
         if (WorldContext.ActiveNetDrivers.Num() > 0)
         {
-            ImGui::Text("Packet Loss");
-            ImGui::SameLine();
-
             const FNamedNetDriver* SelectedNetDriver = &WorldContext.ActiveNetDrivers[0];
             FPacketSimulationSettings Settings = SelectedNetDriver->NetDriver->PacketSimulationSettings;
 
-            TArray<int32> Values{ 0, 5, 10, 20, 30, 40, 50 };
-            if (FCogWindowWidgets::MultiChoiceButtonsInt(Values, Settings.PktIncomingLoss, ImVec2(3.5f * FCogWindowWidgets::GetFontWidth(), 0)))
+            for (int32 i = 0; i < Config->PacketLosses.Num(); ++i)
             {
-                Settings.PktLoss = Settings.PktIncomingLoss;
-                SelectedNetDriver->NetDriver->SetPacketSimulationSettings(Settings);
+                ImGui::PushID(i);
+                const float Value = Config->PacketLosses[i];
+                const auto ValueText = StringCast<ANSICHAR>(*FCogWindowWidgets::FormatSmallFloat(Value));
+                if (ImGui::Selectable(ValueText.Get(), Value == Settings.PktIncomingLagMin, ImGuiSelectableFlags_None, ImVec2(Width, 0)))
+                {
+                    Settings.PktIncomingLoss = Value;
+                    Settings.PktLoss = Settings.PktIncomingLoss;
+                    SelectedNetDriver->NetDriver->SetPacketSimulationSettings(Settings);
+                }
+                
+                ImGui::PopID();
             }
         }
         ImGui::EndPopup();
@@ -198,50 +248,98 @@ void FCogEngineWindow_Stats::RenderMainMenuWidgetPacketLoss(const float Width)
 #endif //DO_ENABLE_NET_TEST
 }
 
+
 //--------------------------------------------------------------------------------------------------------------------------
-ImVec4 FCogEngineWindow_Stats::GetFpsColor(const float Value, const float Good /*= 50.0f*/, const float Medium /*= 30.0f*/)
+ImVec4 UCogEngineWindowConfig_Stats::GetFpsColor(const float Value) const
 {
-    if (Value > Good)
-    {
-        return StatGreenColor;
-    }
+    if (Value > GoodFrameRate)
+    { return FCogImguiHelper::ToImVec4(GoodColor); }
 
-    if (Value > Medium)
-    {
-        return StatOrangeColor;
-    }
+    if (Value > MediumFrameRate)
+    { return FCogImguiHelper::ToImVec4(MediumColor); }
 
-    return StatRedColor;
+    return FCogImguiHelper::ToImVec4(BadColor);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ImVec4 FCogEngineWindow_Stats::GetPingColor(const float Value, const float Good /*= 100.0f*/, const float Medium /*= 200.0f*/)
+ImVec4 UCogEngineWindowConfig_Stats::GetPingColor(const float Value) const
 {
-    if (Value > Medium)
-    {
-        return StatRedColor;
-    }
+    if (Value > MediumPing)
+    { return FCogImguiHelper::ToImVec4(BadColor); }
 
-    if (Value > Good)
-    {
-        return StatOrangeColor;
-    }
+    if (Value > GoodPing)
+    { return FCogImguiHelper::ToImVec4(MediumColor); }
 
-    return StatGreenColor;
+    return FCogImguiHelper::ToImVec4(GoodColor);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ImVec4 FCogEngineWindow_Stats::GetPacketLossColor(const float Value, const float Good /*= 10.0f*/, const float Medium /*= 20.0f*/)
+ImVec4 UCogEngineWindowConfig_Stats::GetPacketLossColor(const float Value) const
 {
-    if (Value > Medium)
-    {
-        return StatRedColor;
-    }
+    if (Value > MediumPacketLoss)
+    { return FCogImguiHelper::ToImVec4(BadColor); }
 
-    if (Value > Good)
-    {
-        return StatOrangeColor;
-    }
+    if (Value > GoodPacketLoss)
+    { return FCogImguiHelper::ToImVec4(MediumColor); }
 
-    return StatGreenColor;
+    return FCogImguiHelper::ToImVec4(GoodColor);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindowConfig_Stats::RenderAllConfigs()
+{
+    RenderColorConfig();
+    RenderFrameRateConfig();
+    RenderPingConfig();
+    RenderPacketLossConfig();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindowConfig_Stats::RenderColorConfig()
+{
+    if (ImGui::CollapsingHeader("Display", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        constexpr ImGuiColorEditFlags ColorEditFlags = ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf;
+        FCogImguiHelper::ColorEdit4("Good Color", GoodColor, ColorEditFlags);
+        ImGui::SetItemTooltip("Color of a stat with a good value.");
+
+        FCogImguiHelper::ColorEdit4("Medium Color", MediumColor, ColorEditFlags);
+        ImGui::SetItemTooltip("Color of a stat with a medium value.");
+
+        FCogImguiHelper::ColorEdit4("Bad Color", BadColor, ColorEditFlags);
+        ImGui::SetItemTooltip("Color of a stat with a bad value.");
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindowConfig_Stats::RenderFrameRateConfig()
+{
+    if (ImGui::CollapsingHeader("Frame Rate", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::InputInt("Good Frame Rate", &GoodFrameRate);
+        ImGui::InputInt("Medium Frame Rate", &MediumFrameRate);
+        FCogWindowWidgets::IntArray("Max Frame Rate", FrameRates, 10, ImVec2(0, ImGui::GetFontSize() * 10));
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindowConfig_Stats::RenderPingConfig()
+{
+    if (ImGui::CollapsingHeader("Ping", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::InputInt("Good Ping", &GoodPing);
+        ImGui::InputInt("Medium Ping", &MediumPing);
+        FCogWindowWidgets::IntArray("Ping Emulation", Pings, 10, ImVec2(0, ImGui::GetFontSize() * 10));
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogEngineWindowConfig_Stats::RenderPacketLossConfig()
+{
+    if (ImGui::CollapsingHeader("Packet Loss", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::InputInt("Good Packet Loss", &GoodPacketLoss);
+        ImGui::InputInt("Medium Packet Loss", &MediumPacketLoss);
+        FCogWindowWidgets::IntArray("Packet Loss Emulation", PacketLosses, 10, ImVec2(0, ImGui::GetFontSize() * 10));
+    }
 }

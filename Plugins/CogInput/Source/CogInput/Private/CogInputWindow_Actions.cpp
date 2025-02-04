@@ -28,14 +28,6 @@ void FCogInputWindow_Actions::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogInputWindow_Actions::ResetConfig()
-{
-    Super::ResetConfig();
-
-    Config->Reset();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void FCogInputWindow_Actions::RenderContent()
 {
     Super::RenderContent();

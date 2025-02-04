@@ -14,6 +14,7 @@
 #include "Framework/Application/SlateUser.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerInput.h"
+#include "HAL/PlatformApplicationMisc.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "implot.h"
@@ -31,7 +32,7 @@ FCogImGuiContextScope::FCogImGuiContextScope(FCogImguiContext& CogImguiContext)
     PrevContext = ImGui::GetCurrentContext();
     PrevPlotContext = ImPlot::GetCurrentContext();
 
-    ImGui::SetCurrentContext(CogImguiContext.ImGuiContext);
+    ImGui::SetCurrentContext(CogImguiContext.Context);
     ImPlot::SetCurrentContext(CogImguiContext.PlotContext);
 }
 
@@ -53,7 +54,7 @@ FCogImGuiContextScope::~FCogImGuiContextScope()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogImguiContext::bIsNetImguiInitialized = false;
+bool FCogImguiContext::bIsNetImGuiInitialized = false;
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::Initialize()
@@ -71,10 +72,10 @@ void FCogImguiContext::Initialize()
         GameViewport->AddViewportWidgetContent(InputCatcherWidget.ToSharedRef(), -TNumericLimits<int32>::Max());
     }
 
-    ImGuiContext = ImGui::CreateContext();
+    Context = ImGui::CreateContext();
     PlotContext = ImPlot::CreateContext();
-    ImGui::SetCurrentContext(ImGuiContext);
-    ImPlot::SetImGuiContext(ImGuiContext);
+    ImGui::SetCurrentContext(Context);
+    ImPlot::SetImGuiContext(Context);
     ImPlot::SetCurrentContext(PlotContext);
 
     ImGuiIO& IO = ImGui::GetIO();
@@ -121,6 +122,11 @@ void FCogImguiContext::Initialize()
     PlatformIO.Platform_SetWindowTitle = ImGui_SetWindowTitle;
     PlatformIO.Platform_SetWindowAlpha = ImGui_SetWindowAlpha;
     PlatformIO.Platform_RenderWindow = ImGui_RenderWindow;
+    
+    PlatformIO.Platform_ClipboardUserData = &ClipboardBuffer;
+    PlatformIO.Platform_GetClipboardTextFn = ImGui_GetClipboardTextFn;
+    PlatformIO.Platform_SetClipboardTextFn = ImGui_SetClipboardTextFn;
+    PlatformIO.Platform_OpenInShellFn = ImGui_OpenInShell;
 
     if (FSlateApplication::IsInitialized())
     {
@@ -143,10 +149,10 @@ void FCogImguiContext::Initialize()
     }
 
 #if NETIMGUI_ENABLED
-    if (bIsNetImguiInitialized == false)
+    if (bIsNetImGuiInitialized == false)
     {
         NetImgui::Startup();
-        bIsNetImguiInitialized = true;
+        bIsNetImGuiInitialized = true;
     }
 #endif
 }
@@ -154,16 +160,16 @@ void FCogImguiContext::Initialize()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::Shutdown()
 {
-    FCogImGuiContextScope ImGuiContextScope(ImGuiContext, PlotContext);
+    FCogImGuiContextScope ImGuiContextScope(Context, PlotContext);
 
     //------------------------------------------------------------------
     // NetImgui must be shutdown before imgui as it uses context hooks
     //------------------------------------------------------------------
 #if NETIMGUI_ENABLED
-    if (bIsNetImguiInitialized)
+    if (bIsNetImGuiInitialized)
     {
         NetImgui::Shutdown();
-        bIsNetImguiInitialized = false;
+        bIsNetImGuiInitialized = false;
     }
 #endif
 
@@ -196,17 +202,17 @@ void FCogImguiContext::Shutdown()
         PlotContext = nullptr;
     }
 
-    if (ImGuiContext)
+    if (Context)
     {
-        ImGui::DestroyContext(ImGuiContext);
-        ImGuiContext = nullptr;
+        ImGui::DestroyContext(Context);
+        Context = nullptr;
     }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::OnDisplayMetricsChanged(const FDisplayMetrics& DisplayMetrics) const
 {
-    FCogImGuiContextScope ImGuiContextScope(ImGuiContext, PlotContext);
+    FCogImGuiContextScope ImGuiContextScope(Context, PlotContext);
 
     ImGuiPlatformIO& PlatformIO = ImGui::GetPlatformIO();
     PlatformIO.Monitors.resize(0);
@@ -234,7 +240,7 @@ void FCogImguiContext::OnDisplayMetricsChanged(const FDisplayMetrics& DisplayMet
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogImguiContext::BeginFrame(float InDeltaTime)
 {
-    FCogImGuiContextScope ImGuiContextScope(ImGuiContext, PlotContext);
+    FCogImGuiContextScope ImGuiContextScope(Context, PlotContext);
 
     //-------------------------------------------------------------------------------------------------------
     // Skip the first frame, to let the main widget update its TickSpaceGeometry which is returned by the 
@@ -376,7 +382,7 @@ ImVec2 FCogImguiContext::GetImguiMousePos()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::EndFrame()
 {
-    FCogImGuiContextScope ImGuiContextScope(ImGuiContext, PlotContext);
+    FCogImGuiContextScope ImGuiContextScope(Context, PlotContext);
 
     ImGui::Render();
     //NetImgui::EndFrame();
@@ -647,6 +653,36 @@ void FCogImguiContext::ImGui_RenderWindow(ImGuiViewport* Viewport, void* Data)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+const char* FCogImguiContext::ImGui_GetClipboardTextFn(ImGuiContext* InImGuiContext)
+{
+    TArray<char>* ClipboardBuffer = static_cast<TArray<char>*>(InImGuiContext->PlatformIO.Platform_ClipboardUserData);
+    if (ClipboardBuffer)
+    {
+        FString ClipboardText;
+        FPlatformApplicationMisc::ClipboardPaste(ClipboardText);
+
+        ClipboardBuffer->SetNumUninitialized(FPlatformString::ConvertedLength<UTF8CHAR>(*ClipboardText));
+        FPlatformString::Convert(reinterpret_cast<UTF8CHAR*>(ClipboardBuffer->GetData()), ClipboardBuffer->Num(), *ClipboardText, ClipboardText.Len() + 1);
+
+        return ClipboardBuffer->GetData();
+    }
+
+    return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogImguiContext::ImGui_SetClipboardTextFn(ImGuiContext* InImGuiContext, const char* ClipboardText)
+{
+    FPlatformApplicationMisc::ClipboardCopy(UTF8_TO_TCHAR(ClipboardText));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+ bool FCogImguiContext::ImGui_OpenInShell(ImGuiContext* Context, const char* Path)
+{
+    return FPlatformProcess::LaunchFileInDefaultExternalApplication(UTF8_TO_TCHAR(Path));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 static APlayerController* GetLocalPlayerController(const UWorld* World)
 {
     if (World == nullptr)
@@ -688,7 +724,7 @@ static UPlayerInput* GetPlayerInput(const UWorld* World)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::SetEnableInput(bool Value)
 {
-    FCogImGuiContextScope ImGuiContextScope(ImGuiContext, PlotContext);
+    FCogImGuiContextScope ImGuiContextScope(Context, PlotContext);
 
     bEnableInput = Value; 
 
@@ -805,7 +841,7 @@ void FCogImguiContext::SetDPIScale(float Value)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::BuildFont()
 {
-    FCogImGuiContextScope ImGuiContextScope(ImGuiContext, PlotContext);
+    FCogImGuiContextScope ImGuiContextScope(Context, PlotContext);
 
     if (FontAtlasTexture != nullptr)
     {

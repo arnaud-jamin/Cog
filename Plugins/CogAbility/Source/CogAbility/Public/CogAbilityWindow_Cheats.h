@@ -22,15 +22,14 @@ public:
 
 protected:
 
-    virtual void GameTick(float DeltaTime);
-
-    virtual void ResetConfig() override;
+    virtual void GameTick(float DeltaTime) override;
 
     virtual void RenderHelp() override;
 
     virtual void RenderContent() override;
 
     virtual void TryReapplyCheats();
+    
     APawn* GetCheatInstigator();
 
     virtual bool AddCheat(AActor* ControlledActor, AActor* TargetActor, const FCogAbilityCheat& CheatEffect, bool IsPersistent);

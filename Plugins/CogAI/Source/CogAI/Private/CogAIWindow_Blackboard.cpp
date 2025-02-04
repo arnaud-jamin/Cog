@@ -26,14 +26,6 @@ void FCogAIWindow_Blackboard::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogAIWindow_Blackboard::ResetConfig()
-{
-    Super::ResetConfig();
-    
-    Config->Reset();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void FCogAIWindow_Blackboard::RenderContent()
 {
     Super::RenderContent();

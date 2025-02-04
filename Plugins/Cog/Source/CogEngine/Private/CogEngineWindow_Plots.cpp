@@ -38,8 +38,6 @@ void FCogEngineWindow_Plots::ResetConfig()
 {
     Super::ResetConfig();
 
-    Config->Reset();
-
     RefreshPlotSettings();
 }
 

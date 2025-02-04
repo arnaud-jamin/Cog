@@ -26,14 +26,6 @@ void FCogEngineWindow_CollisionTester::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_CollisionTester::ResetConfig()
-{
-    Super::ResetConfig();
-
-    Config->Reset();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_CollisionTester::RenderContent()
 {
     Super::RenderContent();

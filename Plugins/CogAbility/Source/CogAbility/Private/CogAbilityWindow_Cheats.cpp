@@ -39,15 +39,6 @@ void FCogAbilityWindow_Cheats::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogAbilityWindow_Cheats::ResetConfig()
-{
-    Super::ResetConfig();
-
-    Config->Reset();
-    AlignmentConfig->Reset();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Cheats::GameTick(float DeltaTime)
 {
     Super::GameTick(DeltaTime);

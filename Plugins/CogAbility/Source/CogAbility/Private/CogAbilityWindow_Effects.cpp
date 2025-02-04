@@ -33,15 +33,6 @@ void FCogAbilityWindow_Effects::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogAbilityWindow_Effects::ResetConfig()
-{
-    Super::ResetConfig();
-
-    Config->Reset();
-    AlignmentConfig->Reset();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Effects::RenderTick(float DeltaTime)
 {
     Super::RenderTick(DeltaTime);

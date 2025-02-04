@@ -35,8 +35,6 @@ protected:
 
     virtual void TryReapplySelection() const;
 
-    virtual void ResetConfig() override;
-
     virtual void PreSaveConfig() override;
 
     virtual void RenderHelp() override;

@@ -77,13 +77,6 @@ void FCogEngineWindow_NetImgui::Shutdown()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_NetImgui::ResetConfig()
-{
-	Super::ResetConfig();
-	Config->Reset();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_NetImgui::RenderHelp()
 {
     ImGui::Text("This window manage the connection to the NetImgui server."

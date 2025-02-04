@@ -28,14 +28,6 @@ void FCogEngineWindow_Metrics::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Metrics::ResetConfig()
-{
-    Super::ResetConfig();
-
-    Config->Reset();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Metrics::PreSaveConfig()
 {
     Super::PreSaveConfig();

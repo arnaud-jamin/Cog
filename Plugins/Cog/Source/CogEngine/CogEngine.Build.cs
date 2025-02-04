@@ -15,6 +15,7 @@ public class CogEngine : ModuleRules
         PrivateDependencyModuleNames.AddRange(
 	        new []
             {
+                "ApplicationCore",
                 "CogCommon",
                 "CogImgui",
                 "CogWindow",

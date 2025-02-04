@@ -1,8 +1,10 @@
 #include "CogEngineWindow_OutputLog.h"
 
 #include "CogDebugHelper.h"
+#include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
 #include "Engine/Engine.h"
+#include "HAL/PlatformApplicationMisc.h"
 #include "Misc/StringBuilder.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -23,14 +25,6 @@ void FCogEngineWindow_OutputLog::RenderHelp()
     "This window output the log based on each log categories verbosity. "
     "The verbosity of each log category can be configured in the 'Log Categories' window. "
     );
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_OutputLog::ResetConfig()
-{
-    Super::ResetConfig();
-
-    Config->Reset();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -61,7 +55,6 @@ void FCogEngineWindow_OutputLog::AddLog(const TCHAR* Message, ELogVerbosity::Typ
     TextBuffer.append(Format.GetData(), Format.GetData() + Format.Len());
 
     LineInfo.End = TextBuffer.size();
-
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -70,9 +63,9 @@ void FCogEngineWindow_OutputLog::DrawRow(const char* BufferStart, const FLineInf
     ImU32 Color;
     switch (LineInfo.Verbosity)
     {
-    case ELogVerbosity::Error:      Color = IM_COL32(255, 0, 0, 255); break;
-    case ELogVerbosity::Warning:    Color = IM_COL32(255, 200, 0, 255); break;
-    default:                        Color = IM_COL32(200, 200, 200, 255); break;
+        case ELogVerbosity::Error:      Color = FCogImguiHelper::ToImColor(Config->ErrorColor); break;
+        case ELogVerbosity::Warning:    Color = FCogImguiHelper::ToImColor(Config->WarningColor); break;
+        default:                        Color = FCogImguiHelper::ToImColor(Config->DefaultColor); break;
     }
 
     ImGui::PushStyleColor(ImGuiCol_Text, Color);
@@ -133,12 +126,28 @@ void FCogEngineWindow_OutputLog::DrawRow(const char* BufferStart, const FLineInf
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_OutputLog::Copy() const
+{
+    const auto Buffer = StringCast<TCHAR>(TextBuffer.c_str());
+    const wchar_t* BufferData = Buffer.Get();
+    if (BufferData == nullptr)
+    { return; }
+
+    FStringBuilderBase StringBuilder;
+    for (const FLineInfo& LineInfo : LineInfos)
+    {
+        StringBuilder.Append(FString::Printf(TEXT("[%3d] [%s] [%s] "), LineInfo.Frame, *LineInfo.Category.ToString(), ToString(LineInfo.Verbosity)));
+        StringBuilder.Append(BufferData + LineInfo.Start, LineInfo.End - LineInfo.Start);
+        StringBuilder.Append("\n");
+    };
+    
+    FPlatformApplicationMisc::ClipboardCopy(StringBuilder.ToString());
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_OutputLog::RenderContent()
 {
     Super::RenderContent();
-
-    bool ClearPressed = false;
-    bool CopyPressed = false;
 
     if (ImGui::BeginMenuBar())
     {
@@ -146,7 +155,7 @@ void FCogEngineWindow_OutputLog::RenderContent()
         {
             if (ImGui::MenuItem("Copy"))
             {
-                ImGui::LogToClipboard();
+                Copy();
             }
             ImGui::Separator();
 
@@ -156,6 +165,20 @@ void FCogEngineWindow_OutputLog::RenderContent()
             ImGui::Checkbox("Show Verbosity", &Config->ShowVerbosity);
             ImGui::Checkbox("Show As Table", &Config->ShowAsTable);
 
+            ImGui::Separator();
+            
+            constexpr ImGuiColorEditFlags ColorEditFlags = ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf;
+            FCogImguiHelper::ColorEdit4("Default Color", Config->DefaultColor, ColorEditFlags);
+            FCogImguiHelper::ColorEdit4("Warning Color", Config->WarningColor, ColorEditFlags);
+            FCogImguiHelper::ColorEdit4("Error Color", Config->ErrorColor, ColorEditFlags);
+
+            ImGui::Separator();
+
+            if (ImGui::Button("Reset Settings", ImVec2(-1, 0)))
+            {
+                ResetConfig();
+            }
+            
             ImGui::EndMenu();
         }
 
@@ -247,8 +270,6 @@ void FCogEngineWindow_OutputLog::RenderContent()
 
             if (LineInfo.Verbosity <= (ELogVerbosity::Type)Config->VerbosityFilter)
             {
-                const char* LineStart = BufferStart + LineInfo.Start;
-                const char* LineEnd = BufferStart + LineInfo.End;
                 DrawRow(BufferStart, LineInfo, IsTableShown);
             }
         }
@@ -290,6 +311,11 @@ void FCogEngineWindow_OutputLog::RenderContent()
         if (ImGui::MenuItem("Clear"))
         {
             Clear();
+        }
+
+        if (ImGui::MenuItem("Copy"))
+        {
+            Copy();
         }
 
         ImGui::EndPopup();

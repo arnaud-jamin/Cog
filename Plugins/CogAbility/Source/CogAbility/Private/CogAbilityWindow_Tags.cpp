@@ -15,14 +15,6 @@ void FCogAbilityWindow_Tags::Initialize()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogAbilityWindow_Tags::ResetConfig()
-{
-    Super::ResetConfig();
-
-    Config->Reset();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Tags::RenderHelp()
 {
     ImGui::Text("This window displays gameplay tags of the selected actor. ");

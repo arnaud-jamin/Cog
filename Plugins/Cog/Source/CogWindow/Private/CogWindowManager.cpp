@@ -475,7 +475,7 @@ void UCogWindowManager::RenderWidgets()
         }
     }
 
-    ImGui::PushStyleVarX(ImGuiStyleVar_CellPadding, 0.0f);
+    //ImGui::PushStyleVarX(ImGuiStyleVar_CellPadding, 0.0f);
     
     if (ImGui::BeginTable("Widgets", NumColumns, Flags))
     {
@@ -501,9 +501,14 @@ void UCogWindowManager::RenderWidgets()
             ImGui::TableNextColumn();
         }
 
-        for (int i = 0; i < Widgets.Num(); ++i)
+        //---------------------------------------------------------------------
+        // Widgets 
+        //---------------------------------------------------------------------
+        for (int column = 0; column < Widgets.Num(); ++column)
         {
-            FCogWindow* Window = Widgets[i];
+            ImGui::PushID(column);
+            
+            FCogWindow* Window = Widgets[column];
             if (Window->GetIsWidgetVisible() == false)
             { continue; }
             
@@ -511,17 +516,17 @@ void UCogWindowManager::RenderWidgets()
             ImGui::AlignTextToFramePadding();
             ImGui::SetCursorPosY(ImGui::GetCursorPosY() - 2);
             Window->RenderMainMenuWidget();
+            ImGui::PopID();
         }
 
         if (AddRightColumn)
         {
             ImGui::TableNextColumn();
         }
-        
+
         ImGui::EndTable();
     }
-
-    ImGui::PopStyleVar();
+    //ImGui::PopStyleVar();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -801,6 +806,9 @@ UCogCommonConfig* UCogWindowManager::GetConfig(const TSubclassOf<UCogCommonConfi
     }
 
     UCogCommonConfig* Config = NewObject<UCogCommonConfig>(this, Class);
+    Config->Reset();
+    Config->ReloadConfig();
+    
     Configs.Add(Config);
     return Config;
 }

@@ -19,8 +19,6 @@ public:
 
 protected:
 
-    virtual void ResetConfig() override;
-
     virtual void PreSaveConfig() override;
 
     virtual void RenderHelp() override;

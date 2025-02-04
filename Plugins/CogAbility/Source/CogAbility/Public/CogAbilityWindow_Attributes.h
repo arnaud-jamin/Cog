@@ -24,11 +24,9 @@ public:
 
 protected:
 
-    virtual void ResetConfig() override;
-
     virtual void RenderHelp() override;
 
-    virtual void RenderTick(float DeltaTime);
+    virtual void RenderTick(float DeltaTime) override;
 
     virtual void RenderContent() override;
 

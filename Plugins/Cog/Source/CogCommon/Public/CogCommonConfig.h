@@ -12,7 +12,6 @@ public:
 
     UCogCommonConfig()
     {
-        Reset();
     }
 
     virtual void Reset()

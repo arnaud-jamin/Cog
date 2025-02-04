@@ -73,4 +73,6 @@ public:
     static bool DragFVector2D(const char* Label, FVector2D& Vector, float Speed = 1.0f, double Min = 0.0f, double Max = 0.0f, const char* Format = "%.3f", ImGuiSliderFlags Flags = 0);
 
     static bool ColorEdit4(const char* Label, FColor& Color, ImGuiColorEditFlags Flags = 0);
+
+    static bool ColorEdit4(const char* Label, FLinearColor& Color, ImGuiColorEditFlags Flags = 0);
 };

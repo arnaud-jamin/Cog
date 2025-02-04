@@ -243,8 +243,14 @@ bool FCogImguiHelper::DragFVector2D(const char* Label, FVector2D& Vector, float 
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogImguiHelper::ColorEdit4(const char* Label, FColor& Color, ImGuiColorEditFlags Flags)
 {
-    FLinearColor Linear(Color);
-    const bool Result = ImGui::ColorEdit4(Label, &Linear.R, Flags);
-    Color = Linear.ToFColor(true);
+    ImColor c = ToImColor(Color);
+    const bool Result = ImGui::ColorEdit4(Label, &c.Value.x, Flags);
+    Color = ToFColor(c);
     return Result;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogImguiHelper::ColorEdit4(const char* Label, FLinearColor& Color, ImGuiColorEditFlags Flags)
+{
+    return ImGui::ColorEdit4(Label, &Color.R, Flags);
 }

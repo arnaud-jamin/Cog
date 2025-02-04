@@ -91,14 +91,6 @@ void FCogEngineWindow_Cheats::UpdateCheatColor(const FCogEngineCheat& Cheat) con
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Cheats::ResetConfig()
-{
-    Super::ResetConfig();
-
-    Config->Reset();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Cheats::GameTick(float DeltaTime)
 {
     Super::GameTick(DeltaTime);

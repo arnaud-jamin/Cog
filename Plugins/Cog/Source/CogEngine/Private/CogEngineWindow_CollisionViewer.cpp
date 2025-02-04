@@ -33,14 +33,6 @@ void FCogEngineWindow_CollisionViewer::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_CollisionViewer::ResetConfig() 
-{
-    Super::ResetConfig();
-
-    Config->Reset();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_CollisionViewer::RenderContent()
 {
     Super::RenderContent();

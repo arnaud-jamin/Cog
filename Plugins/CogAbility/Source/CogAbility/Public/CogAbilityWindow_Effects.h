@@ -34,8 +34,6 @@ protected:
 
     virtual void RenderTick(float DeltaTime) override;
 
-    virtual void ResetConfig() override;
-
     virtual void RenderEffectsTable();
 
     virtual void RenderEffectRow(UAbilitySystemComponent& AbilitySystemComponent, const FActiveGameplayEffectHandle& ActiveHandle, int32 Index, int32& Selected);

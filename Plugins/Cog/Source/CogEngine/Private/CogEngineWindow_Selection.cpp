@@ -61,14 +61,6 @@ void FCogEngineWindow_Selection::Shutdown()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Selection::ResetConfig()
-{
-    Super::ResetConfig();
-
-    Config->Reset();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Selection::PreSaveConfig()
 {
     Super::PreSaveConfig();
@@ -298,17 +290,23 @@ void FCogEngineWindow_Selection::TickSelectionMode()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Selection::RenderMainMenuWidget()
 {
-    if (ImGui::MenuItem("Pick"))
+    ImGui::PushStyleVarX(ImGuiStyleVar_ItemSpacing, 0);
+    ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(0, 0, 0, 0));
+    if (FCogWindowWidgets::PickButton("##Pick", ImVec2(20, 20)))
     {
         GetOwner()->SetActivateSelectionMode(true);
         HackWaitInputRelease();
     }
-    RenderPickButtonTooltip();
 
-    //TODO: Could be replaced by a BeginMenu
+    ImGui::PopStyleColor();
+    ImGui::PopStyleVar();
+    
+    RenderPickButtonTooltip();
     
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 15);
     AActor* NewSelection = nullptr;
+
+    //TODO: Could be replaced by a BeginMenu
     if (FCogWindowWidgets::MenuActorsCombo(
         "MenuActorSelection", 
         NewSelection, 
@@ -317,7 +315,7 @@ void FCogEngineWindow_Selection::RenderMainMenuWidget()
         Config->SelectedClassIndex, 
         &Filter, 
         GetLocalPlayerPawn(), 
-        [this](AActor& Actor) { RenderActorContextMenu(Actor);  }))
+        [this](AActor& Actor) { RenderActorContextMenu(Actor); }))
     {
         SetGlobalSelection(NewSelection);
     }
@@ -338,9 +336,11 @@ void FCogEngineWindow_Selection::SetGlobalSelection(AActor* Value) const
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Selection::RenderPickButtonTooltip()
 {
-    if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
+    if (FCogWindowWidgets::BeginItemTooltipWrappedText())
     {
         const FString Shortcut = FCogImguiInputHelper::KeyInfoToString(GetOwner()->GetSettings()->ToggleSelectionShortcut);
-        ImGui::SetTooltip("Enter picking mode to pick an actor on screen. %s", TCHAR_TO_ANSI(*Shortcut));
+        ImGui::Text("Enter selection mode to select an actor on screen. Change which actor type is selectable by clicking the selection combobox\n"
+        "%s", TCHAR_TO_ANSI(*Shortcut));
+        FCogWindowWidgets::EndItemTooltipWrappedText();
     }
 }

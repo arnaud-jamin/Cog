@@ -1,24 +1,62 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogEngineReplicator.h"
 #include "CogWindow.h"
+#include "CogEngineWindow_TimeScale.generated.h"
 
+class UCogEngineWindowConfig_TimeScale;
+
+//--------------------------------------------------------------------------------------------------------------------------
 class COGENGINE_API FCogEngineWindow_TimeScale : public FCogWindow
 {
     typedef FCogWindow Super;
 
 public:
-    
-    void Initialize();
+    virtual void Initialize() override;
 
 protected:
 
     virtual void RenderHelp() override;
 
     virtual void RenderContent() override;
+    
+    virtual void RenderContextMenu() override;
 
-    TArray<float> TimingScales;
+    virtual void RenderMainMenuWidget() override;
 
-private:
+    virtual void RenderTimeScaleChoices(ACogEngineReplicator* Replicator);
 
+    TWeakObjectPtr<UCogEngineWindowConfig_TimeScale> Config;
+};
+
+//--------------------------------------------------------------------------------------------------------------------------
+UCLASS(Config = Cog)
+class UCogEngineWindowConfig_TimeScale : public UCogCommonConfig
+{
+    GENERATED_BODY()
+
+public:
+
+    virtual void Reset() override
+    {
+        UCogCommonConfig::Reset();
+
+        TimeScale = 1.0f;
+        Inline = true;
+        TimeScales = { 0.00f, 0.01f, 0.10f, 0.50f, 1.00f, 2.00f, 5.00f, 10.0f };
+        TimeScaleModifiedColor = FColor(255, 30, 210, 255);
+    }
+    
+    UPROPERTY(Config)
+    float TimeScale = 1.0f;
+    
+    UPROPERTY(Config)
+    TArray<float> TimeScales;
+
+    UPROPERTY(Config)
+    bool Inline = true;
+
+    UPROPERTY(Config)
+    FColor TimeScaleModifiedColor = FColor();
 };

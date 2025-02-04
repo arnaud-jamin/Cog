@@ -30,17 +30,6 @@ void FCogInputWindow_Gamepad::PreRender(ImGuiWindowFlags& WindowFlags)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogInputWindow_Gamepad::ResetConfig()
-{
-    Super::ResetConfig();
-
-    if (Config != nullptr)
-    {
-        Config->Reset();
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void FCogInputWindow_Gamepad::RenderButtonContextMenu(const FKey& Key, FCogInputActionInfo* ActionInfoButton)
 {
     if (ActionInfoButton != nullptr)

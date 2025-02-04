@@ -25,8 +25,6 @@ public:
 
 protected:
 
-    virtual void ResetConfig() override;
-
     virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;
 
     virtual void RenderContent() override;

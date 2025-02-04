@@ -28,14 +28,6 @@ void FCogEngineWindow_DebugSettings::Initialize()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_DebugSettings::ResetConfig()
-{
-    Super::ResetConfig();
-
-    Config->Reset();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_DebugSettings::PreSaveConfig()
 {
     Super::PreSaveConfig();

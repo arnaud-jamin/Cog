@@ -83,7 +83,7 @@ public:
 
 	TSharedPtr<const SCogImguiWidget> GetMainWidget() const { return MainWidget; }
 
-	static bool GetIsNetImguiInitialized() { return bIsNetImguiInitialized; }
+	static bool GetIsNetImguiInitialized() { return bIsNetImGuiInitialized; }
 
 private:
 
@@ -127,7 +127,12 @@ private:
 
 	static void ImGui_RenderWindow(ImGuiViewport* Viewport, void* Data);
 
-	UPROPERTY()
+	static const char* ImGui_GetClipboardTextFn(ImGuiContext* InImGuiContext);
+
+	static void ImGui_SetClipboardTextFn(ImGuiContext* InImGuiContext, const char* Arg);
+
+	static bool ImGui_OpenInShell(ImGuiContext* Context, const char* Path);
+
 	UTexture2D* FontAtlasTexture = nullptr;
 
 	TMap<TWeakPtr<SWindow>, ImGuiID> WindowToViewportMap;
@@ -144,12 +149,14 @@ private:
 
 	TObjectPtr<UGameViewportClient> GameViewport = nullptr;
 
-	ImGuiContext* ImGuiContext = nullptr;
+	ImGuiContext* Context = nullptr;
 
 	ImPlotContext* PlotContext = nullptr;
 
 	char IniFilename[512] = {};
 
+	TArray<char> ClipboardBuffer;
+	
 	bool bEnableInput = false;
 
 	bool bShareMouse = false;
@@ -174,6 +181,6 @@ private:
 
 	bool bSkipRendering = false;
 
-	static bool bIsNetImguiInitialized;
+	static bool bIsNetImGuiInitialized;
 
 };

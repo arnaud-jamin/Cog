@@ -41,17 +41,33 @@ void FCogWindowWidgets::EndTableTooltip()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogWindowWidgets::ItemTooltipWrappedText(const char* InText)
+bool FCogWindowWidgets::BeginItemTooltipWrappedText()
 {
-    bool result = ImGui::BeginItemTooltip();
+    const bool result = ImGui::BeginItemTooltip();
     if (result == false)
     { return false; }
     
     ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-    ImGui::TextUnformatted(InText);
+    return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogWindowWidgets::EndItemTooltipWrappedText()
+{
     ImGui::PopTextWrapPos();
     ImGui::EndTooltip();
-    return true;
+}
+    
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::ItemTooltipWrappedText(const char* InText)
+{
+    const bool result = BeginItemTooltipWrappedText();
+    if (result)
+    {
+        ImGui::TextUnformatted(InText);
+        EndItemTooltipWrappedText();
+    }
+    return result;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -647,7 +663,7 @@ bool FCogWindowWidgets::MultiChoiceButton(const char* Label, bool IsSelected, co
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogWindowWidgets::MultiChoiceButtonsInt(TArray<int32>& Values, int32& Value, const ImVec2& Size)
+bool FCogWindowWidgets::MultiChoiceButtonsInt(TArray<int32>& InValues, int32& InCurrentValue, const ImVec2& InSize, bool InInline)
 {
     ImGuiStyle& Style = ImGui::GetStyle();
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(Style.WindowPadding.x * 0.40f, (float)(int)(Style.WindowPadding.y * 0.60f)));
@@ -656,18 +672,18 @@ bool FCogWindowWidgets::MultiChoiceButtonsInt(TArray<int32>& Values, int32& Valu
     ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(255, 255, 255, 180));
 
     bool IsPressed = false;
-    for (int32 i = 0; i < Values.Num(); ++i)
+    for (int32 i = 0; i < InValues.Num(); ++i)
     {
-        int32 ButtonValue = Values[i];
+        int32 ButtonValue = InValues[i];
 
         const auto Text = StringCast<ANSICHAR>(*FString::Printf(TEXT("%d"), ButtonValue));
-        if (MultiChoiceButton(Text.Get(), ButtonValue == Value, Size))
+        if (MultiChoiceButton(Text.Get(), ButtonValue == InCurrentValue, InSize))
         {
             IsPressed = true;
-            Value = ButtonValue;
+            InCurrentValue = ButtonValue;
         }
 
-        if (i < Values.Num() - 1)
+        if (InInline && i < InValues.Num() - 1)
         {
             ImGui::SameLine();
         }
@@ -680,7 +696,19 @@ bool FCogWindowWidgets::MultiChoiceButtonsInt(TArray<int32>& Values, int32& Valu
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogWindowWidgets::MultiChoiceButtonsFloat(TArray<float>& Values, float& Value, const ImVec2& Size)
+FString FCogWindowWidgets::RemoveFirstZero(const FString& InText)
+{
+    return InText.Replace(TEXT("0."), TEXT("."));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FString FCogWindowWidgets::FormatSmallFloat(float InValue)
+{
+    return RemoveFirstZero(FString::Printf(TEXT("%g"), InValue));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::MultiChoiceButtonsFloat(TArray<float>& InValues, float& InValue, const ImVec2& InSize, bool InInline)
 {
     ImGuiStyle& Style = ImGui::GetStyle();
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(Style.WindowPadding.x * 0.40f, (float)(int)(Style.WindowPadding.y * 0.60f)));
@@ -689,18 +717,21 @@ bool FCogWindowWidgets::MultiChoiceButtonsFloat(TArray<float>& Values, float& Va
     ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(255, 255, 255, 180));
 
     bool IsPressed = false;
-    for (int32 i = 0; i < Values.Num(); ++i)
+    for (int32 i = 0; i < InValues.Num(); ++i)
     {
-        float ButtonValue = Values[i];
+        float ButtonValue = InValues[i];
 
-        const auto Text = StringCast<ANSICHAR>(*FString::Printf(TEXT("%g"), ButtonValue).Replace(TEXT("0."), TEXT(".")));
-        if (MultiChoiceButton(Text.Get(), ButtonValue == Value, Size))
+        const auto Text = StringCast<ANSICHAR>(*FormatSmallFloat(ButtonValue));
+
+        ImGui::PushID(i);
+        if (MultiChoiceButton(Text.Get(), ButtonValue == InValue, InSize))
         {
             IsPressed = true;
-            Value = ButtonValue;
+            InValue = ButtonValue;
         }
+        ImGui::PopID();
 
-        if (i < Values.Num() - 1)
+        if (InInline && i < InValues.Num() - 1)
         {
             ImGui::SameLine();
         }
@@ -1278,7 +1309,19 @@ bool FCogWindowWidgets::OpenObjectAssetButton(const UObject* InObject, const ImV
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogWindowWidgets::RenderClosebutton(const ImVec2& InPos)
+void FCogWindowWidgets::FloatArray(const char* InLabel, TArray<float>& InArray, int32 InMaxEntries, const ImVec2& Size)
+{
+    ScalarArray(InLabel, ImGuiDataType_Float, InArray, InMaxEntries, Size);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogWindowWidgets::IntArray(const char* InLabel, TArray<int>& InArray, int32 InMaxEntries, const ImVec2& Size)
+{
+    ScalarArray(InLabel, ImGuiDataType_S32, InArray, InMaxEntries, Size);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogWindowWidgets::RenderCloseButton(const ImVec2& InPos)
 {
     ImGuiContext& g = *GImGui;
     ImGuiWindow* window = g.CurrentWindow;
@@ -1294,31 +1337,38 @@ void FCogWindowWidgets::RenderClosebutton(const ImVec2& InPos)
     window->DrawList->AddLine(cross_center + ImVec2(+cross_extent, -cross_extent), cross_center + ImVec2(-cross_extent, +cross_extent), cross_col, 1.0f);
 }
 
-// //--------------------------------------------------------------------------------------------------------------------------
-// bool ImGui::ArrowButtonEx(const char* str_id, ImGuiDir dir, ImVec2 size, ImGuiButtonFlags flags)
-// {
-//     ImGuiContext& g = *GImGui;
-//     ImGuiWindow* window = GetCurrentWindow();
-//     if (window->SkipItems)
-//         return false;
-//
-//     const ImGuiID id = window->GetID(str_id);
-//     const ImRect bb(window->DC.CursorPos, window->DC.CursorPos + size);
-//     const float default_size = GetFrameHeight();
-//     ItemSize(size, (size.y >= default_size) ? g.Style.FramePadding.y : -1.0f);
-//     if (!ItemAdd(bb, id))
-//         return false;
-//
-//     bool hovered, held;
-//     bool pressed = ButtonBehavior(bb, id, &hovered, &held, flags);
-//
-//     // Render
-//     const ImU32 bg_col = GetColorU32((held && hovered) ? ImGuiCol_ButtonActive : hovered ? ImGuiCol_ButtonHovered : ImGuiCol_Button);
-//     const ImU32 text_col = GetColorU32(ImGuiCol_Text);
-//     RenderNavCursor(bb, id);
-//     RenderFrame(bb.Min, bb.Max, bg_col, true, g.Style.FrameRounding);
-//     RenderArrow(window->DrawList, bb.Min + ImVec2(ImMax(0.0f, (size.x - g.FontSize) * 0.5f), ImMax(0.0f, (size.y - g.FontSize) * 0.5f)), text_col, dir);
-//
-//     IMGUI_TEST_ENGINE_ITEM_INFO(id, str_id, g.LastItemData.StatusFlags);
-//     return pressed;
-// }
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::PickButton(const char* InLabel, const ImVec2& InSize, ImGuiButtonFlags InFlags)
+{
+    ImGuiContext& g = *GImGui;
+    ImGuiWindow* window = ImGui::GetCurrentWindow();
+    if (window->SkipItems)
+        return false;
+
+    const ImGuiID id = window->GetID(InLabel);
+    const ImRect bb(window->DC.CursorPos, window->DC.CursorPos + InSize);
+    const float default_size = ImGui::GetFrameHeight();
+    ImGui::ItemSize(InSize, (InSize.y >= default_size) ? g.Style.FramePadding.y : -1.0f);
+    if (!ImGui::ItemAdd(bb, id))
+        return false;
+
+    bool hovered, held;
+    bool pressed = ImGui::ButtonBehavior(bb, id, &hovered, &held, InFlags);
+
+    // Render
+    const ImU32 bg_col = ImGui::GetColorU32((held && hovered) ? ImGuiCol_ButtonActive : hovered ? ImGuiCol_ButtonHovered : ImGuiCol_Button);
+    const ImU32 text_col = ImGui::GetColorU32(ImGuiCol_Text);
+    ImGui::RenderNavCursor(bb, id);
+    ImGui::RenderFrame(bb.Min, bb.Max, bg_col, true, g.Style.FrameRounding);
+
+    ImVec2 pos = bb.Min + ImVec2(ImMax(0.0f, (InSize.x - g.FontSize) * 0.5f), ImMax(0.0f, (InSize.y - g.FontSize) * 0.5f));
+    float scale = 1.0f;
+    
+    const float h = window->DrawList->_Data->FontSize * 1.00f;
+    float r = h * 0.40f * scale;
+    ImVec2 center = pos + ImVec2(h * 0.50f, h * 0.50f * scale);
+    window->DrawList->AddCircle(center, r, text_col, 0, 1);
+    window->DrawList->AddCircleFilled(center, r * 0.3f, text_col);
+
+    return pressed;
+}

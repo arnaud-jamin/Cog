@@ -36,14 +36,6 @@ void FCogAbilityWindow_Attributes::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogAbilityWindow_Attributes::ResetConfig()
-{
-    Super::ResetConfig();
-
-    Config->Reset();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Attributes::RenderTick(float DeltaTime)
 {
     Super::RenderTick(DeltaTime);

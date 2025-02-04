@@ -7,7 +7,6 @@
 #include "Misc/OutputDevice.h"
 #include "CogEngineWindow_OutputLog.generated.h"
 
-class FCogEngineWindow_OutputLog;
 class UCogEngineConfig_OutputLog;
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -17,7 +16,7 @@ public:
     friend class FCogEngineWindow_OutputLog;
 
     FCogLogOutputDevice();
-    ~FCogLogOutputDevice();
+    virtual ~FCogLogOutputDevice() override;
 
     virtual void Serialize(const TCHAR* Message, ELogVerbosity::Type Verbosity, const FName& Category) override;
 
@@ -37,11 +36,11 @@ public:
 
     void Clear();
 
+    void Copy() const;
+
 protected:
 
     virtual void RenderHelp() override;
-
-    virtual void ResetConfig() override;
 
     virtual void RenderContent() override;
 
@@ -66,7 +65,7 @@ private:
 
     FCogLogOutputDevice OutputDevice;
 
-    TObjectPtr<UCogEngineConfig_OutputLog> Config = nullptr;
+    TWeakObjectPtr<UCogEngineConfig_OutputLog> Config = nullptr;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -95,6 +94,15 @@ public:
     UPROPERTY(Config)
     int32 VerbosityFilter = ELogVerbosity::VeryVerbose;
 
+    UPROPERTY(Config)
+    FColor DefaultColor =  FColor::White;
+    
+    UPROPERTY(Config)
+    FColor WarningColor = FColor::White;
+
+    UPROPERTY(Config)
+    FColor ErrorColor = FColor::White;
+
     virtual void Reset() override
     {
         Super::Reset();
@@ -105,5 +113,8 @@ public:
         ShowVerbosity = false;
         ShowAsTable = false;
         VerbosityFilter = ELogVerbosity::VeryVerbose;
+        DefaultColor =  FColor(200, 200, 200, 255);
+        WarningColor = FColor(255, 200, 0, 255); 
+        ErrorColor = FColor(255, 0, 0, 255); 
     }
 };

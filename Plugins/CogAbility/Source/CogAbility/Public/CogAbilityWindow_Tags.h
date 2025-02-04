@@ -23,8 +23,6 @@ protected:
 
     virtual void GetTagContainer(FGameplayTagContainer& TagContainer) {}
 
-    virtual void ResetConfig();
-
     virtual void RenderHelp() override;
 
     virtual void RenderContent() override;
