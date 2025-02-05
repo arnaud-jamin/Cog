@@ -1,5 +1,7 @@
 #include "CogCommonModule.h"
 
+#include "CogCommonLogCategory.h"
+
 #define LOCTEXT_NAMESPACE "FCogCommonModule"
 
 //--------------------------------------------------------------------------------------------------------------------------

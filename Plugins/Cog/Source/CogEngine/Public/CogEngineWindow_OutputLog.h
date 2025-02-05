@@ -32,7 +32,7 @@ public:
 
     virtual void Initialize() override;
 
-    void AddLog(const TCHAR* Message, ELogVerbosity::Type Verbosity, const FName& Category);
+    void AddLog(const TCHAR* InMessage, ELogVerbosity::Type InVerbosity, const FName& InCategory);
 
     void Clear();
 
@@ -40,32 +40,35 @@ public:
 
 protected:
 
-    virtual void RenderHelp() override;
-
-    virtual void RenderContent() override;
-
-private:
-
-    struct FLineInfo
+    struct FLogInfo
     {
-        int32 Start = 0;
-        int32 End = 0;
-        int32 Frame = 0;
+        int32 LineStart = 0;
+        int32 LineEnd = 0;
+        uint64 Frame = 0;
+        FDateTime Time;
         ELogVerbosity::Type Verbosity;
         FName Category;
     };
+    
+    virtual void RenderHelp() override;
 
-    void DrawRow(const char* BufferStart, const FLineInfo& Info, bool IsTableShown) const;
+    virtual void RenderContent() override;
+    
+    virtual void DrawRow(const char* InBufferStart, const FLogInfo& Info, bool InShowAsTableRow) const;
+
+    virtual int32 GetDisplayedFrame(const FLogInfo& InLogInfo) const;
 
     ImGuiTextBuffer TextBuffer;
 
     ImGuiTextFilter Filter;
 
-    TArray<FLineInfo> LineInfos;
+    TArray<FLogInfo> LogInfos;
 
     FCogLogOutputDevice OutputDevice;
 
     TWeakObjectPtr<UCogEngineConfig_OutputLog> Config;
+
+    TArray<FLogInfo> Notifications;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -80,7 +83,13 @@ public:
     bool AutoScroll = true;
 
     UPROPERTY(Config)
+    bool ShowTime = true;
+    
+    UPROPERTY(Config)
     bool ShowFrame = true;
+
+    UPROPERTY(Config)
+    int32 FrameCycle =  1000;
 
     UPROPERTY(Config)
     bool ShowCategory = true;
@@ -103,11 +112,15 @@ public:
     UPROPERTY(Config)
     FColor ErrorColor = FColor::White;
 
+    UPROPERTY(Config)
+    bool UseUTCTime =  false;
+    
     virtual void Reset() override
     {
         Super::Reset();
 
         AutoScroll = true;
+        ShowTime = false;
         ShowFrame = true;
         ShowCategory = true;
         ShowVerbosity = false;

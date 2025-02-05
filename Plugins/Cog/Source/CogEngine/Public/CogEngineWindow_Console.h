@@ -27,18 +27,21 @@ protected:
 
 private:
 
+    static IConsoleObject* GetCommandObjectFromCommandLine(const FString& InCommandLine);
 
-    static FString GetConsoleCommandHelp(const FString& InCommandName);
+    static FString GetConsoleCommandHelp(const FString& InCommandLine);
+
+    static int OnTextInputCallbackStub(ImGuiInputTextCallbackData* InData);
 
     void RenderMenu();
 
     void RenderInput();
+    
     void SelectNextCommand();
+    
     void SelectPreviousCommand();
 
     int OnTextInputCallback(ImGuiInputTextCallbackData* InData);
-
-    static int OnTextInputCallbackStub(ImGuiInputTextCallbackData* InData);
 
     void RenderCommandList();
 

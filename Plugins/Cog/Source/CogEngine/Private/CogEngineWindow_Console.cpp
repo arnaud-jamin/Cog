@@ -455,20 +455,26 @@ void FCogEngineWindow_Console::RenderCommandList()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FString FCogEngineWindow_Console::GetConsoleCommandHelp(const FString& InCommandName)
+ IConsoleObject* FCogEngineWindow_Console::GetCommandObjectFromCommandLine(const FString& InCommandLine)
 {
-    if (InCommandName.IsEmpty() == false)
-    {
-        TArray<FString> CommandSplitWithSpaces;
-        InCommandName.ParseIntoArrayWS(CommandSplitWithSpaces);
+    if (InCommandLine.IsEmpty())
+    { return nullptr; }
+    
+    TArray<FString> CommandSplitWithSpaces;
+    InCommandLine.ParseIntoArrayWS(CommandSplitWithSpaces);
 
-        if (CommandSplitWithSpaces.Num() > 0)
-        {
-            if (const IConsoleObject* ConsoleObject = IConsoleManager::Get().FindConsoleObject(*CommandSplitWithSpaces[0]))
-            {
-                return FString(ConsoleObject->GetHelp());
-            }
-        }
+    if (CommandSplitWithSpaces.Num() == 0)
+    { return nullptr; }
+
+    return IConsoleManager::Get().FindConsoleObject(*CommandSplitWithSpaces[0]);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FString FCogEngineWindow_Console::GetConsoleCommandHelp(const FString& InCommandLine)
+{
+    if (IConsoleObject* ConsoleObject = GetCommandObjectFromCommandLine(InCommandLine))
+    {
+        return ConsoleObject->GetHelp();
     }
     
     return FString("Unknown command.");
@@ -624,11 +630,20 @@ void FCogEngineWindow_Console::ActivateInputText() const
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Console::ExecuteCommand(const FString& InCommand)
 {
-    FString CleanupCommand = InCommand.TrimEnd(); 
+    const FString CleanupCommand = InCommand.TrimEnd(); 
     if (CleanupCommand.IsEmpty() == false)
     {
         IConsoleManager::Get().AddConsoleHistoryEntry(TEXT(""), *CleanupCommand);
         GEngine->DeferredCommands.Add(CleanupCommand);
+
+        if (GetCommandObjectFromCommandLine(InCommand) != nullptr)
+        {
+            COG_NOTIFY(TEXT("Command: %s"), *CleanupCommand);
+        }
+        else
+        {
+            COG_NOTIFY_ERROR(TEXT("Unknown Command: %s"), *CleanupCommand);
+        }
     }    
 
     if (bIsWidgetMode)

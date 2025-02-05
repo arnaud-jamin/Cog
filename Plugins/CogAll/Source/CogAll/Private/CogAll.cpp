@@ -21,6 +21,7 @@
 #include "CogEngineWindow_Metrics.h"
 #include "CogEngineWindow_NetImgui.h"
 #include "CogEngineWindow_NetEmulation.h"
+#include "CogEngineWindow_Notifications.h"
 #include "CogEngineWindow_OutputLog.h"
 #include "CogEngineWindow_Plots.h"
 #include "CogEngineWindow_Scalability.h"
@@ -76,6 +77,8 @@ void Cog::AddAllWindows(UCogWindowManager& CogWindowManager)
     CogWindowManager.AddWindow<FCogEngineWindow_NetImgui>("Engine.Net ImGui");
 
     CogWindowManager.AddWindow<FCogEngineWindow_OutputLog>("Engine.Output Log");
+    
+    CogWindowManager.AddWindow<FCogEngineWindow_Notifications>("Engine.Notifications");
 
     CogWindowManager.AddWindow<FCogEngineWindow_Plots>("Engine.Plots");
 

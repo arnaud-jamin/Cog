@@ -1,10 +1,14 @@
 #include "CogEngineWindow_OutputLog.h"
 
+#include "CogCommon.h"
+#include "CogCommonLogCategory.h"
 #include "CogDebugHelper.h"
 #include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
+#include "imgui_internal.h"
 #include "Engine/Engine.h"
 #include "HAL/PlatformApplicationMisc.h"
+#include "Math/UnitConversion.h"
 #include "Misc/StringBuilder.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -31,37 +35,44 @@ void FCogEngineWindow_OutputLog::RenderHelp()
 void FCogEngineWindow_OutputLog::Clear()
 {
     TextBuffer.clear();
-    LineInfos.Empty();
+    LogInfos.Empty();
+    Notifications.Empty();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_OutputLog::AddLog(const TCHAR* Message, ELogVerbosity::Type Verbosity, const class FName& Category)
+void FCogEngineWindow_OutputLog::AddLog(const TCHAR* InMessage, ELogVerbosity::Type InVerbosity, const class FName& InCategory)
 {
     static TAnsiStringBuilder<512> Format;
 
     Format.Reset();
 
-    if (Message)
+    if (InMessage)
     {
-        Format.Append(Message);
+        Format.Append(InMessage);
     }
 
-    FLineInfo& LineInfo = LineInfos.AddDefaulted_GetRef();
-    LineInfo.Frame = GFrameCounter % 1000;
-    LineInfo.Verbosity = Verbosity;
-    LineInfo.Category = Category;
-    LineInfo.Start = TextBuffer.size();
+    FLogInfo& LogInfo = LogInfos.AddDefaulted_GetRef();
+    LogInfo.Frame = GFrameCounter;
+    LogInfo.Time = Config->UseUTCTime ? FDateTime::UtcNow() : FDateTime::Now();
+    LogInfo.Verbosity = InVerbosity;
+    LogInfo.Category = InCategory;
+    LogInfo.LineStart = TextBuffer.size();
 
     TextBuffer.append(Format.GetData(), Format.GetData() + Format.Len());
 
-    LineInfo.End = TextBuffer.size();
+    LogInfo.LineEnd = TextBuffer.size();
+
+    if (LogInfo.Category == LogCogNotify.GetCategoryName())
+    {
+        Notifications.Emplace(LogInfo);
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_OutputLog::DrawRow(const char* BufferStart, const FLineInfo& LineInfo, bool IsTableShown) const
+void FCogEngineWindow_OutputLog::DrawRow(const char* InBufferStart, const FLogInfo& InLogInfo, bool InShowAsTableRow) const
 {
     ImU32 Color;
-    switch (LineInfo.Verbosity)
+    switch (InLogInfo.Verbosity)
     {
         case ELogVerbosity::Error:      Color = FCogImguiHelper::ToImColor(Config->ErrorColor); break;
         case ELogVerbosity::Warning:    Color = FCogImguiHelper::ToImColor(Config->WarningColor); break;
@@ -70,57 +81,79 @@ void FCogEngineWindow_OutputLog::DrawRow(const char* BufferStart, const FLineInf
 
     ImGui::PushStyleColor(ImGuiCol_Text, Color);
 
-    if (IsTableShown)
+    if (InShowAsTableRow)
     {
         ImGui::TableNextRow();
-
-        if (Config->ShowFrame)
-        {
-            ImGui::TableNextColumn();
-            ImGui::Text("%3d", LineInfo.Frame);
-        }
-
-        if (Config->ShowCategory)
-        {
-            ImGui::TableNextColumn();
-            ImGui::Text("%s", TCHAR_TO_ANSI(*LineInfo.Category.ToString()));
-        }
-
-        if (Config->ShowVerbosity)
-        {
-            ImGui::TableNextColumn();
-            ImGui::Text("%s", TCHAR_TO_ANSI(ToString(LineInfo.Verbosity)));
-        }
-
-        ImGui::TableNextColumn();
-        const char* LineStart = BufferStart + LineInfo.Start;
-        const char* LineEnd = BufferStart + LineInfo.End;
-        ImGui::TextUnformatted(LineStart, LineEnd);
     }
-    else
+    
+    if (Config->ShowFrame)
     {
-        if (Config->ShowFrame)
+        if (InShowAsTableRow)
         {
-            ImGui::Text("[%3d] ", LineInfo.Frame);
+            ImGui::TableNextColumn();
+        }
+        
+        ImGui::Text("%3d", GetDisplayedFrame(InLogInfo));
+
+        if (InShowAsTableRow == false)
+        {
             ImGui::SameLine();
         }
-
-        if (Config->ShowCategory)
-        {
-            ImGui::Text("%s: ", TCHAR_TO_ANSI(*LineInfo.Category.ToString()));
-            ImGui::SameLine();
-        }
-
-        if (Config->ShowVerbosity)
-        {
-            ImGui::Text("%s: ", TCHAR_TO_ANSI(ToString(LineInfo.Verbosity)));
-            ImGui::SameLine();
-        }
-
-        const char* LineStart = BufferStart + LineInfo.Start;
-        const char* LineEnd = BufferStart + LineInfo.End;
-        ImGui::TextUnformatted(LineStart, LineEnd);
     }
+
+    if (Config->ShowTime)
+    {
+        if (InShowAsTableRow)
+        {
+            ImGui::TableNextColumn();
+        }
+
+        ImGui::TextUnformatted(StringCast<ANSICHAR>(*InLogInfo.Time.ToString()).Get());
+
+        if (InShowAsTableRow == false)
+        {
+            ImGui::SameLine();
+        }
+    }
+
+    if (Config->ShowCategory)
+    {
+        if (InShowAsTableRow)
+        {
+            ImGui::TableNextColumn();
+        }
+
+        ImGui::TextUnformatted(StringCast<ANSICHAR>(*InLogInfo.Category.ToString()).Get());
+
+        if (InShowAsTableRow == false)
+        {
+            ImGui::SameLine();
+        }
+    }
+
+    if (Config->ShowVerbosity)
+    {
+        if (InShowAsTableRow)
+        {
+            ImGui::TableNextColumn();
+        }
+
+        ImGui::TextUnformatted(StringCast<ANSICHAR>(ToString(InLogInfo.Verbosity)).Get());
+
+        if (InShowAsTableRow == false)
+        {
+            ImGui::SameLine();
+        }
+    }
+
+    if (InShowAsTableRow)
+    {
+        ImGui::TableNextColumn();
+    }
+    
+    const char* LineStart = InBufferStart + InLogInfo.LineStart;
+    const char* LineEnd = InBufferStart + InLogInfo.LineEnd;
+    ImGui::TextUnformatted(LineStart, LineEnd);
 
     ImGui::PopStyleColor();
 }
@@ -134,14 +167,20 @@ void FCogEngineWindow_OutputLog::Copy() const
     { return; }
 
     FStringBuilderBase StringBuilder;
-    for (const FLineInfo& LineInfo : LineInfos)
+    for (const FLogInfo& LogInfo : LogInfos)
     {
-        StringBuilder.Append(FString::Printf(TEXT("[%3d] [%s] [%s] "), LineInfo.Frame, *LineInfo.Category.ToString(), ToString(LineInfo.Verbosity)));
-        StringBuilder.Append(BufferData + LineInfo.Start, LineInfo.End - LineInfo.Start);
+        StringBuilder.Append(FString::Printf(TEXT("[%3d] [%s] [%s] "), GetDisplayedFrame(LogInfo), *LogInfo.Category.ToString(), ToString(LogInfo.Verbosity)));
+        StringBuilder.Append(BufferData + LogInfo.LineStart, LogInfo.LineEnd - LogInfo.LineStart);
         StringBuilder.Append("\n");
     };
     
     FPlatformApplicationMisc::ClipboardCopy(StringBuilder.ToString());
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+int32 FCogEngineWindow_OutputLog::GetDisplayedFrame(const FCogEngineWindow_OutputLog::FLogInfo& InLogInfo) const
+{
+    return Config->FrameCycle > 0 ? InLogInfo.Frame % Config->FrameCycle : InLogInfo.Frame;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -161,6 +200,7 @@ void FCogEngineWindow_OutputLog::RenderContent()
 
             ImGui::Checkbox("Auto Scroll", &Config->AutoScroll);
             ImGui::Checkbox("Show Frame", &Config->ShowFrame);
+            ImGui::Checkbox("Show Time", &Config->ShowTime);
             ImGui::Checkbox("Show Category", &Config->ShowCategory);
             ImGui::Checkbox("Show Verbosity", &Config->ShowVerbosity);
             ImGui::Checkbox("Show As Table", &Config->ShowAsTable);
@@ -189,6 +229,11 @@ void FCogEngineWindow_OutputLog::RenderContent()
             Clear();
         }
 
+        if (ImGui::MenuItem("Test"))
+        {
+            COG_NOTIFY(TEXT("Test Notification"));
+        }
+
         ImGui::SameLine();
 
         ImGui::SetNextItemWidth(ImGui::GetFontSize() * 9);
@@ -214,13 +259,14 @@ void FCogEngineWindow_OutputLog::RenderContent()
 
     int32 ColumnCount = 1;
     ColumnCount += (int32)Config->ShowFrame;
+    ColumnCount += (int32)Config->ShowTime;
     ColumnCount += (int32)Config->ShowCategory;
     ColumnCount += (int32)Config->ShowVerbosity;
 
     bool IsTableShown = false;
     if (Config->ShowAsTable)
     {
-        if (ImGui::BeginTable("LogTable", ColumnCount, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_ScrollX))
+        if (ImGui::BeginTable("LogTable", ColumnCount, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_ScrollX | ImGuiTableFlags_NoHostExtendX))
         {
             IsTableShown = true;
             if (Config->ShowFrame)
@@ -251,11 +297,11 @@ void FCogEngineWindow_OutputLog::RenderContent()
 
     if (Filter.IsActive())
     {
-        for (int32 LineIndex = 0; LineIndex < LineInfos.Num(); LineIndex++)
+        for (int32 LineIndex = 0; LineIndex < LogInfos.Num(); LineIndex++)
         {
-            const FLineInfo& LineInfo = LineInfos[LineIndex];
-            const char* LineStart = BufferStart + LineInfo.Start;
-            const char* LineEnd = BufferStart + LineInfo.End;
+            const FLogInfo& LineInfo = LogInfos[LineIndex];
+            const char* LineStart = BufferStart + LineInfo.LineStart;
+            const char* LineEnd = BufferStart + LineInfo.LineEnd;
             if (Filter.PassFilter(LineStart, LineEnd))
             {
                 DrawRow(BufferStart, LineInfo, IsTableShown);
@@ -264,9 +310,9 @@ void FCogEngineWindow_OutputLog::RenderContent()
     }
     else if (Config->VerbosityFilter != ELogVerbosity::VeryVerbose)
     {
-        for (int32 LineIndex = 0; LineIndex < LineInfos.Num(); LineIndex++)
+        for (int32 LineIndex = 0; LineIndex < LogInfos.Num(); LineIndex++)
         {
-            const FLineInfo& LineInfo = LineInfos[LineIndex];
+            const FLogInfo& LineInfo = LogInfos[LineIndex];
 
             if (LineInfo.Verbosity <= (ELogVerbosity::Type)Config->VerbosityFilter)
             {
@@ -277,14 +323,14 @@ void FCogEngineWindow_OutputLog::RenderContent()
     else
     {
         ImGuiListClipper Clipper;
-        Clipper.Begin(LineInfos.Num());
+        Clipper.Begin(LogInfos.Num());
         while (Clipper.Step())
         {
             for (int32 LineIndex = Clipper.DisplayStart; LineIndex < Clipper.DisplayEnd; LineIndex++)
             {
-                if (LineInfos.IsValidIndex(LineIndex))
+                if (LogInfos.IsValidIndex(LineIndex))
                 {
-                    const FLineInfo& LineInfo = LineInfos[LineIndex];
+                    const FLogInfo& LineInfo = LogInfos[LineIndex];
                     DrawRow(BufferStart, LineInfo, IsTableShown);
                 }
             }

@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Templates/IsArrayOrRefOfType.h"
+#include "CogCommonLogCategory.h"
 
 #ifndef ENABLE_COG
 #define ENABLE_COG !UE_BUILD_SHIPPING
@@ -16,6 +17,37 @@
 
 //--------------------------------------------------------------------------------------------------------------------------
 #define COG_LOG_ACTIVE_FOR_OBJECT(Object)   (FCogDebug::IsDebugActiveForObject(Object))
+
+//--------------------------------------------------------------------------------------------------------------------------
+#define COG_NOTIFY(Format, ...)                                                                                             \
+{                                                                                                                           \
+    static_assert(TIsArrayOrRefOfType<decltype(Format), TCHAR>::Value, "Formatting string must be a TCHAR array.");         \
+    FMsg::Logf_Internal(nullptr, 0, LogCogNotify.GetCategoryName(), ELogVerbosity::Log, Format, ##__VA_ARGS__);             \
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+#define COG_NOTIFY_WARNING(Format, ...)                                                                                     \
+{                                                                                                                           \
+    static_assert(TIsArrayOrRefOfType<decltype(Format), TCHAR>::Value, "Formatting string must be a TCHAR array.");         \
+    FMsg::Logf_Internal(nullptr, 0, LogCogNotify.GetCategoryName(), ELogVerbosity::Warning, Format, ##__VA_ARGS__);         \
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+#define COG_NOTIFY_ERROR(Format, ...)                                                                                       \
+{                                                                                                                           \
+    static_assert(TIsArrayOrRefOfType<decltype(Format), TCHAR>::Value, "Formatting string must be a TCHAR array.");         \
+    FMsg::Logf_Internal(nullptr, 0, LogCogNotify.GetCategoryName(), ELogVerbosity::Error, Format, ##__VA_ARGS__);           \
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+#define COG_NOTIFY_VERBOSITY(Verbosity, Format, ...)                                                                        \
+{                                                                                                                           \
+    static_assert(TIsArrayOrRefOfType<decltype(Format), TCHAR>::Value, "Formatting string must be a TCHAR array.");         \
+    if (LogCogNotify.IsSuppressed(Verbosity) == false)                                                                      \
+    {                                                                                                                       \
+        FMsg::Logf_Internal(nullptr, 0, LogCogNotify.GetCategoryName(), Verbosity, Format, ##__VA_ARGS__);                  \
+    }                                                                                                                       \
+}
 
 //--------------------------------------------------------------------------------------------------------------------------
 #define COG_LOG(LogCategory, Verbosity, Format, ...)                                                                        \
