@@ -1,5 +1,6 @@
 #include "CogEngineWindow_Console.h"
 
+#include "CogCommon.h"
 #include "CogImguiHelper.h"
 #include "CogWindowManager.h"
 #include "CogWindowWidgets.h"
@@ -321,6 +322,12 @@ int FCogEngineWindow_Console::OnTextInputCallback(ImGuiInputTextCallbackData* In
         {
             DoCompletion = true;
             bSetBufferToSelectedCommand = false;
+        }
+
+        if (ImGui::IsKeyPressed(ImGuiKey_Tab) && ImGui::IsKeyDown(ImGuiKey_ReservedForModShift))
+        {
+            SelectPreviousCommand();
+            DoCompletion = true;
         }
     }
 
