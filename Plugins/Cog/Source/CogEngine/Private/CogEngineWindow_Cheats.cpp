@@ -43,18 +43,25 @@ void FCogEngineWindow_Cheats::Initialize()
             {
                 if (InArgs.Num() > 0)
                 {
-                    if (const FCogEngineCheat* cheat = FindCheatByName(InArgs[0], false))
-                    {
-                        const bool ApplyToEnemies = InArgs.Contains("-Enemies");
-                        const bool ApplyToAllies = InArgs.Contains("-Allies");
-                        const bool ApplyToControlled = InArgs.Contains("-Controlled");
-
-                        RequestCheat(GetLocalPlayerPawn(), GetSelection(), *cheat, ApplyToEnemies, ApplyToAllies, ApplyToControlled);
-                    }
-                    else
+                    const FCogEngineCheat* Cheat = FindCheatByName(InArgs[0], false);
+                    if (Cheat == nullptr)
                     {
                         UE_LOG(LogCogImGui, Warning, TEXT("Cog.Cheat %s | Cheat not found"), *InArgs[0]);
+                        return;
                     }
+
+                    ACogEngineReplicator* Replicator = ACogEngineReplicator::GetLocalReplicator(*InWorld);
+                    if (Replicator == nullptr)
+                    {
+                        UE_LOG(LogCogImGui, Warning, TEXT("Cog.Cheat %s | Repliactor not found"), *InArgs[0]);
+                        return;
+                    }
+                    
+                    const bool ApplyToEnemies = InArgs.Contains("-Enemies");
+                    const bool ApplyToAllies = InArgs.Contains("-Allies");
+                    const bool ApplyToControlled = InArgs.Contains("-Controlled");
+
+                    RequestCheat(*Replicator, GetLocalPlayerPawn(), GetSelection(), *Cheat, ApplyToEnemies, ApplyToAllies, ApplyToControlled);
                 }
             }));
 
@@ -64,12 +71,12 @@ void FCogEngineWindow_Cheats::Initialize()
 
     for (const FCogEngineCheatCategory& CheatCategory : Asset->CheatCategories)
     {
-        for (const FCogEngineCheat& Cheat : CheatCategory.PersistentEffects)
+        for (const FCogEngineCheat& Cheat : CheatCategory.PersistentCheats)
         {
             UpdateCheatColor(Cheat);
         }
 
-        for (const FCogEngineCheat& Cheat : CheatCategory.InstantEffects)
+        for (const FCogEngineCheat& Cheat : CheatCategory.InstantCheats)
         {
             UpdateCheatColor(Cheat);
         }
@@ -179,6 +186,12 @@ void FCogEngineWindow_Cheats::RenderContent()
         return;
     }
 
+    ACogEngineReplicator* Replicator = ACogEngineReplicator::GetLocalReplicator(*GetWorld());
+    if (Replicator == nullptr)
+    {
+        ImGui::TextDisabled("No Replicator");
+    }
+
     if (ImGui::BeginMenuBar())
     {
         if (ImGui::BeginMenu("Options"))
@@ -276,9 +289,9 @@ void FCogEngineWindow_Cheats::RenderContent()
             }
 
             int Index = 0;
-            for (const FCogEngineCheat& Cheat : CheatCategory.PersistentEffects)
+            for (const FCogEngineCheat& Cheat : CheatCategory.PersistentCheats)
             {
-                AddCheat(Index, ControlledActor, SelectedActor, Cheat, true);
+                AddCheat(*Replicator, Index, ControlledActor, SelectedActor, Cheat, true);
                 Index++;
             }
 
@@ -290,10 +303,10 @@ void FCogEngineWindow_Cheats::RenderContent()
             //----------------------------------------------------------------------------
             if (SelectedActor == ControlledActor)
             {
-                for (const FCogEngineCheat& Cheat : CheatCategory.PersistentEffects)
+                for (const FCogEngineCheat& Cheat : CheatCategory.PersistentCheats)
                 {
                     TArray<AActor*> Targets = { SelectedActor };
-                    if (ACogEngineReplicator::IsCheatActiveOnTargets(Targets, Cheat) == ECogEngineCheat_ActiveState::Active)
+                    if (Replicator->IsCheatActiveOnTargets(Targets, Cheat) == ECogEngineCheat_ActiveState::Active)
                     {
                         Config->AppliedCheats.AddUnique(Cheat.Name);
                     }
@@ -307,9 +320,9 @@ void FCogEngineWindow_Cheats::RenderContent()
             ImGui::TableNextColumn();
 
             Index = 0;
-            for (const FCogEngineCheat& Cheat : CheatCategory.InstantEffects)
+            for (const FCogEngineCheat& Cheat : CheatCategory.InstantCheats)
             {
-                AddCheat(Index, ControlledActor, SelectedActor, Cheat, false);
+                AddCheat(*Replicator, Index, ControlledActor, SelectedActor, Cheat, false);
                 Index++;
             }
 
@@ -327,7 +340,7 @@ void FCogEngineWindow_Cheats::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogEngineWindow_Cheats::AddCheat(const int32 Index, AActor* ControlledActor, AActor* SelectedActor, const FCogEngineCheat& Cheat, bool IsPersistent)
+bool FCogEngineWindow_Cheats::AddCheat(ACogEngineReplicator& Replicator, const int32 Index, AActor* ControlledActor, AActor* SelectedActor, const FCogEngineCheat& Cheat, bool IsPersistent)
 {
     const auto CheatName = StringCast<ANSICHAR>(*Cheat.Name);
 
@@ -346,10 +359,10 @@ bool FCogEngineWindow_Cheats::AddCheat(const int32 Index, AActor* ControlledActo
     if (IsPersistent)
     {
         TArray<AActor*> Targets = { SelectedActor };
-        bool isEnabled = ACogEngineReplicator::IsCheatActiveOnTargets(Targets, Cheat) == ECogEngineCheat_ActiveState::Active;
+        bool isEnabled = Replicator.IsCheatActiveOnTargets(Targets, Cheat) == ECogEngineCheat_ActiveState::Active;
         if (ImGui::Checkbox(CheatName.Get(), &isEnabled))
         {
-            RequestCheat(ControlledActor, SelectedActor, Cheat, IsShiftDown, IsAltDown, IsControlDown);
+            RequestCheat(Replicator, ControlledActor, SelectedActor, Cheat, IsShiftDown, IsAltDown, IsControlDown);
             bIsPressed = true;
         }
     }
@@ -357,7 +370,7 @@ bool FCogEngineWindow_Cheats::AddCheat(const int32 Index, AActor* ControlledActo
     {
         if (ImGui::Button(CheatName.Get(), ImVec2(-1, 0)))
         {
-            RequestCheat(ControlledActor, SelectedActor, Cheat, IsShiftDown, IsAltDown, IsControlDown);
+            RequestCheat(Replicator, ControlledActor, SelectedActor, Cheat, IsShiftDown, IsAltDown, IsControlDown);
             bIsPressed = true;
         }
     }
@@ -365,10 +378,10 @@ bool FCogEngineWindow_Cheats::AddCheat(const int32 Index, AActor* ControlledActo
     if (ImGui::IsItemHovered())
     {
         ImGui::BeginTooltip();
-        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, IsShiftDown || IsAltDown || IsControlDown ? 0.5f : 1.0f),   "On Selection");
-        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, IsShiftDown ? 1.0f : 0.5f),                                 "On Enemies    [SHIFT]");
-        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, IsAltDown ? 1.0f : 0.5f),                                   "On Allies     [ALT]");
-        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, IsControlDown ? 1.0f : 0.5f),                               "On Controlled [CTRL]");
+        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, IsShiftDown || IsAltDown || IsControlDown ? 0.5f : 1.0f),   "Selection");
+        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, IsShiftDown ? 1.0f : 0.5f),                                 "Enemies    [SHIFT]");
+        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, IsAltDown ? 1.0f : 0.5f),                                   "Allies     [ALT]");
+        ImGui::TextColored(ImVec4(1.0f, 1.0f, 1.0f, IsControlDown ? 1.0f : 0.5f),                               "Controlled [CTRL]");
         ImGui::EndTooltip();
     }
 
@@ -380,7 +393,7 @@ bool FCogEngineWindow_Cheats::AddCheat(const int32 Index, AActor* ControlledActo
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Cheats::RequestCheat(AActor* ControlledActor, AActor* SelectedActor, const FCogEngineCheat& Cheat, bool ApplyToEnemies, bool ApplyToAllies, bool ApplyToControlled)
+void FCogEngineWindow_Cheats::RequestCheat(ACogEngineReplicator& Replicator, AActor* ControlledActor, AActor* SelectedActor, const FCogEngineCheat& Cheat, bool ApplyToEnemies, bool ApplyToAllies, bool ApplyToControlled)
 {
     TArray<AActor*> Actors;
 
@@ -416,14 +429,7 @@ void FCogEngineWindow_Cheats::RequestCheat(AActor* ControlledActor, AActor* Sele
         Actors.Add(SelectedActor);
     }
 
-    if (ACogEngineReplicator* Replicator = ACogEngineReplicator::GetLocalReplicator(*GetWorld()))
-    {
-        Replicator->Server_ApplyCheat(ControlledActor, Actors, Cheat);
-    }
-    else
-    {
-        UE_LOG(LogCogImGui, Warning, TEXT("FCogAbilityWindow_Cheats::RequestCheat | Replicator not found"));
-    }
+    Replicator.Server_ApplyCheat(ControlledActor, Actors, Cheat);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -431,7 +437,7 @@ const FCogEngineCheat* FCogEngineWindow_Cheats::FindCheatByName(const FString& C
 {
     for (const FCogEngineCheatCategory& CheatCategory : Asset->CheatCategories)
     {
-        for (const FCogEngineCheat& Cheat : CheatCategory.PersistentEffects)
+        for (const FCogEngineCheat& Cheat : CheatCategory.PersistentCheats)
         {
             if (Cheat.Name == CheatName)
             {
@@ -444,7 +450,7 @@ const FCogEngineCheat* FCogEngineWindow_Cheats::FindCheatByName(const FString& C
             continue;
         }
 
-        for (const FCogEngineCheat& Cheat : CheatCategory.InstantEffects)
+        for (const FCogEngineCheat& Cheat : CheatCategory.InstantCheats)
         {
             if (Cheat.Name == CheatName)
             {

@@ -54,7 +54,7 @@ public:
     UFUNCTION(Reliable, Server)
     void Server_ApplyCheat(const AActor* CheatInstigator, const TArray<AActor*>& TargetActors, const FCogEngineCheat& Cheat) const;
 
-	static ECogEngineCheat_ActiveState IsCheatActiveOnTargets(const TArray<AActor*>& Targets, const FCogEngineCheat& Cheat);
+	ECogEngineCheat_ActiveState IsCheatActiveOnTargets(const TArray<AActor*>& Targets, const FCogEngineCheat& Cheat) const;
 
 protected:
 

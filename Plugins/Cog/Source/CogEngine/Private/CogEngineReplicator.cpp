@@ -230,16 +230,16 @@ void ACogEngineReplicator::Server_ApplyCheat_Implementation(const AActor* CheatI
         return;
     }
 
-    Cheat.Execution->Execute(CheatInstigator, Targets);
+    Cheat.Execution->Execute(GetWorld(), CheatInstigator, Targets);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ECogEngineCheat_ActiveState ACogEngineReplicator::IsCheatActiveOnTargets(const TArray<AActor*>& Targets, const FCogEngineCheat& Cheat)
+ECogEngineCheat_ActiveState ACogEngineReplicator::IsCheatActiveOnTargets(const TArray<AActor*>& Targets, const FCogEngineCheat& Cheat) const
 {
     if (Cheat.Execution == nullptr)
     {
         return ECogEngineCheat_ActiveState::Inactive;
     }
 
-    return Cheat.Execution->IsActiveOnTargets(Targets);
+    return Cheat.Execution->IsActiveOnTargets(GetWorld(), Targets);
 }

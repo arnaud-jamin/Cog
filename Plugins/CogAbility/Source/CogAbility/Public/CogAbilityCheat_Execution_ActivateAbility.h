@@ -3,11 +3,11 @@
 #include "CoreMinimal.h"
 #include "CogEngineDataAsset.h"
 #include "GameplayEffect.h"
-#include "CogAbilityCheat_Execution_ApplyEffect.generated.h"
+#include "CogAbilityCheat_Execution_ActivateAbility.generated.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCLASS(DisplayName = "Apply Effect")
-class COGABILITY_API UCogAbilityCheat_Execution_ApplyEffect
+UCLASS(DisplayName = "Activate Ability")
+class COGABILITY_API UCogAbilityCheat_Execution_ActivateAbility
     : public UCogEngineCheat_Execution
 {
     GENERATED_BODY()
@@ -20,5 +20,8 @@ public:
     virtual bool GetColor(const FCogWindow& InCallingWindow, FLinearColor& OutColor) const override;
 
 	UPROPERTY(EditAnywhere)
-    TSubclassOf<UGameplayEffect> Effect;
+    TSubclassOf<UGameplayAbility> Ability;
+
+    UPROPERTY(EditAnywhere)
+    bool RemoveAbilityOnEnd = true;
 };

@@ -24,24 +24,33 @@ FVector4f UCogAbilityConfig_Alignment::GetAttributeColor(const UAbilitySystemCom
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+FVector4f UCogAbilityConfig_Alignment::GetAbilityColor(const UCogAbilityDataAsset* Asset, const UGameplayAbility& Ability) const
+{
+    if (Asset == nullptr)
+    { return NeutralColor; }
+
+    const FGameplayTagContainer& Tags = Ability.GetAssetTags();
+    if (Tags.HasTag(Asset->NegativeAbilityTag))
+    { return NegativeColor; }
+
+    if (Tags.HasTag(Asset->PositiveAbilityTag))
+    { return PositiveColor; }
+
+    return NeutralColor;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 FVector4f UCogAbilityConfig_Alignment::GetEffectColor(const UCogAbilityDataAsset* Asset, const UGameplayEffect& Effect) const
 {
     if (Asset == nullptr)
-    {
-        return NeutralColor;
-    }
+    { return NeutralColor; }
 
     const FGameplayTagContainer& Tags = Effect.GetAssetTags();
-
     if (Tags.HasTag(Asset->NegativeEffectTag))
-    {
-        return NegativeColor;
-    }
+    { return NegativeColor; }
 
     if (Tags.HasTag(Asset->PositiveEffectTag))
-    {
-        return PositiveColor;
-    }
+    { return PositiveColor; }
 
     return NeutralColor;
 }

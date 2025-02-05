@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "CogCommonConfig.h"
+#include "Abilities/GameplayAbility.h"
 #include "CogAbilityConfig_Alignment.generated.h"
 
 class UAbilitySystemComponent;
@@ -22,12 +23,13 @@ public:
 
     FVector4f GetAttributeColor(const UAbilitySystemComponent& AbilitySystemComponent, const FGameplayAttribute& Attribute) const;
 
+    FVector4f GetAbilityColor(const UCogAbilityDataAsset* Asset, const UGameplayAbility& Ability) const;
+
     FVector4f GetEffectModifierColor(const FModifierSpec& ModSpec, const FGameplayModifierInfo& ModInfo, float BaseValue) const;
 
     FVector4f GetEffectModifierColor(float ModifierValue, EGameplayModOp::Type ModifierOp, float BaseValue) const;
 
     FVector4f GetEffectColor(const UCogAbilityDataAsset* Asset, const UGameplayEffect& Effect) const;
-
 
     UPROPERTY(Config)
     FVector4f PositiveColor = FVector4f(0.0f, 1.0f, 0.5f, 1.0f);

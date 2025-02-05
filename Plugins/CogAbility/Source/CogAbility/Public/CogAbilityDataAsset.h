@@ -151,6 +151,12 @@ public:
     UPROPERTY(Category = "Cheats", EditAnywhere)
     FGameplayTag PositiveEffectTag;
 
+    UPROPERTY(Category="Cheats", EditAnywhere)
+    FGameplayTag NegativeAbilityTag;
+    
+    UPROPERTY(Category = "Cheats", EditAnywhere)
+    FGameplayTag PositiveAbilityTag;
+    
     UPROPERTY(Category = "Cheats", EditAnywhere, meta = (TitleProperty = "Name"))
     TArray<FCogAbilityCheat> PersistentEffects;
 

@@ -16,7 +16,7 @@ enum class ECogEngineCheat_ActiveState : uint8
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCLASS(BlueprintType, Abstract, Const, DefaultToInstanced, EditInlineNew, CollapseCategories)
+UCLASS(BlueprintType, Blueprintable, Abstract, Const, DefaultToInstanced, EditInlineNew, CollapseCategories, Meta = (ShowWorldContextPin))
 class COGENGINE_API UCogEngineCheat_Execution
     : public UObject
 {
@@ -24,11 +24,11 @@ class COGENGINE_API UCogEngineCheat_Execution
 
 public:
 
-    UFUNCTION(BlueprintNativeEvent)
-    void Execute(const AActor* Instigator, const TArray<AActor*>& Targets) const;
+    UFUNCTION(BlueprintNativeEvent, meta = (DevelopmentOnly, WorldContext = "WorldContextObject"))
+    void Execute(const UObject* WorldContextObject, const AActor* Instigator, const TArray<AActor*>& Targets) const;
 
-    UFUNCTION(BlueprintNativeEvent)
-    ECogEngineCheat_ActiveState IsActiveOnTargets(const TArray<AActor*>& Targets) const;
+    UFUNCTION(BlueprintNativeEvent, meta = (DevelopmentOnly, WorldContext = "WorldContextObject"))
+    ECogEngineCheat_ActiveState IsActiveOnTargets(const UObject* WorldContextObject, const TArray<AActor*>& Targets) const;
 
     virtual bool GetColor(const FCogWindow& InCallingWindow, FLinearColor& OutColor) const;
 };
@@ -61,10 +61,10 @@ struct COGENGINE_API FCogEngineCheatCategory
     FString Name;
 
     UPROPERTY(Category = "Cheats", EditAnywhere, meta = (TitleProperty = "Name"))
-    TArray<FCogEngineCheat> PersistentEffects;
+    TArray<FCogEngineCheat> PersistentCheats;
 
     UPROPERTY(Category = "Cheats", EditAnywhere, meta = (TitleProperty = "Name"))
-    TArray<FCogEngineCheat> InstantEffects;
+    TArray<FCogEngineCheat> InstantCheats;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
