@@ -60,11 +60,15 @@ Displays the blackboard of the selected actor.
 Used to apply cheats to the selected actor.
 
 ![Cheats](https://github.com/user-attachments/assets/e3bbf157-904f-40e9-a0bf-e8152ff24af4)
-- Cheats replicated to the game server to be executed.
+- Cheats are replicated to the game server to be executed.
 - Key modifiers can be used to change which actor should be affected by the cheat:
   - `[CTRL]` Apply the cheat to the controlled actor
   - `[ALT]` Apply the cheat to the allies of the selected actor
   - `[SHIFT]` Apply the cheat to the enemies of the selected actor
+- Optionaly, cheats applied to the local player character are automatically reapplied.
+
+![Cheats Settings](https://github.com/user-attachments/assets/006c4cf0-34e2-4e0d-8be7-be27db8796aa)
+
 - Cheats can be defined in a Data Asset. Cog provide two default cheat execution (Apply Effect, Activate Ability).
 - Cheat executions can be defined in blueprint.
 
