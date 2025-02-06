@@ -456,7 +456,7 @@ bool FCogEngineWindow_Inspector::RenderPropertyList(TArray<const FProperty*>& Pr
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogEngineWindow_Inspector::RenderProperty(const FProperty* Property, uint8* PointerToValue, int IndexInArray)
+bool FCogEngineWindow_Inspector::RenderProperty(const FProperty* Property, uint8* PointerToValue, int IndexInArray, const char* NameSuffix)
 {
     bool HasChanged = false;
 
@@ -473,6 +473,11 @@ bool FCogEngineWindow_Inspector::RenderProperty(const FProperty* Property, uint8
     if (IndexInArray != -1)
     {
         PropertyName = FString::Printf(TEXT("[%d]"), IndexInArray);
+        if (NameSuffix != nullptr)
+        {
+            PropertyName.Append(" ");
+            PropertyName.Append(NameSuffix);
+        }
     }
     else
     {
@@ -634,6 +639,14 @@ bool FCogEngineWindow_Inspector::RenderProperty(const FProperty* Property, uint8
     else if (const FArrayProperty* ArrayProperty = CastField<FArrayProperty>(Property))
     {
         HasChanged = RenderArray(ArrayProperty, PointerToValue, ShowChildren);
+    }
+    else if (const FSetProperty* SetProperty = CastField<FSetProperty>(Property))
+    {
+        HasChanged = RenderSet(SetProperty, PointerToValue, ShowChildren);
+    }
+    else if (const FMapProperty* MapProperty = CastField<FMapProperty>(Property))
+    {
+        HasChanged = RenderMap(MapProperty, PointerToValue, ShowChildren);
     }
     else if (const FDelegateProperty* DelegateProperty = CastField<FDelegateProperty>(Property))
     {
@@ -936,7 +949,12 @@ bool FCogEngineWindow_Inspector::RenderArray(const FArrayProperty* ArrayProperty
     const int32 Num = Helper.Num();
 
     ImGui::BeginDisabled();
-    ImGui::Text("%s [%d]", TCHAR_TO_ANSI(*ArrayProperty->Inner->GetClass()->GetName()), Num);
+    FString ElementPropertyName = ArrayProperty->Inner->GetClass()->GetName();
+    if (const FStructProperty* StructProperty = CastField<FStructProperty>(ArrayProperty->Inner))
+    {
+        ElementPropertyName = StructProperty->Struct->GetStructCPPName();
+    }
+    ImGui::Text("%s [%d]", StringCast<ANSICHAR>(*ElementPropertyName).Get(), Num);
     ImGui::EndDisabled();
 
     bool HasChanged = false;
@@ -956,6 +974,75 @@ bool FCogEngineWindow_Inspector::RenderArray(const FArrayProperty* ArrayProperty
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+bool FCogEngineWindow_Inspector::RenderSet(const FSetProperty* SetProperty, uint8* PointerToValue, bool ShowChildren)
+{
+    FScriptSetHelper Helper(SetProperty, PointerToValue);
+    const int32 Num = Helper.Num();
+
+    ImGui::BeginDisabled();
+    FString ElementPropertyName = SetProperty->GetElementProperty()->GetClass()->GetName();
+    if (const FStructProperty* StructProperty = CastField<FStructProperty>(SetProperty->GetElementProperty()))
+    {
+        ElementPropertyName = StructProperty->Struct->GetStructCPPName();
+    }
+    ImGui::Text("%s {%d}", StringCast<ANSICHAR>(*ElementPropertyName).Get(), Num);
+    ImGui::EndDisabled();
+
+    bool HasChanged = false;
+
+    if (ShowChildren)
+    {
+        for (int32 i = 0; i < Num; ++i)
+        {
+            ImGui::PushID(i);
+            HasChanged |= RenderProperty(SetProperty->GetElementProperty(), Helper.GetElementPtr(i), i);
+            ImGui::PopID();
+        }
+        ImGui::TreePop();
+    }
+
+    return HasChanged;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogEngineWindow_Inspector::RenderMap(const FMapProperty* MapProperty, uint8* PointerToValue, bool ShowChildren)
+{
+    FScriptMapHelper Helper(MapProperty, PointerToValue);
+    const int32 Num = Helper.Num();
+
+    ImGui::BeginDisabled();
+    FString KeyPropertyName = MapProperty->GetKeyProperty()->GetClass()->GetName();
+    if (const FStructProperty* StructProperty = CastField<FStructProperty>(MapProperty->GetKeyProperty()))
+    {
+        KeyPropertyName = StructProperty->Struct->GetStructCPPName();
+    }
+    FString ValuePropertyName = MapProperty->GetValueProperty()->GetClass()->GetName();
+    if (const FStructProperty* StructProperty = CastField<FStructProperty>(MapProperty->GetValueProperty()))
+    {
+        ValuePropertyName = StructProperty->Struct->GetStructCPPName();
+    }
+    ImGui::Text("%s -> %s [%d]", StringCast<ANSICHAR>(*KeyPropertyName).Get(), StringCast<ANSICHAR>(*ValuePropertyName).Get(), Num);
+    ImGui::EndDisabled();
+
+    bool HasChanged = false;
+
+    if (ShowChildren)
+    {
+        for (int32 i = 0; i < Num; ++i)
+        {
+            ImGui::PushID(i);
+            // @todo: refactor this so it's better?
+            HasChanged |= RenderProperty(MapProperty->GetKeyProperty(), Helper.GetKeyPtr(i), i, "Key");
+            HasChanged |= RenderProperty(MapProperty->GetValueProperty(), Helper.GetValuePtr(i), i, "Value");
+            ImGui::PopID();
+        }
+        ImGui::TreePop();
+    }
+
+    return HasChanged;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 bool FCogEngineWindow_Inspector::HasPropertyAnyChildren(const FProperty* Property, uint8* PointerToValue)
 {
     if (const FStructProperty* StructProperty = CastField<FStructProperty>(Property))
@@ -966,6 +1053,28 @@ bool FCogEngineWindow_Inspector::HasPropertyAnyChildren(const FProperty* Propert
     else if (const FArrayProperty* ArrayProperty = CastField<FArrayProperty>(Property))
     {
 	    const FScriptArrayHelper Helper(ArrayProperty, PointerToValue);
+        const int32 Num = Helper.Num();
+        if (Num == 0)
+        {
+            return false;
+        }
+
+        return true;
+    }
+    else if (const FSetProperty* SetProperty = CastField<FSetProperty>(Property))
+    {
+        const FScriptSetHelper Helper(SetProperty, PointerToValue);
+        const int32 Num = Helper.Num();
+        if (Num == 0)
+        {
+            return false;
+        }
+
+        return true;
+    }
+    else if (const FMapProperty* MapProperty = CastField<FMapProperty>(Property))
+    {
+        const FScriptMapHelper Helper(MapProperty, PointerToValue);
         const int32 Num = Helper.Num();
         if (Num == 0)
         {
