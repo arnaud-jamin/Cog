@@ -192,7 +192,9 @@ void FCogAbilityWindow_Effects::RenderEffectRow(UAbilitySystemComponent& Ability
     //------------------------
     ImGui::TableNextColumn();
 
-    ImGui::PushStyleColor(ImGuiCol_Text, FCogImguiHelper::ToImVec4(AlignmentConfig->GetEffectColor(Asset, Effect)));
+    FLinearColor Color;
+    AlignmentConfig->GetEffectColor(Asset, Effect, Color);
+    ImGui::PushStyleColor(ImGuiCol_Text, FCogImguiHelper::ToImVec4(Color));
 
     if (ImGui::Selectable(EffectName.Get(), Selected == Index, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap | ImGuiSelectableFlags_AllowDoubleClick))
     {

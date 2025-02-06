@@ -24,35 +24,55 @@ FVector4f UCogAbilityConfig_Alignment::GetAttributeColor(const UAbilitySystemCom
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FVector4f UCogAbilityConfig_Alignment::GetAbilityColor(const UCogAbilityDataAsset* Asset, const UGameplayAbility& Ability) const
+bool UCogAbilityConfig_Alignment::GetAbilityColor(const UCogAbilityDataAsset* Asset, const UGameplayAbility& Ability, FLinearColor& OutColor) const
 {
     if (Asset == nullptr)
-    { return NeutralColor; }
+    {
+        OutColor = NeutralColor;
+        return false;
+    }
 
     const FGameplayTagContainer& Tags = Ability.GetAssetTags();
     if (Tags.HasTag(Asset->NegativeAbilityTag))
-    { return NegativeColor; }
+    {
+        OutColor = NegativeColor;
+        return true;
+    }
 
     if (Tags.HasTag(Asset->PositiveAbilityTag))
-    { return PositiveColor; }
+    {
+        OutColor = PositiveColor;
+        return true;
+    }
 
-    return NeutralColor;
+    OutColor = NeutralColor;
+    return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FVector4f UCogAbilityConfig_Alignment::GetEffectColor(const UCogAbilityDataAsset* Asset, const UGameplayEffect& Effect) const
+bool UCogAbilityConfig_Alignment::GetEffectColor(const UCogAbilityDataAsset* Asset, const UGameplayEffect& Effect, FLinearColor& OutColor) const
 {
     if (Asset == nullptr)
-    { return NeutralColor; }
+    {
+        OutColor = NeutralColor;
+        return false;
+    }
 
     const FGameplayTagContainer& Tags = Effect.GetAssetTags();
     if (Tags.HasTag(Asset->NegativeEffectTag))
-    { return NegativeColor; }
+    {
+        OutColor = NegativeColor;
+        return true;
+    }
 
     if (Tags.HasTag(Asset->PositiveEffectTag))
-    { return PositiveColor; }
+    {
+        OutColor = PositiveColor;
+        return true;
+    }
 
-    return NeutralColor;
+    OutColor = NeutralColor;
+    return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

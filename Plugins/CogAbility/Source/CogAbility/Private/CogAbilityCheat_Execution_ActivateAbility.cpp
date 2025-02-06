@@ -110,6 +110,5 @@ bool UCogAbilityCheat_Execution_ActivateAbility::GetColor(const FCogWindow& InCa
 	const UCogAbilityConfig_Alignment* Config = InCallingWindow.GetConfig<UCogAbilityConfig_Alignment>();
     const UCogAbilityDataAsset* Asset = InCallingWindow.GetAsset<UCogAbilityDataAsset>();
 
-    OutColor = Config->GetAbilityColor(Asset, *GameplayAbility);
-	return true;
+    return Config->GetAbilityColor(Asset, *GameplayAbility, OutColor);
 }

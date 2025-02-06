@@ -7,6 +7,7 @@
 #include "CogAbilityConfig_Alignment.h"
 #include "CogImguiHelper.h"
 #include "CogWindow.h"
+#include "MeshPaintVisualize.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogAbilityCheat_Execution_ApplyEffect::Execute_Implementation(const UObject* WorldContextObject, const AActor* Instigator, const TArray<AActor*>& Targets) const
@@ -106,6 +107,5 @@ bool UCogAbilityCheat_Execution_ApplyEffect::GetColor(const FCogWindow& InCallin
 	const UCogAbilityConfig_Alignment* Config = InCallingWindow.GetConfig<UCogAbilityConfig_Alignment>();
     const UCogAbilityDataAsset* Asset = InCallingWindow.GetAsset<UCogAbilityDataAsset>();
 
-    OutColor = Config->GetEffectColor(Asset, *GameplayEffect);
-	return true;
+    return Config->GetEffectColor(Asset, *GameplayEffect, OutColor);
 }
