@@ -273,7 +273,7 @@ void FCogEngineWindow_Inspector::RenderMenu()
 
             ImGui::Checkbox("Sort by Name", &Config->bSortByName);
             ImGui::Checkbox("Show Background", &Config->bShowRowBackground);
-            ImGui::Checkbox("Show Sorders", &Config->bShowBorders);
+            ImGui::Checkbox("Show Borders", &Config->bShowBorders);
 #if WITH_EDITORONLY_DATA
             ImGui::Checkbox("Show Display Name", &Config->bShowDisplayName);
             ImGui::Checkbox("Show Categories", &Config->bShowCategories);
