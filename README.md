@@ -247,7 +247,8 @@ Displays engine stats such as FPS, Ping, Packet Loss.
 
 ![Stats](https://github.com/user-attachments/assets/424bac6a-76df-4d69-9d34-445a4a4bf536)
 
-- Stats can be viewed as a widget in the main menu bar. Clicking on the stat povide menu to force the stat to a specific value.
+- Stats can be viewed as a widget in the main menu bar.
+- Clicking on the stat povide a menu to force the stat to a reach a specific value.
 - Right cliking on the stat display the settings, where the specific stat values can be defined.
 
 ![Stats Settings](https://github.com/user-attachments/assets/a3545a8f-e742-4e8e-8758-03af133d932e)
