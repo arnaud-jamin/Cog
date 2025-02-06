@@ -20,5 +20,5 @@ private:
     TSharedPtr<IPropertyHandle> NameProperty;
     TArray<TSharedPtr<FString>> PropertyOptions;
 
-    void OnLogCategoryChanged(FName SelectedName);
+    void OnLogCategoryChanged(FName SelectedName) const;
 };

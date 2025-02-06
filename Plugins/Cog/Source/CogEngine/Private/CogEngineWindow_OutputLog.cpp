@@ -5,10 +5,8 @@
 #include "CogDebugHelper.h"
 #include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
-#include "imgui_internal.h"
 #include "Engine/Engine.h"
 #include "HAL/PlatformApplicationMisc.h"
-#include "Math/UnitConversion.h"
 #include "Misc/StringBuilder.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -237,12 +235,12 @@ void FCogEngineWindow_OutputLog::RenderContent()
         ImGui::SameLine();
 
         ImGui::SetNextItemWidth(ImGui::GetFontSize() * 9);
-        if (ImGui::BeginCombo("##Verbosity", FCogDebugHelper::VerbosityToString((ELogVerbosity::Type)Config->VerbosityFilter)))
+        if (ImGui::BeginCombo("##Verbosity", FCogDebugHelper::VerbosityToString(static_cast<ELogVerbosity::Type>(Config->VerbosityFilter))))
         {
-            for (int32 i = ELogVerbosity::Error; i <= (int32)ELogVerbosity::VeryVerbose; ++i)
+            for (int32 i = ELogVerbosity::Error; i <= static_cast<int32>(ELogVerbosity::VeryVerbose); ++i)
             {
 	            const bool IsSelected = i == Config->VerbosityFilter;
-	            const ELogVerbosity::Type Verbosity = (ELogVerbosity::Type)i;
+	            const ELogVerbosity::Type Verbosity = static_cast<ELogVerbosity::Type>(i);
 
                 if (ImGui::Selectable(FCogDebugHelper::VerbosityToString(Verbosity), IsSelected))
                 {
@@ -258,10 +256,10 @@ void FCogEngineWindow_OutputLog::RenderContent()
     }
 
     int32 ColumnCount = 1;
-    ColumnCount += (int32)Config->ShowFrame;
-    ColumnCount += (int32)Config->ShowTime;
-    ColumnCount += (int32)Config->ShowCategory;
-    ColumnCount += (int32)Config->ShowVerbosity;
+    ColumnCount += Config->ShowFrame ? 1 : 0;
+    ColumnCount += Config->ShowTime ? 1 : 0;
+    ColumnCount += Config->ShowCategory ? 1 : 0;
+    ColumnCount += Config->ShowVerbosity ? 1 : 0;
 
     bool IsTableShown = false;
     if (Config->ShowAsTable)
@@ -314,7 +312,7 @@ void FCogEngineWindow_OutputLog::RenderContent()
         {
             const FLogInfo& LineInfo = LogInfos[LineIndex];
 
-            if (LineInfo.Verbosity <= (ELogVerbosity::Type)Config->VerbosityFilter)
+            if (LineInfo.Verbosity <= static_cast<ELogVerbosity::Type>(Config->VerbosityFilter))
             {
                 DrawRow(BufferStart, LineInfo, IsTableShown);
             }

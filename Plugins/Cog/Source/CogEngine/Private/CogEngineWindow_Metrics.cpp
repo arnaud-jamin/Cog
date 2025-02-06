@@ -121,7 +121,7 @@ void FCogEngineWindow_Metrics::DrawMetric(FCogDebugMetricEntry& Metric)
 
     ImGui::Text("Crits");
     ImGui::SameLine(FCogWindowWidgets::GetFontWidth() * 20);
-    FCogWindowWidgets::ProgressBarCentered(Metric.Count == 0 ? 0.0f : Metric.Crits / (float)Metric.Count, ImVec2(-1, 0), TCHAR_TO_ANSI(*FString::Printf(TEXT("%d / %d"), Metric.Crits, Metric.Count)));
+    FCogWindowWidgets::ProgressBarCentered(Metric.Count == 0 ? 0.0f : Metric.Crits / static_cast<float>(Metric.Count), ImVec2(-1, 0), TCHAR_TO_ANSI(*FString::Printf(TEXT("%d / %d"), Metric.Crits, Metric.Count)));
 
     if (FCogDebugMetric::MaxDurationSetting > 0.0f)
     {

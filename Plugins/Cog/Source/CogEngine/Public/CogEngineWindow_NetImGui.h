@@ -33,11 +33,11 @@ protected:
 
     virtual void RenderTick(float DeltaTime) override;
 
-    void ConnectTo();
+    void ConnectTo() const;
 
-    void ConnectFrom();
+    void ConnectFrom() const;
 
-    void Disconnect();
+    void Disconnect() const;
 
     void RunServer();
 

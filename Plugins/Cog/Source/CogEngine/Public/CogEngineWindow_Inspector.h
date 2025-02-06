@@ -88,7 +88,7 @@ protected:
 
     FCogEngineInspectorApplyFunction FindObjectApplyFunction(const UObject* Object) const;
 
-    struct Favorite
+    struct FFavorite
     {
         TWeakObjectPtr<UObject> Object = nullptr;
 
@@ -103,7 +103,7 @@ protected:
 
     bool bCollapseAllCategories = false;
 
-    TArray<Favorite> Favorites;
+    TArray<FFavorite> Favorites;
 
     TArray<TWeakObjectPtr<UObject>> History;
 

@@ -74,7 +74,7 @@ float ScreenDistanceToArc(const APlayerController& InPlayerController, const FVe
     const FVector AxisZ = Matrix.GetScaledAxis(EAxis::Z);
 
     float CurrentAngle = AngleStartRad;
-    const float AngleStep = (AngleEndRad - AngleStartRad) / float(NumSegments);
+    const float AngleStep = (AngleEndRad - AngleStartRad) / static_cast<float>(NumSegments);
 
     FVector P0 = Center + Radius * (AxisZ * FMath::Sin(CurrentAngle) + AxisY * FMath::Cos(CurrentAngle));
 
@@ -259,7 +259,7 @@ bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
     const FColor GizmoAxisColorsZHigh[]     = { Settings.GizmoAxisColorsZHighX,        Settings.GizmoAxisColorsZHighY,        Settings.GizmoAxisColorsZHighZ,        Settings.GizmoAxisColorsZHighW };
     const FColor GizmoAxisColorsSelection[] = { Settings.GizmoAxisColorsSelectionX,    Settings.GizmoAxisColorsSelectionY,    Settings.GizmoAxisColorsSelectionZ,    Settings.GizmoAxisColorsSelectionW };
 
-    FCogDebug_GizmoElement GizmoElements[(uint8)ECogDebug_GizmoElementType::MAX];
+    FCogDebug_GizmoElement GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::MAX)];
     for (FCogDebug_GizmoElement& GizmoElement : GizmoElements)
     {
         GizmoElement.Type = ECogDebug_GizmoType::MAX;
@@ -267,35 +267,35 @@ bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
 
     if (EnumHasAnyFlags(Flags, ECogDebug_GizmoFlags::NoTranslationAxis) == false)
     {
-        GizmoElements[(uint8)ECogDebug_GizmoElementType::MoveX] = { ECogDebug_GizmoType::MoveAxis, ECogDebug_GizmoAxis::X, FVector::XAxisVector, UnitAxisX, RotX, GizmoCenter + UnitAxisX * Settings.GizmoTranslationAxisLength * GizmoScale };
-        GizmoElements[(uint8)ECogDebug_GizmoElementType::MoveY] = { ECogDebug_GizmoType::MoveAxis, ECogDebug_GizmoAxis::Y, FVector::YAxisVector, UnitAxisY, RotY, GizmoCenter + UnitAxisY * Settings.GizmoTranslationAxisLength * GizmoScale };
-        GizmoElements[(uint8)ECogDebug_GizmoElementType::MoveZ] = { ECogDebug_GizmoType::MoveAxis, ECogDebug_GizmoAxis::Z, FVector::ZAxisVector, UnitAxisZ, RotZ, GizmoCenter + UnitAxisZ * Settings.GizmoTranslationAxisLength * GizmoScale };
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::MoveX)] = { ECogDebug_GizmoType::MoveAxis, ECogDebug_GizmoAxis::X, FVector::XAxisVector, UnitAxisX, RotX, GizmoCenter + UnitAxisX * Settings.GizmoTranslationAxisLength * GizmoScale };
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::MoveY)] = { ECogDebug_GizmoType::MoveAxis, ECogDebug_GizmoAxis::Y, FVector::YAxisVector, UnitAxisY, RotY, GizmoCenter + UnitAxisY * Settings.GizmoTranslationAxisLength * GizmoScale };
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::MoveZ)] = { ECogDebug_GizmoType::MoveAxis, ECogDebug_GizmoAxis::Z, FVector::ZAxisVector, UnitAxisZ, RotZ, GizmoCenter + UnitAxisZ * Settings.GizmoTranslationAxisLength * GizmoScale };
     }
 
     if (EnumHasAnyFlags(Flags, ECogDebug_GizmoFlags::NoTranslationPlane) == false)
     {
-        GizmoElements[(uint8)ECogDebug_GizmoElementType::MoveXY] = { ECogDebug_GizmoType::MovePlane, ECogDebug_GizmoAxis::Z, FVector::ZAxisVector, UnitAxisZ, RotZ, GizmoCenter + ((UnitAxisX + UnitAxisY) * Settings.GizmoTranslationPlaneOffset * GizmoScale) };
-        GizmoElements[(uint8)ECogDebug_GizmoElementType::MoveXZ] = { ECogDebug_GizmoType::MovePlane, ECogDebug_GizmoAxis::Y, FVector::YAxisVector, UnitAxisY, RotY, GizmoCenter + ((UnitAxisX + UnitAxisZ) * Settings.GizmoTranslationPlaneOffset * GizmoScale) };
-        GizmoElements[(uint8)ECogDebug_GizmoElementType::MoveYZ] = { ECogDebug_GizmoType::MovePlane, ECogDebug_GizmoAxis::X, FVector::XAxisVector, UnitAxisX, RotX, GizmoCenter + ((UnitAxisY + UnitAxisZ) * Settings.GizmoTranslationPlaneOffset * GizmoScale) };
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::MoveXY)] = { ECogDebug_GizmoType::MovePlane, ECogDebug_GizmoAxis::Z, FVector::ZAxisVector, UnitAxisZ, RotZ, GizmoCenter + ((UnitAxisX + UnitAxisY) * Settings.GizmoTranslationPlaneOffset * GizmoScale) };
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::MoveXZ)] = { ECogDebug_GizmoType::MovePlane, ECogDebug_GizmoAxis::Y, FVector::YAxisVector, UnitAxisY, RotY, GizmoCenter + ((UnitAxisX + UnitAxisZ) * Settings.GizmoTranslationPlaneOffset * GizmoScale) };
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::MoveYZ)] = { ECogDebug_GizmoType::MovePlane, ECogDebug_GizmoAxis::X, FVector::XAxisVector, UnitAxisX, RotX, GizmoCenter + ((UnitAxisY + UnitAxisZ) * Settings.GizmoTranslationPlaneOffset * GizmoScale) };
     }
 
     if (EnumHasAnyFlags(Flags, ECogDebug_GizmoFlags::NoRotation) == false)
     {
-        GizmoElements[(uint8)ECogDebug_GizmoElementType::RotateX] = { ECogDebug_GizmoType::Rotate, ECogDebug_GizmoAxis::X, FVector::XAxisVector, UnitAxisX, RotX, FVector::ZeroVector };
-        GizmoElements[(uint8)ECogDebug_GizmoElementType::RotateY] = { ECogDebug_GizmoType::Rotate, ECogDebug_GizmoAxis::Y, FVector::YAxisVector, UnitAxisY, RotY, FVector::ZeroVector };
-        GizmoElements[(uint8)ECogDebug_GizmoElementType::RotateZ] = { ECogDebug_GizmoType::Rotate, ECogDebug_GizmoAxis::Z, FVector::ZAxisVector, UnitAxisZ, RotZ, FVector::ZeroVector };
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::RotateX)] = { ECogDebug_GizmoType::Rotate, ECogDebug_GizmoAxis::X, FVector::XAxisVector, UnitAxisX, RotX, FVector::ZeroVector };
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::RotateY)] = { ECogDebug_GizmoType::Rotate, ECogDebug_GizmoAxis::Y, FVector::YAxisVector, UnitAxisY, RotY, FVector::ZeroVector };
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::RotateZ)] = { ECogDebug_GizmoType::Rotate, ECogDebug_GizmoAxis::Z, FVector::ZAxisVector, UnitAxisZ, RotZ, FVector::ZeroVector };
     }
 
     if (EnumHasAnyFlags(Flags, ECogDebug_GizmoFlags::NoScaleUniform) == false)
     {
-        GizmoElements[(uint8)ECogDebug_GizmoElementType::ScaleXYZ] = { ECogDebug_GizmoType::ScaleUniform, ECogDebug_GizmoAxis::MAX, FVector::OneVector, FVector::OneVector, RotX, GizmoCenter };
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::ScaleXYZ)] = { ECogDebug_GizmoType::ScaleUniform, ECogDebug_GizmoAxis::MAX, FVector::OneVector, FVector::OneVector, RotX, GizmoCenter };
     }
 
     if (EnumHasAnyFlags(Flags, ECogDebug_GizmoFlags::NoScaleAxis) == false)
     {
-        GizmoElements[(uint8)ECogDebug_GizmoElementType::ScaleX] = { ECogDebug_GizmoType::ScaleAxis, ECogDebug_GizmoAxis::X, FVector::XAxisVector, UnitAxisX, RotX, GizmoCenter + UnitAxisX * Settings.GizmoScaleBoxOffset * GizmoScale };
-        GizmoElements[(uint8)ECogDebug_GizmoElementType::ScaleY] = { ECogDebug_GizmoType::ScaleAxis, ECogDebug_GizmoAxis::Y, FVector::YAxisVector, UnitAxisY, RotY, GizmoCenter + UnitAxisY * Settings.GizmoScaleBoxOffset * GizmoScale };
-        GizmoElements[(uint8)ECogDebug_GizmoElementType::ScaleZ] = { ECogDebug_GizmoType::ScaleAxis, ECogDebug_GizmoAxis::Z, FVector::ZAxisVector, UnitAxisZ, RotZ, GizmoCenter + UnitAxisZ * Settings.GizmoScaleBoxOffset * GizmoScale };
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::ScaleX)] = { ECogDebug_GizmoType::ScaleAxis, ECogDebug_GizmoAxis::X, FVector::XAxisVector, UnitAxisX, RotX, GizmoCenter + UnitAxisX * Settings.GizmoScaleBoxOffset * GizmoScale };
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::ScaleY)] = { ECogDebug_GizmoType::ScaleAxis, ECogDebug_GizmoAxis::Y, FVector::YAxisVector, UnitAxisY, RotY, GizmoCenter + UnitAxisY * Settings.GizmoScaleBoxOffset * GizmoScale };
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::ScaleZ)] = { ECogDebug_GizmoType::ScaleAxis, ECogDebug_GizmoAxis::Z, FVector::ZAxisVector, UnitAxisZ, RotZ, GizmoCenter + UnitAxisZ * Settings.GizmoScaleBoxOffset * GizmoScale };
     }
 
     ECogDebug_GizmoElementType HoveredElementType = ECogDebug_GizmoElementType::MAX;
@@ -306,7 +306,7 @@ bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
     else if (IO.WantCaptureMouse == false)
     {
         float MinDistanceToMouse = FLT_MAX;
-        for (uint8 i = (uint8)ECogDebug_GizmoElementType::MoveX; i < (uint8)ECogDebug_GizmoElementType::MAX; ++i)
+        for (uint8 i = static_cast<uint8>(ECogDebug_GizmoElementType::MoveX); i < static_cast<uint8>(ECogDebug_GizmoElementType::MAX); ++i)
         {
             FCogDebug_GizmoElement& Elm = GizmoElements[i];
             float DistanceToMouse = FLT_MAX;
@@ -345,17 +345,17 @@ bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
 
             if (DistanceToMouse < Settings.GizmoCursorSelectionThreshold && DistanceToMouse < MinDistanceToMouse)
             {
-                HoveredElementType = (ECogDebug_GizmoElementType)i;
+                HoveredElementType = static_cast<ECogDebug_GizmoElementType>(i);
                 MinDistanceToMouse = DistanceToMouse;
             }
         }
     }
 
-    for (uint8 i = (uint8)ECogDebug_GizmoElementType::MoveX; i < (uint8)ECogDebug_GizmoElementType::MAX; ++i)
+    for (uint8 i = static_cast<uint8>(ECogDebug_GizmoElementType::MoveX); i < static_cast<uint8>(ECogDebug_GizmoElementType::MAX); ++i)
     {
         const FCogDebug_GizmoElement& Elm = GizmoElements[i];
-        const bool IsClosestToMouse = i == (uint8)HoveredElementType;
-        const uint8 AxisIndex = (uint8)Elm.AxisType;
+        const bool IsClosestToMouse = i == static_cast<uint8>(HoveredElementType);
+        const uint8 AxisIndex = static_cast<uint8>(Elm.AxisType);
         const FColor ZLowColor = IsClosestToMouse ? GizmoAxisColorsSelection[AxisIndex] : GizmoAxisColorsZLow[AxisIndex];
         const FColor ZHighColor = IsClosestToMouse ? GizmoAxisColorsSelection[AxisIndex] : GizmoAxisColorsZHigh[AxisIndex];
 
@@ -425,7 +425,7 @@ bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
         }
         else if (ImGui::IsMouseDragging(ImGuiMouseButton_Left, Settings.GizmoCursorDraggingThreshold))
         {
-            const FCogDebug_GizmoElement& DraggedElement = GizmoElements[(uint8)DraggedElementType];
+            const FCogDebug_GizmoElement& DraggedElement = GizmoElements[static_cast<uint8>(DraggedElementType)];
 
             switch (DraggedElement.Type)
             {

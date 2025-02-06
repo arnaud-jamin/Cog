@@ -78,7 +78,7 @@ void FCogDebugDrawHelper::DrawArc(
     }
 
     float CurrentAngle = AngleStartRad;
-    const float AngleStep = (AngleEndRad - AngleStartRad) / float(Segments);
+    const float AngleStep = (AngleEndRad - AngleStartRad) / static_cast<float>(Segments);
     FVector PrevVertex = Center + OuterRadius * (AxisZ * FMath::Sin(CurrentAngle) + AxisY * FMath::Cos(CurrentAngle));
     int32 Count = Segments;
     while (Count--)
@@ -94,7 +94,6 @@ void FCogDebugDrawHelper::DrawArc(
         CurrentAngle = AngleStartRad;
         PrevVertex = Center + InnerRadius * (AxisZ * FMath::Sin(CurrentAngle) + AxisY * FMath::Cos(CurrentAngle));
 
-        Count = Segments;
         while (Segments--)
         {
             CurrentAngle += AngleStep;
@@ -189,8 +188,8 @@ void FCogDebugDrawHelper::DrawFrustum(
 
     const float HozHalfAngleInRadians = FMath::DegreesToRadians(Angle * 0.5f);
 
-    float HozLength = 0.0f;
-    float VertLength = 0.0f;
+    float HozLength;
+    float VertLength;
 
     if (Angle > 0.0f)
     {
@@ -398,7 +397,7 @@ void FCogDebugDrawHelper::DrawLineTrace(
     const FVector& Start,
     const FVector& End,
     const bool HasHits,
-    TArray<FHitResult>& HitResults,
+    const TArray<FHitResult>& HitResults,
     const FCogDebugDrawLineTraceParams& Settings
 )
 {

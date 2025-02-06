@@ -92,7 +92,6 @@ private:
     template<typename TShape, typename TDrawFunction>
     static void DrawShapes(TArray<TShape>& Shapes, TDrawFunction DrawFunction)
     {
-        ImDrawList* ImDrawList = ImGui::GetBackgroundDrawList();
         const double Time = ImGui::GetCurrentContext()->Time;
 
         for (int32 i = 0; i < Shapes.Num(); i++)

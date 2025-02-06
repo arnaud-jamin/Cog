@@ -1,7 +1,5 @@
 #include "CogImguiInputHelper.h"
 
-#include <ThirdParty/SPIRV-Reflect/SPIRV-Reflect/spirv_reflect.h>
-
 #include "CogImguiKeyInfo.h"
 #include "Engine/World.h"
 #include "Framework/Application/SlateApplication.h"
@@ -50,14 +48,14 @@ UPlayerInput* FCogImguiInputHelper::GetPlayerInput(const UWorld& World)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogImguiInputHelper::IsTopPriorityKey(UWorld* InWorld, const FKey& InKey)
+bool FCogImguiInputHelper::IsTopPriorityKey(const UWorld* InWorld, const FKey& InKey)
 {
     FKeyEvent KeyEvent(InKey, FModifierKeysState(), 0, false, 0, 0);
     return IsTopPriorityKeyEvent(InWorld, KeyEvent);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogImguiInputHelper::IsTopPriorityKeyEvent(UWorld* InWorld, const FKeyEvent& InKeyEvent)
+bool FCogImguiInputHelper::IsTopPriorityKeyEvent(const UWorld* InWorld, const FKeyEvent& InKeyEvent)
 {
     //------------------------------------------------------------------------------------------------
     // We want the user to be able to use Cog shortcuts when imgui has the input.
@@ -202,7 +200,7 @@ bool FCogImguiInputHelper::IsKeyBindMatchingKeyInfo(const FKeyBind& InKeyBind, c
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogImguiInputHelper::WasKeyInfoJustPressed(APlayerController& PlayerController, const FCogImGuiKeyInfo& KeyInfo)
+bool FCogImguiInputHelper::WasKeyInfoJustPressed(const APlayerController& PlayerController, const FCogImGuiKeyInfo& KeyInfo)
 {
     if (PlayerController.WasInputKeyJustPressed(KeyInfo.Key))
     {
@@ -221,7 +219,7 @@ bool FCogImguiInputHelper::WasKeyInfoJustPressed(APlayerController& PlayerContro
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogImguiInputHelper::IsKeyBoundToCommand(UWorld* World, const FKeyEvent& KeyEvent)
+bool FCogImguiInputHelper::IsKeyBoundToCommand(const UWorld* World, const FKeyEvent& KeyEvent)
 {
     if (World == nullptr)
     {
@@ -452,7 +450,7 @@ bool FCogImguiInputHelper::IsKeyBoundToCommand(const UPlayerInput* InPlayerInput
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogImguiInputHelper::IsMouseInsideMainViewport()
 {
-    if (ImGuiViewportP* Viewport = (ImGuiViewportP*)ImGui::GetMainViewport())
+    if (ImGuiViewportP* Viewport = static_cast<ImGuiViewportP*>(ImGui::GetMainViewport()))
     {
         ImGuiIO& IO = ImGui::GetIO();
         const bool Result = Viewport->GetMainRect().Contains(IO.MousePos);

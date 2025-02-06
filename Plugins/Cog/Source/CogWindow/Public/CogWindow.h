@@ -34,7 +34,7 @@ public:
     /** Called every frame with a valid imgui context even if the window is hidden. */
     virtual void RenderTick(float DeltaTime);
 
-    /** Called every frame without a valid imgui context (outside of the imgui NewFrame/EndFrame) even if the window is hidden. */
+    /** Called every frame without a valid imgui context (outside the imgui NewFrame/EndFrame) even if the window is hidden. */
     virtual void GameTick(float DeltaTime);
 
     /**  */
@@ -80,7 +80,7 @@ public:
     template<class T>
     const T* GetAsset() const { return Cast<T>(GetAsset(T::StaticClass())); }
 
-    const UObject* GetAsset(const TSubclassOf<UObject> AssetClass) const;
+    const UObject* GetAsset(const TSubclassOf<UObject>& AssetClass) const;
 
 protected:
     

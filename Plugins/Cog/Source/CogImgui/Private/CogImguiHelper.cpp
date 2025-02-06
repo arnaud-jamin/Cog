@@ -56,10 +56,10 @@ FColor FCogImguiHelper::ToFColor(ImU32 Color)
 {
     return FColor
     {
-        (uint8)((Color >> IM_COL32_R_SHIFT) & 0xFF),
-        (uint8)((Color >> IM_COL32_G_SHIFT) & 0xFF),
-        (uint8)((Color >> IM_COL32_B_SHIFT) & 0xFF),
-        (uint8)((Color >> IM_COL32_A_SHIFT) & 0xFF)
+        static_cast<uint8>((Color >> IM_COL32_R_SHIFT) & 0xFF),
+        static_cast<uint8>((Color >> IM_COL32_G_SHIFT) & 0xFF),
+        static_cast<uint8>((Color >> IM_COL32_B_SHIFT) & 0xFF),
+        static_cast<uint8>((Color >> IM_COL32_A_SHIFT) & 0xFF)
     };
 }
 

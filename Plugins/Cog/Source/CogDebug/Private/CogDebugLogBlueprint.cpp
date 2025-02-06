@@ -30,6 +30,7 @@ void UCogDebugLogBlueprint::Log(const UObject* WorldContextObject, const FCogLog
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+// ReSharper disable once CppPassValueParameterByConstReference
 bool UCogDebugLogBlueprint::IsLogActive(const UObject* WorldContextObject, const FCogLogCategory LogCategory)
 {
 #if ENABLE_COG

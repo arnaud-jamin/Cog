@@ -30,7 +30,7 @@ struct COGDEBUG_API FCogDebugShape
 {
     ECogDebugShape Type = ECogDebugShape::Invalid;
     TArray<FVector> ShapeData;
-    FColor Color;
+    FColor Color = FColor::White;
     bool bPersistent = false;
     float Thickness = 0.0f;
     uint8 DepthPriority = 0;

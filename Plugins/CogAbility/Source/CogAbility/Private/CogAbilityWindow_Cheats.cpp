@@ -5,7 +5,7 @@
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Cheats::RenderHelp()
 {
-    ImGui::TextDisabled("This window is deprecated. Please use the CogEngineWindow_Cheat instead as it provide more functionnalities.");
+    ImGui::TextDisabled("This window is deprecated. Please use the CogEngineWindow_Cheat instead as it provide more functionalities.");
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

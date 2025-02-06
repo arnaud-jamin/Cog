@@ -1,6 +1,7 @@
 #include "CogAbilityWindow_Tweaks.h"
 
 #include "CogAbilityDataAsset.h"
+#include "CogAbilityHelper.h"
 #include "CogAbilityReplicator.h"
 #include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
@@ -20,10 +21,10 @@ void FCogAbilityWindow_Tweaks::RenderHelp()
 {
     ImGui::Text(
         "This window can be used to apply tweaks to all the loaded actors. "
-        "The tweaks are used to test various gameplay settings by actor category. "
-        "The tweaks can be configured in the '%s' data asset. "
-        , TCHAR_TO_ANSI(*GetNameSafe(Asset.Get()))
+        "Tweaks are used to test various gameplay settings by actor category. "
     );
+
+    FCogAbilityHelper::RenderConfigureMessage(Asset);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

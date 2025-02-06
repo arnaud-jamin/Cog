@@ -223,7 +223,7 @@ void FCogWindow::ResetConfig()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-const UObject* FCogWindow::GetAsset(const TSubclassOf<UObject> AssetClass) const
+const UObject* FCogWindow::GetAsset(const TSubclassOf<UObject>& AssetClass) const
 {
     return GetOwner()->GetAsset(AssetClass);
 }
