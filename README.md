@@ -59,12 +59,15 @@ Displays the blackboard of the selected actor.
 ### Cheats
 Used to apply cheats to the selected actor.
 
-![Cheats](https://github.com/arnaud-jamin/Cog/assets/13844285/b7b89635-7924-49b7-98c0-311199947dfc)
-- The cheats are gameplay effects configured in a data asset.
+![Cheats](https://github.com/user-attachments/assets/e3bbf157-904f-40e9-a0bf-e8152ff24af4)
+- Cheats replicated to the game server to be executed.
 - Key modifiers can be used to change which actor should be affected by the cheat:
   - `[CTRL]` Apply the cheat to the controlled actor
   - `[ALT]` Apply the cheat to the allies of the selected actor
   - `[SHIFT]` Apply the cheat to the enemies of the selected actor
+- Cheats can be defined in a Data Asset. Cog provide two default cheat execution (Apply Effect, Activate Ability).
+- Cheat executions can be defined in blueprint.
+![Cheats Asset](https://github.com/user-attachments/assets/46a14b89-ebab-4628-b97b-e5ccd2b63576)
 
 ### Collisions Tester
 Used to test a collision query
