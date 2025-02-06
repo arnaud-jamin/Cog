@@ -25,7 +25,7 @@ General Info:
 
 Displays the gameplay abilities of the selected actor.
 
-[![Abilities](https://github.com/arnaud-jamin/Cog/assets/13844285/cc6cb2af-eb9a-42fd-8ae5-80b5c7b361e9)]()
+![Abilities](https://github.com/user-attachments/assets/b332cf3a-9fee-408f-a86e-157c513c0ee2)
 - Click the ability checkbox to force its activation or deactivation.
 - Right click an ability to remove it, or open/close the ability separate window.
 - Use the 'Give Ability' menu to manually give an ability from a list defined in a Data Asset.
@@ -33,14 +33,14 @@ Displays the gameplay abilities of the selected actor.
 ### Actions
 Displays the state of Input Action.
 
-![Actions](https://github.com/arnaud-jamin/Cog/assets/13844285/6323e78b-2ee4-43e2-bec6-19aa15716d2c)
+![Actions](https://github.com/user-attachments/assets/e4b60f69-efa0-4a23-b78e-9f261e5f78f5)
 - Can be used to inject inputs to help debugging, as loosing window focus when breaking in the code doesn't affect the state of injected inputs unlike real inputs.
 - The display input action are read from a Input Mapping Context defined in a Data Asset.
 
 ### Attributes
 Displays the gameplay attributes of the selected actor.
 
-![Attributes](https://github.com/arnaud-jamin/Cog/assets/13844285/a6329ef1-f775-4e6e-9581-6389f9f4b39c)
+![Attributes](https://github.com/user-attachments/assets/ff010ac5-d8e5-44ca-b46f-263c45a0fc47)
 - Attributes can be sorted by name, category or attribute set.
 - Attributes with the Current value greater than the Base value are displayed in green.
 - Attributes with the Current value lower than the Base value are displayed in red.
@@ -88,6 +88,17 @@ Used to configure the command bindings.
   - `Cog.ToggleInput`
   - `Cog.LoadLayout <LayoutIndex>`
   - `Cog.ToggleSelectionMode`
+
+### Console
+Used as a replacement of the Unreal console command.
+
+![Console](https://github.com/user-attachments/assets/224b8913-61fb-4a63-b63a-fc3522fafe5f)
+- The console exist as a window and a widget (placed in main menu bar).
+- The console widget can optionaly get the keyboard focus when the main menu bar is shown.
+- Use the Keys Up/Down or Tab/Shift-Tab to nagivate in the command list.
+- The console settings can be change in the console window menu, or by right clicking the widget.
+
+![Console Settings](https://github.com/user-attachments/assets/92bd2e0e-e860-403d-ade3-e780fb3a88c7)
 
 ### Debug Settings
 Used to tweak how the debug display is drawn.
@@ -149,6 +160,15 @@ The following image shows the editor running along a dedicated server. The NetIm
 This can be used to debug the state of the game server. For example the behavior trees are only available on the game server.
 ![image](https://github.com/user-attachments/assets/3cd788c9-9884-4c1c-8333-7a311bdcd20a)
 
+### Notifications
+Use to display and configure notifications
+
+![Notification](https://github.com/user-attachments/assets/84db0359-f002-4c35-9d45-11187b3f9228)
+
+- Notification can be added by calling COG_NOTIFY, COG_NOTIFY_WARNING, COG_NOTIFY_ERROR.
+- Notification settings can used to adjust the filtering, their location, their size, etc.
+![Notification Settings](https://github.com/user-attachments/assets/aa47495e-4544-4e33-925e-d87cb9125e76)
+
 ### Output Log
 Display the output log based on each log categories verbosity.
     
@@ -185,15 +205,7 @@ Plots values and events overtime. When applicable, only the values and events of
 Used to configure the rendering quality.
 
 ![Scalability](https://github.com/arnaud-jamin/Cog/assets/13844285/4866b54c-5efa-4efa-a841-74ac8e1713c0)
-
-### Skeleton
-Display the bone hierarchy and the skeleton debug draw of the selected actor if it has a Skeletal Mesh.
-
-![Skeleton](https://github.com/arnaud-jamin/Cog/assets/13844285/19648e3d-70dc-45bc-940d-e53eb9a99871)
-- Mouse over a bone to highlight it.
-- Right click a bone to access more debug display.
-- Use the [Ctrl] key to toggle the bone debug draw recursively.
-        
+       
 ### Selection
 Used to select an actor either by picking an actor in the world or by selecting an actor in the actor list.
 
@@ -207,6 +219,14 @@ Configure the settings of Cog Windows.
 ![Settings](https://github.com/arnaud-jamin/Cog/assets/13844285/edd6a701-9a50-41fa-b7df-90fd11cc2937)
 - Can configure the input key to toggle the input focus between the game and imgui
 - Can change the DPI Scaling
+
+### Skeleton
+Display the bone hierarchy and the skeleton debug draw of the selected actor if it has a Skeletal Mesh.
+
+![Skeleton](https://github.com/arnaud-jamin/Cog/assets/13844285/19648e3d-70dc-45bc-940d-e53eb9a99871)
+- Mouse over a bone to highlight it.
+- Right click a bone to access more debug display.
+- Use the [Ctrl] key to toggle the bone debug draw recursively.
 
 ### Spawn
 Used to spawn new actors in the world. The spawn list can be configured in a Data Asset.
