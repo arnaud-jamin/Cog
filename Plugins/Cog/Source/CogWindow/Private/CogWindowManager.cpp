@@ -509,13 +509,14 @@ void UCogWindowManager::RenderWidgets()
             ImGui::PushID(column);
             
             FCogWindow* Window = Widgets[column];
-            if (Window->GetIsWidgetVisible() == false)
-            { continue; }
-            
-            ImGui::TableNextColumn();
-            ImGui::AlignTextToFramePadding();
-            ImGui::SetCursorPosY(ImGui::GetCursorPosY() - 2);
-            Window->RenderMainMenuWidget();
+            if (Window->GetIsWidgetVisible())
+            {
+                ImGui::TableNextColumn();
+                ImGui::AlignTextToFramePadding();
+                ImGui::SetCursorPosY(ImGui::GetCursorPosY() - 2);
+                Window->RenderMainMenuWidget();
+            }
+
             ImGui::PopID();
         }
 
