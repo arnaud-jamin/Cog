@@ -249,7 +249,7 @@ Displays engine stats such as FPS, Ping, Packet Loss.
 
 - Stats can be viewed as a widget in the main menu bar.
 - Clicking on the stat povide a menu to force the stat to a reach a specific value.
-- Right cliking on the stat display the settings, where the specific stat values can be defined.
+- Right cliking the stat display the settings, where the specific stat values can be defined.
 
 ![Stats Settings](https://github.com/user-attachments/assets/a3545a8f-e742-4e8e-8758-03af133d932e)
 
@@ -263,6 +263,9 @@ Used to change the game global time scale.
 
 ![Time Scale](https://github.com/arnaud-jamin/Cog/assets/13844285/d19198c5-37dd-400d-a09f-7a5077eb2511)
 - If changed on a client the time scale is also modified on the game server, and replicated to the other clients.
+- Time Scale can be viewed as a widget in the main menu bar.
+- Right cliking the Time Scale display the settings, where the specific Time Scale values can be defined.
+![image](https://github.com/user-attachments/assets/130f6250-af5b-41fb-8ae2-016c66fbdedc)
 
 ### Transform
 Used to read and set the selected actor transform. 
