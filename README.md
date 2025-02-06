@@ -112,7 +112,7 @@ Used to tweak how the debug display is drawn.
 ### Effects
 Displays the gameplay effects of the selected actor.
 
-![Effects](https://github.com/arnaud-jamin/Cog/assets/13844285/4fffa8fe-bd93-44bc-8ca5-27ae81f5da0c)
+![Effects](https://github.com/user-attachments/assets/ff9c0baa-80d8-4916-a81a-9914443bd88b)
 - Mouse over an effect to see its details such as its modifiers, the gameplay tags it grants, the remaining time, etc.
 
 ### Gamepad
