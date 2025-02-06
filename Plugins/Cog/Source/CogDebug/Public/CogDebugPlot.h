@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 #include "CogCommon.h"
 #include "imgui.h"
-#include "implot.h"
 
 #ifdef ENABLE_COG
 

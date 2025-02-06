@@ -202,7 +202,7 @@ void FCogEngineWindow_Stats::RenderMainMenuWidgetPacketLoss()
     const float TotalPacketLost = (OutPacketLost + InPacketLost) / 2;
 
     ImGui::PushStyleColor(ImGuiCol_Text, Config->GetPacketLossColor(TotalPacketLost));
-    const bool Open = ImGui::BeginMenu(TCHAR_TO_ANSI(*FString::Printf(TEXT("%2d%% ###PacketLossButton"), (int32)TotalPacketLost)));
+    const bool Open = ImGui::BeginMenu(TCHAR_TO_ANSI(*FString::Printf(TEXT("%2d%% ###PacketLossButton"), static_cast<int32>(TotalPacketLost))));
     const float Width = ImGui::GetItemRectSize().x;
     ImGui::PopStyleColor(1);
 

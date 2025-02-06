@@ -97,16 +97,16 @@ ELogVerbosity::Type FCogDebugLog::GetServerVerbosity(const FName CategoryName)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugLog::SetServerVerbosity(UWorld& World, const FName CategoryName, ELogVerbosity::Type Verbosity)
+void FCogDebugLog::SetServerVerbosity(const UWorld& World, const FName CategoryName, ELogVerbosity::Type Verbosity)
 {
     if (ACogDebugReplicator* Replicator = ACogDebugReplicator::GetLocalReplicator(World))
     {
-        Replicator->Server_SetCategoryVerbosity(CategoryName, (ECogLogVerbosity)Verbosity);
+        Replicator->Server_SetCategoryVerbosity(CategoryName, static_cast<ECogLogVerbosity>(Verbosity));
     }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugLog::SetServerVerbosityActive(UWorld& World, const FName CategoryName, const bool Value)
+void FCogDebugLog::SetServerVerbosityActive(const UWorld& World, const FName CategoryName, const bool Value)
 {
     SetServerVerbosity(World, CategoryName, Value ? ELogVerbosity::Verbose : ELogVerbosity::Warning);
 }

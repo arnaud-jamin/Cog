@@ -18,7 +18,7 @@ private:
     /** Pin factory for abilities graph; Cached so it can be unregistered */
     TSharedPtr<FCogGraphPanelPinFactory> GraphPanelPinFactory;
 
-    EAssetTypeCategories::Type AssetCategory;
+    EAssetTypeCategories::Type AssetCategory = EAssetTypeCategories::None;
 };
 
 IMPLEMENT_MODULE(FCogDebugEditorModule, CogDebugEditor);

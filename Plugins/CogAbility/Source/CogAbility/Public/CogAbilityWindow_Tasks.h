@@ -21,7 +21,7 @@ protected:
 
     virtual void RenderHelp() override;
 
-    virtual void RenderTick(float DetlaTime) override;
+    virtual void RenderTick(float DeltaTime) override;
 
     virtual void RenderContent() override;
 

@@ -1,6 +1,7 @@
 #include "CogImguiInputCatcherWidget.h"
 
 #include "CogImguiContext.h"
+#include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
 #include "Engine/GameViewportClient.h"
 #include "imgui.h"
@@ -16,11 +17,6 @@ void SCogImguiInputCatcherWidget::Construct(const FArguments& InArgs)
     RefreshVisibility();
 }
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
-
-//--------------------------------------------------------------------------------------------------------------------------
-SCogImguiInputCatcherWidget::~SCogImguiInputCatcherWidget()
-{
-}
 
 //--------------------------------------------------------------------------------------------------------------------------
 void SCogImguiInputCatcherWidget::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime)
@@ -91,7 +87,7 @@ FReply SCogImguiInputCatcherWidget::OnMouseButtonUp(const FGeometry& MyGeometry,
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FReply SCogImguiInputCatcherWidget::HandleMouseButtonEvent(const FPointerEvent& MouseEvent, bool Down)
+FReply SCogImguiInputCatcherWidget::HandleMouseButtonEvent(const FPointerEvent& MouseEvent, bool Down) const
 {
     FCogImGuiContextScope ImGuiContextScope(*Context);
 
@@ -132,19 +128,19 @@ FReply SCogImguiInputCatcherWidget::OnMouseMove(const FGeometry& MyGeometry, con
 //--------------------------------------------------------------------------------------------------------------------------
 void SCogImguiInputCatcherWidget::RefreshVisibility()
 {
-    EVisibility DesiredVisiblity = EVisibility::SelfHitTestInvisible;
+    EVisibility DesiredVisibility;
 
     if (Context->GetEnableInput() && Context->GetShareMouseWithGameplay() == false)
     {
-        DesiredVisiblity = EVisibility::Visible;
+        DesiredVisibility = EVisibility::Visible;
     }
     else
     {
-        DesiredVisiblity = EVisibility::SelfHitTestInvisible;
+        DesiredVisibility = EVisibility::SelfHitTestInvisible;
     }
 
-    if (DesiredVisiblity != GetVisibility())
+    if (DesiredVisibility != GetVisibility())
     {
-        SetVisibility(DesiredVisiblity);
+        SetVisibility(DesiredVisibility);
     }
 }

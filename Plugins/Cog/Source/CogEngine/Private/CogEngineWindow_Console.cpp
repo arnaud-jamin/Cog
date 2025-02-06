@@ -1,13 +1,8 @@
 #include "CogEngineWindow_Console.h"
 
-#include "CogCommon.h"
 #include "CogImguiHelper.h"
 #include "CogWindowManager.h"
 #include "CogWindowWidgets.h"
-#include "imgui.h"
-#include "imgui.h"
-#include "imgui.h"
-#include "imgui.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 
@@ -200,7 +195,7 @@ void FCogEngineWindow_Console::RenderMenu()
             RefreshCommandList();
         }
         
-        ImGui::ColorEdit4("History Color", (float*)&Config->HistoryColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        ImGui::ColorEdit4("History Color", &Config->HistoryColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
 
         FCogWindowWidgets::ThinSeparatorText("Window");
 

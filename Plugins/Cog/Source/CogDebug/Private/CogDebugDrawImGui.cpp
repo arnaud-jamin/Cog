@@ -181,7 +181,6 @@ void FCogDebugDrawImGui::AddText(const ImVec2& Pos, const FString& Text, ImU32 C
 void FCogDebugDrawImGui::Draw()
 {
     ImDrawList* DrawList = ImGui::GetBackgroundDrawList();
-    double Time = ImGui::GetCurrentContext()->Time;
 
     DrawShapes(Lines, [DrawList](const FLine& Line, const ImColor Color) { DrawList->AddLine(Line.P1, Line.P2, Color, Line.Thickness); });
     DrawShapes(Rectangles, [DrawList](const FRectangle& Rectangle, const ImColor Color) { DrawList->AddRect(Rectangle.Min, Rectangle.Max, Color, Rectangle.Rounding, Rectangle.Thickness); });

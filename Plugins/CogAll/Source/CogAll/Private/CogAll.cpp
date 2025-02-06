@@ -37,8 +37,6 @@
 #include "CogWindowManager.h"
 
 #include "Engine/Engine.h"
-#include "GameFramework/Character.h"
-#include "GameFramework/GameStateBase.h"
 #include "GameFramework/GameUserSettings.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -92,7 +90,7 @@ void Cog::AddAllWindows(UCogWindowManager& CogWindowManager)
 
     CogWindowManager.AddWindow<FCogEngineWindow_Spawns>("Engine.Spawns");
 
-    FCogEngineWindow_Stats* StatsWindow = CogWindowManager.AddWindow<FCogEngineWindow_Stats>("Engine.Stats");
+    CogWindowManager.AddWindow<FCogEngineWindow_Stats>("Engine.Stats");
 
     CogWindowManager.AddWindow<FCogEngineWindow_TimeScale>("Engine.Time Scale");
 

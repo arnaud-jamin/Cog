@@ -32,12 +32,13 @@ ACogEngineReplicator* ACogEngineReplicator::Spawn(APlayerController* Controller)
 //--------------------------------------------------------------------------------------------------------------------------
 ACogEngineReplicator* ACogEngineReplicator::GetLocalReplicator(const UWorld& World)
 {
-    for (TActorIterator<ACogEngineReplicator> It(&World, StaticClass()); It; ++It)
+    const TActorIterator<ACogEngineReplicator> It(&World, StaticClass());
+    if (It)
     {
         ACogEngineReplicator* Replicator = *It;
         return Replicator;
     }
-
+    
     return nullptr;
 }
 

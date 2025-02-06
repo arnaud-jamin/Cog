@@ -123,7 +123,7 @@ public:
 	*/
 	void Construct(const FArguments& InArgs);
 
-	virtual ~SLogCategoryListWidget();
+	virtual ~SLogCategoryListWidget() override;
 
 private:
 	typedef TTextFilter<const FName&> FLogCategoryTextFilter;
@@ -132,10 +132,10 @@ private:
 	void OnFilterTextChanged(const FText& InFilterText);
 
 	/** Creates the row widget when called by Slate when an item appears on the list. */
-	TSharedRef< ITableRow > OnGenerateRowForLogCategoryViewer(TSharedPtr<FLogCategoryViewerNode> Item, const TSharedRef< STableViewBase >& OwnerTable);
+	TSharedRef< ITableRow > OnGenerateRowForLogCategoryViewer(TSharedPtr<FLogCategoryViewerNode> Item, const TSharedRef< STableViewBase >& OwnerTable) const;
 
 	/** Called by Slate when an item is selected from the tree/list. */
-	void OnLogCategorySelectionChanged(TSharedPtr<FLogCategoryViewerNode> Item, ESelectInfo::Type SelectInfo);
+	void OnLogCategorySelectionChanged(TSharedPtr<FLogCategoryViewerNode> Item, ESelectInfo::Type SelectInfo) const;
 
 	/** Updates the list of items in the dropdown menu */
 	TSharedPtr<FLogCategoryViewerNode> UpdatePropertyOptions();
@@ -146,7 +146,7 @@ private:
 	/** The search box */
 	TSharedPtr<SSearchBox> SearchBoxPtr;
 
-	/** Holds the Slate List widget which holds the LogCategorys for the LogCategory Viewer. */
+	/** Holds the Slate List widget which holds the LogCategory for the LogCategory Viewer. */
 	TSharedPtr<SListView<TSharedPtr< FLogCategoryViewerNode > >> LogCategoryList;
 
 	/** Array of items that can be selected in the dropdown menu */
@@ -229,7 +229,7 @@ void SLogCategoryListWidget::Construct(const FArguments& InArgs)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-TSharedRef<ITableRow> SLogCategoryListWidget::OnGenerateRowForLogCategoryViewer(TSharedPtr<FLogCategoryViewerNode> Item, const TSharedRef< STableViewBase >& OwnerTable)
+TSharedRef<ITableRow> SLogCategoryListWidget::OnGenerateRowForLogCategoryViewer(TSharedPtr<FLogCategoryViewerNode> Item, const TSharedRef< STableViewBase >& OwnerTable) const
 {
 	TSharedRef< SLogCategoryItem > ReturnRow = SNew(SLogCategoryItem, OwnerTable)
 		.HighlightText(SearchBoxPtr->GetText())
@@ -273,7 +273,7 @@ void SLogCategoryListWidget::OnFilterTextChanged(const FText& InFilterText)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void SLogCategoryListWidget::OnLogCategorySelectionChanged(TSharedPtr<FLogCategoryViewerNode> Item, ESelectInfo::Type SelectInfo)
+void SLogCategoryListWidget::OnLogCategorySelectionChanged(TSharedPtr<FLogCategoryViewerNode> Item, ESelectInfo::Type SelectInfo) const
 {
 	OnLogCategoryPicked.ExecuteIfBound(Item->Name);
 }

@@ -18,11 +18,11 @@ public:
 
 protected:
 
-    virtual void RenderHelp();
+    virtual void RenderHelp() override;
 
     virtual void RenderContent() override;
 
-    virtual void RenderSpawnGroup(ACogEngineReplicator& Replicator, const FCogEngineSpawnGroup& SpawnGroup);
+    virtual void RenderSpawnGroup(ACogEngineReplicator& Replicator, const FCogEngineSpawnGroup& SpawnGroup, int32 GroupIndex);
 
     virtual bool RenderSpawnAsset(ACogEngineReplicator& Replicator, const FCogEngineSpawnEntry& SpawnEntry, bool IsLastSelected);
 

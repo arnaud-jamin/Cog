@@ -115,12 +115,6 @@ public:
     UPROPERTY(Config)
     FVector4f HistoryColor = FVector4f(1.0f, 1.0f, 1.0f, 0.5f);
 
-    
-    UCogEngineConfig_Console()
-    {
-        Reset();
-    }
-
     virtual void Reset() override
     {
         Super::Reset();

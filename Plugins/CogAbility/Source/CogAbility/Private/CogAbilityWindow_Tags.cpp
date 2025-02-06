@@ -145,7 +145,7 @@ void FCogAbilityWindow_Tags::RenderTag(const UAbilitySystemComponent& AbilitySys
 {
     if (ImGui::BeginTable("Tag", 2, ImGuiTableFlags_Borders))
     {
-        const ImVec4 TextColor(1.0f, 1.0f, 1.0f, 0.5f);
+        constexpr ImVec4 TextColor(1.0f, 1.0f, 1.0f, 0.5f);
 
         ImGui::TableSetupColumn("Property");
         ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);

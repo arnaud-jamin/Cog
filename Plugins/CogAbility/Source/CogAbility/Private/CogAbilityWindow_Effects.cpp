@@ -53,9 +53,9 @@ void FCogAbilityWindow_Effects::RenderContent()
             ImGui::Checkbox("Sort by Alignment", &Config->SortByAlignment);
             
             ImGui::Separator();
-            ImGui::ColorEdit4("Positive Color", (float*)&AlignmentConfig->PositiveColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-            ImGui::ColorEdit4("Negative Color", (float*)&AlignmentConfig->NegativeColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-            ImGui::ColorEdit4("Neutral Color", (float*)&AlignmentConfig->NeutralColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("Positive Color", &AlignmentConfig->PositiveColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("Negative Color", &AlignmentConfig->NegativeColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("Neutral Color", &AlignmentConfig->NeutralColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
             
             ImGui::Separator();
             if (ImGui::MenuItem("Reset"))
@@ -128,7 +128,6 @@ void FCogAbilityWindow_Effects::RenderEffectsTable()
                     }
                 }
 
-                bool AlignmentOrder = false;
                 if (Config->SortByAlignment && Asset != nullptr)
                 {
                     const FGameplayTagContainer& Tags1 = Effect1->GetAssetTags();

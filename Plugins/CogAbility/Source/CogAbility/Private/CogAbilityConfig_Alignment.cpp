@@ -86,62 +86,53 @@ FVector4f UCogAbilityConfig_Alignment::GetEffectModifierColor(float ModifierValu
 {
     switch (ModifierOp)
     {
-        case EGameplayModOp::Additive:
+        case EGameplayModOp::AddBase:
+        case EGameplayModOp::AddFinal:
         {
             if (ModifierValue > 0.0f)
-            {
-                return PositiveColor;
-            }
+            { return PositiveColor; }
 
             if (ModifierValue < 0.0f)
-            {
-                return NegativeColor;
-            }
-            break;
+            { return NegativeColor; }
+                
+            return NeutralColor;
         }
 
-        case EGameplayModOp::Multiplicitive:
+        case EGameplayModOp::MultiplyAdditive:
+        case EGameplayModOp::MultiplyCompound:
         {
             if (ModifierValue > 1.0f)
-            {
-                return PositiveColor;
-            }
-            else if (ModifierValue < 1.0f)
-            {
-                return NegativeColor;
-            }
-            break;
+            { return PositiveColor; }
+
+            if (ModifierValue < 1.0f)
+            { return NegativeColor; }
+                
+            return NeutralColor;
         }
 
-        case EGameplayModOp::Division:
+        case EGameplayModOp::DivideAdditive:
         {
             if (ModifierValue < 1.0f)
-            {
-                return PositiveColor;
-            }
+            { return PositiveColor; }
 
             if (ModifierValue > 1.0f)
-            {
-                return NegativeColor;
-            }
-            break;
+            { return NegativeColor; }
+                
+            return NeutralColor;
         }
 
         case EGameplayModOp::Override:
         {
             if (ModifierValue > BaseValue)
-            {
-                return PositiveColor;
-            }
+            { return PositiveColor; }
 
             if (ModifierValue < BaseValue)
-            {
-                return NegativeColor;
-            }
-            break;
-        }
-    }
+            { return NegativeColor; }
 
-    return NeutralColor;
+            return NeutralColor;
+        }
+
+        default: return NeutralColor;
+    }
 }
 

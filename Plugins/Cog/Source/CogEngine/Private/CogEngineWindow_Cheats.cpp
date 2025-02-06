@@ -3,6 +3,7 @@
 #include "CogEngineDataAsset.h"
 #include "CogEngineReplicator.h"
 #include "CogCommonAllegianceActorInterface.h"
+#include "CogEngineHelper.h"
 #include "CogImguiHelper.h"
 #include "CogWindowConsoleCommandManager.h"
 #include "CogWindowWidgets.h"
@@ -22,14 +23,7 @@ void FCogEngineWindow_Cheats::RenderHelp()
         "   [SHIFT] to apply the cheat to the enemies of the selected actor\n"
     );
 
-    if (Asset == nullptr)
-    {
-        ImGui::Text("Create a DataAsset child of 'CogEngineDataAsset' to configure the cheats. ");
-    }
-    else
-    {
-        ImGui::Text("The cheats can be configured in the '%s' data asset. ", StringCast<ANSICHAR>(*GetNameSafe(Asset.Get())).Get());
-    }
+    FCogEngineHelper::RenderConfigureMessage(Asset);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -46,7 +40,7 @@ void FCogEngineWindow_Cheats::Initialize()
         TEXT("Cog.Cheat"),
         TEXT("Apply a cheat to the selection. Cog.Cheat <CheatName> -Allies -Enemies -Controlled"),
         GetWorld(),
-        FCogWindowConsoleCommandDelegate::CreateLambda([this](const TArray<FString>& InArgs, UWorld* InWorld)
+        FCogWindowConsoleCommandDelegate::CreateLambda([this](const TArray<FString>& InArgs, const UWorld* InWorld)
             {
                 if (InArgs.Num() > 0)
                 {
@@ -60,7 +54,7 @@ void FCogEngineWindow_Cheats::Initialize()
                     ACogEngineReplicator* Replicator = ACogEngineReplicator::GetLocalReplicator(*InWorld);
                     if (Replicator == nullptr)
                     {
-                        UE_LOG(LogCogImGui, Warning, TEXT("Cog.Cheat %s | Repliactor not found"), *InArgs[0]);
+                        UE_LOG(LogCogImGui, Warning, TEXT("Cog.Cheat %s | Replicator not found"), *InArgs[0]);
                         return;
                     }
                     

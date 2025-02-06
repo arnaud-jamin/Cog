@@ -7,7 +7,7 @@
 #include "imgui.h"
 
 //----------------------------------------------------------------------------------------------------------------------
-const UObject* FCogWindowHelper::GetFirstAssetByClass(const TSubclassOf<UObject> AssetClass)
+const UObject* FCogWindowHelper::GetFirstAssetByClass(const TSubclassOf<UObject>& AssetClass)
 {
     const IAssetRegistry& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry")).Get();
 

@@ -368,8 +368,6 @@ UCogWindowManager::FMenu* UCogWindowManager::AddMenu(const FString& Name)
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::RenderMainMenu()
 {
-    const UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*GetWorld());
-
     IsRenderingInMainMenu = true;
 
     //-----------------------------------------------------------------------------------------------
@@ -623,7 +621,7 @@ void UCogWindowManager::SettingsHandler_ClearAll(ImGuiContext* Context, ImGuiSet
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::SettingsHandler_ApplyAll(ImGuiContext* Context, ImGuiSettingsHandler* Handler)
 {
-    UCogWindowManager* Manager = (UCogWindowManager*)Handler->UserData;
+    UCogWindowManager* Manager = static_cast<UCogWindowManager*>(Handler->UserData);
 
     Manager->Widgets.Sort([](const FCogWindow& Window1, const FCogWindow& Window2)
     {
@@ -636,15 +634,15 @@ void* UCogWindowManager::SettingsHandler_ReadOpen(ImGuiContext* Context, ImGuiSe
 {
     if (strcmp(Name, "Windows") == 0)
     {
-        return (void*)1;
+        return reinterpret_cast<void*>(1);
     }
 
     if (strcmp(Name, "Widgets") == 0)
     {
-        UCogWindowManager* Manager = (UCogWindowManager*)Handler->UserData;
+        UCogWindowManager* Manager = static_cast<UCogWindowManager*>(Handler->UserData);
         Manager->WidgetsOrderIndex = 0;
 
-        return (void*)2;
+        return reinterpret_cast<void*>(2);
     }
 
     return nullptr;
@@ -656,7 +654,7 @@ void UCogWindowManager::SettingsHandler_ReadLine(ImGuiContext* Context, ImGuiSet
     //-----------------------------------------------------------------------------------
 	// Load the visibility of windows. 
 	//-----------------------------------------------------------------------------------
-    if (Entry == (void*)1)
+    if (Entry == reinterpret_cast<void*>(1))
     {
         ImGuiID Id;
         int32 ShowMenu;
@@ -666,7 +664,7 @@ void UCogWindowManager::SettingsHandler_ReadLine(ImGuiContext* Context, ImGuiSet
         if (sscanf(Line, "0x%08X", &Id) == 1)
 #endif
         {
-            UCogWindowManager* Manager = (UCogWindowManager*)Handler->UserData;
+            UCogWindowManager* Manager = static_cast<UCogWindowManager*>(Handler->UserData);
             if (FCogWindow* Window = Manager->FindWindowByID(Id))
             {
                 Window->SetIsVisible(true);
@@ -677,7 +675,7 @@ void UCogWindowManager::SettingsHandler_ReadLine(ImGuiContext* Context, ImGuiSet
     //-----------------------------------------------------------------------------------
     // Load which widgets are present in the main menu bar and with what order. 
     //-----------------------------------------------------------------------------------
-    else if (Entry == (void*)2)
+    else if (Entry == reinterpret_cast<void*>(2))
     {
         ImGuiID Id;
         int32 Visible = false;
@@ -687,7 +685,7 @@ void UCogWindowManager::SettingsHandler_ReadLine(ImGuiContext* Context, ImGuiSet
         if (sscanf(Line, "0x%08X %d", &Id, &Visible) == 2)
 #endif
         {
-            UCogWindowManager* Manager = (UCogWindowManager*)Handler->UserData;
+            UCogWindowManager* Manager = static_cast<UCogWindowManager*>(Handler->UserData);
             if (FCogWindow* Window = Manager->FindWindowByID(Id))
             {
                 Window->SetWidgetOrderIndex(Manager->WidgetsOrderIndex);
@@ -702,7 +700,7 @@ void UCogWindowManager::SettingsHandler_ReadLine(ImGuiContext* Context, ImGuiSet
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::SettingsHandler_WriteAll(ImGuiContext* Context, ImGuiSettingsHandler* Handler, ImGuiTextBuffer* Buffer)
 {
-    const UCogWindowManager* Manager = (UCogWindowManager*)Handler->UserData;
+    const UCogWindowManager* Manager = static_cast<UCogWindowManager*>(Handler->UserData);
 
     //-----------------------------------------------------------------------------------
 	// Save the visibility of windows. Example:
@@ -715,7 +713,7 @@ void UCogWindowManager::SettingsHandler_WriteAll(ImGuiContext* Context, ImGuiSet
     {
         if (Window->GetIsVisible())
         {
-            Buffer->appendf("0x%08X %d\n", Window->GetID(), (int32)Window->bShowMenu);
+            Buffer->appendf("0x%08X %d\n", Window->GetID(), static_cast<int32>(Window->bShowMenu));
         }
     }
     Buffer->append("\n");

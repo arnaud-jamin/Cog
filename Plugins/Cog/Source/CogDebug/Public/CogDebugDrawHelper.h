@@ -70,7 +70,7 @@ public:
 
     static void DrawHitResults(const UWorld* World, const TArray<FHitResult>& HitResults, const FCogDebugDrawLineTraceParams& Settings);
 
-    static void DrawLineTrace(const UWorld* World, const FVector& Start, const FVector& End, const bool HasHits, TArray<FHitResult>& HitResults, const FCogDebugDrawLineTraceParams& Settings);
+    static void DrawLineTrace(const UWorld* World, const FVector& Start, const FVector& End, const bool HasHits, const TArray<FHitResult>& HitResults, const FCogDebugDrawLineTraceParams& Settings);
 
     static void DrawSweep(const UWorld* World, const FCollisionShape& Shape, const FVector& Start, const FVector& End, const FQuat& Rotation, const bool HasHits, TArray<FHitResult>& HitResults, const FCogDebugDrawSweepParams& Settings);
 };

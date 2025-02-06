@@ -47,18 +47,19 @@ void FCogEngineWindow_Spawns::RenderContent()
         return;
     }
 
+    int32 GroupIndex = 0;
     for (const FCogEngineSpawnGroup& SpawnGroup : Asset->SpawnGroups)
     {
-        RenderSpawnGroup(*Replicator, SpawnGroup);
+        RenderSpawnGroup(*Replicator, SpawnGroup, GroupIndex);
+        GroupIndex++;
     }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Spawns::RenderSpawnGroup(ACogEngineReplicator& Replicator, const FCogEngineSpawnGroup& SpawnGroup)
+void FCogEngineWindow_Spawns::RenderSpawnGroup(ACogEngineReplicator& Replicator, const FCogEngineSpawnGroup& SpawnGroup, int32 GroupIndex)
 {
     if (FCogWindowWidgets::DarkCollapsingHeader(TCHAR_TO_ANSI(*SpawnGroup.Name), ImGuiTreeNodeFlags_DefaultOpen))
     {
-        int32 GroupIndex = 0;
         ImGui::PushID(GroupIndex);
 
         const bool PushColor = (SpawnGroup.Color != FColor::Transparent);
@@ -86,7 +87,6 @@ void FCogEngineWindow_Spawns::RenderSpawnGroup(ACogEngineReplicator& Replicator,
         }
 
         ImGui::PopID();
-        GroupIndex++;
     }
 }
 
@@ -95,7 +95,7 @@ bool FCogEngineWindow_Spawns::RenderSpawnAsset(ACogEngineReplicator& Replicator,
 {
     bool IsPressed = false;
 
-    ImGui::PushStyleColor(ImGuiCol_Button, IsLastSelected ? ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive) : ImGui::GetStyleColorVec4(ImGuiCol_Button));
+    //ImGui::PushStyleColor(ImGuiCol_Button, IsLastSelected ? ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive) : ImGui::GetStyleColorVec4(ImGuiCol_Button));
     ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
 
     FString EntryName;
@@ -115,7 +115,7 @@ bool FCogEngineWindow_Spawns::RenderSpawnAsset(ACogEngineReplicator& Replicator,
     }
 
     ImGui::PopStyleVar(1);
-    ImGui::PopStyleColor(1);
+    //ImGui::PopStyleColor(1);
 
     return IsPressed;
 }

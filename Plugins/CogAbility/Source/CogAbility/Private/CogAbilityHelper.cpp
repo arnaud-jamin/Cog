@@ -1,5 +1,6 @@
 #include "CogAbilityHelper.h"
 
+#include "CogAbilityDataAsset.h"
 #include "CogWindowWidgets.h"
 #include "GameplayTagContainer.h"
 #include "imgui.h"
@@ -55,5 +56,18 @@ void FCogAbilityHelper::RenderTagContainer(
         {
             ImGui::SameLine();
         }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityHelper::RenderConfigureMessage(const TWeakObjectPtr<const UCogAbilityDataAsset> InAsset)
+{
+    if (InAsset == nullptr)
+    {
+        ImGui::Text("Create a DataAsset child of '%s' to configure. ", StringCast<ANSICHAR>(*UCogAbilityDataAsset::StaticClass()->GetName()).Get());
+    }
+    else
+    {
+        ImGui::Text("Can be configured in the '%s' DataAsset. ", StringCast<ANSICHAR>(*GetNameSafe(InAsset.Get())).Get());
     }
 }

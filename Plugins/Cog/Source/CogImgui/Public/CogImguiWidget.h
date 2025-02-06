@@ -24,8 +24,6 @@ public:
 
     void Construct(const FArguments& InArgs);
 
-    ~SCogImguiWidget();
-
     virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
 
     virtual int32 OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyClippingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& WidgetStyle, bool bParentEnabled) const override;
@@ -58,13 +56,13 @@ public:
 
     TSharedPtr<const SWindow> GetWindow() const { return Window; }
 
-    void SetWindow(TSharedPtr<SWindow> Value) { Window = Value; }
+    void SetWindow(const TSharedPtr<SWindow>& Value) { Window = Value; }
 
 protected:
 
-    FReply HandleKeyEvent(const FKeyEvent& KeyEvent, bool Down);
+    FReply HandleKeyEvent(const FKeyEvent& KeyEvent, bool Down) const;
 
-    FReply HandleMouseButtonEvent(const FPointerEvent& MouseEvent, bool Down);
+    FReply HandleMouseButtonEvent(const FPointerEvent& MouseEvent, bool Down) const;
 
     void RefreshVisibility();
 

@@ -57,14 +57,14 @@ void FCogEngineWindow_Inspector::SetInspectedObject(UObject* Value)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Inspector::AddFavorite(UObject* Object)
 {
-    Favorite& Favorite = Favorites.AddDefaulted_GetRef();
+    FFavorite& Favorite = Favorites.AddDefaulted_GetRef();
     Favorite.Object = Object;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Inspector::AddFavorite(UObject* Object, FCogEngineInspectorApplyFunction ApplyFunction)
 {
-    Favorite& Favorite = Favorites.AddDefaulted_GetRef();
+    FFavorite& Favorite = Favorites.AddDefaulted_GetRef();
     Favorite.Object = Object;
     Favorite.ApplyFunction = ApplyFunction;
 }
@@ -110,7 +110,7 @@ void FCogEngineWindow_Inspector::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 FCogEngineInspectorApplyFunction FCogEngineWindow_Inspector::FindObjectApplyFunction(const UObject* Object) const
 {
-    for (const Favorite& Favorite : Favorites)
+    for (const FFavorite& Favorite : Favorites)
     {
         if (Favorite.Object == Object)
         {
@@ -206,7 +206,7 @@ void FCogEngineWindow_Inspector::RenderMenu()
             }
 
             ImGui::PushID("Favorites");
-            for (Favorite& Favorite : Favorites)
+            for (FFavorite& Favorite : Favorites)
             {
                 const TWeakObjectPtr<UObject>& Object = Favorite.Object;
                 if (ImGui::MenuItem(TCHAR_TO_ANSI(*GetNameSafe(Object.Get()))))
@@ -273,7 +273,7 @@ void FCogEngineWindow_Inspector::RenderMenu()
 
             ImGui::Checkbox("Sort by Name", &Config->bSortByName);
             ImGui::Checkbox("Show Background", &Config->bShowRowBackground);
-            ImGui::Checkbox("Show Sorders", &Config->bShowBorders);
+            ImGui::Checkbox("Show Borders", &Config->bShowBorders);
 #if WITH_EDITORONLY_DATA
             ImGui::Checkbox("Show Display Name", &Config->bShowDisplayName);
             ImGui::Checkbox("Show Categories", &Config->bShowCategories);
@@ -680,7 +680,7 @@ bool FCogEngineWindow_Inspector::RenderByte(const FByteProperty* ByteProperty, u
     if (ImGui::InputInt("##Byte", &Value))
     {
         HasChanged = true;
-        ByteProperty->SetPropertyValue(PointerToValue, (uint8)Value);
+        ByteProperty->SetPropertyValue(PointerToValue, static_cast<uint8>(Value));
     }
 
     return HasChanged;
@@ -695,7 +695,7 @@ bool FCogEngineWindow_Inspector::RenderInt8(const FInt8Property* Int8Property, u
     if (ImGui::InputInt("##Int8", &Value))
     {
         HasChanged = true;
-        Int8Property->SetPropertyValue(PointerToValue, (int8)Value);
+        Int8Property->SetPropertyValue(PointerToValue, static_cast<int8>(Value));
     }
 
     return HasChanged;
@@ -721,11 +721,11 @@ bool FCogEngineWindow_Inspector::RenderInt64(const FInt64Property* Int64Property
 {
     bool HasChanged = false;
 
-    int Value = (int)Int64Property->GetPropertyValue(PointerToValue);
+    int Value = static_cast<int>(Int64Property->GetPropertyValue(PointerToValue));
     if (ImGui::InputInt("##UInt64", &Value))
     {
         HasChanged = true;
-        Int64Property->SetPropertyValue(PointerToValue, (uint64)Value);
+        Int64Property->SetPropertyValue(PointerToValue, static_cast<uint64>(Value));
     }
 
     return HasChanged;
@@ -736,11 +736,11 @@ bool FCogEngineWindow_Inspector::RenderUInt32(const FUInt32Property* UInt32Prope
 {
     bool HasChanged = false;
 
-    int Value = (int)UInt32Property->GetPropertyValue(PointerToValue);
+    int Value = static_cast<int>(UInt32Property->GetPropertyValue(PointerToValue));
     if (ImGui::InputInt("##UInt32", &Value))
     {
         HasChanged = true;
-        UInt32Property->SetPropertyValue(PointerToValue, (uint32)Value);
+        UInt32Property->SetPropertyValue(PointerToValue, static_cast<uint32>(Value));
     }
 
     return HasChanged;
@@ -963,28 +963,25 @@ bool FCogEngineWindow_Inspector::HasPropertyAnyChildren(const FProperty* Propert
         const TFieldIterator<FProperty> It(StructProperty->Struct);
         return It ? true : false;
     }
-    else if (const FArrayProperty* ArrayProperty = CastField<FArrayProperty>(Property))
+
+    if (const FArrayProperty* ArrayProperty = CastField<FArrayProperty>(Property))
     {
 	    const FScriptArrayHelper Helper(ArrayProperty, PointerToValue);
         const int32 Num = Helper.Num();
         if (Num == 0)
-        {
-            return false;
-        }
+        { return false; }
 
         return true;
     }
-    else if (const FClassProperty* ClassProperty = CastField<FClassProperty>(Property))
-    {
-        return false;
-    }
-    else if (const FObjectProperty* ObjectProperty = CastField<FObjectProperty>(Property))
+
+    if (const FClassProperty* ClassProperty = CastField<FClassProperty>(Property))
+    { return false; }
+
+    if (const FObjectProperty* ObjectProperty = CastField<FObjectProperty>(Property))
     {
 	    const UObject* ReferencedObject = ObjectProperty->GetObjectPropertyValue(PointerToValue);
         if (ReferencedObject == nullptr)
-        {
-            return false;
-        }
+        { return false; }
 
         return true;
     }
