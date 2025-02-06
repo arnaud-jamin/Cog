@@ -245,7 +245,12 @@ Used to spawn new actors in the world. The spawn list can be configured in a Dat
 ### Stats
 Displays engine stats such as FPS, Ping, Packet Loss.
 
-![Stats](https://github.com/arnaud-jamin/Cog/assets/13844285/e394ec7b-02fa-4b09-879b-90c82bd542ef)
+![Stats](https://github.com/user-attachments/assets/424bac6a-76df-4d69-9d34-445a4a4bf536)
+
+- Stats can be viewed as a widget in the main menu bar. Clicking on the stat povide menu to force the stat to a specific value.
+- Right cliking on the stat display the settings, where the specific stat values can be defined.
+
+![Stats Settings](https://github.com/user-attachments/assets/a3545a8f-e742-4e8e-8758-03af133d932e)
 
 ### Tags
 Displays the gameplay tags of the selected actor.
