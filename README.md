@@ -169,8 +169,9 @@ Use to display and configure notifications
 
 ![Notification](https://github.com/user-attachments/assets/84db0359-f002-4c35-9d45-11187b3f9228)
 
-- Notification can be added by calling COG_NOTIFY, COG_NOTIFY_WARNING, COG_NOTIFY_ERROR.
+- Notification can be added by using the following macros: `COG_NOTIFY`, `COG_NOTIFY_WARNING`, or `COG_NOTIFY_ERROR`.
 - Notification settings can used to adjust the filtering, their location, their size, etc.
+
 ![Notification Settings](https://github.com/user-attachments/assets/aa47495e-4544-4e33-925e-d87cb9125e76)
 
 ### Output Log
