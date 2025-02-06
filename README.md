@@ -67,6 +67,7 @@ Used to apply cheats to the selected actor.
   - `[SHIFT]` Apply the cheat to the enemies of the selected actor
 - Cheats can be defined in a Data Asset. Cog provide two default cheat execution (Apply Effect, Activate Ability).
 - Cheat executions can be defined in blueprint.
+
 ![Cheats Asset](https://github.com/user-attachments/assets/46a14b89-ebab-4628-b97b-e5ccd2b63576)
 
 ### Collisions Tester
