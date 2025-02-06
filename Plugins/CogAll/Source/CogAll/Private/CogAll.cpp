@@ -82,9 +82,7 @@ void Cog::AddAllWindows(UCogWindowManager& CogWindowManager)
 
     CogWindowManager.AddWindow<FCogEngineWindow_Plots>("Engine.Plots");
 
-    FCogEngineWindow_Selection* SelectionWindow = CogWindowManager.AddWindow<FCogEngineWindow_Selection>("Engine.Selection");
-    SelectionWindow->SetActorClasses({ ACharacter::StaticClass(), AActor::StaticClass(), AGameModeBase::StaticClass(), AGameStateBase::StaticClass() });
-    SelectionWindow->SetTraceType(UEngineTypes::ConvertToTraceType(ECC_Pawn));
+    CogWindowManager.AddWindow<FCogEngineWindow_Selection>("Engine.Selection");
 
     CogWindowManager.AddWindow<FCogEngineWindow_Scalability>("Engine.Scalability");
 

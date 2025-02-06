@@ -3,6 +3,9 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "Engine/EngineTypes.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/GameModeBase.h"
+#include "GameFramework/GameStateBase.h"
 #include "CogEngineDataAsset.generated.h"
 
 class FCogWindow;
@@ -111,4 +114,10 @@ public:
 
     UPROPERTY(Category = "Spawns", EditAnywhere, meta = (TitleProperty = "Name"))
     TArray<FCogEngineSpawnGroup> SpawnGroups;
+
+    UPROPERTY(Category = "Selection", EditAnywhere)
+    TArray<TSubclassOf<AActor>> SelectionFilters = { ACharacter::StaticClass(), AActor::StaticClass(), AGameModeBase::StaticClass(), AGameStateBase::StaticClass() };
+    
+    UPROPERTY(Category = "Selection", EditAnywhere)
+    TEnumAsByte<ETraceTypeQuery> SelectionTraceChannel = UEngineTypes::ConvertToTraceType(ECC_Pawn);
 };

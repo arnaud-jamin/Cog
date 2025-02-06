@@ -28,9 +28,10 @@ void FCogEngineWindow_Selection::Initialize()
     bHasMenu = true;
     bHasWidget = true;
     bIsWidgetVisible = true;
-    ActorClasses = { AActor::StaticClass(), ACharacter::StaticClass() };
 
     Config = GetConfig<UCogEngineConfig_Selection>();
+
+    Asset = GetAsset<UCogEngineDataAsset>();
 
     FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(
         *ToggleSelectionModeCommand,
@@ -108,9 +109,10 @@ void FCogEngineWindow_Selection::TryReapplySelection() const
 TSubclassOf<AActor> FCogEngineWindow_Selection::GetSelectedActorClass() const
 {
     TSubclassOf<AActor> SelectedClass = AActor::StaticClass();
-    if (ActorClasses.IsValidIndex(Config->SelectedClassIndex))
+    const TArray<TSubclassOf<AActor>>& SelectionFilters = GetSelectionFilters();
+    if (SelectionFilters.IsValidIndex(Config->SelectedClassIndex))
     {
-        SelectedClass = ActorClasses[Config->SelectedClassIndex];
+        SelectedClass = SelectionFilters[Config->SelectedClassIndex];
     }
 
     return SelectedClass;
@@ -134,7 +136,10 @@ void FCogEngineWindow_Selection::RenderTick(float DeltaTime)
 
     if (GetOwner()->GetActivateSelectionMode())
     {
-        TickSelectionMode();
+        if (TickSelectionMode() == false)
+        {
+            GetOwner()->SetActivateSelectionMode(false);
+        }
     }
 
     if (const AActor* Actor = GetSelection())
@@ -185,7 +190,7 @@ void FCogEngineWindow_Selection::RenderContent()
 bool FCogEngineWindow_Selection::DrawSelectionCombo()
 {
     AActor* NewSelection = nullptr;
-    const bool result = FCogWindowWidgets::ActorsListWithFilters(NewSelection, *GetWorld(), ActorClasses, Config->SelectedClassIndex, &Filter, GetLocalPlayerPawn());
+    const bool result = FCogWindowWidgets::ActorsListWithFilters(NewSelection, *GetWorld(), GetSelectionFilters(), Config->SelectedClassIndex, &Filter, GetLocalPlayerPawn());
     if (result)
     {
         SetGlobalSelection(NewSelection);
@@ -195,26 +200,18 @@ bool FCogEngineWindow_Selection::DrawSelectionCombo()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Selection::TickSelectionMode()
+bool FCogEngineWindow_Selection::TickSelectionMode()
 {
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
-    {
-        GetOwner()->SetActivateSelectionMode(false);
-        return;
-    }
+    { return false; }
 
     APlayerController* PlayerController = GetLocalPlayerController();
     if (PlayerController == nullptr)
-    {
-        GetOwner()->SetActivateSelectionMode(false);
-        return;
-    }
+    {  return false; }
 
     ImGuiViewport* Viewport = ImGui::GetMainViewport();
     if (Viewport == nullptr)
-    {
-        return;
-    }
+    { return false; }
 
     const ImVec2 ViewportPos = Viewport->Pos;
     const ImVec2 ViewportSize = Viewport->Size;
@@ -245,7 +242,7 @@ void FCogEngineWindow_Selection::TickSelectionMode()
         FHitResult HitResult;
         for (int i = 0; i < 2; ++i)
         {
-            if (UKismetSystemLibrary::LineTraceSingle(GetWorld(), WorldOrigin, WorldOrigin + WorldDirection * 10000, TraceType, false, IgnoreList, EDrawDebugTrace::None, HitResult, true))
+            if (UKismetSystemLibrary::LineTraceSingle(GetWorld(), WorldOrigin, WorldOrigin + WorldDirection * 10000, GetSelectionTraceChannel(), false, IgnoreList, EDrawDebugTrace::None, HitResult, true))
             {
                 if (SelectedActorClass == nullptr || HitResult.GetActor()->GetClass()->IsChildOf(SelectedActorClass))
                 {
@@ -285,6 +282,8 @@ void FCogEngineWindow_Selection::TickSelectionMode()
             }
         }
     }
+
+    return true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -311,7 +310,7 @@ void FCogEngineWindow_Selection::RenderMainMenuWidget()
         "MenuActorSelection", 
         NewSelection, 
         *GetWorld(), 
-        ActorClasses, 
+        GetSelectionFilters(), 
         Config->SelectedClassIndex, 
         &Filter, 
         GetLocalPlayerPawn(), 
@@ -343,4 +342,23 @@ void FCogEngineWindow_Selection::RenderPickButtonTooltip()
         "%s", TCHAR_TO_ANSI(*Shortcut));
         FCogWindowWidgets::EndItemTooltipWrappedText();
     }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+const TArray<TSubclassOf<AActor>>& FCogEngineWindow_Selection::GetSelectionFilters() const
+{
+    if (Asset != nullptr)
+    { return Asset->SelectionFilters; }
+
+    static TArray<TSubclassOf<AActor>> SelectionFilters = { ACharacter::StaticClass(), AActor::StaticClass(), AGameModeBase::StaticClass(), AGameStateBase::StaticClass() };
+    return SelectionFilters;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+ ETraceTypeQuery FCogEngineWindow_Selection::GetSelectionTraceChannel() const
+{
+    if (Asset != nullptr)
+    { return Asset->SelectionTraceChannel; }
+
+    return UEngineTypes::ConvertToTraceType(ECC_Pawn);
 }
