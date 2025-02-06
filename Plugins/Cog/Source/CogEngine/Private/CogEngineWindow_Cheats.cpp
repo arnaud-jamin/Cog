@@ -190,6 +190,7 @@ void FCogEngineWindow_Cheats::RenderContent()
     if (Replicator == nullptr)
     {
         ImGui::TextDisabled("No Replicator");
+        return;
     }
 
     if (ImGui::BeginMenuBar())
