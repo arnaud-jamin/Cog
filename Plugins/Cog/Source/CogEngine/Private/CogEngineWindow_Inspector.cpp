@@ -869,7 +869,7 @@ bool FCogEngineWindow_Inspector::RenderObject(UObject* Object, bool ShowChildren
 bool FCogEngineWindow_Inspector::RenderStruct(const FStructProperty* StructProperty, uint8* PointerToValue, bool ShowChildren)
 {
     ImGui::BeginDisabled();
-    ImGui::Text("%s", TCHAR_TO_ANSI(*StructProperty->Struct->GetClass()->GetName()));
+    ImGui::Text("%s", TCHAR_TO_ANSI(*StructProperty->Struct->GetStructCPPName()));
     ImGui::EndDisabled();
 
     bool HasChanged = false;
