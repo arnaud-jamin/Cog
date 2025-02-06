@@ -13,6 +13,13 @@
 #include "NetImgui_Api.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_NetImgui::RenderHelp()
+{
+	ImGui::Text("This window manage the connection to the NetImgui server."
+		"See https://github.com/sammyfreg/netImgui for more info.");
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_NetImgui::Initialize()
 {
     Super::Initialize();
@@ -74,13 +81,6 @@ void FCogEngineWindow_NetImgui::Shutdown()
 	}
 
 	CloseServer();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_NetImgui::RenderHelp()
-{
-    ImGui::Text("This window manage the connection to the NetImgui server."
-		"See https://github.com/sammyfreg/netImgui for more info.");
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

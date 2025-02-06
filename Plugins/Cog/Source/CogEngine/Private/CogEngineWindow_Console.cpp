@@ -635,15 +635,6 @@ void FCogEngineWindow_Console::ExecuteCommand(const FString& InCommand)
     {
         IConsoleManager::Get().AddConsoleHistoryEntry(TEXT(""), *CleanupCommand);
         GEngine->DeferredCommands.Add(CleanupCommand);
-
-        if (GetCommandObjectFromCommandLine(InCommand) != nullptr)
-        {
-            COG_NOTIFY(TEXT("Command: %s"), *CleanupCommand);
-        }
-        else
-        {
-            COG_NOTIFY_ERROR(TEXT("Unknown Command: %s"), *CleanupCommand);
-        }
     }    
 
     if (bIsWidgetMode)

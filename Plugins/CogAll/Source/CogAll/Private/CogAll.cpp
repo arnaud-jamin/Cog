@@ -76,9 +76,9 @@ void Cog::AddAllWindows(UCogWindowManager& CogWindowManager)
 
     CogWindowManager.AddWindow<FCogEngineWindow_NetImgui>("Engine.Net ImGui");
 
-    CogWindowManager.AddWindow<FCogEngineWindow_OutputLog>("Engine.Output Log");
-    
     CogWindowManager.AddWindow<FCogEngineWindow_Notifications>("Engine.Notifications");
+
+    CogWindowManager.AddWindow<FCogEngineWindow_OutputLog>("Engine.Output Log");
 
     CogWindowManager.AddWindow<FCogEngineWindow_Plots>("Engine.Plots");
 

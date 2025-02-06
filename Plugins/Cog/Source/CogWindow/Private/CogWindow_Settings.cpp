@@ -1,5 +1,6 @@
 #include "CogWindow_Settings.h"
 
+#include "CogCommon.h"
 #include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
 #include "CogWindowManager.h"
@@ -285,6 +286,7 @@ void FCogWindow_Settings::SetDPIScale(float Value) const
 {
     Config->DPIScale = Value;
     GetOwner()->GetContext().SetDPIScale(Config->DPIScale);
+    COG_NOTIFY(TEXT("DPI Scale: %0.2f"), Value);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

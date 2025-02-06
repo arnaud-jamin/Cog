@@ -42,21 +42,19 @@ public:
 
     virtual void Initialize() override;
 
-    void AddLog(const TCHAR* InMessage, ELogVerbosity::Type InVerbosity, const FName& InCategory);
+    void OnLogReceived(const TCHAR* InMessage, ELogVerbosity::Type InVerbosity, const FName& InCategory);
 
     void Clear();
+    void AddNotification(const TCHAR* InMessage, ELogVerbosity::Type InVerbosity);
 
 protected:
 
     struct FNotification
     {
-        int32 LineStart = 0;
-        int32 LineEnd = 0;
-        uint64 Frame = 0;
+        FString Id;
         FDateTime Time;
         ELogVerbosity::Type Verbosity;
-        FName Category;
-        FString Message; 
+        FString Message;
     };
     
     virtual void RenderHelp() override;
@@ -67,16 +65,17 @@ protected:
 
     virtual void RenderNotifications();
 
-    virtual void DrawRow(const FNotification& InNotification, bool InShowAsTableRow) const;
+    virtual void RenderSettings();
 
     ImGuiTextFilter Filter;
 
     FCogNotificationOutputDevice OutputDevice;
 
     TArray<FNotification> Notifications;
+    
+    static int32 NotificationsId;
 
     TWeakObjectPtr<UCogEngineConfig_Notifications> Config;
-
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -86,19 +85,19 @@ class UCogEngineConfig_Notifications : public UCogCommonConfig
     GENERATED_BODY()
 
 public:
+    
+    UPROPERTY(Config)
+    bool DisableNotifications = false;
 
     UPROPERTY(Config)
-    bool AutoScroll = true;
+    bool NotifyAllWarnings = false;
 
     UPROPERTY(Config)
-    bool ShowVerbosity = false;
+    bool NotifyAllErrors = false;
 
     UPROPERTY(Config)
-    int32 VerbosityFilter = ELogVerbosity::VeryVerbose;
-
-    UPROPERTY(Config)
-    bool ShowAsTable = false;
-
+    bool NotifyConsoleCommands = true;
+    
     UPROPERTY(Config)
     FColor BackgroundDefaultColor =  FColor::White;
     
@@ -133,42 +132,48 @@ public:
     int Padding = 10;
 
     UPROPERTY(Config)
-    int32 TextWrapping = 30;
+    bool UseFixedWidth = true;
 
     UPROPERTY(Config)
-    int32 WindowRounding = 6;
+    int32 MaxHeight = 10;
+    
+    UPROPERTY(Config)
+    int32 TextWrapping = 20;
 
     UPROPERTY(Config)
-    bool WindowBorder = false;
+    int32 Rounding = 6;
 
     UPROPERTY(Config)
-    float VisibleDuration = 3.0f;
+    bool ShowBorder = true;
 
     UPROPERTY(Config)
-    float FadeDuration = 0.5f;
+    float Duration = 5.0f;
+
+    UPROPERTY(Config)
+    float FadeOut = 0.5f;
     
     virtual void Reset() override
     {
         Super::Reset();
 
-        AutoScroll = true;
-        ShowVerbosity = false;
-        VerbosityFilter = ELogVerbosity::VeryVerbose;
-        ShowAsTable = false;
-        TextDefaultColor        =  FColor(200, 200, 200, 255);
-        TextWarningColor        = FColor(255, 200, 0, 255); 
-        TextErrorColor          = FColor(255, 0, 0, 255);
-        BackgroundDefaultColor  =  FColor(0, 0, 0, 170);
-        BackgroundWarningColor  = FColor(50, 20, 0, 170); 
-        BackgroundErrorColor    = FColor(50, 0, 0, 170);
-        BorderDefaultColor      =  FColor(200, 200, 200, 100);
-        BorderWarningColor      = FColor(255, 200, 0, 100); 
-        BorderErrorColor        = FColor(255, 0, 0, 100);
+        TextDefaultColor        = FColor(200, 200, 200, 255);
+        TextWarningColor        = FColor(255, 200,   0, 255); 
+        TextErrorColor          = FColor(240,  77,  77, 255);
+        BackgroundDefaultColor  = FColor( 15,  15,  15, 150);
+        BackgroundWarningColor  = FColor( 23,   9,   0, 150); 
+        BackgroundErrorColor    = FColor( 21,   0,   0, 150);
+        BorderDefaultColor      = FColor(200, 200, 200, 100);
+        BorderWarningColor      = FColor(255, 200,   0, 100); 
+        BorderErrorColor        = FColor(240,  77,  77, 100);
         
         Location = ECogEngineNotificationLocation::BottomRight;
         Padding = 10;
-        TextWrapping = 40;
-        WindowRounding = 6;
-        WindowBorder = true;
+        UseFixedWidth = true;
+        TextWrapping = 20;
+        MaxHeight = 10;
+        Rounding = 6;
+        ShowBorder = true;
+        Duration = 5.0f;
+        FadeOut = 0.5f;
     }
 };
