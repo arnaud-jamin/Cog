@@ -261,7 +261,7 @@ Displays the gameplay tags of the selected actor.
 ### Time Scale
 Used to change the game global time scale. 
 
-![Time Scale](https://github.com/arnaud-jamin/Cog/assets/13844285/d19198c5-37dd-400d-a09f-7a5077eb2511)
+![Time Scale](https://github.com/user-attachments/assets/fc5a49e7-a04d-42b3-9d83-a8290e261665)
 - If changed on a client the time scale is also modified on the game server, and replicated to the other clients.
 - Time Scale can be viewed as a widget in the main menu bar.
 - Right cliking the Time Scale display the settings, where the specific Time Scale values can be defined.
