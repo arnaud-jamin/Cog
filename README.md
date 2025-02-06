@@ -91,7 +91,7 @@ Used to test collision queries
 
 ![Collisions Tester](https://github.com/arnaud-jamin/Cog/assets/13844285/12f7cb7e-13c9-4eed-8ea4-f3eb7475cf34)
 ![Collisions Tester](https://github.com/arnaud-jamin/Cog/assets/13844285/4d01fd01-d0b3-41a7-9344-662f190ebaf0)
-https://github.com/user-attachments/assets/95106f62-8a70-43ed-871d-c2f9380418a3
+<video src="https://github.com/user-attachments/assets/95106f62-8a70-43ed-871d-c2f9380418a3" />
 
 ---
 
