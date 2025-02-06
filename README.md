@@ -320,7 +320,8 @@ The Cog repository has the following structure:
   - `CogImGui` - Integration of Imgui for Unreal, inspired by [UnrealImGui](https://github.com/segross/UnrealImGui)
   - `CogCommon` - Interfaces implemented by your project actor classes which cannot be excluded from a shipping build
 - `Plugins/CogAll` - Only contains a utility function to easily add all the built-in windows from all the Cog plugins. Useful for projects that do not need to exclude some plugins. 
-  
+- `Plugins/CogCommonUI` - Contains an implementation of CommonUIActionRouterBase to let the Cog shorcuts work while in a CommonUI menu. Only use this plugin if you use CommonUI.
+    
 Cog has multiple plugins to ease the integration for projects that do not use the `Ability System Component` or `Enhanced Input`. For the next steps, it is assumed all the plugins are used.
 
 - Setup up module dependencies:
@@ -516,6 +517,8 @@ class ACogSamplePlayerController
 - Reference the added Data Assets in the projet Asset Manager for them to be found in package mode:
 
 ![Data Assets](https://github.com/user-attachments/assets/39d0fcc2-1e82-4bb7-aa5e-0661ed9ab58b)
+
+
 
 ## Screenshots
 
