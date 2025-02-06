@@ -30,12 +30,16 @@ Displays the gameplay abilities of the selected actor.
 - Right click an ability to remove it, or open/close the ability separate window.
 - Use the 'Give Ability' menu to manually give an ability from a list defined in a Data Asset.
 
+---
+
 ### Actions
 Displays the state of Input Action.
 
 ![Actions](https://github.com/user-attachments/assets/e4b60f69-efa0-4a23-b78e-9f261e5f78f5)
 - Can be used to inject inputs to help debugging, as loosing window focus when breaking in the code doesn't affect the state of injected inputs unlike real inputs.
 - The display input action are read from a Input Mapping Context defined in a Data Asset.
+
+---
 
 ### Attributes
 Displays the gameplay attributes of the selected actor.
@@ -46,15 +50,21 @@ Displays the gameplay attributes of the selected actor.
 - Attributes with the Current value lower than the Base value are displayed in red.
 - Use the options 'Show Only Modified' to only show the attributes that have modifiers.
 
+---
+
 ### Behavior Tree
 Displays the behavior tree of the selected actor.
 
 ![Behavior Tree](https://github.com/arnaud-jamin/Cog/assets/13844285/c799e85f-b641-4d6f-9476-54a5cbd73c65)
 
+---
+
 ### Blackboard 
 Displays the blackboard of the selected actor.
 
 ![Blackboard](https://github.com/arnaud-jamin/Cog/assets/13844285/649d46d5-386c-4990-9f45-e4eb95a6b81a)
+
+---
 
 ### Cheats
 Used to apply cheats to the selected actor.
@@ -74,6 +84,8 @@ Used to apply cheats to the selected actor.
 
 ![Cheats Asset](https://github.com/user-attachments/assets/46a14b89-ebab-4628-b97b-e5ccd2b63576)
 
+---
+
 ### Collisions Tester
 Used to test collision queries
 
@@ -82,6 +94,8 @@ Used to test collision queries
 
 [Video](https://github.com/user-attachments/assets/aa1096d3-375d-4789-b274-923c36588a5b)
 
+---
+
 ### Collisions Viewer
 Used to inspect collisions in the world 
 
@@ -89,11 +103,15 @@ Used to inspect collisions in the world
 - The query can be configured in the options.
 - It can be used to better understand what object collisions are blocking a raycast.
 
+---
+
 ### Command Bindings
 Used to configure the command bindings. 
         
 ![Command Bindings](https://github.com/arnaud-jamin/Cog/assets/13844285/47179de9-ee28-427f-951f-5773b66cdeb2)
 - Bindings are used to trigger console commands from a keyboard shortcuts, which are saved in `Saved/Config/WindowEditor/Input.ini` (in editor).
+
+---
 
 ### Console
 Used as a replacement of the Unreal console command.
@@ -106,16 +124,22 @@ Used as a replacement of the Unreal console command.
 
 ![Console Settings](https://github.com/user-attachments/assets/92bd2e0e-e860-403d-ade3-e780fb3a88c7)
 
+---
+
 ### Debug Settings
 Used to tweak how the debug display is drawn.
 
 ![Debug Settings](https://github.com/arnaud-jamin/Cog/assets/13844285/1c078311-2395-45e6-9a13-ddc405e1c914)
+
+---
 
 ### Effects
 Displays the gameplay effects of the selected actor.
 
 ![Effects](https://github.com/user-attachments/assets/ff9c0baa-80d8-4916-a81a-9914443bd88b)
 - Mouse over an effect to see its details such as its modifiers, the gameplay tags it grants, the remaining time, etc.
+
+---
 
 ### Gamepad
 Display the state of the gamepad
@@ -124,6 +148,8 @@ Display the state of the gamepad
 - Can be displayed as an overlay
 - Can be used to inject inputs to help debugging, as loosing window focus when breaking in the code doesn't affect the state of injected inputs unlike real inputs.
 
+---
+
 ### Inspector
 Used to inspect and modify an Object properties 
 
@@ -131,6 +157,8 @@ Used to inspect and modify an Object properties
 - Inspect the selected actor by default 
 - Favorites can be added with a custom function defining what happens when the user press the Apply button (typically this can be used to modify and apply the Game User Settings)
 - Manage a history of inspected objects.
+
+---
 
 ### Log Categories
 Can be used to activate and deactivate log categories
@@ -142,6 +170,8 @@ Can be used to activate and deactivate log categories
 - A client can modify the verbosity of the server.
 - The log categories are used to filter both the output log and the debug draw.
 
+---
+
 ### Metric
 Gather various values sent by the selected actor and compute their rate per second. This is typically used to compute the damage dealt or received per second.
 
@@ -152,10 +182,14 @@ Gather various values sent by the selected actor and compute their rate per seco
 FCogDebugMetric::AddMetric(this, "Damage Dealt", MitigatedDamage, UnmitigatedDamage, false);
 ```
 
+---
+
 ### Net Emulation
 Used to configure the network emulation
 
 ![Net Emulation](https://github.com/arnaud-jamin/Cog/assets/13844285/97103f15-fae8-4fe9-8189-8fdbcab5cb20)
+
+---
 
 ### NetImgui
 Handle connections to a [NetImgui](https://github.com/sammyfreg/netImgui) server.
@@ -165,6 +199,8 @@ Handle connections to a [NetImgui](https://github.com/sammyfreg/netImgui) server
 The following image shows the editor running along a dedicated server. The NetImgui server displays the dedicated server imgui windows. 
 This can be used to debug the state of the game server. For example the behavior trees are only available on the game server.
 ![image](https://github.com/user-attachments/assets/3cd788c9-9884-4c1c-8333-7a311bdcd20a)
+
+---
 
 ### Notifications
 Use to display and configure notifications
@@ -176,17 +212,23 @@ Use to display and configure notifications
 
 ![Notification Settings](https://github.com/user-attachments/assets/aa47495e-4544-4e33-925e-d87cb9125e76)
 
+---
+
 ### Output Log
 Display the output log based on each log categories verbosity.
     
 ![Output Log](https://github.com/arnaud-jamin/Cog/assets/13844285/71b1de06-a3d0-4e4d-83f3-c3f482c0d8f4)
 - The verbosity of each log category can be configured in the 'Log Categories' window.
 
+---
+
 ### Pools
 Displays attributes of the selected actor as pools.
 
 ![Pools](https://github.com/arnaud-jamin/Cog/assets/13844285/7bb1aadd-9c0b-439f-b263-5ed842d0cd69)
 - The pools can be configured in a data asset.
+
+---
 
 ### Plots 
 Plots values and events overtime. When applicable, only the values and events of the selected actor are displayed.
@@ -208,17 +250,23 @@ Plots values and events overtime. When applicable, only the values and events of
     FCogDebugPlot::PlotEventStop(this, "Effects", RemovedGameplayEffect.Spec.Def->GetFName());
 ```
 
+---
+
 ### Scalability
 Used to configure the rendering quality.
 
 ![Scalability](https://github.com/arnaud-jamin/Cog/assets/13844285/4866b54c-5efa-4efa-a841-74ac8e1713c0)
        
+---
+
 ### Selection
 Used to select an actor either by picking an actor in the world or by selecting an actor in the actor list.
 
 ![Selection](https://github.com/arnaud-jamin/Cog/assets/13844285/67cf9019-85c0-449f-88bf-0fc4841f8795)
 - The actor list can be filtered by actor type (Actor, Character, etc).
 - The current selection is used by various debug windows to filter out their content.
+
+---
 
 ### Settings
 Configure the settings of Cog.
@@ -229,6 +277,8 @@ Configure the settings of Cog.
 - Change Cog Shorctuts
 - Change the DPI Scaling. Use `[Ctrl][MouseWheel]` to change the DPI.
 
+---
+
 ### Skeleton
 Display the bone hierarchy and the skeleton debug draw of the selected actor if it has a Skeletal Mesh.
 
@@ -237,10 +287,14 @@ Display the bone hierarchy and the skeleton debug draw of the selected actor if 
 - Right click a bone to access more debug display.
 - Use the `[Ctrl]` key to toggle the bone debug draw recursively.
 
+---
+
 ### Spawn
 Used to spawn new actors in the world. The spawn list can be configured in a Data Asset.
 
 ![Spawn](https://github.com/arnaud-jamin/Cog/assets/13844285/b37f9307-5fd5-4ea5-9652-c265a8f63e32)
+
+---
 
 ### Stats
 Displays engine stats such as FPS, Ping, Packet Loss.
@@ -253,10 +307,14 @@ Displays engine stats such as FPS, Ping, Packet Loss.
 
 ![Stats Settings](https://github.com/user-attachments/assets/a3545a8f-e742-4e8e-8758-03af133d932e)
 
+---
+
 ### Tags
 Displays the gameplay tags of the selected actor.
 
 ![Tags](https://github.com/user-attachments/assets/9aef871c-5af0-4ee0-8eb8-5fd706b43e51)
+
+---
 
 ### Time Scale
 Used to change the game global time scale. 
@@ -268,6 +326,8 @@ Used to change the game global time scale.
 
 ![image](https://github.com/user-attachments/assets/130f6250-af5b-41fb-8ae2-016c66fbdedc)
 
+---
+
 ### Transform
 Used to read and set the selected actor transform. 
 
@@ -275,6 +335,8 @@ Used to read and set the selected actor transform.
 - A gizmo in the viewport can also be used to change the transform.
 
 ![Transform](https://github.com/arnaud-jamin/Cog/assets/13844285/34657828-9fda-4af4-bdd0-4ea4514c23a0)
+
+---
 
 ### Tweaks
 Used to apply tweaks to all the spawned actors
