@@ -75,10 +75,12 @@ Used to apply cheats to the selected actor.
 ![Cheats Asset](https://github.com/user-attachments/assets/46a14b89-ebab-4628-b97b-e5ccd2b63576)
 
 ### Collisions Tester
-Used to test a collision query
+Used to test collision queries
 
 ![Collisions Tester](https://github.com/arnaud-jamin/Cog/assets/13844285/12f7cb7e-13c9-4eed-8ea4-f3eb7475cf34)
 ![Collisions Tester](https://github.com/arnaud-jamin/Cog/assets/13844285/4d01fd01-d0b3-41a7-9344-662f190ebaf0)
+
+[Video](https://github.com/user-attachments/assets/aa1096d3-375d-4789-b274-923c36588a5b)
 
 ### Collisions Viewer
 Used to inspect collisions in the world 
