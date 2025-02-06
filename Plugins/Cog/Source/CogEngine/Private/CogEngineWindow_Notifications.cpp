@@ -49,6 +49,7 @@ void FCogEngineWindow_Notifications::AddNotification(const TCHAR* InMessage, ELo
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Notifications::OnLogReceived(const TCHAR* InMessage, ELogVerbosity::Type InVerbosity, const class FName& InCategory)
 {
+#if !NO_LOGGING
     if (Config->DisableNotifications)
     { return; }
     
@@ -61,6 +62,7 @@ void FCogEngineWindow_Notifications::OnLogReceived(const TCHAR* InMessage, ELogV
     {
         AddNotification(InMessage, InVerbosity);
     }
+#endif
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

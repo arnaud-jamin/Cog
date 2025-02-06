@@ -109,6 +109,10 @@ void FCogEngineWindow_LogCategories::RenderContent()
         return;
     }
 
+#if NO_LOGGING
+    ImGui::Text("Logging is disabled.");
+#else
+
     const bool IsClient = World->GetNetMode() == NM_Client;
 
     ImGuiStyle& Style = ImGui::GetStyle();
@@ -284,4 +288,5 @@ void FCogEngineWindow_LogCategories::RenderContent()
         ImGui::PopID();
         Index++;
     }
+#endif // NO_LOGGING else
 }
