@@ -70,6 +70,11 @@ void FCogEngineWindow_Console::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Console::RenderTick(float DeltaTime)
 {
+    if (GetOwner()->GetContext().GetEnableInput() == false)
+    {
+        WidgetMode_OpenCommandList = false;
+    }
+    
     if (WidgetMode_OpenCommandList)
     {
         bIsWidgetMode = true;
@@ -79,13 +84,13 @@ void FCogEngineWindow_Console::RenderTick(float DeltaTime)
         ImGui::SetNextWindowSize(ImVec2(Config->WidgetWidth, ImGui::GetFontSize() * 30), ImGuiCond_FirstUseEver);
         ImGui::SetNextWindowPos(WidgetMode_CommandListPosition, ImGuiCond_Always);
 
-        ImGuiWindowFlags flags =
+        ImGuiWindowFlags Flags =
             ImGuiWindowFlags_NoTitleBar
             | ImGuiWindowFlags_NoMove
             | ImGuiWindowFlags_NoFocusOnAppearing; // We want the console input text to keep the focus.
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-        const bool IsCommandListWindowVisible = ImGui::Begin("ConsoleCommandList", nullptr, flags);
+        const bool IsCommandListWindowVisible = ImGui::Begin("ConsoleCommandList", nullptr, Flags);
         ImGui::PopStyleVar();
 
         if (IsCommandListWindowVisible)
