@@ -92,10 +92,6 @@ Used to configure the command bindings.
         
 ![Command Bindings](https://github.com/arnaud-jamin/Cog/assets/13844285/47179de9-ee28-427f-951f-5773b66cdeb2)
 - Bindings are used to trigger console commands from a keyboard shortcuts, which are saved in `Saved/Config/WindowEditor/Input.ini` (in editor).
-- Can be used to register the shortcuts Cog console commands:
-  - `Cog.ToggleInput`
-  - `Cog.LoadLayout <LayoutIndex>`
-  - `Cog.ToggleSelectionMode`
 
 ### Console
 Used as a replacement of the Unreal console command.
@@ -223,11 +219,13 @@ Used to select an actor either by picking an actor in the world or by selecting 
 - The current selection is used by various debug windows to filter out their content.
 
 ### Settings
-Configure the settings of Cog Windows.
+Configure the settings of Cog.
 
-![Settings](https://github.com/arnaud-jamin/Cog/assets/13844285/edd6a701-9a50-41fa-b7df-90fd11cc2937)
-- Can configure the input key to toggle the input focus between the game and imgui
-- Can change the DPI Scaling
+![Settings](https://github.com/user-attachments/assets/6587d44d-bf40-4ff1-8d26-71f79a3110f2)
+- Configure how ImGui behaves
+- Change the visibility and ordeing of the widgets appearing in the main menu bar
+- Change Cog Shorctuts
+- Change the DPI Scaling. Use `[Ctrl][MouseWheel]` to change the DPI.
 
 ### Skeleton
 Display the bone hierarchy and the skeleton debug draw of the selected actor if it has a Skeletal Mesh.
@@ -235,7 +233,7 @@ Display the bone hierarchy and the skeleton debug draw of the selected actor if 
 ![Skeleton](https://github.com/arnaud-jamin/Cog/assets/13844285/19648e3d-70dc-45bc-940d-e53eb9a99871)
 - Mouse over a bone to highlight it.
 - Right click a bone to access more debug display.
-- Use the [Ctrl] key to toggle the bone debug draw recursively.
+- Use the `[Ctrl]` key to toggle the bone debug draw recursively.
 
 ### Spawn
 Used to spawn new actors in the world. The spawn list can be configured in a Data Asset.
@@ -519,3 +517,7 @@ class ACogSamplePlayerController
 
 ![Data Assets](https://github.com/user-attachments/assets/39d0fcc2-1e82-4bb7-aa5e-0661ed9ab58b)
 
+## Screenshots
+
+Cog integrated in Lyra:
+![Lyra](https://github.com/user-attachments/assets/cf432ac3-0fd5-4875-aa29-35161abd8dcc)
