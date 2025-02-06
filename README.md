@@ -256,7 +256,7 @@ Displays engine stats such as FPS, Ping, Packet Loss.
 ### Tags
 Displays the gameplay tags of the selected actor.
 
-![Tags](https://github.com/arnaud-jamin/Cog/assets/13844285/3f14be3f-77f2-4d59-887d-1245fc97ed6a)
+![Tags](https://github.com/user-attachments/assets/9aef871c-5af0-4ee0-8eb8-5fd706b43e51)
 
 ### Time Scale
 Used to change the game global time scale. 
