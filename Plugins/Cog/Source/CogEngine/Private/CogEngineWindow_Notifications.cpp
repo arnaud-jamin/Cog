@@ -14,9 +14,9 @@ void FCogEngineWindow_Notifications::Initialize()
 {    
     Super::Initialize();
 
-    OutputDevice.Notifications = this;
-
     Config = GetConfig<UCogEngineConfig_Notifications>();
+
+    OutputDevice.Notifications = this;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -46,6 +46,9 @@ void FCogEngineWindow_Notifications::AddNotification(const TCHAR* InMessage, ELo
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Notifications::OnLogReceived(const TCHAR* InMessage, ELogVerbosity::Type InVerbosity, const class FName& InCategory)
 {
+    if (Config == nullptr)
+    { return; }
+
     if (Config->DisableNotifications)
     { return; }
     
