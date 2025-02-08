@@ -349,7 +349,7 @@ bool FCogEngineWindow_Inspector::RenderInspector()
                 ImGui::SetNextItemOpen(false);
             }
 
-            if (ImGui::CollapsingHeader(TCHAR_TO_ANSI(*Entry.Key), nullptr, ImGuiTreeNodeFlags_DefaultOpen))
+            if (ImGui::CollapsingHeader(TCHAR_TO_UTF8(*Entry.Key), nullptr, ImGuiTreeNodeFlags_DefaultOpen))
             {
                 if (RenderBegin())
                 {
@@ -515,7 +515,7 @@ bool FCogEngineWindow_Inspector::RenderProperty(const FProperty* Property, uint8
             ImGui::TableNextColumn();
             ImGui::Text("DisplayName:");
             ImGui::TableNextColumn();
-            ImGui::Text(TCHAR_TO_ANSI(*Property->GetDisplayNameText().ToString()));
+            ImGui::Text(TCHAR_TO_UTF8(*Property->GetDisplayNameText().ToString()));
 #endif  // WITH_EDITORONLY_DATA
 
             ImGui::TableNextRow();
@@ -537,7 +537,7 @@ bool FCogEngineWindow_Inspector::RenderProperty(const FProperty* Property, uint8
             ImGui::TableNextColumn();
             if (Property->HasMetaData("Tooltip"))
             {
-                ImGui::Text(TCHAR_TO_ANSI(*Property->GetToolTipText(false).ToString()));
+                ImGui::Text(TCHAR_TO_UTF8(*Property->GetToolTipText(false).ToString()));
             }
 #endif  // WITH_EDITORONLY_DATA
 
@@ -555,7 +555,7 @@ bool FCogEngineWindow_Inspector::RenderProperty(const FProperty* Property, uint8
             ImGui::BeginTooltip();
             ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
 
-            ImGui::Text(TCHAR_TO_ANSI(*Property->GetToolTipText(false).ToString()));
+            ImGui::Text(TCHAR_TO_UTF8(*Property->GetToolTipText(false).ToString()));
             ImGui::Text("Details [CTRL]");
             ImGui::PopTextWrapPos();
             ImGui::EndTooltip();
@@ -832,7 +832,7 @@ bool FCogEngineWindow_Inspector::RenderText(const FTextProperty* TextProperty, u
     FString Text;
     TextProperty->ExportTextItem_Direct(Text, PointerToValue, nullptr, nullptr, PPF_None, nullptr);
     ImGui::BeginDisabled();
-    ImGui::Text("%s", TCHAR_TO_ANSI(*Text));
+    ImGui::Text("%s", TCHAR_TO_UTF8(*Text));
     ImGui::EndDisabled();
 
     return false;
