@@ -172,15 +172,10 @@ void FCogEngineWindow_Inspector::RenderMenu()
             }
             if (ImGui::IsItemHovered())
             {
-                ImGui::SetTooltip("Current Inspected Object: %s", InspectedObjectName.Get());
+                ImGui::SetTooltip("%s", InspectedObjectName.Get());
             }
 
             ImGui::PopStyleVar(1);
-        }
-
-        if (ImGui::IsItemHovered())
-        {
-            ImGui::SetTooltip("%s", InspectedObjectName.Get());
         }
 
         ImGui::PopStyleColor(1);
