@@ -17,7 +17,6 @@ void FCogAbilityWindow_Attributes::Initialize()
     Super::Initialize();
 
     bHasMenu = true;
-    bNoPadding = true;
 
     Config = GetConfig<UCogAbilityConfig_Attributes>();
     AlignmentConfig = GetConfig<UCogAbilityConfig_Alignment>();
@@ -33,6 +32,18 @@ void FCogAbilityWindow_Attributes::RenderHelp()
         "Attributes with the Current value lower than the Base value are displayed in red. "
         "Use the options 'Show Only Modified' to only show the attributes that have modifiers. "
         );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_Attributes::PreBegin(ImGuiWindowFlags& WindowFlags)
+{
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_Attributes::PostBegin()
+{
+    ImGui::PopStyleVar();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -87,11 +98,11 @@ void FCogAbilityWindow_Attributes::RenderContent()
             ImGui::SetItemTooltip("Prefixes to remove from the attribute set name. Separate multiple prefixes with the semicolon character ';'");
 
             ImGui::Separator();
-            ImGui::ColorEdit4("Positive Color", (float*)&AlignmentConfig->PositiveColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-            ImGui::ColorEdit4("Negative Color", (float*)&AlignmentConfig->NegativeColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-            ImGui::ColorEdit4("Neutral Color", (float*)&AlignmentConfig->NeutralColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-            ImGui::ColorEdit4("AttributeSet Color", (float*)&Config->AttributeSetColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-            ImGui::ColorEdit4("Category Color", (float*)&Config->CategoryColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("Positive Color", &AlignmentConfig->PositiveColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("Negative Color", &AlignmentConfig->NegativeColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("Neutral Color", &AlignmentConfig->NeutralColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("AttributeSet Color", &Config->AttributeSetColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("Category Color", &Config->CategoryColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
             ImGui::Separator();
             if (ImGui::MenuItem("Reset"))
             {
@@ -108,7 +119,7 @@ void FCogAbilityWindow_Attributes::RenderContent()
     const bool bGroupByAttributeSetValue = Filter.IsActive() == false && Config->ShowOnlyModified == false && Config->GroupByAttributeSet;
     const bool bGroupByCategoryValue = Filter.IsActive() == false && Config->ShowOnlyModified == false && Config->GroupByCategory;
     const float bShowGroup = bGroupByAttributeSetValue | bGroupByCategoryValue;
-    const float FirstColWidth = ((int32)bGroupByAttributeSetValue + (int32)bGroupByCategoryValue) * ImGui::GetFontSize() * 2;
+    const float FirstColWidth = (static_cast<int32>(bGroupByAttributeSetValue) + static_cast<int32>(bGroupByCategoryValue)) * ImGui::GetFontSize() * 2;
 
     if (ImGui::BeginTable("Attributes", 5, ImGuiTableFlags_SizingFixedFit 
                                          | ImGuiTableFlags_Resizable 

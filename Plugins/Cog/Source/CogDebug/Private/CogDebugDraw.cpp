@@ -546,7 +546,7 @@ void FCogDebugDraw::Points(const FLogCategoryBase& LogCategory, const UObject* W
         int32 Index = 0;
         for (const FVector& Point : Points)
         {
-            const FLinearColor Color = FLinearColor::LerpUsingHSV(FLinearColor(StartColor), FLinearColor(EndColor), Points.Num() <= 1 ? 0.0f : Index / (float)(Points.Num() - 1));
+            const FLinearColor Color = FLinearColor::LerpUsingHSV(FLinearColor(StartColor), FLinearColor(EndColor), Points.Num() <= 1 ? 0.0f : Index / static_cast<float>(Points.Num() - 1));
             Sphere(LogCategory, WorldContextObject, Point, Radius, Color.ToFColor(true), Persistent, DepthPriority);
             Index++;
         }
@@ -577,7 +577,7 @@ void FCogDebugDraw::Path(const FLogCategoryBase& LogCategory, const UObject* Wor
     int32 Index = 0;
     for (const FVector& Position : Points)
     {
-        const FLinearColor LinearColor = FLinearColor::LerpUsingHSV(FLinearColor(StartColor), FLinearColor(EndColor), Points.Num() <= 1 ? 0.0f : Index / (float)(Points.Num() - 1));
+        const FLinearColor LinearColor = FLinearColor::LerpUsingHSV(FLinearColor(StartColor), FLinearColor(EndColor), Points.Num() <= 1 ? 0.0f : Index / static_cast<float>(Points.Num() - 1));
         FColor Color = LinearColor.ToFColor(true);
 
         Point(LogCategory, WorldContextObject, Position, PointSize, Color, Persistent, DepthPriority);
@@ -622,7 +622,6 @@ void FCogDebugDraw::Skeleton(const FLogCategoryBase& LogCategory, const USkeleta
 
         const FTransform Transform = ComponentSpaceTransforms[BoneIndex] * WorldTransform;
         const FVector BoneLocation = Transform.GetLocation();
-        const FRotator BoneRotation = FRotator(Transform.GetRotation());
         const int32 ParentIndex = ReferenceSkeleton.GetParentIndex(BoneIndex);
 
         FVector ParentLocation;

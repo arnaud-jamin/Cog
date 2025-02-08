@@ -34,11 +34,12 @@ public:
     /** Called every frame with a valid imgui context even if the window is hidden. */
     virtual void RenderTick(float DeltaTime);
 
-    /** Called every frame without a valid imgui context (outside of the imgui NewFrame/EndFrame) even if the window is hidden. */
+    /** Called every frame without a valid imgui context (outside the imgui NewFrame/EndFrame) even if the window is hidden. */
     virtual void GameTick(float DeltaTime);
 
     /**  */
     virtual void RenderMainMenuWidget();
+    void RenderSettings();
 
     ImGuiID GetID() const { return ID; }
 
@@ -72,6 +73,8 @@ public:
 
     UCogWindowManager* GetOwner() const { return Owner; }
 
+    float GetDpiScale() const;
+    
     template<class T>
     T* GetConfig(bool InResetConfigOnRequest = true) const { return Cast<T>(GetConfig(T::StaticClass(), InResetConfigOnRequest)); }
 
@@ -80,7 +83,7 @@ public:
     template<class T>
     const T* GetAsset() const { return Cast<T>(GetAsset(T::StaticClass())); }
 
-    const UObject* GetAsset(const TSubclassOf<UObject> AssetClass) const;
+    const UObject* GetAsset(const TSubclassOf<UObject>& AssetClass) const;
 
 protected:
     
@@ -92,9 +95,11 @@ protected:
 
     virtual void RenderHelp();
 
-    virtual void PreRender(ImGuiWindowFlags& WindowFlags) {}
+    virtual void PreBegin(ImGuiWindowFlags& WindowFlags) {}
 
-    virtual void PostRender() {}
+    virtual void PostBegin() {}
+
+    virtual void PostEnd() {}
 
     virtual void RenderContent() {}
 
@@ -117,8 +122,6 @@ protected:
 protected:
 
     bool bShowMenu = true;
-
-    bool bNoPadding = false;
 
     bool bHasMenu = false;
 

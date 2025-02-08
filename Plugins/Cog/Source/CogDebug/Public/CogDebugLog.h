@@ -46,13 +46,13 @@ struct COGDEBUG_API FCogDebugLog
 
     static TMap<FName, FCogDebugLogCategoryInfo>& GetLogCategories() { return LogCategories; }
 
-    static void SetServerVerbosityActive(UWorld& World, FName CategoryName, bool Value);
+    static void SetServerVerbosityActive(const UWorld& World, FName CategoryName, bool Value);
 
     static bool IsServerVerbosityActive(FName CategoryName);
 
     static ELogVerbosity::Type GetServerVerbosity(FName CategoryName);
 
-    static void SetServerVerbosity(UWorld& World, FName CategoryName, ELogVerbosity::Type Verbosity);
+    static void SetServerVerbosity(const UWorld& World, FName CategoryName, ELogVerbosity::Type Verbosity);
 
     static void OnServerVerbosityChanged(FName CategoryName, ELogVerbosity::Type Verbosity);
 

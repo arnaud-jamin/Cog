@@ -5,7 +5,6 @@
 #include "CogDebugReplicator.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
-#include "imgui.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Misc/EngineVersionComparison.h"
 
@@ -144,7 +143,7 @@ bool FCogDebug::GetIsFilteringBySelection()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebug::SetIsFilteringBySelection(UWorld* World, bool Value)
+void FCogDebug::SetIsFilteringBySelection(const UWorld* World, bool Value)
 {
     Settings.bIsFilteringBySelection = Value;
 
@@ -191,7 +190,7 @@ int FCogDebug::GetDebugSegments()
 //--------------------------------------------------------------------------------------------------------------------------
 int FCogDebug::GetCircleSegments()
 {
-    return (Settings.Segments * 2) + 2; // because DrawDebugCircle does Segments = FMath::Max((Segments - 2) / 2, 4) for some reason
+    return (Settings.Segments * 2) + 2; // because DrawDebugCircle do: Segments = FMath::Max((Segments - 2) / 2, 4) for some reason
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -252,7 +251,7 @@ FColor FCogDebug::ModulateDebugColor(const UWorld* World, const FColor& Color, b
         case ECogDebugRecolorMode::HueOverFrames:
         {
             const FLinearColor BaseColor(Color);
-            const float Factor = (Settings.RecolorFrameCycle > 0) ? (GFrameCounter % Settings.RecolorFrameCycle) / (float)Settings.RecolorFrameCycle : 0.0f;
+            const float Factor = (Settings.RecolorFrameCycle > 0) ? (GFrameCounter % Settings.RecolorFrameCycle) / static_cast<float>(Settings.RecolorFrameCycle) : 0.0f;
             const FLinearColor NewColor(Factor * 360.0f, 1.0f, 1.0f);
             const FLinearColor BlendColor = BaseColor * (1.0f - Settings.RecolorIntensity) + NewColor.HSVToLinearRGB() * Settings.RecolorIntensity;
             return BlendColor.ToFColor(true);

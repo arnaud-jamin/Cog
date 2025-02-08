@@ -1,7 +1,7 @@
+// ReSharper disable CppUEBlueprintCallableFunctionUnused
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "CogDebugDrawBlueprint.generated.h"
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -17,6 +17,6 @@ class FCogGraphPanelPinFactory : public FGraphPanelPinFactory
         {
             return SNew(SCogLogCategoryGraphPin, InPin);
         }
-        return NULL;
+        return nullptr;
     }
 };

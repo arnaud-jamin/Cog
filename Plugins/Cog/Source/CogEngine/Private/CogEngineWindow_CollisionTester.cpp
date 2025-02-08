@@ -145,13 +145,12 @@ void FCogEngineWindow_CollisionTester::RenderContent()
                 {
                     CollisionTester->ProfileIndex = i;
                     CollisionTester->ObjectTypesToQuery = 0;
-                    SelectedProfile = CollisionProfile->GetProfileByIndex(CollisionTester->ProfileIndex);
 
                     if (Profile->CollisionEnabled != ECollisionEnabled::NoCollision)
                     {
                         for (int j = 0; j < ECC_MAX; ++j)
                         {
-	                        const ECollisionResponse Response = Profile->ResponseToChannels.GetResponse((ECollisionChannel)j);
+	                        const ECollisionResponse Response = Profile->ResponseToChannels.GetResponse(static_cast<ECollisionChannel>(j));
                             if (Response != ECR_Ignore)
                             {
                                 CollisionTester->ObjectTypesToQuery |= ECC_TO_BITFIELD(j);

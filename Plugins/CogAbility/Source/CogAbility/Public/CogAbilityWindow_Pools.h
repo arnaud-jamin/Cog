@@ -1,7 +1,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameplayTagContainer.h"
 #include "CogWindow.h"
 
 class UCogAbilityDataAsset;

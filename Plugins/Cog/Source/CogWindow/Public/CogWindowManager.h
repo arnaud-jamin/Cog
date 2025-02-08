@@ -126,8 +126,6 @@ protected:
 
     static void SettingsHandler_WriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler, ImGuiTextBuffer* buf);
 
-    static void DisableConflictingCommand(UPlayerInput* InPlayerInput, const FCogImGuiKeyInfo& InShortcut);
-
     static FString ToggleInputCommand;
 
     static FString DisableInputCommand;

@@ -2,9 +2,6 @@
 
 #include "CogCommon.h"
 #include "CogCommonLogCategory.h"
-#include "CogDebugDraw.h"
-#include "CogDebugDrawHelper.h"
-#include "CogDebugDrawImGui.h"
 #include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
 #include "Engine/Engine.h"
@@ -17,9 +14,9 @@ void FCogEngineWindow_Notifications::Initialize()
 {    
     Super::Initialize();
 
-    OutputDevice.Notifications = this;
-
     Config = GetConfig<UCogEngineConfig_Notifications>();
+
+    OutputDevice.Notifications = this;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -49,6 +46,9 @@ void FCogEngineWindow_Notifications::AddNotification(const TCHAR* InMessage, ELo
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Notifications::OnLogReceived(const TCHAR* InMessage, ELogVerbosity::Type InVerbosity, const class FName& InCategory)
 {
+    if (Config == nullptr)
+    { return; }
+
     if (Config->DisableNotifications)
     { return; }
     
@@ -87,23 +87,18 @@ void FCogEngineWindow_Notifications::RenderNotifications()
         | ImGuiWindowFlags_AlwaysAutoResize
         | ImGuiWindowFlags_NoSavedSettings
         | ImGuiWindowFlags_NoFocusOnAppearing
-        | ImGuiWindowFlags_NoNav;
-    
+        | ImGuiWindowFlags_NoNav
+        | ImGuiWindowFlags_NoInputs;
+
     const ImGuiViewport* Viewport = ImGui::GetMainViewport();
-    const ImVec2 ViewportPos = Viewport->WorkPos;
-    const ImVec2 ViewportSize = Viewport->WorkSize;
+
+    const float DpiScale = GetDpiScale();
+    
+    ImVec2 WindowPos = FCogWindowWidgets::ComputeScreenCornerLocation(Config->Alignment, Config->Padding);
     const ImVec2 WindowPadding = ImGui::GetStyle().WindowPadding;
     const ImVec2 ItemSpacing = ImGui::GetStyle().ItemSpacing;
+    const float MaxHeight = Config->MaxHeight * DpiScale + WindowPadding.y * 2;
     
-    const bool IsRight = static_cast<int32>(Config->Location) & 1;
-    const bool IsBottom = static_cast<int32>(Config->Location) & 2;
-    
-    ImVec2 WindowPos;
-    WindowPos.x = ViewportPos.x + (IsRight ? ViewportSize.x - Config->Padding : Config->Padding);
-    WindowPos.y = ViewportPos.y + (IsBottom ? ViewportSize.y - Config->Padding : Config->Padding);
-
-    const ImVec2 WindowPosPivot(IsRight ? 1.0f : 0.0f, IsBottom ? 1.0f : 0.0f);
-
     ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, Config->Rounding); 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, Config->ShowBorder); 
 
@@ -160,13 +155,13 @@ void FCogEngineWindow_Notifications::RenderNotifications()
         ImGui::PushStyleColor(ImGuiCol_Text, TextColor);
 
         const auto Message = StringCast<ANSICHAR>(*Notification.Message);
-        const float WrapWidth = Config->TextWrapping * ImGui::GetFontSize();
+        const float WrapWidth = Config->TextWrapping * DpiScale;
 
         ImGui::SetNextWindowViewport(Viewport->ID);
-        ImGui::SetNextWindowPos(WindowPos, ImGuiCond_Always, WindowPosPivot);
+        ImGui::SetNextWindowPos(WindowPos, ImGuiCond_Always, FCogImguiHelper::ToImVec2(Config->Alignment));
         if (Config->UseFixedWidth)
         {
-            ImGui::SetNextWindowSizeConstraints(ImVec2(WrapWidth, 0) + WindowPadding * 2, ImVec2(WrapWidth, Config->MaxHeight * ImGui::GetFontSize()) + WindowPadding * 2);
+            ImGui::SetNextWindowSizeConstraints(ImVec2(WrapWidth + WindowPadding.x * 2, 0), ImVec2(WrapWidth + WindowPadding.x * 2, MaxHeight));
         }
         
         if (ImGui::Begin(StringCast<ANSICHAR>(*Notification.Id).Get(), nullptr, Flags))
@@ -183,8 +178,8 @@ void FCogEngineWindow_Notifications::RenderNotifications()
         // maybe because the real window size is  computed the next frame.
         //----------------------------------------------------------------------
         const ImVec2 TextSize = ImGui::CalcTextSize(Message.Get(), nullptr, false, WrapWidth);
-        const float WindowHeight = TextSize.y + (WindowPadding.y * 2);
-        WindowPos.y += (WindowHeight + ItemSpacing.y) * (IsBottom ? -1 : 1);
+        const float WindowHeight = FMath::Min(MaxHeight, TextSize.y + (WindowPadding.y * 2));
+        WindowPos.y += (WindowHeight + ItemSpacing.y) * (Config->Alignment.Y > 0.5f ? -1 : 1);
         ImGui::End();
     }
 
@@ -237,19 +232,19 @@ void FCogEngineWindow_Notifications::RenderSettings()
     FCogWindowWidgets::ThinSeparatorText("Location & Size");
 
     FCogWindowWidgets::SetNextItemToShortWidth();
-    FCogWindowWidgets::ComboboxEnum("Location", Config->Location);
+    ImGui::SliderFloat2("Alignment", &Config->Alignment.X, 0, 1.0f, "%.2f");
+    
+    FCogWindowWidgets::SetNextItemToShortWidth();
+    ImGui::SliderInt2("Padding", &Config->Padding.X, 0, 100);
     
     ImGui::Checkbox("Use Fixed Width", &Config->UseFixedWidth);
 
     FCogWindowWidgets::SetNextItemToShortWidth();
-    ImGui::DragInt("Text Wrapping", &Config->TextWrapping, 1, 0, INT_MAX);
+    ImGui::SliderInt("Text Wrapping", &Config->TextWrapping, 1, 500);
 
     FCogWindowWidgets::SetNextItemToShortWidth();
-    ImGui::DragInt("Max Height", &Config->MaxHeight, 1, 0, INT_MAX);
+    ImGui::SliderInt("Max Height", &Config->MaxHeight, 0, 500);
 
-    FCogWindowWidgets::SetNextItemToShortWidth();
-    ImGui::DragInt("Padding", &Config->Padding, 1, 0, INT_MAX);
-    
     FCogWindowWidgets::ThinSeparatorText("Display");
 
     FCogWindowWidgets::SetNextItemToShortWidth();

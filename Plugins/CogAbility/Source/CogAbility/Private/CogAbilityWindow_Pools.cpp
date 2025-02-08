@@ -3,6 +3,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
 #include "CogAbilityDataAsset.h"
+#include "CogAbilityHelper.h"
 #include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
 #include "imgui_internal.h"
@@ -18,11 +19,8 @@ void FCogAbilityWindow_Pools::Initialize()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Pools::RenderHelp()
 {
-    ImGui::Text(
-        "This window displays attributes of the selected actor as pools. "
-        "The pools can be configured in the '%s' data asset."
-        , TCHAR_TO_ANSI(*GetNameSafe(Asset.Get()))
-    );
+    ImGui::Text("This window displays attributes of the selected actor as pools. ");
+    FCogAbilityHelper::RenderConfigureMessage(Asset);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -87,13 +85,13 @@ void FCogAbilityWindow_Pools::DrawPool(const UAbilitySystemComponent* AbilitySys
     //-------------------------------------------------------------------------------------------
     // Use a different format base on max value for all pools to be nicely aligned at the center
     //-------------------------------------------------------------------------------------------
-    const char* format = nullptr;
-    if (Max >= 100)         { format = "%3.0f / %3.0f"; }   //     |200 / 200|        |__1 / 200|        3 characters with 0 floating point
-    else if (Max >= 10)     { format = "%4.1f / %4.1f"; }   //    |20.0 / 20.0|      |_1.1 / 20.0|       4 characters with 1 floating point
-    else                    { format = "%3.2f / %3.2f"; }   //    |2.00 / 2.00|      |1.11 / 2.00|       3 characters with 2 floating points
+    const char* Format;
+    if (Max >= 100)         { Format = "%3.0f / %3.0f"; }   //     |200 / 200|        |__1 / 200|        3 characters with 0 floating point
+    else if (Max >= 10)     { Format = "%4.1f / %4.1f"; }   //    |20.0 / 20.0|      |_1.1 / 20.0|       4 characters with 1 floating point
+    else                    { Format = "%3.2f / %3.2f"; }   //    |2.00 / 2.00|      |1.11 / 2.00|       3 characters with 2 floating points
 
     char Buffer[64];
-    ImFormatString(Buffer, IM_ARRAYSIZE(Buffer), format, Value, Max);
+    ImFormatString(Buffer, IM_ARRAYSIZE(Buffer), Format, Value, Max);
 
     const float Ratio = Max > 0.0f ? Value / Max : 0.0f;
 

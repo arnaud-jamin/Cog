@@ -13,7 +13,6 @@ void FCogEngineWindow_Plots::Initialize()
     Super::Initialize();
 
     bHasMenu = true;
-    bNoPadding = true;
 
     Config = GetConfig<UCogEngineConfig_Plots>();
 
@@ -46,6 +45,18 @@ void FCogEngineWindow_Plots::RenderTick(float DeltaTime)
 {
     Super::RenderTick(DeltaTime);
     FCogDebugPlot::IsVisible = GetIsVisible();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_Plots::PreBegin(ImGuiWindowFlags& WindowFlags)
+{
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_Plots::PostBegin()
+{
+    ImGui::PopStyleVar();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -714,9 +725,9 @@ void FCogEngineWindow_Plots::RenderEventTooltip(const FCogDebugPlotEvent* Hovere
                     ImGui::Text("Frames");
                     ImGui::TableNextColumn();
                     ImGui::Text("%d  [%d-%d]",
-                        (int32)(ActualEndFrame - HoveredEvent->StartFrame),
-                        (int32)(HoveredEvent->StartFrame % 1000),
-                        (int32)(ActualEndFrame % 1000));
+                        static_cast<int32>(ActualEndFrame - HoveredEvent->StartFrame),
+                        static_cast<int32>(HoveredEvent->StartFrame % 1000),
+                        static_cast<int32>(ActualEndFrame % 1000));
                 }
                 else
                 {
@@ -724,7 +735,7 @@ void FCogEngineWindow_Plots::RenderEventTooltip(const FCogDebugPlotEvent* Hovere
                     ImGui::TableNextColumn();
                     ImGui::Text("Frame");
                     ImGui::TableNextColumn();
-                    ImGui::Text("%d", (int32)(HoveredEvent->StartFrame % 1000));
+                    ImGui::Text("%d", static_cast<int32>(HoveredEvent->StartFrame % 1000));
                 }
 
                 //------------------------

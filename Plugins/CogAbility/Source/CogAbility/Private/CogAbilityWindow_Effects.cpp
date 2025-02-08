@@ -16,7 +16,6 @@ void FCogAbilityWindow_Effects::Initialize()
     Super::Initialize();
 
     bHasMenu = true;
-    bNoPadding = true;
 
     Asset = GetAsset<UCogAbilityDataAsset>();
     Config = GetConfig<UCogAbilityConfig_Effects>();
@@ -41,6 +40,19 @@ void FCogAbilityWindow_Effects::RenderTick(float DeltaTime)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_Effects::PreBegin(ImGuiWindowFlags& WindowFlags)
+{
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_Effects::PostBegin()
+{
+    ImGui::PopStyleVar();
+}
+
+
+//--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Effects::RenderContent()
 {
     Super::RenderContent();
@@ -53,9 +65,9 @@ void FCogAbilityWindow_Effects::RenderContent()
             ImGui::Checkbox("Sort by Alignment", &Config->SortByAlignment);
             
             ImGui::Separator();
-            ImGui::ColorEdit4("Positive Color", (float*)&AlignmentConfig->PositiveColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-            ImGui::ColorEdit4("Negative Color", (float*)&AlignmentConfig->NegativeColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-            ImGui::ColorEdit4("Neutral Color", (float*)&AlignmentConfig->NeutralColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("Positive Color", &AlignmentConfig->PositiveColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("Negative Color", &AlignmentConfig->NegativeColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("Neutral Color", &AlignmentConfig->NeutralColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
             
             ImGui::Separator();
             if (ImGui::MenuItem("Reset"))
@@ -128,7 +140,6 @@ void FCogAbilityWindow_Effects::RenderEffectsTable()
                     }
                 }
 
-                bool AlignmentOrder = false;
                 if (Config->SortByAlignment && Asset != nullptr)
                 {
                     const FGameplayTagContainer& Tags1 = Effect1->GetAssetTags();

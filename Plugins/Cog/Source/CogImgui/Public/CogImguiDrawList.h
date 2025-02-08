@@ -1,7 +1,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogImguiHelper.h"
 #include "imgui.h"
 #include "Rendering/RenderingCommon.h"
 

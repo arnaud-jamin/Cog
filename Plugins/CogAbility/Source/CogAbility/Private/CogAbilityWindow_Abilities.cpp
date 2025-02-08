@@ -19,7 +19,6 @@ void FCogAbilityWindow_Abilities::Initialize()
     Super::Initialize();
 
     bHasMenu = true;
-    bNoPadding = true;
 
     Asset = GetAsset<UCogAbilityDataAsset>();
     Config = GetConfig<UCogAbilityConfig_Abilities>();
@@ -32,8 +31,20 @@ void FCogAbilityWindow_Abilities::RenderHelp()
     "This window displays the gameplay abilities of the selected actor. "
     "Click the ability check box to force its activation or deactivation. "
     "Right click an ability to open or close the ability separate window. "
-    "Use the 'Give Ability' menu to manually give an ability from a list defined in the '%s' data asset. "
-    , TCHAR_TO_ANSI(*GetNameSafe(Asset.Get())));
+    );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_Abilities::PreBegin(ImGuiWindowFlags& WindowFlags)
+{
+    WindowFlags |= ImGuiWindowFlags_NoScrollbar;
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_Abilities::PostBegin()
+{
+    ImGui::PopStyleVar();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -185,12 +196,12 @@ void FCogAbilityWindow_Abilities::RenderAbilitiesMenuFilters()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Abilities::RenderAbilitiesMenuColorSettings()
 {
-    ImGui::ColorEdit4("Active Color", (float*)&Config->ActiveAbilityColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-    ImGui::ColorEdit4("Inactive Color", (float*)&Config->InactiveAbilityColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-    ImGui::ColorEdit4("Blocked Color", (float*)&Config->BlockedAbilityColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-    ImGui::ColorEdit4("Default Tag Color", (float*)&Config->DefaultTagsColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-    ImGui::ColorEdit4("Blocked Tag Color", (float*)&Config->BlockedTagsColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-    ImGui::ColorEdit4("Input Pressed Color", (float*)&Config->InputPressedColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+    ImGui::ColorEdit4("Active Color", &Config->ActiveAbilityColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+    ImGui::ColorEdit4("Inactive Color", &Config->InactiveAbilityColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+    ImGui::ColorEdit4("Blocked Color", &Config->BlockedAbilityColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+    ImGui::ColorEdit4("Default Tag Color", &Config->DefaultTagsColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+    ImGui::ColorEdit4("Blocked Tag Color", &Config->BlockedTagsColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+    ImGui::ColorEdit4("Input Pressed Color", &Config->InputPressedColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

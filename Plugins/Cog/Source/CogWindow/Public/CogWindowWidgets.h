@@ -19,6 +19,7 @@ struct FKeyBind;
 
 using FCogWindowActorContextMenuFunction = TFunction<void(AActor& Actor)>;
 
+//--------------------------------------------------------------------------------------------------------------------------
 class COGWINDOW_API FCogWindowWidgets
 {
 public:
@@ -63,7 +64,7 @@ public:
     
     static void PopStyleCompact();
 
-    static void AddTextWithShadow(ImDrawList* DrawList, const ImVec2& Position, ImU32 Color, const char* TextBegin, const char* TextEnd = NULL);
+    static void AddTextWithShadow(ImDrawList* DrawList, const ImVec2& Position, ImU32 Color, const char* TextBegin, const char* TextEnd = nullptr);
 
     static bool SearchBar(const char* InLabel, ImGuiTextFilter& InFilter, float InWidth = -1.0f);
 
@@ -83,9 +84,9 @@ public:
     template<typename EnumType>
     static bool ComboboxEnum(const char* Label, EnumType& Value);
 
-    static bool ComboboxEnum(const char* Label, UEnum* Enum, int64 CurrentValue, int64& NewValue);
+    static bool ComboboxEnum(const char* Label, const UEnum* Enum, int64 CurrentValue, int64& NewValue);
     
-    static bool ComboboxEnum(const char* Label, UObject* Object, const char* FieldName, uint8* PointerToEnumValue);
+    static bool ComboboxEnum(const char* Label, const UObject* Object, const char* FieldName, uint8* PointerToEnumValue);
     
     static bool ComboboxEnum(const char* Label, const FEnumProperty* EnumProperty, uint8* PointerToEnumValue);
 
@@ -107,13 +108,13 @@ public:
 
     static bool CollisionProfileChannels(int32& Channels);
 
-    static bool MenuActorsCombo(const char* StrID, AActor*& NewSelection, const UWorld& World, TSubclassOf<AActor> ActorClass, const FCogWindowActorContextMenuFunction& ContextMenuFunction = nullptr);
+    static bool MenuActorsCombo(const char* StrID, AActor*& NewSelection, const UWorld& World, const TSubclassOf<AActor>& ActorClass, const FCogWindowActorContextMenuFunction& ContextMenuFunction = nullptr);
 
     static bool MenuActorsCombo(const char* StrID, AActor*& NewSelection, const UWorld& World, const TArray<TSubclassOf<AActor>>& ActorClasses, int32& SelectedActorClassIndex, ImGuiTextFilter* Filter, const APawn* LocalPlayerPawn, const FCogWindowActorContextMenuFunction& ContextMenuFunction = nullptr);
 
     static bool ActorsListWithFilters(AActor*& NewSelection, const UWorld& World, const TArray<TSubclassOf<AActor>>& ActorClasses, int32& SelectedActorClassIndex, ImGuiTextFilter* Filter, const APawn* LocalPlayerPawn, const FCogWindowActorContextMenuFunction& ContextMenuFunction = nullptr);
 
-    static bool ActorsList(AActor*& NewSelection, const UWorld& World, const TSubclassOf<AActor> ActorClass, const ImGuiTextFilter* Filter = nullptr, const APawn* LocalPlayerPawn = nullptr, const FCogWindowActorContextMenuFunction& ContextMenuFunction = nullptr);
+    static bool ActorsList(AActor*& NewSelection, const UWorld& World, const TSubclassOf<AActor>& ActorClass, const ImGuiTextFilter* Filter = nullptr, const APawn* LocalPlayerPawn = nullptr, const FCogWindowActorContextMenuFunction& ContextMenuFunction = nullptr);
 
     static void ActorContextMenu(AActor& Selection, const FCogWindowActorContextMenuFunction& ContextMenuFunction);
 
@@ -153,15 +154,19 @@ public:
 
     template<typename T>
     static bool ScalarArray(const char* InLabel, ImGuiDataType InDataType, TArray<T>& InArray, int32 InMaxEntries = 0, const ImVec2& Size = ImVec2(0, 0));
+
+    static ImVec2 ComputeScreenCornerLocation(const FVector2f& InAlignment, const FIntVector2& InPadding);
+
+    static ImVec2 ComputeScreenCornerLocation(const ImVec2& InAlignment, const ImVec2& InPadding);
 };
 
 template<typename EnumType>
 bool FCogWindowWidgets::ComboboxEnum(const char* Label, const EnumType CurrentValue, EnumType& NewValue)
 {
     int64 NewValueInt;
-    if (ComboboxEnum(Label, StaticEnum<EnumType>(), (int64)CurrentValue, NewValueInt))
+    if (ComboboxEnum(Label, StaticEnum<EnumType>(), static_cast<int64>(CurrentValue), NewValueInt))
     {
-        NewValue = (EnumType)NewValueInt;
+        NewValue = static_cast<EnumType>(NewValueInt);
         return true;
     }
 
