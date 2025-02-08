@@ -34,7 +34,6 @@ void FCogEngineWindow_OutputLog::Clear()
 {
     TextBuffer.clear();
     LogInfos.Empty();
-    Notifications.Empty();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -59,11 +58,6 @@ void FCogEngineWindow_OutputLog::AddLog(const TCHAR* InMessage, ELogVerbosity::T
     TextBuffer.append(Format.GetData(), Format.GetData() + Format.Len());
 
     LogInfo.LineEnd = TextBuffer.size();
-
-    if (LogInfo.Category == LogCogNotify.GetCategoryName())
-    {
-        Notifications.Emplace(LogInfo);
-    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

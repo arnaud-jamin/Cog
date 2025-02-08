@@ -53,7 +53,8 @@ void FCogEngineWindow_Notifications::OnLogReceived(const TCHAR* InMessage, ELogV
     { return; }
     
     static FName CmdName("Cmd");
-    
+
+#if ENABLE_COG
     if (InCategory == LogCogNotify.GetCategoryName()
         || (InCategory == CmdName && Config->NotifyConsoleCommands)
         || (InVerbosity == ELogVerbosity::Warning && Config->NotifyAllWarnings)
@@ -61,7 +62,9 @@ void FCogEngineWindow_Notifications::OnLogReceived(const TCHAR* InMessage, ELogV
     {
         AddNotification(InMessage, InVerbosity);
     }
+#endif
 }
+
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Notifications::RenderTick(float DeltaTime)

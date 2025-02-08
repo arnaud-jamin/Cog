@@ -22,7 +22,7 @@ public class CogSample : ModuleRules
             "Niagara",
         });
 
-        if (Target.Configuration != UnrealTargetConfiguration.Shipping && Target.Type != TargetRules.TargetType.Server)
+        if (Target.Configuration != UnrealTargetConfiguration.Shipping)
         {
             PublicDependencyModuleNames.AddRange(new string[]
             {

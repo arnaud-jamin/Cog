@@ -82,10 +82,13 @@
 
 #else //ENABLE_COG
 
-#define IF_COG(expr)            (0)
-#define COG_LOG_CATEGORY        FNoLoggingCategory
-#define COG_LOG_ABILITY(...)    (0)
-
+#define IF_COG(expr)                                                            (0)
+#define COG_LOG_CATEGORY                                                        FNoLoggingCategory
+#define COG_LOG_ABILITY(...)                                                    (0)
+#define COG_NOTIFY(Format, ...)                                                 (0)
+#define COG_NOTIFY_WARNING(Format, ...)                                         (0)
+#define COG_NOTIFY_ERROR(Format, ...)                                           (0)
+#define COG_NOTIFY_VERBOSITY(Verbosity, Format, ...)                            (0)
 #define COG_LOG_ACTIVE_FOR_OBJECT(Object)                                       (0)
 #define COG_LOG(LogCategory, Verbosity, Format, ...)                            (0)
 #define COG_LOG_FUNC(LogCategory, Verbosity, Format, ...)                       (0)
