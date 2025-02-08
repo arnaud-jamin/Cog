@@ -1365,3 +1365,24 @@ bool FCogWindowWidgets::PickButton(const char* InLabel, const ImVec2& InSize, Im
 
     return pressed;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+ImVec2 FCogWindowWidgets::ComputeScreenCornerLocation(const FVector2f& InAlignment, const FIntVector2& InPadding)
+{
+    return ComputeScreenCornerLocation(FCogImguiHelper::ToImVec2(InAlignment), FCogImguiHelper::ToImVec2(InPadding));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+ImVec2 FCogWindowWidgets::ComputeScreenCornerLocation(const ImVec2& InAlignment, const ImVec2& InPadding)
+{
+    const ImGuiViewport* Viewport = ImGui::GetMainViewport();
+    if (Viewport == nullptr)
+    { return ImVec2(0, 0); }
+
+    // +Padding for left, 0 for center, -Padding for left 
+    // +Padding for top, 0 for center, -Padding for bottom
+    const ImVec2 Offset = (InAlignment * 2 - ImVec2(1.0f, 1.0f)) * InPadding;
+
+    ImVec2 Position = Viewport->WorkPos + (InAlignment * Viewport->WorkSize) - Offset;
+    return Position;
+}

@@ -11,13 +11,24 @@ void FCogAbilityWindow_Tags::Initialize()
     Super::Initialize();
 
     bHasMenu = true;
-    bNoPadding = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Tags::RenderHelp()
 {
     ImGui::Text("This window displays gameplay tags of the selected actor. ");
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_Tags::PreBegin(ImGuiWindowFlags& WindowFlags)
+{
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_Tags::PostBegin()
+{
+    ImGui::PopStyleVar();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -16,7 +16,6 @@ void FCogAbilityWindow_Effects::Initialize()
     Super::Initialize();
 
     bHasMenu = true;
-    bNoPadding = true;
 
     Asset = GetAsset<UCogAbilityDataAsset>();
     Config = GetConfig<UCogAbilityConfig_Effects>();
@@ -39,6 +38,19 @@ void FCogAbilityWindow_Effects::RenderTick(float DeltaTime)
 
     RenderOpenEffects();
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_Effects::PreBegin(ImGuiWindowFlags& WindowFlags)
+{
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_Effects::PostBegin()
+{
+    ImGui::PopStyleVar();
+}
+
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Effects::RenderContent()

@@ -286,7 +286,7 @@ void FCogWindow_Settings::SetDPIScale(float Value) const
 {
     Config->DPIScale = Value;
     GetOwner()->GetContext().SetDPIScale(Config->DPIScale);
-    COG_NOTIFY(TEXT("DPI Scale: %0.2f"), Value);
+    //COG_NOTIFY(TEXT("DPI Scale: %0.2f"), Value);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

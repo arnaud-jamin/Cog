@@ -13,7 +13,6 @@ void FCogEngineWindow_Plots::Initialize()
     Super::Initialize();
 
     bHasMenu = true;
-    bNoPadding = true;
 
     Config = GetConfig<UCogEngineConfig_Plots>();
 
@@ -46,6 +45,18 @@ void FCogEngineWindow_Plots::RenderTick(float DeltaTime)
 {
     Super::RenderTick(DeltaTime);
     FCogDebugPlot::IsVisible = GetIsVisible();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_Plots::PreBegin(ImGuiWindowFlags& WindowFlags)
+{
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_Plots::PostBegin()
+{
+    ImGui::PopStyleVar();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

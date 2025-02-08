@@ -19,7 +19,6 @@ void FCogEngineWindow_Console::Initialize()
 
     Config = GetConfig<UCogEngineConfig_Console>();
 
-    bNoPadding = true;
     bHasMenu = true;
     bHasWidget = true;
     bIsWidgetVisible = true;
@@ -29,9 +28,16 @@ void FCogEngineWindow_Console::Initialize()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
- void FCogEngineWindow_Console::PreRender(ImGuiWindowFlags& WindowFlags)
+void FCogEngineWindow_Console::PreBegin(ImGuiWindowFlags& WindowFlags)
 {
     WindowFlags |= ImGuiWindowFlags_NoScrollbar;
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_Console::PostBegin()
+{
+    ImGui::PopStyleVar();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -17,7 +17,6 @@ void FCogAbilityWindow_Attributes::Initialize()
     Super::Initialize();
 
     bHasMenu = true;
-    bNoPadding = true;
 
     Config = GetConfig<UCogAbilityConfig_Attributes>();
     AlignmentConfig = GetConfig<UCogAbilityConfig_Alignment>();
@@ -33,6 +32,18 @@ void FCogAbilityWindow_Attributes::RenderHelp()
         "Attributes with the Current value lower than the Base value are displayed in red. "
         "Use the options 'Show Only Modified' to only show the attributes that have modifiers. "
         );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_Attributes::PreBegin(ImGuiWindowFlags& WindowFlags)
+{
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_Attributes::PostBegin()
+{
+    ImGui::PopStyleVar();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
