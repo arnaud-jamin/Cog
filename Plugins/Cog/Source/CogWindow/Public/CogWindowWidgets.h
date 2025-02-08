@@ -19,6 +19,7 @@ struct FKeyBind;
 
 using FCogWindowActorContextMenuFunction = TFunction<void(AActor& Actor)>;
 
+//--------------------------------------------------------------------------------------------------------------------------
 class COGWINDOW_API FCogWindowWidgets
 {
 public:
@@ -153,6 +154,10 @@ public:
 
     template<typename T>
     static bool ScalarArray(const char* InLabel, ImGuiDataType InDataType, TArray<T>& InArray, int32 InMaxEntries = 0, const ImVec2& Size = ImVec2(0, 0));
+
+    static ImVec2 ComputeScreenCornerLocation(const FVector2f& InAlignment, const FIntVector2& InPadding);
+
+    static ImVec2 ComputeScreenCornerLocation(const ImVec2& InAlignment, const ImVec2& InPadding);
 };
 
 template<typename EnumType>

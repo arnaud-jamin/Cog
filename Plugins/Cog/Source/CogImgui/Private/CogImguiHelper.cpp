@@ -88,6 +88,17 @@ ImVec2 FCogImguiHelper::ToImVec2(const FVector2D& Value)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+ImVec2 FCogImguiHelper::ToImVec2(const FIntVector2& Value)
+{
+    return ImVec2(Value.X, Value.Y);
+}
+//--------------------------------------------------------------------------------------------------------------------------
+ImVec2 FCogImguiHelper::ToImVec2(const FVector2f& Value)
+{
+    return ImVec2(Value.X, Value.Y);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 ImColor FCogImguiHelper::ToImColor(const FColor& Value)
 {
     return ImColor(Value.R, Value.G, Value.B, Value.A);
@@ -118,11 +129,16 @@ ImVec4 FCogImguiHelper::ToImVec4(const FVector4f& Value)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ImU32 FCogImguiHelper::ToImU32(const FColor& Value)
+ImU32 FCogImguiHelper::ToImU32(const FLinearColor& Value)
 {
-    return (ImU32)ToImColor(Value);
+    return ToImColor(Value);
 }
 
+//--------------------------------------------------------------------------------------------------------------------------
+ImU32 FCogImguiHelper::ToImU32(const FColor& Value)
+{
+    return ToImColor(Value);
+}
 //--------------------------------------------------------------------------------------------------------------------------
 ImU32 FCogImguiHelper::ToImU32(const FVector4f& Value)
 {

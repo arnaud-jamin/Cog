@@ -19,7 +19,6 @@ void FCogAbilityWindow_Abilities::Initialize()
     Super::Initialize();
 
     bHasMenu = true;
-    bNoPadding = true;
 
     Asset = GetAsset<UCogAbilityDataAsset>();
     Config = GetConfig<UCogAbilityConfig_Abilities>();
@@ -33,6 +32,19 @@ void FCogAbilityWindow_Abilities::RenderHelp()
     "Click the ability check box to force its activation or deactivation. "
     "Right click an ability to open or close the ability separate window. "
     );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_Abilities::PreBegin(ImGuiWindowFlags& WindowFlags)
+{
+    WindowFlags |= ImGuiWindowFlags_NoScrollbar;
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_Abilities::PostBegin()
+{
+    ImGui::PopStyleVar();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

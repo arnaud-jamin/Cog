@@ -17,7 +17,9 @@ protected:
 
     virtual void Initialize() override;
 
-    virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;
+    virtual void PreBegin(ImGuiWindowFlags& WindowFlags) override;
+
+    virtual void PostBegin() override;
 
     virtual void RenderMainMenuWidget() override;
     

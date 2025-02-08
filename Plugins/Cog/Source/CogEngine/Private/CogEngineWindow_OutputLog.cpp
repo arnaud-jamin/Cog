@@ -51,7 +51,7 @@ void FCogEngineWindow_OutputLog::AddLog(const TCHAR* InMessage, ELogVerbosity::T
 
     FLogInfo& LogInfo = LogInfos.AddDefaulted_GetRef();
     LogInfo.Frame = GFrameCounter;
-    LogInfo.Time = Config->UseUTCTime ? FDateTime::UtcNow() : FDateTime::Now();
+    LogInfo.Time = Config != nullptr && Config->UseUTCTime ? FDateTime::UtcNow() : FDateTime::Now();
     LogInfo.Verbosity = InVerbosity;
     LogInfo.Category = InCategory;
     LogInfo.LineStart = TextBuffer.size();

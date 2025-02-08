@@ -25,6 +25,10 @@ protected:
 
     virtual void RenderHelp() override;
 
+    virtual void PreBegin(ImGuiWindowFlags& WindowFlags) override;
+    
+    virtual void PostBegin() override;
+
     virtual void RenderContent() override;
 
     virtual void RenderTagContainer(const UAbilitySystemComponent& AbilitySystemComponent, FGameplayTagContainer& TagContainer);

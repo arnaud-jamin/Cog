@@ -36,6 +36,10 @@ public:
 
     static ImVec2 ToImVec2(const FVector2D& Value);
 
+    static ImVec2 ToImVec2(const FIntVector2& Value);
+
+    static ImVec2 ToImVec2(const FVector2f& Value);
+
     static ImColor ToImColor(const FColor& Value);
 
     static ImColor ToImColor(const FLinearColor& Value);
@@ -45,6 +49,8 @@ public:
     static ImVec4 ToImVec4(const FLinearColor& Value);
 
     static ImVec4 ToImVec4(const FVector4f& Value);
+
+    static ImU32 ToImU32(const FLinearColor& Value);
 
     static ImU32 ToImU32(const FColor& Value);
 

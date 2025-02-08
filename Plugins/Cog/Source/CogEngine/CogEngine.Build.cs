@@ -25,7 +25,8 @@ public class CogEngine : ModuleRules
                 "InputCore",
                 "NetCore",
                 "Slate",
-                "SlateCore",
+                "SlateCore", 
+                "BuildSettings",
             });
         
         if (Target.bBuildEditor)

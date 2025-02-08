@@ -28,6 +28,10 @@ protected:
 
     virtual void RenderTick(float DeltaTime) override;
 
+    virtual void PreBegin(ImGuiWindowFlags& WindowFlags) override;
+
+    virtual void PostBegin() override;
+
     virtual void RenderContent() override;
 
     virtual void RenderAllEntriesNames(const ImVec2& InSize);

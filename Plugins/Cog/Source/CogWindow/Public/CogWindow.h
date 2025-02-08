@@ -39,6 +39,7 @@ public:
 
     /**  */
     virtual void RenderMainMenuWidget();
+    void RenderSettings();
 
     ImGuiID GetID() const { return ID; }
 
@@ -72,6 +73,8 @@ public:
 
     UCogWindowManager* GetOwner() const { return Owner; }
 
+    float GetDpiScale() const;
+    
     template<class T>
     T* GetConfig(bool InResetConfigOnRequest = true) const { return Cast<T>(GetConfig(T::StaticClass(), InResetConfigOnRequest)); }
 
@@ -92,9 +95,11 @@ protected:
 
     virtual void RenderHelp();
 
-    virtual void PreRender(ImGuiWindowFlags& WindowFlags) {}
+    virtual void PreBegin(ImGuiWindowFlags& WindowFlags) {}
 
-    virtual void PostRender() {}
+    virtual void PostBegin() {}
+
+    virtual void PostEnd() {}
 
     virtual void RenderContent() {}
 
@@ -117,8 +122,6 @@ protected:
 protected:
 
     bool bShowMenu = true;
-
-    bool bNoPadding = false;
 
     bool bHasMenu = false;
 

@@ -14,7 +14,6 @@ void FCogAbilityWindow_Tasks::Initialize()
     Super::Initialize();
 
     bHasMenu = true;
-    bNoPadding = true;
 
     Config = GetConfig<UCogAbilityConfig_Tasks>();
 }
@@ -27,9 +26,15 @@ void FCogAbilityWindow_Tasks::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogAbilityWindow_Tasks::RenderTick(float DeltaTime)
+void FCogAbilityWindow_Tasks::PreBegin(ImGuiWindowFlags& WindowFlags)
 {
-    Super::RenderTick(DeltaTime);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAbilityWindow_Tasks::PostBegin()
+{
+    ImGui::PopStyleVar();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
