@@ -66,6 +66,12 @@ Displays the blackboard of the selected actor.
 
 ---
 
+### Build Info 
+Display the build information such as the build version, changelist, date, target, and so on.
+
+![image](https://github.com/user-attachments/assets/b0383dea-a372-4ce2-94e2-6e1f9d3d6807)
+
+
 ### Cheats
 Used to apply cheats to the selected actor.
 
