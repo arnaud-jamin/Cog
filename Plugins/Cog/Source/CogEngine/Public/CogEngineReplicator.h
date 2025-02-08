@@ -33,7 +33,7 @@ public:
 
     FCogEngineSpawnFunction GetSpawnFunction() const { return SpawnFunction; }
 
-    void SetSpawnFunction(FCogEngineSpawnFunction Value) { SpawnFunction = Value; }
+    void SetSpawnFunction(const FCogEngineSpawnFunction& Value) { SpawnFunction = Value; }
 
     UFUNCTION(Server, Reliable)
     void Server_Spawn(const FCogEngineSpawnEntry& SpawnEntry);
@@ -64,7 +64,7 @@ protected:
     UFUNCTION()
     void OnRep_TimeDilation() const;
 
-    TObjectPtr<APlayerController> OwnerPlayerController;
+    TWeakObjectPtr<APlayerController> OwnerPlayerController;
 
     uint32 bHasAuthority : 1;
     uint32 bIsLocal : 1;

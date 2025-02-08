@@ -129,7 +129,6 @@ void FCogWindowWidgets::ProgressBarCentered(float Fraction, const ImVec2& Size, 
     Fraction = ImSaturate(Fraction);
     ImGui::RenderFrame(bb.Min, bb.Max, ImGui::GetColorU32(ImGuiCol_FrameBg), true, style.FrameRounding);
     bb.Expand(ImVec2(-style.FrameBorderSize, -style.FrameBorderSize));
-    const ImVec2 fill_br = ImVec2(ImLerp(bb.Min.x, bb.Max.x, Fraction), bb.Max.y);
     ImGui::RenderRectFilledRangeH(window->DrawList, bb, ImGui::GetColorU32(ImGuiCol_PlotHistogram), 0.0f, Fraction, style.FrameRounding);
 
     // Default displaying the fraction as percentage string, but user can override it
@@ -140,7 +139,7 @@ void FCogWindowWidgets::ProgressBarCentered(float Fraction, const ImVec2& Size, 
         Overlay = overlay_buf;
     }
 
-    ImVec2 overlay_size = ImGui::CalcTextSize(Overlay, NULL);
+    ImVec2 overlay_size = ImGui::CalcTextSize(Overlay, nullptr);
     if (overlay_size.x > 0.0f)
     {
 
@@ -148,17 +147,16 @@ void FCogWindowWidgets::ProgressBarCentered(float Fraction, const ImVec2& Size, 
         ImVec2 pos2(pos1.x + 1, pos1.y + 1);
 
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 0, 255));
-        ImGui::RenderTextClipped(pos2, bb.Max, Overlay, NULL, &overlay_size, ImVec2(0.0f, 0.5f), &bb);
+        ImGui::RenderTextClipped(pos2, bb.Max, Overlay, nullptr, &overlay_size, ImVec2(0.0f, 0.5f), &bb);
         ImGui::PopStyleColor();
 
-        ImGui::RenderTextClipped(pos1, bb.Max, Overlay, NULL, &overlay_size, ImVec2(0.0f, 0.5f), &bb);
+        ImGui::RenderTextClipped(pos1, bb.Max, Overlay, nullptr, &overlay_size, ImVec2(0.0f, 0.5f), &bb);
     }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogWindowWidgets::ToggleMenuButton(bool* Value, const char* Text, const ImVec4& TrueColor)
 {
-    bool IsPressed = false;
     bool IsTrue = *Value;
     if (IsTrue)
     {
@@ -171,7 +169,7 @@ bool FCogWindowWidgets::ToggleMenuButton(bool* Value, const char* Text, const Im
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
     }
 
-    IsPressed = ImGui::Button(Text);
+    bool IsPressed = ImGui::Button(Text);
     if (IsPressed)
     {
         *Value = !*Value;
@@ -270,9 +268,9 @@ void FCogWindowWidgets::HelpMarker(const char* Text)
 void FCogWindowWidgets::PushStyleCompact()
 {
     ImGuiStyle& style = ImGui::GetStyle();
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(style.WindowPadding.x * 0.60f, (float)(int)(style.WindowPadding.y * 0.60f)));
-    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(style.FramePadding.x * 0.60f, (float)(int)(style.FramePadding.y * 0.60f)));
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x * 0.60f, (float)(int)(style.ItemSpacing.y * 0.60f)));
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(style.WindowPadding.x * 0.60f, static_cast<int>(style.WindowPadding.y * 0.60f)));
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(style.FramePadding.x * 0.60f, static_cast<int>(style.FramePadding.y * 0.60f)));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(style.ItemSpacing.x * 0.60f, static_cast<int>(style.ItemSpacing.y * 0.60f)));
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -344,7 +342,7 @@ float FCogWindowWidgets::GetFontWidth()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogWindowWidgets::ComboboxEnum(const char* Label, UObject* Object, const char* FieldName, uint8* PointerToEnumValue)
+bool FCogWindowWidgets::ComboboxEnum(const char* Label, const UObject* Object, const char* FieldName, uint8* PointerToEnumValue)
 {
     const FEnumProperty* EnumProperty = CastField<FEnumProperty>(Object->GetClass()->FindPropertyByName(FName(FieldName)));
     if (EnumProperty == nullptr)
@@ -374,7 +372,7 @@ bool FCogWindowWidgets::ComboboxEnum(const char* Label, const FEnumProperty* Enu
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogWindowWidgets::ComboboxEnum(const char* Label, UEnum* Enum, int64 CurrentValue, int64& NewValue)
+bool FCogWindowWidgets::ComboboxEnum(const char* Label, const UEnum* Enum, int64 CurrentValue, int64& NewValue)
 {
     bool HasChanged = false;
 
@@ -666,9 +664,9 @@ bool FCogWindowWidgets::MultiChoiceButton(const char* Label, bool IsSelected, co
 bool FCogWindowWidgets::MultiChoiceButtonsInt(TArray<int32>& InValues, int32& InCurrentValue, const ImVec2& InSize, bool InInline)
 {
     ImGuiStyle& Style = ImGui::GetStyle();
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(Style.WindowPadding.x * 0.40f, (float)(int)(Style.WindowPadding.y * 0.60f)));
-    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(Style.FramePadding.x * 0.40f, (float)(int)(Style.FramePadding.y * 0.60f)));
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(Style.ItemSpacing.x * 0.30f, (float)(int)(Style.ItemSpacing.y * 0.60f)));
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(Style.WindowPadding.x * 0.40f, static_cast<int>(Style.WindowPadding.y * 0.60f)));
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(Style.FramePadding.x * 0.40f, static_cast<int>(Style.FramePadding.y * 0.60f)));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(Style.ItemSpacing.x * 0.30f, static_cast<int>(Style.ItemSpacing.y * 0.60f)));
     ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(255, 255, 255, 180));
 
     bool IsPressed = false;
@@ -711,9 +709,9 @@ FString FCogWindowWidgets::FormatSmallFloat(float InValue)
 bool FCogWindowWidgets::MultiChoiceButtonsFloat(TArray<float>& InValues, float& InValue, const ImVec2& InSize, bool InInline)
 {
     ImGuiStyle& Style = ImGui::GetStyle();
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(Style.WindowPadding.x * 0.40f, (float)(int)(Style.WindowPadding.y * 0.60f)));
-    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(Style.FramePadding.x * 0.40f, (float)(int)(Style.FramePadding.y * 0.60f)));
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(Style.ItemSpacing.x * 0.30f, (float)(int)(Style.ItemSpacing.y * 0.60f)));
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(Style.WindowPadding.x * 0.40f, static_cast<int>(Style.WindowPadding.y * 0.60f)));
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(Style.FramePadding.x * 0.40f, static_cast<int>(Style.FramePadding.y * 0.60f)));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(Style.ItemSpacing.x * 0.30f, static_cast<int>(Style.ItemSpacing.y * 0.60f)));
     ImGui::PushStyleColor(ImGuiCol_Border, IM_COL32(255, 255, 255, 180));
 
     bool IsPressed = false;
@@ -759,7 +757,7 @@ bool FCogWindowWidgets::ComboCollisionChannel(const char* Label, ECollisionChann
     bool Result = false;
     if (ImGui::BeginCombo(Label, TCHAR_TO_ANSI(*SelectedChannelName.ToString()), ImGuiComboFlags_HeightLarge))
     {
-        for (int32 ChannelIndex = 0; ChannelIndex < (int32)ECC_OverlapAll_Deprecated; ++ChannelIndex)
+        for (int32 ChannelIndex = 0; ChannelIndex < static_cast<int32>(ECC_OverlapAll_Deprecated); ++ChannelIndex)
         {
             FColor Color = ChannelColors[ChannelIndex];
             if (Color == FColor::Transparent)
@@ -778,7 +776,7 @@ bool FCogWindowWidgets::ComboCollisionChannel(const char* Label, ECollisionChann
             {
                 if (ImGui::Selectable(TCHAR_TO_ANSI(*ChannelName.ToString())))
                 {
-                    Channel = (ECollisionChannel)ChannelIndex;
+                    Channel = static_cast<ECollisionChannel>(ChannelIndex);
                     Result = true;
                 }
             }
@@ -832,7 +830,7 @@ bool FCogWindowWidgets::CollisionProfileChannels(int32& Channels)
 
     bool Result = false;
 
-    for (int32 ChannelIndex = 0; ChannelIndex < (int32)ECC_OverlapAll_Deprecated; ++ChannelIndex)
+    for (int32 ChannelIndex = 0; ChannelIndex < static_cast<int32>(ECC_OverlapAll_Deprecated); ++ChannelIndex)
     {
         FColor Color = ChannelColors[ChannelIndex];
         if (Color == FColor::Transparent)
@@ -905,7 +903,7 @@ bool FCogWindowWidgets::ActorsListWithFilters(AActor*& NewSelection, const UWorl
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogWindowWidgets::ActorsList(AActor*& NewSelection, const UWorld& World, const TSubclassOf<AActor> ActorClass, const ImGuiTextFilter* Filter, const APawn* LocalPlayerPawn, const FCogWindowActorContextMenuFunction& ContextMenuFunction)
+bool FCogWindowWidgets::ActorsList(AActor*& NewSelection, const UWorld& World, const TSubclassOf<AActor>& ActorClass, const ImGuiTextFilter* Filter, const APawn* LocalPlayerPawn, const FCogWindowActorContextMenuFunction& ContextMenuFunction)
 {
     TArray<AActor*> Actors;
     for (TActorIterator It(&World, ActorClass); It; ++It)
@@ -977,12 +975,11 @@ bool FCogWindowWidgets::ActorsList(AActor*& NewSelection, const UWorld& World, c
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogWindowWidgets::MenuActorsCombo(const char* StrID, AActor*& NewSelection, const UWorld& World, TSubclassOf<AActor> ActorClass, const FCogWindowActorContextMenuFunction& ContextMenuFunction)
+bool FCogWindowWidgets::MenuActorsCombo(const char* StrID, AActor*& NewSelection, const UWorld& World, const TSubclassOf<AActor>& ActorClass, const FCogWindowActorContextMenuFunction& ContextMenuFunction)
 {
     int32 SelectedActorClassIndex = 0;
     const TArray ActorClasses = { ActorClass };
 
-    AActor* Actor = nullptr;
     return MenuActorsCombo(StrID, NewSelection, World, ActorClasses, SelectedActorClassIndex, nullptr, nullptr, ContextMenuFunction);
 }
 
@@ -1367,4 +1364,25 @@ bool FCogWindowWidgets::PickButton(const char* InLabel, const ImVec2& InSize, Im
     window->DrawList->AddCircleFilled(center, radius * 0.15f, text_col);
 
     return pressed;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+ImVec2 FCogWindowWidgets::ComputeScreenCornerLocation(const FVector2f& InAlignment, const FIntVector2& InPadding)
+{
+    return ComputeScreenCornerLocation(FCogImguiHelper::ToImVec2(InAlignment), FCogImguiHelper::ToImVec2(InPadding));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+ImVec2 FCogWindowWidgets::ComputeScreenCornerLocation(const ImVec2& InAlignment, const ImVec2& InPadding)
+{
+    const ImGuiViewport* Viewport = ImGui::GetMainViewport();
+    if (Viewport == nullptr)
+    { return ImVec2(0, 0); }
+
+    // +Padding for left, 0 for center, -Padding for left 
+    // +Padding for top, 0 for center, -Padding for bottom
+    const ImVec2 Offset = (InAlignment * 2 - ImVec2(1.0f, 1.0f)) * InPadding;
+
+    ImVec2 Position = Viewport->WorkPos + (InAlignment * Viewport->WorkSize) - Offset;
+    return Position;
 }

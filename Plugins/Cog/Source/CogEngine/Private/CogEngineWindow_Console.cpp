@@ -1,13 +1,8 @@
 #include "CogEngineWindow_Console.h"
 
-#include "CogCommon.h"
 #include "CogImguiHelper.h"
 #include "CogWindowManager.h"
 #include "CogWindowWidgets.h"
-#include "imgui.h"
-#include "imgui.h"
-#include "imgui.h"
-#include "imgui.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 
@@ -24,7 +19,6 @@ void FCogEngineWindow_Console::Initialize()
 
     Config = GetConfig<UCogEngineConfig_Console>();
 
-    bNoPadding = true;
     bHasMenu = true;
     bHasWidget = true;
     bIsWidgetVisible = true;
@@ -34,9 +28,16 @@ void FCogEngineWindow_Console::Initialize()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
- void FCogEngineWindow_Console::PreRender(ImGuiWindowFlags& WindowFlags)
+void FCogEngineWindow_Console::PreBegin(ImGuiWindowFlags& WindowFlags)
 {
     WindowFlags |= ImGuiWindowFlags_NoScrollbar;
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_Console::PostBegin()
+{
+    ImGui::PopStyleVar();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -200,7 +201,7 @@ void FCogEngineWindow_Console::RenderMenu()
             RefreshCommandList();
         }
         
-        ImGui::ColorEdit4("History Color", (float*)&Config->HistoryColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        ImGui::ColorEdit4("History Color", &Config->HistoryColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
 
         FCogWindowWidgets::ThinSeparatorText("Window");
 

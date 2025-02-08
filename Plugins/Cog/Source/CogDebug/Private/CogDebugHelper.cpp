@@ -12,8 +12,8 @@ FColor FCogDebugHelper::GetAutoColor(FName Name, const FColor& UserColor)
 	    const uint32 Hash = GetTypeHash(Name.ToString());
         FMath::RandInit(Hash);
 
-        const uint8 Hue = (uint8)(FMath::FRand() * 255);
-        const uint8 Saturation = 255;
+        const uint8 Hue = static_cast<uint8>(FMath::FRand() * 255);
+        constexpr uint8 Saturation = 255;
         const uint8 Value = FMath::Rand() > 0.5f ? 200 : 255;
 
         return FLinearColor::MakeFromHSV8(Hue, Saturation, Value).ToFColor(true);
@@ -33,9 +33,8 @@ const char* FCogDebugHelper::VerbosityToString(ELogVerbosity::Type Verbosity)
         case ELogVerbosity::Log:            return "Log";
         case ELogVerbosity::Verbose:        return "Verbose";
         case ELogVerbosity::VeryVerbose:    return "Very Verbose";
+        default:                            return "None";
     }
-
-    return "None";
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

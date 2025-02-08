@@ -13,7 +13,6 @@
 #include "Framework/Application/SlateApplication.h"
 #include "Framework/Application/SlateUser.h"
 #include "GameFramework/PlayerController.h"
-#include "GameFramework/PlayerInput.h"
 #include "HAL/PlatformApplicationMisc.h"
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -24,10 +23,8 @@
 #include "Widgets/SViewport.h"
 #include "Widgets/SWindow.h"
 
-static UPlayerInput* GetPlayerInput(const UWorld* World);
-
 //--------------------------------------------------------------------------------------------------------------------------
-FCogImGuiContextScope::FCogImGuiContextScope(FCogImguiContext& CogImguiContext)
+FCogImGuiContextScope::FCogImGuiContextScope(const FCogImguiContext& CogImguiContext)
 {
     PrevContext = ImGui::GetCurrentContext();
     PrevPlotContext = ImPlot::GetCurrentContext();
@@ -244,7 +241,7 @@ bool FCogImguiContext::BeginFrame(float InDeltaTime)
 
     //-------------------------------------------------------------------------------------------------------
     // Skip the first frame, to let the main widget update its TickSpaceGeometry which is returned by the 
-    // plateform callback ImGui_GetWindowPos. When using viewports Imgui needs to know the main viewport 
+    // platform callback ImGui_GetWindowPos. When using viewports Imgui needs to know the main viewport 
     // absolute position to correctly place the initial imgui windows. 
     //-------------------------------------------------------------------------------------------------------
     if (bIsFirstFrame)
@@ -367,7 +364,7 @@ bool FCogImguiContext::BeginFrame(float InDeltaTime)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-ImVec2 FCogImguiContext::GetImguiMousePos()
+ImVec2 FCogImguiContext::GetImguiMousePos() const
 {
     const FVector2D& MousePosition = FSlateApplication::Get().GetCursorPos();
     if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
@@ -686,39 +683,16 @@ void FCogImguiContext::ImGui_SetClipboardTextFn(ImGuiContext* InImGuiContext, co
 static APlayerController* GetLocalPlayerController(const UWorld* World)
 {
     if (World == nullptr)
-    {
-        return nullptr;
-    }
+    { return nullptr; }
 
-    APlayerController* PlayerController = nullptr;
     for (FConstPlayerControllerIterator Iterator = World->GetPlayerControllerIterator(); Iterator; ++Iterator)
     {
         APlayerController* ItPlayerController = Iterator->Get();
         if (ItPlayerController->IsLocalController())
-        {
-            return ItPlayerController;
-        }
+        { return ItPlayerController; }
     }
 
     return nullptr;
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-static UPlayerInput* GetPlayerInput(const UWorld* World)
-{
-    if (World == nullptr)
-    {
-        return nullptr;
-    }
-
-    APlayerController* PlayerController = GetLocalPlayerController(World);
-    if (PlayerController == nullptr)
-    {
-        return nullptr;
-    }
-
-    UPlayerInput* PlayerInput = PlayerController->PlayerInput;
-    return PlayerInput;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -891,7 +865,7 @@ bool FCogImguiContext::IsConsoleOpened() const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogImguiContext::DrawDebug()
+void FCogImguiContext::DrawDebug() const
 {
     if (ImGui::Begin("ImGui Integration Debug"))
     {

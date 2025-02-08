@@ -7,8 +7,6 @@ class COGENGINE_API FCogEngineWindow_ImGui : public FCogWindow
 {
     typedef FCogWindow Super;
 
-public:
-
 protected:
 
     virtual void RenderTick(float DeltaTime) override;

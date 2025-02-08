@@ -3,6 +3,7 @@
 #include "imgui_internal.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
+float FCogDebugDrawImGui::Time = 0;
 TArray<FCogDebugDrawImGui::FLine>       FCogDebugDrawImGui::Lines;
 TArray<FCogDebugDrawImGui::FTriangle>   FCogDebugDrawImGui::Triangles;
 TArray<FCogDebugDrawImGui::FTriangle>   FCogDebugDrawImGui::TrianglesFilled;
@@ -22,7 +23,7 @@ void FCogDebugDrawImGui::AddLine(const ImVec2& P1, const ImVec2& P2, ImU32 Color
     Line.P2 = P2;
     Line.Color = Color;
     Line.Thickness = Thickness;
-    Line.Time = ImGui::GetCurrentContext()->Time;
+    Line.Time = Time;
     Line.Duration = Duration;
     Line.FadeColor = FadeColor;
     Lines.Add_GetRef(Line);
@@ -37,7 +38,7 @@ void FCogDebugDrawImGui::AddRect(const ImVec2& Min, const ImVec2& Max, ImU32 Col
     Rectangle.Color = Color;
     Rectangle.Rounding = Rounding;
     Rectangle.Thickness = Thickness;
-    Rectangle.Time = ImGui::GetCurrentContext()->Time;
+    Rectangle.Time = Time;
     Rectangle.Duration = Duration;
     Rectangle.FadeColor = FadeColor;
     Rectangles.Add_GetRef(Rectangle);
@@ -52,7 +53,7 @@ void FCogDebugDrawImGui::AddRectFilled(const ImVec2& Min, const ImVec2& Max, ImU
     Rectangle.Color = Color;
     Rectangle.Rounding = Rounding;
     Rectangle.Thickness = 0.0f;
-    Rectangle.Time = ImGui::GetCurrentContext()->Time;
+    Rectangle.Time = Time;
     Rectangle.Duration = Duration;
     Rectangle.FadeColor = FadeColor;
     RectanglesFilled.Add_GetRef(Rectangle);
@@ -68,7 +69,7 @@ void FCogDebugDrawImGui::AddQuad(const ImVec2& P1, const ImVec2& P2, const ImVec
     Quad.P4 = P4;
     Quad.Color = Color;
     Quad.Thickness = Thickness;
-    Quad.Time = ImGui::GetCurrentContext()->Time;
+    Quad.Time = Time;
     Quad.Duration = Duration;
     Quad.FadeColor = FadeColor;
     Quads.Add_GetRef(Quad);
@@ -84,7 +85,7 @@ void FCogDebugDrawImGui::AddQuadFilled(const ImVec2& P1, const ImVec2& P2, const
     Quad.P4 = P4;
     Quad.Color = Color;
     Quad.Thickness = 0.0f;
-    Quad.Time = ImGui::GetCurrentContext()->Time;
+    Quad.Time = Time;
     Quad.Duration = Duration;
     Quad.FadeColor = FadeColor;
     QuadsFilled.Add_GetRef(Quad);
@@ -99,7 +100,7 @@ void FCogDebugDrawImGui::AddTriangle(const ImVec2& P1, const ImVec2& P2, const I
     Triangle.P3 = P3;
     Triangle.Color = Color;
     Triangle.Thickness = Thickness;
-    Triangle.Time = ImGui::GetCurrentContext()->Time;
+    Triangle.Time = Time;
     Triangle.Duration = Duration;
     Triangle.FadeColor = FadeColor;
     Triangles.Add_GetRef(Triangle);
@@ -114,7 +115,7 @@ void FCogDebugDrawImGui::AddTriangleFilled(const ImVec2& P1, const ImVec2& P2, c
     Triangle.P3 = P3;
     Triangle.Color = Color;
     Triangle.Thickness = 0.0f;
-    Triangle.Time = ImGui::GetCurrentContext()->Time;
+    Triangle.Time = Time;
     Triangle.Duration = Duration;
     Triangle.FadeColor = FadeColor;
     TrianglesFilled.Add_GetRef(Triangle);
@@ -123,13 +124,14 @@ void FCogDebugDrawImGui::AddTriangleFilled(const ImVec2& P1, const ImVec2& P2, c
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogDebugDrawImGui::AddCircle(const ImVec2& Center, float Radius, ImU32 Color, int Segments /*= 0*/, float Thickness /*= 1.0f*/, float Duration /*= 0.0f*/, bool FadeColor /*= false*/)
 {
+    
     FCircle Circle;
     Circle.Center = Center;
     Circle.Radius = Radius > 0.0f ? Radius : 1.0f;
     Circle.Color = Color;
     Circle.Segments = Segments;
     Circle.Thickness = Thickness;
-    Circle.Time = ImGui::GetCurrentContext()->Time;
+    Circle.Time = Time;
     Circle.Duration = Duration;
     Circle.FadeColor = FadeColor;
     Circles.Add_GetRef(Circle);
@@ -144,7 +146,7 @@ void FCogDebugDrawImGui::AddCircleFilled(const ImVec2& Center, float Radius, ImU
     Circle.Color = Color;
     Circle.Segments = Segments;
     Circle.Thickness = 0.0f;
-    Circle.Time = ImGui::GetCurrentContext()->Time;
+    Circle.Time = Time;
     Circle.Duration = Duration;
     Circle.FadeColor = FadeColor;
     CirclesFilled.Add_GetRef(Circle);
@@ -157,7 +159,7 @@ void FCogDebugDrawImGui::AddText(const ImVec2& Pos, const FString& Text, ImU32 C
     TextElement.Pos = Pos;
     TextElement.Text = Text;
     TextElement.Color = Color;
-    TextElement.Time = ImGui::GetCurrentContext()->Time;
+    TextElement.Time = Time;
     TextElement.Duration = Duration;
     TextElement.FadeColor = FadeColor;
     Texts.Add_GetRef(TextElement);
@@ -169,7 +171,7 @@ void FCogDebugDrawImGui::AddText(const ImVec2& Pos, const FString& Text, ImU32 C
         ShadowTextElement.Text = Text;
         const float Alpha = ImGui::ColorConvertU32ToFloat4(Color).w; // Keep original Alpha and set to black
         ShadowTextElement.Color = ImGui::ColorConvertFloat4ToU32(ImVec4(0, 0, 0, Alpha));
-        ShadowTextElement.Time = ImGui::GetCurrentContext()->Time;
+        ShadowTextElement.Time = Time;
         ShadowTextElement.Duration = Duration;
         ShadowTextElement.FadeColor = FadeColor;
         Texts.Add_GetRef(ShadowTextElement);
@@ -181,7 +183,7 @@ void FCogDebugDrawImGui::AddText(const ImVec2& Pos, const FString& Text, ImU32 C
 void FCogDebugDrawImGui::Draw()
 {
     ImDrawList* DrawList = ImGui::GetBackgroundDrawList();
-    double Time = ImGui::GetCurrentContext()->Time;
+    Time = ImGui::GetCurrentContext()->Time;
 
     DrawShapes(Lines, [DrawList](const FLine& Line, const ImColor Color) { DrawList->AddLine(Line.P1, Line.P2, Color, Line.Thickness); });
     DrawShapes(Rectangles, [DrawList](const FRectangle& Rectangle, const ImColor Color) { DrawList->AddRect(Rectangle.Min, Rectangle.Max, Color, Rectangle.Rounding, Rectangle.Thickness); });

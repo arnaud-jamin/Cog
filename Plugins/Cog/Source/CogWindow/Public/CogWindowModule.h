@@ -13,5 +13,4 @@ public:
 
 	virtual void ShutdownModule() override;
 
-private:
 };

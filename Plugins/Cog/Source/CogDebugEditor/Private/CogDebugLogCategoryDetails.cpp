@@ -64,7 +64,7 @@ void FCogLogCategoryDetails::CustomizeChildren(TSharedRef<IPropertyHandle> Struc
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogLogCategoryDetails::OnLogCategoryChanged(FName SelectedName)
+void FCogLogCategoryDetails::OnLogCategoryChanged(const FName SelectedName) const
 {
     if (NameProperty.IsValid())
     {

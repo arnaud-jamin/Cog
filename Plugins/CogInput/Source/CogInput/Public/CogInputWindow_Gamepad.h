@@ -25,7 +25,7 @@ public:
 
 protected:
 
-    virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;
+    virtual void PreBegin(ImGuiWindowFlags& WindowFlags) override;
 
     virtual void RenderContent() override;
 

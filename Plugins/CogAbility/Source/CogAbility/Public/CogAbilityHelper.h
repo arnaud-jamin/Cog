@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 #include "imgui.h"
 
-
 class UCogAbilityDataAsset;
 class UGameplayEffect;
 namespace EGameplayModOp { enum Type : int; }
@@ -25,5 +24,6 @@ public:
         const bool Inline = false,
         const ImVec4& DefaultColor = ImVec4(0.4f, 0.4f, 0.4f, 1.0f),
         const ImVec4& MatchColor = ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-
+    
+    static void RenderConfigureMessage(TWeakObjectPtr<const UCogAbilityDataAsset> InAsset);
 };

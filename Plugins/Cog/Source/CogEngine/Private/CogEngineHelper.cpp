@@ -1,7 +1,6 @@
 #include "CogEngineHelper.h"
 
 #include "CogEngineReplicator.h"
-#include "CogWindowHelper.h"
 #include "CogWindowWidgets.h"
 #include "imgui.h"
 #include "GameFramework/Actor.h"
@@ -54,5 +53,18 @@ void FCogEngineHelper::ActorContextMenu(AActor& Actor)
             }
 
         }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineHelper::RenderConfigureMessage(const TWeakObjectPtr<const UCogEngineDataAsset> InAsset)
+{
+    if (InAsset == nullptr)
+    {
+        ImGui::Text("Create a DataAsset child of '%s' to configure. ", StringCast<ANSICHAR>(*UCogEngineDataAsset::StaticClass()->GetName()).Get());
+    }
+    else
+    {
+        ImGui::Text("Can be configured in the '%s' DataAsset. ", StringCast<ANSICHAR>(*GetNameSafe(InAsset.Get())).Get());
     }
 }

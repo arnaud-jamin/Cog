@@ -35,11 +35,12 @@ protected:
         FColor Color;
     };
 
-    FChannel Channels[ECC_MAX];
-
     TObjectPtr<UCogEngineConfig_CollisionTester> Config = nullptr;
 
+    FChannel Channels[ECC_MAX] = {};
+
     FCogDebug_Gizmo StartGizmo;
+    
     FCogDebug_Gizmo EndGizmo;
 };
 
@@ -89,11 +90,6 @@ public:
 
     UPROPERTY(Config)
     FVector ShapeExtent;
-
-    UCogEngineConfig_CollisionTester()
-    {
-        Reset();
-    }
 
     virtual void Reset() override
     {

@@ -8,7 +8,7 @@ class COGALL_API FCogAllModule : public IModuleInterface
 
 public:
   
-   static inline FCogAllModule &Get() { return FModuleManager::LoadModuleChecked<FCogAllModule>("CogAll"); }
+   static FCogAllModule &Get() { return FModuleManager::LoadModuleChecked<FCogAllModule>("CogAll"); }
 
   /** IModuleInterface implementation */
   virtual void StartupModule() override;

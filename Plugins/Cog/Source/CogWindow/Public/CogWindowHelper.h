@@ -18,7 +18,7 @@ public:
     template<typename T>
     static const T* GetFirstAssetByClass();
 
-    static const UObject* GetFirstAssetByClass(const TSubclassOf<UObject> AssetClass);
+    static const UObject* GetFirstAssetByClass(const TSubclassOf<UObject>& AssetClass);
 };
 
 //----------------------------------------------------------------------------------------------------------------------

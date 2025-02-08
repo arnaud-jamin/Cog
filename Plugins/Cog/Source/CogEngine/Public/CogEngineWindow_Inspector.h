@@ -44,7 +44,7 @@ protected:
 
     virtual bool RenderPropertyList(TArray<const FProperty*>& Properties, uint8* PointerToValue);
 
-    virtual bool RenderProperty(const FProperty* Property, uint8* PointerToValue, int IndexInArray);
+    virtual bool RenderProperty(const FProperty* Property, uint8* PointerToValue, int IndexInArray, const char* NameSuffix = nullptr);
 
     virtual bool RenderBool(const FBoolProperty* BoolProperty, uint8* PointerToValue);
 
@@ -79,12 +79,16 @@ protected:
     virtual bool RenderObject(UObject* Object, bool ShowChildren);
 
     virtual bool RenderArray(const FArrayProperty* ArrayProperty, uint8* PointerToValue, bool ShowChildren);
+    
+    virtual bool RenderSet(const FSetProperty* SetProperty, uint8* PointerToValue, bool ShowChildren);
+    
+    virtual bool RenderMap(const FMapProperty* MapProperty, uint8* PointerToValue, bool ShowChildren);
 
     virtual FString GetPropertyName(const FProperty& Property);
 
     FCogEngineInspectorApplyFunction FindObjectApplyFunction(const UObject* Object) const;
 
-    struct Favorite
+    struct FFavorite
     {
         TWeakObjectPtr<UObject> Object = nullptr;
 
@@ -99,7 +103,7 @@ protected:
 
     bool bCollapseAllCategories = false;
 
-    TArray<Favorite> Favorites;
+    TArray<FFavorite> Favorites;
 
     TArray<TWeakObjectPtr<UObject>> History;
 

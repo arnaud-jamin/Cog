@@ -10,7 +10,7 @@ class COGDEBUG_API FCogDebugModule : public IModuleInterface
 {
 public:
 
-    static inline FCogDebugModule& Get() { return FModuleManager::LoadModuleChecked<FCogDebugModule>("CogDebug"); }
+    static FCogDebugModule& Get() { return FModuleManager::LoadModuleChecked<FCogDebugModule>("CogDebug"); }
 
 	virtual void StartupModule() override;
 

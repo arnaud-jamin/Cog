@@ -104,9 +104,9 @@ FCogDebugPlotEvent& FCogDebugEventHistory::AddEvent(
     //----------------------------
     StopEvent(EventId);
 
-    FCogDebugPlotEvent* Event = nullptr;
-
-    int32 AddedIndex = 0;
+    FCogDebugPlotEvent* Event;
+    int32 AddedIndex;
+    
     if (Events.Num() < Events.Max())
     {
         Event = &Events.AddDefaulted_GetRef();

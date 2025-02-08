@@ -392,7 +392,7 @@ public:
     
     static bool GetIsFilteringBySelection();
 
-    static void SetIsFilteringBySelection(UWorld* World, bool Value);
+    static void SetIsFilteringBySelection(const UWorld* World, bool Value);
 
     static bool GetDebugPersistent(bool bPersistent);
     

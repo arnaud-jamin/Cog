@@ -1,6 +1,7 @@
 #include "CogImguiWidget.h"
 
 #include "CogImguiContext.h"
+#include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
 #include "Engine/GameViewportClient.h"
 #include "imgui.h"
@@ -16,11 +17,6 @@ void SCogImguiWidget::Construct(const FArguments& InArgs)
     RefreshVisibility();
 }
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
-
-//--------------------------------------------------------------------------------------------------------------------------
-SCogImguiWidget::~SCogImguiWidget()
-{
-}
 
 //--------------------------------------------------------------------------------------------------------------------------
 void SCogImguiWidget::SetDrawData(const ImDrawData* InDrawData)
@@ -143,7 +139,7 @@ FReply SCogImguiWidget::OnKeyUp(const FGeometry& MyGeometry, const FKeyEvent& Ke
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FReply SCogImguiWidget::HandleKeyEvent(const FKeyEvent& KeyEvent, bool Down)
+FReply SCogImguiWidget::HandleKeyEvent(const FKeyEvent& KeyEvent, bool Down) const
 {
     FCogImGuiContextScope ImGuiContextScope(*Context);
 
@@ -212,7 +208,7 @@ FReply SCogImguiWidget::OnMouseButtonUp(const FGeometry& MyGeometry, const FPoin
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FReply SCogImguiWidget::HandleMouseButtonEvent(const FPointerEvent& MouseEvent, bool Down)
+FReply SCogImguiWidget::HandleMouseButtonEvent(const FPointerEvent& MouseEvent, bool Down) const
 {
     FCogImGuiContextScope ImGuiContextScope(*Context);
 
@@ -278,26 +274,26 @@ FReply SCogImguiWidget::OnFocusReceived(const FGeometry& MyGeometry, const FFocu
 //--------------------------------------------------------------------------------------------------------------------------
 void SCogImguiWidget::RefreshVisibility()
 {
-    EVisibility DesiredVisiblity = EVisibility::SelfHitTestInvisible;
+    EVisibility DesiredVisibility;
 
     if (Context->GetEnableInput())
     {
         if (Context->GetShareMouse() && Context->GetWantCaptureMouse() == false)
         {
-            DesiredVisiblity = EVisibility::SelfHitTestInvisible;
+            DesiredVisibility = EVisibility::SelfHitTestInvisible;
         }
         else
         {
-            DesiredVisiblity = EVisibility::Visible;
+            DesiredVisibility = EVisibility::Visible;
         }
     }
     else
     {
-        DesiredVisiblity = EVisibility::SelfHitTestInvisible;
+        DesiredVisibility = EVisibility::SelfHitTestInvisible;
     }
 
-    if (DesiredVisiblity != GetVisibility())
+    if (DesiredVisibility != GetVisibility())
     {
-        SetVisibility(DesiredVisiblity);
+        SetVisibility(DesiredVisibility);
     }
 }

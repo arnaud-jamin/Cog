@@ -100,7 +100,7 @@ void FCogEngineWindow_NetImgui::RenderTick(float DeltaTime)
 			RunServer();
 		}
 
-		ECogNetImguiAutoConnectionMode AutoConnectMode = ECogNetImguiAutoConnectionMode::NoAutoConnect;
+		ECogNetImguiAutoConnectionMode AutoConnectMode;
 		switch (GetWorld()->GetNetMode())
 		{
 			case NM_Client:				AutoConnectMode = Config->AutoConnectOnClient; break;
@@ -265,7 +265,7 @@ void FCogEngineWindow_NetImgui::RenderContent()
 		FCogWindowWidgets::InputText("Server Arguments", Config->ServerArguments);
 		ImGui::SetItemTooltip("Argument used when launching the NetImgui server executable.");
 	}
-#endif // #if NETIMGUI_ENABLED
+#endif 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -285,7 +285,7 @@ FString FCogEngineWindow_NetImgui::GetClientName() const
 
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_NetImgui::ConnectTo()
+void FCogEngineWindow_NetImgui::ConnectTo() const
 {
 	FCogImGuiContextScope ImGuiContextScope(GetOwner()->GetContext());
 
@@ -302,7 +302,7 @@ void FCogEngineWindow_NetImgui::ConnectTo()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_NetImgui::ConnectFrom()
+void FCogEngineWindow_NetImgui::ConnectFrom() const
 {
 	FCogImGuiContextScope ImGuiContextScope(GetOwner()->GetContext());
 
@@ -318,7 +318,7 @@ void FCogEngineWindow_NetImgui::ConnectFrom()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_NetImgui::Disconnect()
+void FCogEngineWindow_NetImgui::Disconnect() const
 {
 	FCogImGuiContextScope ImGuiContextScope(GetOwner()->GetContext());
 

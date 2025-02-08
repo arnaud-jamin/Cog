@@ -12,7 +12,6 @@ void FCogAIWindow_Blackboard::Initialize()
     Super::Initialize();
 
     bHasMenu = true;
-    bNoPadding = true;
 
     Config = GetConfig<UCogAIConfig_Blackboard>();
 }
@@ -23,6 +22,19 @@ void FCogAIWindow_Blackboard::RenderHelp()
     ImGui::Text(
         "This window displays the blackboard of the selected actor. "
     );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAIWindow_Blackboard::PreBegin(ImGuiWindowFlags& WindowFlags)
+{
+    WindowFlags |= ImGuiWindowFlags_NoScrollbar;
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogAIWindow_Blackboard::PostBegin()
+{
+    ImGui::PopStyleVar();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

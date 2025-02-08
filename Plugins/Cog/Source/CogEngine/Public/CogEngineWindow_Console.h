@@ -17,7 +17,9 @@ protected:
 
     virtual void Initialize() override;
 
-    virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;
+    virtual void PreBegin(ImGuiWindowFlags& WindowFlags) override;
+
+    virtual void PostBegin() override;
 
     virtual void RenderMainMenuWidget() override;
     
@@ -114,12 +116,6 @@ public:
     
     UPROPERTY(Config)
     FVector4f HistoryColor = FVector4f(1.0f, 1.0f, 1.0f, 0.5f);
-
-    
-    UCogEngineConfig_Console()
-    {
-        Reset();
-    }
 
     virtual void Reset() override
     {

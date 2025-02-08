@@ -225,8 +225,8 @@ void FCogEngineWindow_Skeleton::RenderBoneEntry(int32 BoneIndex, bool OpenAllChi
         }
         FCogWindowWidgets::PopStyleCompact();
 
-        const bool HasCustomVisiblity = BoneInfo.ShowName || BoneInfo.ShowAxes || BoneInfo.ShowLocalVelocity || BoneInfo.ShowTrajectory;
-        if (HasCustomVisiblity)
+        const bool HasCustomVisibility = BoneInfo.ShowName || BoneInfo.ShowAxes || BoneInfo.ShowLocalVelocity || BoneInfo.ShowTrajectory;
+        if (HasCustomVisibility)
         {
             BoneInfo.ShowBone = true;
         }
@@ -235,7 +235,7 @@ void FCogEngineWindow_Skeleton::RenderBoneEntry(int32 BoneIndex, bool OpenAllChi
         // Name
         //------------------------
         ImGui::SameLine();
-        ImVec4 NameColor = HasCustomVisiblity ? ImVec4(1.0f, 1.0f, 0.0f, 1.0f) : ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+        ImVec4 NameColor = HasCustomVisibility ? ImVec4(1.0f, 1.0f, 0.0f, 1.0f) : ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
         ImGui::TextColored(NameColor, "%s", BoneName.Get());
     }
 

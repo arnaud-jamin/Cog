@@ -77,6 +77,7 @@ private:
     };
 
     //----------------------------------------------------------------------------------------------------------------------
+    static float Time;
     static TArray<FLine> Lines;
     static TArray<FTriangle> Triangles;
     static TArray<FTriangle> TrianglesFilled;
@@ -92,9 +93,6 @@ private:
     template<typename TShape, typename TDrawFunction>
     static void DrawShapes(TArray<TShape>& Shapes, TDrawFunction DrawFunction)
     {
-        ImDrawList* ImDrawList = ImGui::GetBackgroundDrawList();
-        const double Time = ImGui::GetCurrentContext()->Time;
-
         for (int32 i = 0; i < Shapes.Num(); i++)
         {
             const TShape& Shape = Shapes[i];

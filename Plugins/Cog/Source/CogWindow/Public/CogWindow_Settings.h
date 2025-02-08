@@ -4,7 +4,6 @@
 #include "CogCommonConfig.h"
 #include "CogImguiKeyInfo.h"
 #include "CogWindow.h"
-#include "GameFramework/PlayerInput.h"
 #include "CogWindow_Settings.generated.h"
 
 class UCogEngineConfig_Settings;

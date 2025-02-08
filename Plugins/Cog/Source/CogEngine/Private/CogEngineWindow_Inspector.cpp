@@ -57,14 +57,14 @@ void FCogEngineWindow_Inspector::SetInspectedObject(UObject* Value)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Inspector::AddFavorite(UObject* Object)
 {
-    Favorite& Favorite = Favorites.AddDefaulted_GetRef();
+    FFavorite& Favorite = Favorites.AddDefaulted_GetRef();
     Favorite.Object = Object;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Inspector::AddFavorite(UObject* Object, FCogEngineInspectorApplyFunction ApplyFunction)
 {
-    Favorite& Favorite = Favorites.AddDefaulted_GetRef();
+    FFavorite& Favorite = Favorites.AddDefaulted_GetRef();
     Favorite.Object = Object;
     Favorite.ApplyFunction = ApplyFunction;
 }
@@ -110,7 +110,7 @@ void FCogEngineWindow_Inspector::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 FCogEngineInspectorApplyFunction FCogEngineWindow_Inspector::FindObjectApplyFunction(const UObject* Object) const
 {
-    for (const Favorite& Favorite : Favorites)
+    for (const FFavorite& Favorite : Favorites)
     {
         if (Favorite.Object == Object)
         {
@@ -172,15 +172,10 @@ void FCogEngineWindow_Inspector::RenderMenu()
             }
             if (ImGui::IsItemHovered())
             {
-                ImGui::SetTooltip("Current Inspected Object: %s", InspectedObjectName.Get());
+                ImGui::SetTooltip("%s", InspectedObjectName.Get());
             }
 
             ImGui::PopStyleVar(1);
-        }
-
-        if (ImGui::IsItemHovered())
-        {
-            ImGui::SetTooltip("%s", InspectedObjectName.Get());
         }
 
         ImGui::PopStyleColor(1);
@@ -206,7 +201,7 @@ void FCogEngineWindow_Inspector::RenderMenu()
             }
 
             ImGui::PushID("Favorites");
-            for (Favorite& Favorite : Favorites)
+            for (FFavorite& Favorite : Favorites)
             {
                 const TWeakObjectPtr<UObject>& Object = Favorite.Object;
                 if (ImGui::MenuItem(TCHAR_TO_ANSI(*GetNameSafe(Object.Get()))))
@@ -273,7 +268,7 @@ void FCogEngineWindow_Inspector::RenderMenu()
 
             ImGui::Checkbox("Sort by Name", &Config->bSortByName);
             ImGui::Checkbox("Show Background", &Config->bShowRowBackground);
-            ImGui::Checkbox("Show Sorders", &Config->bShowBorders);
+            ImGui::Checkbox("Show Borders", &Config->bShowBorders);
 #if WITH_EDITORONLY_DATA
             ImGui::Checkbox("Show Display Name", &Config->bShowDisplayName);
             ImGui::Checkbox("Show Categories", &Config->bShowCategories);
@@ -349,7 +344,7 @@ bool FCogEngineWindow_Inspector::RenderInspector()
                 ImGui::SetNextItemOpen(false);
             }
 
-            if (ImGui::CollapsingHeader(TCHAR_TO_ANSI(*Entry.Key), nullptr, ImGuiTreeNodeFlags_DefaultOpen))
+            if (ImGui::CollapsingHeader(TCHAR_TO_UTF8(*Entry.Key), nullptr, ImGuiTreeNodeFlags_DefaultOpen))
             {
                 if (RenderBegin())
                 {
@@ -456,7 +451,7 @@ bool FCogEngineWindow_Inspector::RenderPropertyList(TArray<const FProperty*>& Pr
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogEngineWindow_Inspector::RenderProperty(const FProperty* Property, uint8* PointerToValue, int IndexInArray)
+bool FCogEngineWindow_Inspector::RenderProperty(const FProperty* Property, uint8* PointerToValue, int IndexInArray, const char* NameSuffix)
 {
     bool HasChanged = false;
 
@@ -473,6 +468,11 @@ bool FCogEngineWindow_Inspector::RenderProperty(const FProperty* Property, uint8
     if (IndexInArray != -1)
     {
         PropertyName = FString::Printf(TEXT("[%d]"), IndexInArray);
+        if (NameSuffix != nullptr)
+        {
+            PropertyName.Append(" ");
+            PropertyName.Append(NameSuffix);
+        }
     }
     else
     {
@@ -510,7 +510,7 @@ bool FCogEngineWindow_Inspector::RenderProperty(const FProperty* Property, uint8
             ImGui::TableNextColumn();
             ImGui::Text("DisplayName:");
             ImGui::TableNextColumn();
-            ImGui::Text(TCHAR_TO_ANSI(*Property->GetDisplayNameText().ToString()));
+            ImGui::Text(TCHAR_TO_UTF8(*Property->GetDisplayNameText().ToString()));
 #endif  // WITH_EDITORONLY_DATA
 
             ImGui::TableNextRow();
@@ -532,7 +532,7 @@ bool FCogEngineWindow_Inspector::RenderProperty(const FProperty* Property, uint8
             ImGui::TableNextColumn();
             if (Property->HasMetaData("Tooltip"))
             {
-                ImGui::Text(TCHAR_TO_ANSI(*Property->GetToolTipText(false).ToString()));
+                ImGui::Text(TCHAR_TO_UTF8(*Property->GetToolTipText(false).ToString()));
             }
 #endif  // WITH_EDITORONLY_DATA
 
@@ -550,7 +550,7 @@ bool FCogEngineWindow_Inspector::RenderProperty(const FProperty* Property, uint8
             ImGui::BeginTooltip();
             ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
 
-            ImGui::Text(TCHAR_TO_ANSI(*Property->GetToolTipText(false).ToString()));
+            ImGui::Text(TCHAR_TO_UTF8(*Property->GetToolTipText(false).ToString()));
             ImGui::Text("Details [CTRL]");
             ImGui::PopTextWrapPos();
             ImGui::EndTooltip();
@@ -635,6 +635,14 @@ bool FCogEngineWindow_Inspector::RenderProperty(const FProperty* Property, uint8
     {
         HasChanged = RenderArray(ArrayProperty, PointerToValue, ShowChildren);
     }
+    else if (const FSetProperty* SetProperty = CastField<FSetProperty>(Property))
+    {
+        HasChanged = RenderSet(SetProperty, PointerToValue, ShowChildren);
+    }
+    else if (const FMapProperty* MapProperty = CastField<FMapProperty>(Property))
+    {
+        HasChanged = RenderMap(MapProperty, PointerToValue, ShowChildren);
+    }
     else if (const FDelegateProperty* DelegateProperty = CastField<FDelegateProperty>(Property))
     {
     }
@@ -680,7 +688,7 @@ bool FCogEngineWindow_Inspector::RenderByte(const FByteProperty* ByteProperty, u
     if (ImGui::InputInt("##Byte", &Value))
     {
         HasChanged = true;
-        ByteProperty->SetPropertyValue(PointerToValue, (uint8)Value);
+        ByteProperty->SetPropertyValue(PointerToValue, static_cast<uint8>(Value));
     }
 
     return HasChanged;
@@ -695,7 +703,7 @@ bool FCogEngineWindow_Inspector::RenderInt8(const FInt8Property* Int8Property, u
     if (ImGui::InputInt("##Int8", &Value))
     {
         HasChanged = true;
-        Int8Property->SetPropertyValue(PointerToValue, (int8)Value);
+        Int8Property->SetPropertyValue(PointerToValue, static_cast<int8>(Value));
     }
 
     return HasChanged;
@@ -721,11 +729,11 @@ bool FCogEngineWindow_Inspector::RenderInt64(const FInt64Property* Int64Property
 {
     bool HasChanged = false;
 
-    int Value = (int)Int64Property->GetPropertyValue(PointerToValue);
+    int Value = static_cast<int>(Int64Property->GetPropertyValue(PointerToValue));
     if (ImGui::InputInt("##UInt64", &Value))
     {
         HasChanged = true;
-        Int64Property->SetPropertyValue(PointerToValue, (uint64)Value);
+        Int64Property->SetPropertyValue(PointerToValue, static_cast<uint64>(Value));
     }
 
     return HasChanged;
@@ -736,11 +744,11 @@ bool FCogEngineWindow_Inspector::RenderUInt32(const FUInt32Property* UInt32Prope
 {
     bool HasChanged = false;
 
-    int Value = (int)UInt32Property->GetPropertyValue(PointerToValue);
+    int Value = static_cast<int>(UInt32Property->GetPropertyValue(PointerToValue));
     if (ImGui::InputInt("##UInt32", &Value))
     {
         HasChanged = true;
-        UInt32Property->SetPropertyValue(PointerToValue, (uint32)Value);
+        UInt32Property->SetPropertyValue(PointerToValue, static_cast<uint32>(Value));
     }
 
     return HasChanged;
@@ -819,7 +827,7 @@ bool FCogEngineWindow_Inspector::RenderText(const FTextProperty* TextProperty, u
     FString Text;
     TextProperty->ExportTextItem_Direct(Text, PointerToValue, nullptr, nullptr, PPF_None, nullptr);
     ImGui::BeginDisabled();
-    ImGui::Text("%s", TCHAR_TO_ANSI(*Text));
+    ImGui::Text("%s", TCHAR_TO_UTF8(*Text));
     ImGui::EndDisabled();
 
     return false;
@@ -869,7 +877,7 @@ bool FCogEngineWindow_Inspector::RenderObject(UObject* Object, bool ShowChildren
 bool FCogEngineWindow_Inspector::RenderStruct(const FStructProperty* StructProperty, uint8* PointerToValue, bool ShowChildren)
 {
     ImGui::BeginDisabled();
-    ImGui::Text("%s", TCHAR_TO_ANSI(*StructProperty->Struct->GetClass()->GetName()));
+    ImGui::Text("%s", TCHAR_TO_ANSI(*StructProperty->Struct->GetStructCPPName()));
     ImGui::EndDisabled();
 
     bool HasChanged = false;
@@ -936,7 +944,12 @@ bool FCogEngineWindow_Inspector::RenderArray(const FArrayProperty* ArrayProperty
     const int32 Num = Helper.Num();
 
     ImGui::BeginDisabled();
-    ImGui::Text("%s [%d]", TCHAR_TO_ANSI(*ArrayProperty->Inner->GetClass()->GetName()), Num);
+    FString ElementPropertyName = ArrayProperty->Inner->GetClass()->GetName();
+    if (const FStructProperty* StructProperty = CastField<FStructProperty>(ArrayProperty->Inner))
+    {
+        ElementPropertyName = StructProperty->Struct->GetStructCPPName();
+    }
+    ImGui::Text("%s [%d]", StringCast<ANSICHAR>(*ElementPropertyName).Get(), Num);
     ImGui::EndDisabled();
 
     bool HasChanged = false;
@@ -956,6 +969,75 @@ bool FCogEngineWindow_Inspector::RenderArray(const FArrayProperty* ArrayProperty
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+bool FCogEngineWindow_Inspector::RenderSet(const FSetProperty* SetProperty, uint8* PointerToValue, bool ShowChildren)
+{
+    FScriptSetHelper Helper(SetProperty, PointerToValue);
+    const int32 Num = Helper.Num();
+
+    ImGui::BeginDisabled();
+    FString ElementPropertyName = SetProperty->GetElementProperty()->GetClass()->GetName();
+    if (const FStructProperty* StructProperty = CastField<FStructProperty>(SetProperty->GetElementProperty()))
+    {
+        ElementPropertyName = StructProperty->Struct->GetStructCPPName();
+    }
+    ImGui::Text("%s {%d}", StringCast<ANSICHAR>(*ElementPropertyName).Get(), Num);
+    ImGui::EndDisabled();
+
+    bool HasChanged = false;
+
+    if (ShowChildren)
+    {
+        for (int32 i = 0; i < Num; ++i)
+        {
+            ImGui::PushID(i);
+            HasChanged |= RenderProperty(SetProperty->GetElementProperty(), Helper.GetElementPtr(i), i);
+            ImGui::PopID();
+        }
+        ImGui::TreePop();
+    }
+
+    return HasChanged;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogEngineWindow_Inspector::RenderMap(const FMapProperty* MapProperty, uint8* PointerToValue, bool ShowChildren)
+{
+    FScriptMapHelper Helper(MapProperty, PointerToValue);
+    const int32 Num = Helper.Num();
+
+    ImGui::BeginDisabled();
+    FString KeyPropertyName = MapProperty->GetKeyProperty()->GetClass()->GetName();
+    if (const FStructProperty* StructProperty = CastField<FStructProperty>(MapProperty->GetKeyProperty()))
+    {
+        KeyPropertyName = StructProperty->Struct->GetStructCPPName();
+    }
+    FString ValuePropertyName = MapProperty->GetValueProperty()->GetClass()->GetName();
+    if (const FStructProperty* StructProperty = CastField<FStructProperty>(MapProperty->GetValueProperty()))
+    {
+        ValuePropertyName = StructProperty->Struct->GetStructCPPName();
+    }
+    ImGui::Text("%s -> %s [%d]", StringCast<ANSICHAR>(*KeyPropertyName).Get(), StringCast<ANSICHAR>(*ValuePropertyName).Get(), Num);
+    ImGui::EndDisabled();
+
+    bool HasChanged = false;
+
+    if (ShowChildren)
+    {
+        for (int32 i = 0; i < Num; ++i)
+        {
+            ImGui::PushID(i);
+            // @todo: refactor this so it's better?
+            HasChanged |= RenderProperty(MapProperty->GetKeyProperty(), Helper.GetKeyPtr(i), i, "Key");
+            HasChanged |= RenderProperty(MapProperty->GetValueProperty(), Helper.GetValuePtr(i), i, "Value");
+            ImGui::PopID();
+        }
+        ImGui::TreePop();
+    }
+
+    return HasChanged;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 bool FCogEngineWindow_Inspector::HasPropertyAnyChildren(const FProperty* Property, uint8* PointerToValue)
 {
     if (const FStructProperty* StructProperty = CastField<FStructProperty>(Property))
@@ -963,9 +1045,20 @@ bool FCogEngineWindow_Inspector::HasPropertyAnyChildren(const FProperty* Propert
         const TFieldIterator<FProperty> It(StructProperty->Struct);
         return It ? true : false;
     }
-    else if (const FArrayProperty* ArrayProperty = CastField<FArrayProperty>(Property))
+
+    if (const FArrayProperty* ArrayProperty = CastField<FArrayProperty>(Property))
     {
 	    const FScriptArrayHelper Helper(ArrayProperty, PointerToValue);
+        const int32 Num = Helper.Num();
+        if (Num == 0)
+        { return false; }
+
+        return true;
+    }
+
+    if (const FSetProperty* SetProperty = CastField<FSetProperty>(Property))
+    {
+        const FScriptSetHelper Helper(SetProperty, PointerToValue);
         const int32 Num = Helper.Num();
         if (Num == 0)
         {
@@ -974,17 +1067,27 @@ bool FCogEngineWindow_Inspector::HasPropertyAnyChildren(const FProperty* Propert
 
         return true;
     }
-    else if (const FClassProperty* ClassProperty = CastField<FClassProperty>(Property))
+
+    if (const FMapProperty* MapProperty = CastField<FMapProperty>(Property))
     {
-        return false;
-    }
-    else if (const FObjectProperty* ObjectProperty = CastField<FObjectProperty>(Property))
-    {
-	    const UObject* ReferencedObject = ObjectProperty->GetObjectPropertyValue(PointerToValue);
-        if (ReferencedObject == nullptr)
+        const FScriptMapHelper Helper(MapProperty, PointerToValue);
+        const int32 Num = Helper.Num();
+        if (Num == 0)
         {
             return false;
         }
+
+        return true;
+    }
+
+    if (const FClassProperty* ClassProperty = CastField<FClassProperty>(Property))
+    { return false; }
+
+    if (const FObjectProperty* ObjectProperty = CastField<FObjectProperty>(Property))
+    {
+	    const UObject* ReferencedObject = ObjectProperty->GetObjectPropertyValue(PointerToValue);
+        if (ReferencedObject == nullptr)
+        { return false; }
 
         return true;
     }

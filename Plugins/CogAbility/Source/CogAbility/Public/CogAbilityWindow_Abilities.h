@@ -24,6 +24,10 @@ protected:
 
     virtual void RenderHelp() override;
 
+    virtual void PreBegin(ImGuiWindowFlags& WindowFlags) override;
+
+    virtual void PostBegin() override;
+
     virtual void RenderTick(float DeltaTime) override;
 
     virtual void RenderContent() override;

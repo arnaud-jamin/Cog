@@ -7,7 +7,7 @@ class COGIMGUI_API FCogImguiModule : public IModuleInterface
 {
 public:
 
-    static inline FCogImguiModule& Get()
+    static FCogImguiModule& Get()
     {
         return FModuleManager::LoadModuleChecked<FCogImguiModule>("CogImgui");
     }
@@ -17,7 +17,5 @@ public:
     //----------------------------------------------------------------------------------------------------------------------
     virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
-
-private:
 
 };

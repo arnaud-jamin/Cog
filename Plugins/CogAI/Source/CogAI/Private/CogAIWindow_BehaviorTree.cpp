@@ -135,8 +135,8 @@ void FCogAIWindow_BehaviorTree::RenderContent()
     {
         if (ImGui::BeginMenu("Options"))
         {
-            ImGui::ColorEdit4("Active Color", (float*)&Config->ActiveColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-            ImGui::ColorEdit4("Inactive Color", (float*)&Config->InactiveColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("Active Color", &Config->ActiveColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+            ImGui::ColorEdit4("Inactive Color", &Config->InactiveColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
             ImGui::EndMenu();
         }
 
@@ -276,7 +276,7 @@ void FCogAIWindow_BehaviorTree::RenderNode(UBehaviorTreeComponent& BehaviorTreeC
 	            ImGui::TableSetupColumn("Property");
 	            ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
 
-	            const ImVec4 TextColor(1.0f, 1.0f, 1.0f, 0.5f);
+                constexpr ImVec4 TextColor(1.0f, 1.0f, 1.0f, 0.5f);
 
 	            //------------------------
 	            // Name

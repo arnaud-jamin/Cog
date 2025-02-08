@@ -7,14 +7,10 @@ class COGWINDOW_API FCogWindow_Spacing : public FCogWindow
 {
     typedef FCogWindow Super;
 
-public:
-    
 protected: 
 
-    virtual void PreRender(ImGuiWindowFlags& WindowFlags) override;
+    virtual void PreBegin(ImGuiWindowFlags& WindowFlags) override;
     
-    virtual void PostRender() override;
+    virtual void PostBegin() override;
 
-private:
-    
 };

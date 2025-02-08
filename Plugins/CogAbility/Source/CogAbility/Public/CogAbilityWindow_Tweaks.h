@@ -25,5 +25,5 @@ protected:
 
 private:
 
-    TObjectPtr<const UCogAbilityDataAsset> Asset = nullptr;
+    TWeakObjectPtr<const UCogAbilityDataAsset> Asset;
 };

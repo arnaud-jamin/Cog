@@ -1,7 +1,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CogImguiDrawList.h"
 #include "Rendering/RenderingCommon.h"
 #include "UObject/WeakObjectPtr.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
@@ -23,8 +22,6 @@ public:
     SLATE_END_ARGS()
 
     void Construct(const FArguments& InArgs);
-
-    ~SCogImguiInputCatcherWidget();
 
     virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
 
@@ -58,9 +55,7 @@ public:
 
 protected:
 
-    FReply HandleKeyEvent(const FKeyEvent& KeyEvent, bool Down);
-
-    FReply HandleMouseButtonEvent(const FPointerEvent& MouseEvent, bool Down);
+    FReply HandleMouseButtonEvent(const FPointerEvent& MouseEvent, bool Down) const;
 
     void RefreshVisibility();
 

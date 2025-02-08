@@ -17,7 +17,7 @@ void FCogInputWindow_Gamepad::Initialize()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogInputWindow_Gamepad::PreRender(ImGuiWindowFlags& WindowFlags)
+void FCogInputWindow_Gamepad::PreBegin(ImGuiWindowFlags& WindowFlags)
 {
     if (Config->bShowAsOverlay)
     {

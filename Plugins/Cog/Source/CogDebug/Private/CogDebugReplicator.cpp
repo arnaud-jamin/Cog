@@ -1,12 +1,10 @@
 #include "CogDebugReplicator.h"
 
 #include "CogDebug.h"
-#include "CogDebugDraw.h"
 #include "CogDebugLog.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/WorldSettings.h"
-#include "Net/Core/PushModel/PushModel.h"
 #include "Net/UnrealNetwork.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -27,17 +25,18 @@ ACogDebugReplicator* ACogDebugReplicator::Spawn(APlayerController* Controller)
 //--------------------------------------------------------------------------------------------------------------------------
 ACogDebugReplicator* ACogDebugReplicator::GetLocalReplicator(const UWorld& World)
 {
-    for (TActorIterator<ACogDebugReplicator> It(&World, StaticClass()); It; ++It)
+    const TActorIterator<ACogDebugReplicator> It(&World, StaticClass());
+    if (It)
     {
         ACogDebugReplicator* Replicator = *It;
-        return Replicator;
+        return Replicator;        
     }
-
+    
     return nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void ACogDebugReplicator::GetRemoteReplicators(UWorld& World, TArray<ACogDebugReplicator*>& Replicators)
+void ACogDebugReplicator::GetRemoteReplicators(const UWorld& World, TArray<ACogDebugReplicator*>& Replicators)
 {
     for (TActorIterator<ACogDebugReplicator> It(&World, ACogDebugReplicator::StaticClass()); It; ++It)
     {
@@ -104,7 +103,7 @@ void ACogDebugReplicator::TickActor(float DeltaTime, enum ELevelTick TickType, F
 #if !UE_BUILD_SHIPPING
 
     Super::TickActor(DeltaTime, TickType, ThisTickFunction);
-    if (OwnerPlayerController)
+    if (OwnerPlayerController.IsValid())
     {
         if (GetWorld()->GetNetMode() == NM_Client)
         {
@@ -128,7 +127,7 @@ void ACogDebugReplicator::Server_SetCategoryVerbosity_Implementation(FName LogCa
     {
         if (const FCogDebugLogCategoryInfo* LogCategoryInfo = FCogDebugLog::FindLogCategoryInfo(LogCategoryName))
         {
-            LogCategoryInfo->LogCategory->SetVerbosity((ELogVerbosity::Type)Verbosity);
+            LogCategoryInfo->LogCategory->SetVerbosity(static_cast<ELogVerbosity::Type>(Verbosity));
 
             TArray<FCogServerCategoryData> CategoriesData;
             CategoriesData.Add({ LogCategoryName, Verbosity });
@@ -148,7 +147,7 @@ void ACogDebugReplicator::NetMulticast_SendCategoriesVerbosity_Implementation(co
     {
         for (const FCogServerCategoryData& Category : Categories)
         {
-            FCogDebugLog::OnServerVerbosityChanged(Category.LogCategoryName, (ELogVerbosity::Type)Category.Verbosity);
+            FCogDebugLog::OnServerVerbosityChanged(Category.LogCategoryName, static_cast<ELogVerbosity::Type>(Category.Verbosity));
         }
     }
 
@@ -164,7 +163,7 @@ void ACogDebugReplicator::Client_SendCategoriesVerbosity_Implementation(const TA
     {
         for (const FCogServerCategoryData& Category : Categories)
         {
-            FCogDebugLog::OnServerVerbosityChanged(Category.LogCategoryName, (ELogVerbosity::Type)Category.Verbosity);
+            FCogDebugLog::OnServerVerbosityChanged(Category.LogCategoryName, static_cast<ELogVerbosity::Type>(Category.Verbosity));
         }
     }
 
@@ -188,7 +187,7 @@ void ACogDebugReplicator::Server_RequestAllCategoriesVerbosity_Implementation()
                 CategoriesData.Add(
                 { 
                     CategoryInfo.LogCategory->GetCategoryName(), 
-                    (ECogLogVerbosity)CategoryInfo.LogCategory->GetVerbosity() 
+                    static_cast<ECogLogVerbosity>(CategoryInfo.LogCategory->GetVerbosity()) 
                 });
             }
         }
@@ -248,14 +247,14 @@ public:
 //--------------------------------------------------------------------------------------------------------------------------
 // FCogReplicatorNetPack
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogReplicatorNetPack::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms)
+bool FCogReplicatorNetPack::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams)
 {
-    if (DeltaParms.bUpdateUnmappedObjects || Owner == nullptr)
+    if (DeltaParams.bUpdateUnmappedObjects || Owner == nullptr)
     {
         return true;
     }
 
-    if (DeltaParms.Writer)
+    if (DeltaParams.Writer)
     {
         const bool bIsOwnerClient = !Owner->bHasAuthority;
         if (bIsOwnerClient)
@@ -263,10 +262,10 @@ bool FCogReplicatorNetPack::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms
             return false;
         }
 
-        const FCogReplicatorNetState* OldState = static_cast<FCogReplicatorNetState*>(DeltaParms.OldState);
+        const FCogReplicatorNetState* OldState = static_cast<FCogReplicatorNetState*>(DeltaParams.OldState);
         FCogReplicatorNetState* NewState = new FCogReplicatorNetState();
-        check(DeltaParms.NewState);
-        *DeltaParms.NewState = TSharedPtr<INetDeltaBaseState>(NewState);
+        check(DeltaParams.NewState);
+        *DeltaParams.NewState = TSharedPtr<INetDeltaBaseState>(NewState);
 
         //------------------------------------------------------------------------------------------------------------------
         // Find delta to replicate
@@ -289,7 +288,7 @@ bool FCogReplicatorNetPack::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms
             const bool bMissingOldState = (OldState == nullptr);
             const uint8 ShouldUpdateShapes = bMissingOldState || (OldState->ShapesRepCounter != NewState->ShapesRepCounter);
 
-            FBitWriter& Writer = *DeltaParms.Writer;
+            FBitWriter& Writer = *DeltaParams.Writer;
             Writer.WriteBit(ShouldUpdateShapes);
             if (ShouldUpdateShapes)
             {
@@ -297,12 +296,12 @@ bool FCogReplicatorNetPack::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms
             }
         }
     }
-    else if (DeltaParms.Reader)
+    else if (DeltaParams.Reader)
     {
         //------------------------------------------------------------------------------------------------------------------
         // Read
         //------------------------------------------------------------------------------------------------------------------
-        FBitReader& Reader = *DeltaParms.Reader;
+        FBitReader& Reader = *DeltaParams.Reader;
         const uint8 ShouldUpdateShapes = Reader.ReadBit();
         if (ShouldUpdateShapes)
         {

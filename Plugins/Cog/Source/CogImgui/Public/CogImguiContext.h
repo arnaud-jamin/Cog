@@ -28,7 +28,7 @@ struct COGIMGUI_API FCogImGuiViewportData
 
 struct COGIMGUI_API FCogImGuiContextScope
 {
-	UE_NODISCARD_CTOR explicit FCogImGuiContextScope(FCogImguiContext& CogImguiContext);
+	UE_NODISCARD_CTOR explicit FCogImGuiContextScope(const FCogImguiContext& CogImguiContext);
 	UE_NODISCARD_CTOR explicit FCogImGuiContextScope(ImGuiContext* GuiCtx, ImPlotContext* PlotCtx);
 	~FCogImGuiContextScope();
 
@@ -65,8 +65,6 @@ public:
 
 	bool BeginFrame(float InDeltaTime);
 
-	void GetCursorPos(ImGuiIO& IO);
-
 	void EndFrame();
 
 	float GetDpiScale() const { return DpiScale; }
@@ -77,7 +75,7 @@ public:
 
 	void SetSkipRendering(bool Value);
 
-	ImVec2 GetImguiMousePos();
+	ImVec2 GetImguiMousePos() const;
 
 	TObjectPtr<const UGameViewportClient> GetGameViewport() const { return GameViewport; }
 
@@ -93,7 +91,7 @@ private:
 
 	bool IsConsoleOpened() const;
 
-	void DrawDebug();
+	void DrawDebug() const;
 
 	void BuildFont();
 

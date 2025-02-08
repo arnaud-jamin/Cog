@@ -9,6 +9,7 @@
 #include "CogAbilityWindow_Tweaks.h"
 #include "CogAIWindow_BehaviorTree.h"
 #include "CogAIWindow_Blackboard.h"
+#include "CogEngineWindow_BuildInfo.h"
 #include "CogEngineWindow_Cheats.h"
 #include "CogEngineWindow_CollisionTester.h"
 #include "CogEngineWindow_CollisionViewer.h"
@@ -37,8 +38,6 @@
 #include "CogWindowManager.h"
 
 #include "Engine/Engine.h"
-#include "GameFramework/Character.h"
-#include "GameFramework/GameStateBase.h"
 #include "GameFramework/GameUserSettings.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -47,6 +46,8 @@ void Cog::AddAllWindows(UCogWindowManager& CogWindowManager)
     //---------------------------------------
     // Engine
     //---------------------------------------
+    CogWindowManager.AddWindow<FCogEngineWindow_BuildInfo>("Engine.Build Info");
+
     CogWindowManager.AddWindow<FCogEngineWindow_CollisionTester>("Engine.Collision Tester");
 
     CogWindowManager.AddWindow<FCogEngineWindow_CollisionViewer>("Engine.Collision Viewer");
@@ -92,12 +93,12 @@ void Cog::AddAllWindows(UCogWindowManager& CogWindowManager)
 
     CogWindowManager.AddWindow<FCogEngineWindow_Spawns>("Engine.Spawns");
 
-    FCogEngineWindow_Stats* StatsWindow = CogWindowManager.AddWindow<FCogEngineWindow_Stats>("Engine.Stats");
+    CogWindowManager.AddWindow<FCogEngineWindow_Stats>("Engine.Stats");
 
     CogWindowManager.AddWindow<FCogEngineWindow_TimeScale>("Engine.Time Scale");
 
     CogWindowManager.AddWindow<FCogEngineWindow_Transform>("Engine.Transform");
-
+    
     //---------------------------------------
     // Abilities
     //---------------------------------------

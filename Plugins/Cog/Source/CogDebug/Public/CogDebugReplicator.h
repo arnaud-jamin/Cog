@@ -32,9 +32,9 @@ struct FCogReplicatorNetPack
 {
     GENERATED_USTRUCT_BODY()
 
-    ACogDebugReplicator* Owner = nullptr;
+    TObjectPtr<ACogDebugReplicator> Owner;
 
-    bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms);
+    bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParams);
 
 private:
 
@@ -63,7 +63,7 @@ public:
 
     static ACogDebugReplicator* GetLocalReplicator(const UWorld& World);
 
-    static void GetRemoteReplicators(UWorld& World, TArray<ACogDebugReplicator*>& Replicators);
+    static void GetRemoteReplicators(const UWorld& World, TArray<ACogDebugReplicator*>& Replicators);
 
     virtual void BeginPlay() override;
     
@@ -98,7 +98,7 @@ public:
 protected:
     friend FCogReplicatorNetPack;
 
-    TObjectPtr<APlayerController> OwnerPlayerController;
+    TWeakObjectPtr<APlayerController> OwnerPlayerController;
 
     uint32 bHasAuthority : 1;
 

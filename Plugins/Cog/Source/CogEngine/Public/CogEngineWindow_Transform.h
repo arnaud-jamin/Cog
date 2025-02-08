@@ -22,17 +22,17 @@ protected:
 
     virtual void RenderContent() override;
 
-    bool RenderComponent(const char* Label, double* Value, float Speed, double Min, double Max, double Reset);
+    virtual bool RenderComponent(const char* Label, double* Value, float Speed, double Min, double Max, double Reset);
 
-    void RenderSnap(const char* CheckboxLabel, const char* InputLabel, bool* SnapEnable, float* Snap);
+    virtual void RenderSnap(const char* CheckboxLabel, const char* InputLabel, bool* SnapEnable, float* Snap);
 
-    bool RenderLocation(FTransform& InOutTransform);
+    virtual bool RenderLocation(FTransform& InOutTransform);
 
-    bool RenderRotation(FTransform& InOutTransform);
+    virtual bool RenderRotation(FTransform& InOutTransform);
 
-    bool RenderScale(FTransform& InOutTransform);
+    virtual bool RenderScale(FTransform& InOutTransform);
 
-    bool RenderTransform(FTransform& InOutTransform);
+    virtual bool RenderTransform(FTransform& InOutTransform);
 
 private:
 

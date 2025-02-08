@@ -22,11 +22,11 @@ public:
 
     static UPlayerInput* GetPlayerInput(const UWorld& World);
 
-    static bool IsTopPriorityKey(UWorld* InWorld, const FKey& InKey);
+    static bool IsTopPriorityKey(const UWorld* InWorld, const FKey& InKey);
 
-    static bool IsTopPriorityKeyEvent(UWorld* InWorld, const FKeyEvent& InKeyEvent);
+    static bool IsTopPriorityKeyEvent(const UWorld* InWorld, const FKeyEvent& InKeyEvent);
 
-    static bool WasKeyInfoJustPressed(APlayerController& PlayerController, const FCogImGuiKeyInfo& KeyInfo);
+    static bool WasKeyInfoJustPressed(const APlayerController& PlayerController, const FCogImGuiKeyInfo& KeyInfo);
 
     static bool IsCheckBoxStateMatchingValue(ECheckBoxState CheckBoxState, bool bValue);
 
@@ -48,7 +48,7 @@ public:
 
     static bool IsConsoleEvent(const FKeyEvent& KeyEvent);
 
-    static bool IsKeyBoundToCommand(UWorld* World, const FKeyEvent& KeyEvent);
+    static bool IsKeyBoundToCommand(const UWorld* World, const FKeyEvent& KeyEvent);
 
     static bool IsStopPlaySessionEvent(const FKeyEvent& KeyEvent);
 

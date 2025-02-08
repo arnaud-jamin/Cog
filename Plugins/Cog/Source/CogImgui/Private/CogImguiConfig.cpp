@@ -1,3 +1,4 @@
+// ReSharper disable CppUnusedIncludeDirective
 #include "CogImguiConfig.h"
 
 THIRD_PARTY_INCLUDES_START

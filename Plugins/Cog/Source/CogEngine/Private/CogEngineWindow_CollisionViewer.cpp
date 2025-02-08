@@ -2,7 +2,6 @@
 
 #include "CogDebugDrawHelper.h"
 #include "CogDebug.h"
-#include "CogEngineCollisionTester.h"
 #include "CogImguiHelper.h"
 #include "CogWindowWidgets.h"
 #include "Components/PrimitiveComponent.h"
@@ -120,7 +119,7 @@ void FCogEngineWindow_CollisionViewer::RenderContent()
                 {
                     for (int j = 0; j < ECC_MAX; ++j)
                     {
-                        ECollisionResponse Response = Profile->ResponseToChannels.GetResponse((ECollisionChannel)j);
+                        ECollisionResponse Response = Profile->ResponseToChannels.GetResponse(static_cast<ECollisionChannel>(j));
                         if (Response != ECR_Ignore)
                         {
                             Config->ObjectTypesToQuery |= ECC_TO_BITFIELD(j);
@@ -182,6 +181,8 @@ void FCogEngineWindow_CollisionViewer::RenderContent()
             QueryRadius = Config->QueryThickness;
             break;
         }
+
+        default: break;
     }
 
     static const FName TraceTag(TEXT("FCogWindow_Collision"));

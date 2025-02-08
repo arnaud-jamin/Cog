@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "CogCommonConfig.h"
 #include "CogWindow.h"
+#include "CogWindowWidgets.h"
 #include "imgui.h"
 #include "Misc/OutputDevice.h"
 #include "CogEngineWindow_Notifications.generated.h"
@@ -21,16 +22,6 @@ public:
     virtual void Serialize(const TCHAR* Message, ELogVerbosity::Type Verbosity, const FName& Category) override;
 
     FCogEngineWindow_Notifications* Notifications = nullptr;
-};
-
-//--------------------------------------------------------------------------------------------------------------------------
-UENUM()
-enum class ECogEngineNotificationLocation : uint8
-{
-    TopLeft     = 0,
-    TopRight    = 1,
-    BottomLeft  = 2,
-    BottomRight = 3,
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -126,19 +117,19 @@ public:
     FColor TextErrorColor = FColor::White;
 
     UPROPERTY(Config)
-    ECogEngineNotificationLocation Location = ECogEngineNotificationLocation::BottomRight;
+    FVector2f Alignment = FVector2f(1.0f, 1.0f);
 
     UPROPERTY(Config)
-    int Padding = 10;
+    FIntVector2 Padding = FIntVector2(10, 10);
 
     UPROPERTY(Config)
     bool UseFixedWidth = true;
 
     UPROPERTY(Config)
-    int32 MaxHeight = 10;
+    int32 MaxHeight = 100;
     
     UPROPERTY(Config)
-    int32 TextWrapping = 20;
+    int32 TextWrapping = 200;
 
     UPROPERTY(Config)
     int32 Rounding = 6;
@@ -166,11 +157,11 @@ public:
         BorderWarningColor      = FColor(255, 200,   0, 100); 
         BorderErrorColor        = FColor(240,  77,  77, 100);
         
-        Location = ECogEngineNotificationLocation::BottomRight;
-        Padding = 10;
+        Alignment = { 1, 1 };
+        Padding = { 10, 10 };
         UseFixedWidth = true;
-        TextWrapping = 20;
-        MaxHeight = 10;
+        TextWrapping = 200;
+        MaxHeight = 100;
         Rounding = 6;
         ShowBorder = true;
         Duration = 5.0f;

@@ -60,6 +60,12 @@ bool FCogWindow::CheckEditorVisibility()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogWindow::RenderContextMenu()
 {
+    RenderSettings();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogWindow::RenderSettings()
+{
     if (bHasMenu)
     {
         ImGui::Checkbox("Show Menu", &bShowMenu);
@@ -75,46 +81,32 @@ void FCogWindow::RenderContextMenu()
 void FCogWindow::Render(float DeltaTime)
 {
     ImGuiWindowFlags WindowFlags = 0;
-    PreRender(WindowFlags);
-
-    const FString WindowTitle = GetTitle() + "##" + Name;
 
     if (bHasMenu && bShowMenu)
     {
         WindowFlags |= ImGuiWindowFlags_MenuBar;
     }
 
-    if (bNoPadding)
-    {
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-    }
+    PreBegin(WindowFlags);
     
-    if (ImGui::Begin(TCHAR_TO_ANSI(*WindowTitle), &bIsVisible, WindowFlags))
+    const FString WindowTitle = GetTitle() + "##" + Name;
+    const bool IsOpen = ImGui::Begin(StringCast<ANSICHAR>(*WindowTitle).Get(), &bIsVisible, WindowFlags);
+
+    PostBegin();
+    
+    if (IsOpen)
     {
-        if (bNoPadding)
-        {
-            ImGui::PopStyleVar(1);
-        }
+        RenderContent();
 
         if (ImGui::BeginPopupContextWindow())
         {
             RenderContextMenu();
             ImGui::EndPopup();
         }
-
-        RenderContent();
     }
-    else
-    {
-        if (bNoPadding)
-        {
-            ImGui::PopStyleVar(1);
-        }
-    }
-
     ImGui::End();
-
-    PostRender();
+    
+    PostEnd();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -223,7 +215,7 @@ void FCogWindow::ResetConfig()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-const UObject* FCogWindow::GetAsset(const TSubclassOf<UObject> AssetClass) const
+const UObject* FCogWindow::GetAsset(const TSubclassOf<UObject>& AssetClass) const
 {
     return GetOwner()->GetAsset(AssetClass);
 }
@@ -238,5 +230,11 @@ UWorld* FCogWindow::GetWorld() const
 bool FCogWindow::IsWindowRenderedInMainMenu()
 {
     return Owner->IsRenderingMainMenu();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+float FCogWindow::GetDpiScale() const
+{
+    return GetOwner()->GetContext().GetDpiScale();
 }
 
