@@ -25,7 +25,6 @@
 - CogEngine: Improve collision window: Add Query Type, Single or Multi, By Channel or Object Type, Object Type.
 - CogEngine: Add multi selection to the selection window actor filter (Character+GameState for example).
 - CogEngine: Add an event history window. Similar to the plot event, but a flat list with event name, params, frame and time.
-- CogEngine: Add more graphic settings (resolution, VSync, Window Mode).
 - CogEngine: Add a level loader. List the available level and load them.
 - CogEngine: Add an Audio window to change the volume. Maybe add a widget too.
 - CogEngine: Add quick shortcuts to change the time scale. (maybe -+).
