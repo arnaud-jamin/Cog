@@ -9,6 +9,11 @@
 - CogWindow: DPI change on mousewheel should be a command with a key bind as the rest.
 - CogWindow: Add more window help and tooltip on input window and more
 - CogWindow: Support loading/saving custom style
+- CogWindow: Fix time. Currently Cog is updated in the game state, making ImGui affected by the time scale. Also there is no need to unload reload windows when changing level.
+- CogWindow: Add a way for windows to define shorctuts that can be configured in the cog settings. 
+- CogWindow: Add shortcuts for cheats. Maybe Input Action should be used to be able to map on gamepad, for things like ghost.
+- CogWindow: Find a way to automate the settings reset without having to write a Reset function (maybe with reflection, but how to get constructed values?)
+- CogWindow: Add a way to access settings in a generic way between windows (sometime in a menu, sometime on a context menu, sometime directly on the window)
 
 - CogEngine: More stats in the stats window
 - CogEngine: Overlay mode of stats.
@@ -19,6 +24,15 @@
 - CogEngine: add menu on the PlotWindow wih the controls
 - CogEngine: Improve collision window: Add Query Type, Single or Multi, By Channel or Object Type, Object Type.
 - CogEngine: Add multi selection to the selection window actor filter (Character+GameState for example).
+- CogEngine: Add an event history window. Similar to the plot event, but a flat list with event name, params, frame and time.
+- CogEngine: Add more graphic settings (resolution, VSync, Window Mode)
+- CogEngine: Add a level loader. List the available level and load them.
+- CogEngine: Add an Audio window to change the volume. Maybe add a widget too.
+- CogEngine: Add quick shortcuts to change the time scale. (maybe -+)
+- CogEngine: Collapse similar notifications (optionaly). Maybe by comparing strings or by providing the file and line at which the notif has been created
+- CogEngine: Notification are not always over other windows. Should it be manually drawn on the foreground drawlist, like the build info ?
+- CogEngine: Fix selection widget going outside the screen when docking widgets to the right.
+- CogEngine: Fix collision tester spawning happening at the previous collision tester location instead of spawning at the character
 
 - CogSample: Add more info in the team window
 - CogSample: Create more abilities
@@ -33,3 +47,10 @@
 - CogInput: Add help about usnig CTRL+Drag on the stick to lock them
 
 - CogAbility: Add inputs to level up/down abilities and effects
+- CogAbility: Add Current Tasks of an ability
+- CogAbility: Add Current Montage of an ability
+- CogAbility: Override attribute base value
+- CogAbility: Add recently modified attribute. Maybe have a time threshold setting.
+
+- CogAI: Add AI perception toggle.
+
