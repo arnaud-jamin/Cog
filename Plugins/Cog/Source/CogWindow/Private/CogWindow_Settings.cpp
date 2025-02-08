@@ -142,6 +142,10 @@ void FCogWindow_Settings::RenderContent()
         //-------------------------------------------------------------------------------------------
         ImGui::Checkbox("Compact Mode", &Config->bCompactMode);
         FCogWindowWidgets::ItemTooltipWrappedText("Enable compact mode.");
+
+        //-------------------------------------------------------------------------------------------
+        ImGui::Checkbox("Transparent Mode", &Config->bTransparentMode);
+        FCogWindowWidgets::ItemTooltipWrappedText("Enable transparent mode.");
     
         //-------------------------------------------------------------------------------------------
         ImGui::Checkbox("Show Windows In Main Menu", &Config->bShowWindowsInMainMenu);
