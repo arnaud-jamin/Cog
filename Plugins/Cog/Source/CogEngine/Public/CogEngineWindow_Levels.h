@@ -38,6 +38,8 @@ private:
     
     TArray<FAssetData> UnsortedLevels;
 
+    bool HasGatheredLevels = false; 
+
     int32 SelectedIndex = -1;
 
     TObjectPtr<UCogEngineWindowConfig_LevelLoader> Config = nullptr;

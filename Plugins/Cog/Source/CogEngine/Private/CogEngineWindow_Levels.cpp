@@ -17,22 +17,16 @@ void FCogEngineWindow_Levels::Initialize()
 
     bHasMenu = true;
     Config = GetConfig<UCogEngineWindowConfig_LevelLoader>();
-    GetAllLevels(UnsortedLevels);
-
-    RefreshSorting();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
  void FCogEngineWindow_Levels::GetAllLevels(TArray<FAssetData>& OutLevels)
 {
     const FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
-    IAssetRegistry& AssetRegistry = AssetRegistryModule.Get();
-
-    AssetRegistry.SearchAllAssets(true);
+    const IAssetRegistry& AssetRegistry = AssetRegistryModule.Get();
 
     FARFilter AssetFilter;
     AssetFilter.ClassPaths.Add(UWorld::StaticClass()->GetClassPathName());
-    AssetFilter.bRecursiveClasses = true; 
 
     AssetRegistry.GetAssets(AssetFilter, OutLevels);
 
@@ -48,11 +42,11 @@ void FCogEngineWindow_Levels::RefreshSorting()
     {
         if (Config->ShowPath)
         {
-            Levels.Sort([](const FAssetData& InA, const FAssetData& InB) { return InA.PackagePath.Compare(InB.PackagePath) < 0; });
+            Levels.Sort([](const auto& InA, const auto& InB) { return InA.PackagePath.Compare(InB.PackagePath) < 0; });
         }
         else
         {
-            Levels.Sort([](const FAssetData& InA, const FAssetData& InB) { return InA.AssetName.Compare(InB.AssetName) < 0; });
+            Levels.Sort([](const auto& InA, const auto& InB) { return InA.AssetName.Compare(InB.AssetName) < 0; });
         }
     }
 }
@@ -88,6 +82,13 @@ void FCogEngineWindow_Levels::RenderContent()
 {
     Super::RenderContent();
 
+    if (HasGatheredLevels == false)
+    {
+        GetAllLevels(UnsortedLevels);
+        RefreshSorting();
+        HasGatheredLevels = true;
+    }
+    
     RenderMenu();
 
     const float FooterHeight = ImGui::GetFrameHeightWithSpacing();
@@ -133,15 +134,7 @@ void FCogEngineWindow_Levels::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Levels::RenderLevel(int32 InIndex, const FAssetData& InAsset)
 {
-    FString Label;
-    if (Config->ShowPath)
-    {
-        Label = InAsset.PackageName.ToString();
-    }
-    else
-    {
-        Label = InAsset.AssetName.ToString();
-    }
+    const FString Label = Config->ShowPath ? InAsset.PackageName.ToString() : InAsset.AssetName.ToString();
 
     const auto LabelStr = StringCast<ANSICHAR>(*Label);
     if (Filter.PassFilter(LabelStr.Get()) == false)
@@ -156,7 +149,7 @@ void FCogEngineWindow_Levels::RenderLevel(int32 InIndex, const FAssetData& InAss
         }
     }
 
-    ImGui::SetItemTooltip(StringCast<ANSICHAR>(*InAsset.PackagePath.ToString()).Get());
+    ImGui::SetItemTooltip(StringCast<ANSICHAR>(*InAsset.PackageName.ToString()).Get());
 
     RenderLevelContextMenu(InIndex, InAsset);
 }
