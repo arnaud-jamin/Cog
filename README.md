@@ -166,6 +166,13 @@ Used to inspect and modify an Object properties
 
 ---
 
+### Levels
+Can be used to load specific levels
+
+![image](https://github.com/user-attachments/assets/473ea0c8-05c6-4246-b295-995d4c43b6af)
+
+---
+
 ### Log Categories
 Can be used to activate and deactivate log categories
 
