@@ -358,6 +358,8 @@ Used to apply tweaks to all the spawned actors
 - The tweaks are used to test various gameplay settings by actor category
 - The tweaks can be configured in a data asset.
 
+---
+
 ## Debug Functionalities
 
 Cog provides C++ and Blueprint functions to log and debug draw within Log Categories. 
