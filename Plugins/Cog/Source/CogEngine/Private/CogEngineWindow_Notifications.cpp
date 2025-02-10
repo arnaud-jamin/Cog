@@ -47,7 +47,6 @@ void FCogEngineWindow_Notifications::AddNotification(const TCHAR* InMessage, ELo
 void FCogEngineWindow_Notifications::OnLogReceived(const TCHAR* InMessage, ELogVerbosity::Type InVerbosity, const class FName& InCategory)
 {
 #if !NO_LOGGING
-
     if (Config == nullptr)
     { return; }
 
@@ -56,7 +55,6 @@ void FCogEngineWindow_Notifications::OnLogReceived(const TCHAR* InMessage, ELogV
     
     static FName CmdName("Cmd");
 
-#if ENABLE_COG
     if (InCategory == LogCogNotify.GetCategoryName()
         || (InCategory == CmdName && Config->NotifyConsoleCommands)
         || (InVerbosity == ELogVerbosity::Warning && Config->NotifyAllWarnings)

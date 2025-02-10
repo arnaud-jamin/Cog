@@ -58,13 +58,6 @@ void FCogEngineWindow_OutputLog::AddLog(const TCHAR* InMessage, ELogVerbosity::T
     TextBuffer.append(Format.GetData(), Format.GetData() + Format.Len());
 
     LogInfo.LineEnd = TextBuffer.size();
-
-#if !NO_LOGGING
-    if (LogInfo.Category == LogCogNotify.GetCategoryName())
-    {
-        Notifications.Emplace(LogInfo);
-    }
-#endif
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
