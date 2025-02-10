@@ -18,6 +18,7 @@
 #include "CogEngineWindow_DebugSettings.h"
 #include "CogEngineWindow_ImGui.h"
 #include "CogEngineWindow_Inspector.h"
+#include "CogEngineWindow_Levels.h"
 #include "CogEngineWindow_LogCategories.h"
 #include "CogEngineWindow_Metrics.h"
 #include "CogEngineWindow_NetImgui.h"
@@ -68,6 +69,8 @@ void Cog::AddAllWindows(UCogWindowManager& CogWindowManager)
                 UserSettings->ApplySettings(true);
             }
         });
+
+    CogWindowManager.AddWindow<FCogEngineWindow_Levels>("Engine.Levels");
 
     CogWindowManager.AddWindow<FCogEngineWindow_LogCategories>("Engine.Log Categories");
 

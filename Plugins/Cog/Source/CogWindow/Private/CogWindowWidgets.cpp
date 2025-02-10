@@ -1237,6 +1237,24 @@ bool FCogWindowWidgets::BrowseToAssetButton(const UObject* InAsset, const ImVec2
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+bool FCogWindowWidgets::BrowseToAssetButton(const FAssetData& InAssetData, const ImVec2& InSize)
+{
+#if WITH_EDITOR
+
+    const bool result = ImGui::Button("Browse To Asset", InSize);
+    if (result)
+    {
+        IAssetTools::Get().SyncBrowserToAssets({ InAssetData });
+    }
+
+    return result;
+
+#else
+    return false;
+#endif
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 bool FCogWindowWidgets::BrowseToObjectAssetButton(const UObject* InObject, const ImVec2& InSize)
 {
 #if WITH_EDITOR

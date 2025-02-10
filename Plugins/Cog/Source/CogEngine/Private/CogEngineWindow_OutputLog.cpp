@@ -34,7 +34,6 @@ void FCogEngineWindow_OutputLog::Clear()
 {
     TextBuffer.clear();
     LogInfos.Empty();
-    Notifications.Empty();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -133,6 +133,8 @@ public:
     static void MenuItemShortcut(const char* Id, const FString& Text);
 
     static bool BrowseToAssetButton(const UObject* InAsset, const ImVec2& InSize = ImVec2(0, 0));
+    
+    static bool BrowseToAssetButton(const FAssetData& InAssetData, const ImVec2& InSize = ImVec2(0, 0));
 
     static bool BrowseToObjectAssetButton(const UObject* InObject, const ImVec2& InSize = ImVec2(0, 0));
 

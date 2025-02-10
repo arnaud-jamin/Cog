@@ -6,14 +6,6 @@
 #include "CogWindowWidgets.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Spawns::Initialize()
-{
-    Super::Initialize();
-
-    Asset = GetAsset<UCogEngineDataAsset>();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Spawns::RenderHelp()
 {
     ImGui::Text(
@@ -21,6 +13,14 @@ void FCogEngineWindow_Spawns::RenderHelp()
         "The spawn list can be configured in the '%s' data asset. "
         , TCHAR_TO_ANSI(*GetNameSafe(Asset.Get()))
     );
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogEngineWindow_Spawns::Initialize()
+{
+    Super::Initialize();
+
+    Asset = GetAsset<UCogEngineDataAsset>();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -92,6 +92,7 @@ typedef FLogCategoryBase FCogLogCategoryAlias;
         COG_LOG(LogCategory, Verbosity, TEXT("%s | %s"), *GetNameSafe(Object), *FString::Printf(Format, ##__VA_ARGS__));    \
     }                                                                                                                       \
 
+
 #else
 
 #define COG_LOG_ACTIVE_FOR_OBJECT(Object)                                       (0)

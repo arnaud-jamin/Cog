@@ -67,8 +67,6 @@ protected:
     FCogLogOutputDevice OutputDevice;
 
     TWeakObjectPtr<UCogEngineConfig_OutputLog> Config;
-
-    TArray<FLogInfo> Notifications;
 };
 
 //--------------------------------------------------------------------------------------------------------------------------

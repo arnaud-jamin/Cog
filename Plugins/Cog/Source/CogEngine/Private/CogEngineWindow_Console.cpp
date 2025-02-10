@@ -590,7 +590,7 @@ void FCogEngineWindow_Console::RefreshCommandList()
         if (Command.IsEmpty())
         { continue; }
 
-        if (CurrentUserInput.IsEmpty() == false && Command.StartsWith(CurrentUserInput) == false)
+        if (CurrentUserInput.IsEmpty() == false && Command.Contains(CurrentUserInput) == false)
         { continue; }
 
         if (CommandList.Num() >= Config->NumHistoryCommands)
@@ -611,7 +611,7 @@ void FCogEngineWindow_Console::RefreshCommandList()
             Commands.Add(InName);
         };
 
-        IConsoleManager::Get().ForEachConsoleObjectThatStartsWith(FConsoleObjectVisitor::CreateLambda(OnConsoleObject), *CurrentUserInputWithoutArgs);
+        IConsoleManager::Get().ForEachConsoleObjectThatContains(FConsoleObjectVisitor::CreateLambda(OnConsoleObject), *CurrentUserInputWithoutArgs);
     }
 
     if (Config->SortCommands)
