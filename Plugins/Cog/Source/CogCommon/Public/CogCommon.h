@@ -16,6 +16,12 @@ typedef FNoLoggingCategory FCogLogCategoryAlias;
 typedef FLogCategoryBase FCogLogCategoryAlias;
 #endif
 
+#if ENABLE_COG
+#define IF_COG(expr) { expr; }
+#else
+#define IF_COG(expr) (0)
+#endif
+
 /**
  * Logging Macros
  */
