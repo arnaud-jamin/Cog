@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogCommon.h"
 #include "CogCommonLog.generated.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -30,5 +31,5 @@ struct COGCOMMON_API FCogLogCategory
 
     FString GetName() const { return Name.ToString(); }
 
-    mutable FLogCategoryBase* LogCategory = nullptr;
+    mutable FCogLogCategoryAlias* LogCategory = nullptr;
 };

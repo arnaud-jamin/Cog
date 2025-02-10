@@ -179,7 +179,7 @@ void UCogSampleProjectileComponent::TickComponent(float DeltaTime, enum ELevelTi
 
     //TravelingTime += DeltaTime;
 
-#if ENABLE_COG
+#if ENABLE_COG && !NO_LOGGING
 
     if (FCogDebugLog::IsLogCategoryActive(LogCogProjectile))
     {
