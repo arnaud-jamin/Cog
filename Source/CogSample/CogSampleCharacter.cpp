@@ -27,7 +27,7 @@
 #if ENABLE_COG
 #include "CogAbilityReplicator.h"
 #include "CogDebugMetric.h"
-#include "CogDebugPlot.h"
+#include "CogDebug.h"
 #endif //ENABLE_COG
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -402,7 +402,7 @@ void ACogSampleCharacter::OnAbilityInputStarted(const UInputAction* InputAction,
     COG_LOG_OBJECT(LogCogInput, ELogVerbosity::Verbose, this, TEXT("%d"), Index);
 
 #if ENABLE_COG
-    FCogDebugPlot::PlotEventStart(this, "Input", InputAction->GetFName());
+    FCogDebug::StartEvent(this, "Input", InputAction->GetFName());
 #endif
 
     if (ActiveAbilityHandles.IsValidIndex(Index) == false)
@@ -450,7 +450,7 @@ void ACogSampleCharacter::OnAbilityInputCompleted(const UInputAction* InputActio
     COG_LOG_OBJECT(LogCogInput, ELogVerbosity::Verbose, this, TEXT("%d"), Index);
 
 #if ENABLE_COG
-    FCogDebugPlot::PlotEventStop(this, "Input", InputAction->GetFName());
+    FCogDebug::StopEvent(this, "Input", InputAction->GetFName());
 #endif
 
     if (ActiveAbilityHandles.IsValidIndex(Index) == false)
@@ -631,7 +631,7 @@ void ACogSampleCharacter::OnRevived(AActor* InInstigator, AActor* InCauser, cons
 void ACogSampleCharacter::OnGameplayEffectAdded(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& GameplayEffectSpec, FActiveGameplayEffectHandle Handle)
 {
 #if ENABLE_COG
-    FCogDebugPlot::PlotEvent(this, "Effects", GameplayEffectSpec.Def->GetFName(), GameplayEffectSpec.GetDuration() == 0.0f)
+    FCogDebug::StartEvent(this, "Effects", GameplayEffectSpec.Def->GetFName(), GameplayEffectSpec.GetDuration() == 0.0f)
                     .AddParam("Name", AbilitySystemComponent->CleanupName(GetNameSafe(GameplayEffectSpec.Def)))
                     .AddParam("Effect Instigator", GetNameSafe(GameplayEffectSpec.GetEffectContext().GetInstigator()))
                     .AddParam("Effect Level", GameplayEffectSpec.GetLevel())
@@ -643,7 +643,7 @@ void ACogSampleCharacter::OnGameplayEffectAdded(UAbilitySystemComponent* Ability
 void ACogSampleCharacter::OnGameplayEffectRemoved(const FActiveGameplayEffect& RemovedGameplayEffect)
 {
 #if ENABLE_COG
-    FCogDebugPlot::PlotEventStop(this, "Effects", RemovedGameplayEffect.Spec.Def->GetFName());
+    FCogDebug::StopEvent(this, "Effects", RemovedGameplayEffect.Spec.Def->GetFName());
 #endif //ENABLE_COG
 }
 

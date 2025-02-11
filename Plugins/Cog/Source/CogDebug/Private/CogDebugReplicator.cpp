@@ -217,11 +217,11 @@ void ACogDebugReplicator::Server_SetSelection_Implementation(AActor* Value, bool
 
     if (ForceSelection)
     {
-        FCogDebug::SetSelection(GetWorld(), Value);
+        FCogDebug::SetSelection(Value);
     }
     else
     {
-        FCogDebug::SetSelection(GetWorld(), nullptr);
+        FCogDebug::SetSelection(nullptr);
     }
 
 

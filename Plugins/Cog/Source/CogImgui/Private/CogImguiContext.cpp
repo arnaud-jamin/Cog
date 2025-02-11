@@ -54,11 +54,11 @@ FCogImGuiContextScope::~FCogImGuiContextScope()
 bool FCogImguiContext::bIsNetImGuiInitialized = false;
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogImguiContext::Initialize()
+void FCogImguiContext::Initialize(UGameViewportClient* InGameViewport)
 {
     IMGUI_CHECKVERSION();
 
-    GameViewport = GEngine->GameViewport;
+    GameViewport = InGameViewport;
 
     if (GameViewport != nullptr)
     {

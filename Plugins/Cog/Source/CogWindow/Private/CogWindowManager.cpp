@@ -1,5 +1,6 @@
 #include "CogWindowManager.h"
 
+#include "CogCommon.h"
 #include "CogDebugDrawImGui.h"
 #include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
@@ -28,9 +29,33 @@ UCogWindowManager::UCogWindowManager()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::InitializeInternal()
+void UCogWindowManager::Initialize(FSubsystemCollectionBase& Collection)
 {
-    Context.Initialize();
+    Super::Initialize(Collection);
+    FWorldDelegates::OnWorldPostActorTick.AddUObject(this, &ThisClass::Tick);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogWindowManager::Deinitialize()
+{
+    Super::Deinitialize();
+    Shutdown();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogWindowManager::TryInitializeInternal()
+{
+    if (IsInitialized)
+    { return; }
+
+    FWorldContext* WorldContext = GEngine->GetWorldContextFromWorld(GetWorld());
+    if (WorldContext == nullptr)
+    { return; }
+
+    if (WorldContext->GameViewport == nullptr && IsRunningDedicatedServer() == false)
+    { return; }
+
+    Context.Initialize(WorldContext->GameViewport.Get());
 
     FCogImGuiContextScope ImGuiContextScope(Context);
 
@@ -111,7 +136,6 @@ void UCogWindowManager::InitializeInternal()
         }));
 
     IsInitialized = true;
-
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -155,18 +179,22 @@ void UCogWindowManager::Shutdown()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::Tick(float DeltaTime)
+void UCogWindowManager::Tick(UWorld* World, ELevelTick TickType, float DeltaTime)
 {
+    //----------------------------------------------------------------------------------------------
+    // The tick currently gets called from a static tick function, which tick for all PIE worlds.
+    // We must not tick for a different world than ours.
+    // TODO: find a cleaner way to tick only for our world.
+    //----------------------------------------------------------------------------------------------
+    if (GetWorld() != World)
+    { return; }
+    
     FCogImGuiContextScope ImGuiContextScope(Context);
 
-    if (GEngine->GameViewport == nullptr && IsRunningDedicatedServer() == false)
-    {
-        return;
-    }
-    
     if (IsInitialized == false)
     {
-        InitializeInternal();
+        TryInitializeInternal();
+        return;
     }
     
     if (LayoutToLoad != -1)
@@ -247,6 +275,12 @@ void UCogWindowManager::Render(float DeltaTime)
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogWindowManager::AddWindow(FCogWindow* Window, const FString& Name, const bool AddToMainMenu /*= true*/)
 {
+    if (Windows.ContainsByPredicate([&](const FCogWindow* w) { return w->GetName() == Name; }))
+    {
+        COG_LOG_FUNC(LogCogImGui, ELogVerbosity::Warning, TEXT("Trying to add a window, but one already exist with the same name: %s"), *Name);
+        return;
+    }
+    
     Window->SetFullName(Name);
     Window->SetOwner(this);
     Windows.Add(Window);
@@ -745,9 +779,7 @@ void UCogWindowManager::ResetAllWindowsConfig()
 void UCogWindowManager::AddCommand(UPlayerInput* PlayerInput, const FString& Command, const FKey& Key)
 {
     if (PlayerInput == nullptr)
-    {
-        return;
-    }
+    { return; }
 
     //---------------------------------------------------
     // Reassign conflicting commands

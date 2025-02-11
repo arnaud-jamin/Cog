@@ -42,8 +42,6 @@ protected:
 
 #if ENABLE_COG
 
-    void InitializeCog();
-
     TObjectPtr<UCogWindowManager> CogWindowManager = nullptr;
 
     float _ClientFramerateSmooth = 0.0f;

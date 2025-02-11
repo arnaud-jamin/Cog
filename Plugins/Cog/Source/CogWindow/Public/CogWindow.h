@@ -7,6 +7,7 @@
 #include "UObject/ReflectedTypeAccessors.h"
 #include "UObject/WeakObjectPtrTemplates.h"
 
+struct FCogDebugContext;
 class AActor;
 class APawn;
 class APlayerController;
@@ -20,9 +21,9 @@ public:
     
     virtual ~FCogWindow() {}
 
-    virtual void Initialize() {}
+    virtual void Initialize();
 
-    virtual void Shutdown() {}
+    virtual void Shutdown();
 
     virtual void ResetConfig();
 
@@ -39,7 +40,8 @@ public:
 
     /**  */
     virtual void RenderMainMenuWidget();
-    void RenderSettings();
+
+    virtual void RenderSettings();
 
     ImGuiID GetID() const { return ID; }
 
@@ -51,7 +53,7 @@ public:
     /** The short name of the window. "Effect" if the window full name is "Gameplay.Character.Effect" */
     const FString& GetName() const { return Name; }
 
-    AActor* GetSelection() const { return CurrentSelection.Get(); }
+    AActor* GetSelection() const;
 
     void SetSelection(AActor* Actor);
 
@@ -119,8 +121,8 @@ protected:
 
     ULocalPlayer* GetLocalPlayer() const;
 
-protected:
-
+    bool bIsInitialized = false;
+    
     bool bShowMenu = true;
 
     bool bHasMenu = false;
@@ -142,10 +144,6 @@ protected:
     FString Title;
 
     UCogWindowManager* Owner = nullptr;
-
-    TWeakObjectPtr<AActor> CurrentSelection;
-
-    TWeakObjectPtr<AActor> OverridenSelection;
 
     mutable TArray<TWeakObjectPtr<UCogCommonConfig>> ConfigsToResetOnRequest;
 };

@@ -8,7 +8,6 @@
 
 #if ENABLE_COG
 #include "CogAll.h"
-#include "CogDebugPlot.h"
 #include "CogSampleWindow_Team.h"
 #include "CogWindowManager.h"
 #endif //ENABLE_COG
@@ -40,31 +39,12 @@ void ACogSampleGameState::BeginPlay()
     Super::BeginPlay();
 
     AbilitySystemComponent->InitAbilityActorInfo(this, this);
-
-#if ENABLE_COG
-    CogWindowManager = NewObject<UCogWindowManager>(this);
-    CogWindowManagerRef = CogWindowManager;
-
-	// Add all the built-in windows
-    Cog::AddAllWindows(*CogWindowManager);
-
-	// Add a custom window 
-    CogWindowManager->AddWindow<FCogSampleWindow_Team>("Gameplay.Team");
-#endif //ENABLE_COG
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogSampleGameState::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
     Super::EndPlay(EndPlayReason);
-
-#if ENABLE_COG
-    
-    if (CogWindowManager != nullptr)
-    {
-        CogWindowManager->Shutdown();
-    }
-#endif //ENABLE_COG
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -88,10 +68,10 @@ void ACogSampleGameState::Tick(float DeltaSeconds)
 
     if (GetLocalRole() != ROLE_Authority)
     {
-        FCogDebugPlot::PlotValue(this, "Frame Rate Client Raw", GAverageFPS);
-        FCogDebugPlot::PlotValue(this, "Frame Rate Client Smooth", _ClientFramerateSmooth);
-        FCogDebugPlot::PlotValue(this, "Frame Rate Server Raw", _ServerFramerateRaw);
-        FCogDebugPlot::PlotValue(this, "Frame Rate Server Smooth", _ServerFramerateSmooth);
+        FCogDebug::Plot(this, "Frame Rate Client Raw", GAverageFPS);
+        FCogDebug::Plot(this, "Frame Rate Client Smooth", _ClientFramerateSmooth);
+        FCogDebug::Plot(this, "Frame Rate Server Raw", _ServerFramerateRaw);
+        FCogDebug::Plot(this, "Frame Rate Server Smooth", _ServerFramerateSmooth);
 
         if (const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController())
         {
@@ -99,16 +79,16 @@ void ACogSampleGameState::Tick(float DeltaSeconds)
             {
                 if (const APlayerState* PlayerState = PlayerController->GetPlayerState<APlayerState>())
                 {
-                    FCogDebugPlot::PlotValue(this, "Ping", PlayerState->GetPingInMilliseconds());
+                    FCogDebug::Plot(this, "Ping", PlayerState->GetPingInMilliseconds());
                 }
 
                 if (const UNetConnection* Connection = PlayerController->GetNetConnection())
                 {
-                    FCogDebugPlot::PlotValue(this,
+                    FCogDebug::Plot(this,
                         "Packet Loss In",
                         Connection->GetInLossPercentage().GetAvgLossPercentage() * 100.0f);
 
-                    FCogDebugPlot::PlotValue(this,
+                    FCogDebug::Plot(this,
                         "Packet Loss Out",
                         Connection->GetOutLossPercentage().GetAvgLossPercentage() * 100.0f);
                 }
@@ -117,14 +97,8 @@ void ACogSampleGameState::Tick(float DeltaSeconds)
     }
     else
     {
-        FCogDebugPlot::PlotValue(this, "Frame Rate Raw", GAverageFPS);
-        FCogDebugPlot::PlotValue(this, "Frame Rate Smooth", _ClientFramerateSmooth);
-    }
-
-
-    if (CogWindowManager != nullptr)
-    {
-        CogWindowManager->Tick(DeltaSeconds);
+        FCogDebug::Plot(this, "Frame Rate Raw", GAverageFPS);
+        FCogDebug::Plot(this, "Frame Rate Smooth", _ClientFramerateSmooth);
     }
 
 #endif //ENABLE_COG

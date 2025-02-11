@@ -6,11 +6,12 @@
 #include "implot.h"
 #include "CogEngineWindow_Plots.generated.h"
 
-struct FCogDebugEventHistory;
-struct FCogDebugValueHistory;
+struct FCogDebugTrack;
+struct FCogDebugTracker;
+struct FCogDebugPlotTrack;
+struct FCogDebugEventTrack;
+struct FCogDebugEvent;
 struct ImVec2;
-struct FCogDebugPlotEvent;
-struct FCogDebugHistory;
 class UCogEngineConfig_Plots;
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -34,23 +35,23 @@ protected:
 
     virtual void RenderContent() override;
 
-    virtual void RenderAllEntriesNames(const ImVec2& InSize);
+    virtual void RenderAllEntriesNames(FCogDebugTracker& InTracker, const ImVec2& InSize);
 
-    virtual void RenderEntryName(const int Index, FCogDebugHistory& Entry);
+    virtual void RenderEntryName(FCogDebugTracker& InTracker, int Index, FCogDebugTrack& Entry);
 
-    virtual void RenderPlots();
+    virtual void RenderPlots(FCogDebugTracker& InTracker);
 
-    virtual void RenderMenu();
+    virtual void RenderMenu(FCogDebugTracker& InTracker);
 
-    virtual void RenderValues(FCogDebugValueHistory& Entry, const char* Label) const;
+    virtual void RenderValues(FCogDebugPlotTrack& Timeline, const char* Label) const;
 
-    virtual void RenderEvents(FCogDebugEventHistory& Entry, const char* Label, const ImVec2& PlotMin, const ImVec2& PlotMax) const;
+    virtual void RenderEvents(FCogDebugEventTrack& InTrack, const char* InLabel, const ImVec2& InPlotMin, const ImVec2& InPlotMax) const;
 
-    static void RenderEventTooltip(const FCogDebugPlotEvent* HoveredEvent, const FCogDebugHistory& Entry);
+    static void RenderEventTooltip(const FCogDebugEvent* HoveredEvent, const FCogDebugTrack& Entry);
 
-    virtual void AssignToGraphAndAxis(const FName InName, const int32 InGraphIndex, const ImAxis InYAxis);
+    virtual void AssignToGraphAndAxis(FCogDebugTracker& InTracker, FName InName, int32 InGraphIndex, ImAxis InYAxis);
 
-    virtual void UnassignToGraphAndAxis(const FName InName);
+    virtual void UnassignToGraphAndAxis(FCogDebugTracker& InTracker, FName InName);
 
     virtual void RefreshPlotSettings();
 

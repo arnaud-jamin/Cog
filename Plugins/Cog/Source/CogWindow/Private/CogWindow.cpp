@@ -10,6 +10,19 @@
 #include "Engine/LocalPlayer.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
+void FCogWindow::Initialize()
+{
+    ensure(bIsInitialized == false);
+    bIsInitialized = true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogWindow::Shutdown()
+{
+    bIsInitialized = false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void FCogWindow::SetFullName(const FString& InFullName)
 {
     FullName = InFullName;
@@ -129,15 +142,16 @@ void FCogWindow::GameTick(float DeltaTime)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogWindow::SetSelection(AActor* NewSelection)
 {
-    if (CurrentSelection == NewSelection)
-    {
-        return;
-    }
+    AActor* OldActor = GetSelection();
+    FCogDebug::SetSelection(NewSelection);
 
-    AActor* OldActor = CurrentSelection.Get();
-
-    CurrentSelection = NewSelection;
     OnSelectionChanged(OldActor, NewSelection);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+AActor* FCogWindow::GetSelection() const
+{
+    return FCogDebug::GetSelection();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -128,7 +128,7 @@ void FCogEngineWindow_Selection::RenderTick(float DeltaTime)
 {
     Super::RenderTick(DeltaTime);
 
-    if (FCogDebug::GetSelection() == nullptr)
+    if (GetSelection() == nullptr)
     {
         SetGlobalSelection(GetLocalPlayerPawn());
     }
@@ -236,7 +236,7 @@ bool FCogEngineWindow_Selection::TickSelectionMode()
         // Prioritize another actor than the selected actor unless we only touch the selected actor.
         //--------------------------------------------------------------------------------------------------------
         TArray<AActor*> IgnoreList;
-        IgnoreList.Add(FCogDebug::GetSelection());
+        IgnoreList.Add(GetSelection());
 
         FHitResult HitResult;
         for (int i = 0; i < 2; ++i)
@@ -328,7 +328,7 @@ void FCogEngineWindow_Selection::RenderActorContextMenu(AActor& Actor)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Selection::SetGlobalSelection(AActor* Value) const
 {
-    FCogDebug::SetSelection(GetWorld(), Value);
+    FCogDebug::SetSelection(Value);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

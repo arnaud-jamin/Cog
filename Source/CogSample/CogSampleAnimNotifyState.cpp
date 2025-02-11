@@ -8,7 +8,7 @@
 #include "Components/SkeletalMeshComponent.h"
 
 #if ENABLE_COG
-#include "CogDebugPlot.h"
+#include "CogDebug.h"
 #endif
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ UCogSampleAnimNotifyState::UCogSampleAnimNotifyState(const FObjectInitializer& O
 void UCogSampleAnimNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference)
 {
 #if ENABLE_COG
-    FCogDebugPlot::PlotEventStart(MeshComp->GetOwner(), "Anim Notify", GetFName())
+    FCogDebug::StartEvent(MeshComp->GetOwner(), "Anim Notify", GetFName())
         .AddParam("Name", GetNameSafe(this))
         .AddParam("Animation", GetNameSafe(Animation))
         .AddParam("Debug Info", GetDebugInfo());
@@ -35,7 +35,7 @@ void UCogSampleAnimNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UA
 void UCogSampleAnimNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 #if ENABLE_COG
-    FCogDebugPlot::PlotEventStop(MeshComp->GetOwner(), "Anim Notify", GetFName());
+    FCogDebug::StopEvent(MeshComp->GetOwner(), "Anim Notify", GetFName());
 #endif
 
     Super::NotifyEnd(MeshComp, Animation, EventReference);

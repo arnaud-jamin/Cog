@@ -1,7 +1,9 @@
 #include "CogEngineWindow_Plots.h"
 
-#include "CogDebugPlot.h"
+#include "CogDebug.h"
+#include "CogDebugTracker.h"
 #include "CogImguiHelper.h"
+#include "CogWindowManager.h"
 #include "CogWindowWidgets.h"
 #include "Engine/World.h"
 #include "imgui.h"
@@ -14,14 +16,14 @@ void FCogEngineWindow_Plots::Initialize()
 
     bHasMenu = true;
 
+    auto& Tracker = FCogDebug::GetTracker();
+    Tracker.Clear();
+    
     Config = GetConfig<UCogEngineConfig_Plots>();
-
     if (Config != nullptr)
     {
         RefreshPlotSettings();
     }
-    
-    FCogDebugPlot::Clear();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -44,7 +46,9 @@ void FCogEngineWindow_Plots::ResetConfig()
 void FCogEngineWindow_Plots::RenderTick(float DeltaTime)
 {
     Super::RenderTick(DeltaTime);
-    FCogDebugPlot::IsVisible = GetIsVisible();
+
+    FCogDebugTracker& Tracker = FCogDebug::GetTracker();
+    Tracker.IsVisible = GetIsVisible();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -64,7 +68,9 @@ void FCogEngineWindow_Plots::RenderContent()
 {
     Super::RenderContent();
 
-    RenderMenu();
+    FCogDebugTracker& Tracker = FCogDebug::GetTracker();
+
+    RenderMenu(Tracker);
 
     if (Config->DockEntries)
     {
@@ -81,10 +87,10 @@ void FCogEngineWindow_Plots::RenderContent()
 
 
             ImGui::TableNextColumn();
-            RenderAllEntriesNames(ImVec2(0, -1));
+            RenderAllEntriesNames(Tracker, ImVec2(0, -1));
 
             ImGui::TableNextColumn();
-            RenderPlots();
+            RenderPlots(Tracker);
 
             ImGui::EndTable();
         }
@@ -92,7 +98,7 @@ void FCogEngineWindow_Plots::RenderContent()
     }
     else
     {
-        RenderPlots();
+        RenderPlots(Tracker);
     }
 
     bApplyTimeScale = false;
@@ -101,12 +107,13 @@ void FCogEngineWindow_Plots::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Plots::RefreshPlotSettings()
 {
-    FCogDebugPlot::SetNumRecordedValues(Config->NumRecordedValues);
-    FCogDebugPlot::RecordValuesWhenPause = Config->RecordValuesWhenPaused;
+    FCogDebugTracker& Tracker = FCogDebug::GetTracker();
+    Tracker.SetNumRecordedValues(Config->NumRecordedValues);
+    Tracker.RecordValuesWhenPause = Config->RecordValuesWhenPaused;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Plots::RenderMenu()
+void FCogEngineWindow_Plots::RenderMenu(FCogDebugTracker& InTracker)
 {
     if (ImGui::BeginMenuBar())
     {
@@ -114,7 +121,7 @@ void FCogEngineWindow_Plots::RenderMenu()
         {
             if (ImGui::BeginMenu("Entries"))
             {
-                RenderAllEntriesNames(ImVec2(ImGui::GetFontSize() * 15, ImGui::GetFontSize() * 20));
+                RenderAllEntriesNames(InTracker, ImVec2(ImGui::GetFontSize() * 15, ImGui::GetFontSize() * 20));
                 ImGui::EndMenu();
             }
         }
@@ -176,8 +183,8 @@ void FCogEngineWindow_Plots::RenderMenu()
 
             if (ImGui::MenuItem("Reset Settings"))
             {
-                FCogDebugPlot::Pause = false;
-                FCogDebugPlot::Reset();
+                InTracker.Pause = false;
+                InTracker.Reset();
                 ResetConfig();
                 bApplyTimeScale = true;
             }
@@ -187,17 +194,17 @@ void FCogEngineWindow_Plots::RenderMenu()
 
         if (ImGui::MenuItem("Clear"))
         {
-            FCogDebugPlot::Clear();
+            InTracker.Clear();
         }
 
-        FCogWindowWidgets::ToggleMenuButton(&FCogDebugPlot::Pause, "Pause", ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+        FCogWindowWidgets::ToggleMenuButton(&InTracker.Pause, "Pause", ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
 
         ImGui::EndMenuBar();
     }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Plots::RenderEntryName(const int Index, FCogDebugHistory& Entry)
+void FCogEngineWindow_Plots::RenderEntryName(FCogDebugTracker& InTracker, const int Index, FCogDebugTrack& Entry)
 {
     ImGui::PushID(Index);
 
@@ -206,28 +213,28 @@ void FCogEngineWindow_Plots::RenderEntryName(const int Index, FCogDebugHistory& 
     for (int32 i = 0; i < UCogEngineConfig_Plots::MaxNumGraphs; ++i)
     {
         FCogEngineConfig_Plots_GraphInfo& GraphInfo = Config->Graphs[i];
-        if (GraphInfo.Entries.ContainsByPredicate([Entry](const auto& InEntry) { return InEntry.Name == Entry.Name; }))
+        if (GraphInfo.Entries.ContainsByPredicate([Entry](const auto& InEntry) { return InEntry.Name == Entry.Id; }))
         {
             IsAssignedToGraph = true;
             break;
         }
     }
 
-    if (ImGui::Selectable(TCHAR_TO_ANSI(*Entry.Name.ToString()), IsAssignedToGraph, ImGuiSelectableFlags_AllowDoubleClick))
+    if (ImGui::Selectable(TCHAR_TO_ANSI(*Entry.Id.ToString()), IsAssignedToGraph, ImGuiSelectableFlags_AllowDoubleClick))
     {
         if (IsAssignedToGraph)
         {
-            UnassignToGraphAndAxis(Entry.Name);
+            UnassignToGraphAndAxis(InTracker, Entry.Id);
         }
         else
         {
-            AssignToGraphAndAxis(Entry.Name, 0, ImAxis_Y1);
+            AssignToGraphAndAxis(InTracker, Entry.Id, 0, ImAxis_Y1);
         }
     }
 
     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
     {
-        const auto EntryName = StringCast<ANSICHAR>(*Entry.Name.ToString());
+        const auto EntryName = StringCast<ANSICHAR>(*Entry.Id.ToString());
         ImGui::SetDragDropPayload("DragAndDrop", EntryName.Get(), EntryName.Length() + 1);
         ImGui::Text("%s", EntryName.Get());
         ImGui::EndDragDropSource();
@@ -237,7 +244,7 @@ void FCogEngineWindow_Plots::RenderEntryName(const int Index, FCogDebugHistory& 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Plots::RenderAllEntriesNames(const ImVec2& InSize)
+void FCogEngineWindow_Plots::RenderAllEntriesNames(FCogDebugTracker& InTracker, const ImVec2& InSize)
 {
     const int32 Indent = ImGui::GetFontSize() * 0.5f;
 
@@ -248,15 +255,15 @@ void FCogEngineWindow_Plots::RenderAllEntriesNames(const ImVec2& InSize)
         if (FCogWindowWidgets::DarkCollapsingHeader("Events", ImGuiTreeNodeFlags_DefaultOpen))
         {
             ImGui::Indent(Indent);
-            if (FCogDebugPlot::Events.IsEmpty())
+            if (InTracker.Events.IsEmpty())
             {
                 ImGui::TextDisabled("No event added yet");
             }
             else
             {
-                for (auto& kv : FCogDebugPlot::Events)
+                for (auto& kv : InTracker.Events)
                 {
-                    RenderEntryName(Index, kv.Value);
+                    RenderEntryName(InTracker, Index, kv.Value);
                     Index++;
                 }
             }
@@ -266,15 +273,15 @@ void FCogEngineWindow_Plots::RenderAllEntriesNames(const ImVec2& InSize)
         if (FCogWindowWidgets::DarkCollapsingHeader("Plots", ImGuiTreeNodeFlags_DefaultOpen))
         {
             ImGui::Indent(Indent);
-            if (FCogDebugPlot::Values.IsEmpty())
+            if (InTracker.Values.IsEmpty())
             {
                 ImGui::TextDisabled("No plot added yet");
             }
             else
             {
-                for (auto& kv : FCogDebugPlot::Values)
+                for (auto& kv : InTracker.Values)
                 {
-                    RenderEntryName(Index, kv.Value);
+                    RenderEntryName(InTracker, Index, kv.Value);
                     Index++;
                 }
             }
@@ -287,14 +294,14 @@ void FCogEngineWindow_Plots::RenderAllEntriesNames(const ImVec2& InSize)
     {
         if (const ImGuiPayload* Payload = ImGui::AcceptDragDropPayload("DragAndDrop"))
         {
-            UnassignToGraphAndAxis(GetDroppedEntryName(Payload));
+            UnassignToGraphAndAxis(InTracker, GetDroppedEntryName(Payload));
         }
         ImGui::EndDragDropTarget();
     }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Plots::RenderPlots()
+void FCogEngineWindow_Plots::RenderPlots(FCogDebugTracker& InTracker)
 {
     if (ImGui::BeginChild("Graph", ImVec2(0, -1)))
     {
@@ -302,7 +309,7 @@ void FCogEngineWindow_Plots::RenderPlots()
         static float ColRatios[] = { 1 };
         static ImPlotSubplotFlags SubplotsFlags = ImPlotSubplotFlags_LinkCols;
 
-        const bool PushPlotBgStyle = FCogDebugPlot::Pause;
+        const bool PushPlotBgStyle = InTracker.Pause;
         if (PushPlotBgStyle)
         {
             ImPlot::PushStyleColor(ImPlotCol_PlotBg, FCogImguiHelper::ToImVec4(Config->PauseBackgroundColor));
@@ -340,7 +347,7 @@ void FCogEngineWindow_Plots::RenderPlots()
                         {
                             IsAssigned |= GraphEntry.YAxis == YAxis;
 
-                            if (FCogDebugEventHistory* EventHistory = FCogDebugPlot::Events.Find(GraphEntry.Name))
+                            if (FCogDebugEventTrack* EventHistory = InTracker.Events.Find(GraphEntry.Name))
                             {
                                 YMax = FMath::Max(FMath::Max(5, YMax), EventHistory->MaxRow);
                             }
@@ -386,7 +393,7 @@ void FCogEngineWindow_Plots::RenderPlots()
                         //--------------------------------------------------------------------------------
                         // Make the time axis move forward automatically, unless the user pauses or zoom.
                         //--------------------------------------------------------------------------------
-                        if (FCogDebugPlot::Pause == false && ImGui::GetIO().MouseWheel == 0)
+                        if (InTracker.Pause == false && ImGui::GetIO().MouseWheel == 0)
                         {
                             ImPlot::SetupAxisLimits(ImAxis_X1, Time - TimeRange, Time, ImGuiCond_Always);
                         }
@@ -417,14 +424,14 @@ void FCogEngineWindow_Plots::RenderPlots()
                         
                             if (FMath::Abs(Drag.x) > Config->DragPauseSensitivity)
                             {
-                                FCogDebugPlot::Pause = true;
+                                InTracker.Pause = true;
                             }
                         }
                     }
 
                     if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
                     {
-                        FCogDebugPlot::Pause = false;
+                        InTracker.Pause = false;
                     }
 
                     //---------------------------------------------------------------------------
@@ -443,7 +450,7 @@ void FCogEngineWindow_Plots::RenderPlots()
                             PlotDrawList->AddLine(ImVec2(ImGui::GetMousePos().x, PlotTop), ImVec2(ImGui::GetMousePos().x, TimeBarBottom), IM_COL32(128, 128, 128, 64));
                         }
 
-                        if (Config->ShowTimeBarAtGameTime && FCogDebugPlot::Pause)
+                        if (Config->ShowTimeBarAtGameTime && InTracker.Pause)
                         {
                             const float TimeBarX = ImPlot::PlotToPixels(Time, 0.0f).x;
                             PlotDrawList->AddLine(ImVec2(TimeBarX, PlotTop), ImVec2(TimeBarX, TimeBarBottom), IM_COL32(255, 255, 255, 64));
@@ -456,8 +463,8 @@ void FCogEngineWindow_Plots::RenderPlots()
                     //-----------------------------------------------------------
                     for (FCogEngineConfig_Plots_GraphEntryInfo& Entry : GraphInfo.Entries)
                     {
-                        FCogDebugHistory* History = FCogDebugPlot::FindEntry(Entry.Name);
-                        if (History == nullptr)
+                        FCogDebugTrack* Track = InTracker.FindTrack(Entry.Name);
+                        if (Track == nullptr)
                         {
                             continue;
                         }
@@ -470,17 +477,17 @@ void FCogEngineWindow_Plots::RenderPlots()
                         //-------------------------------------------------------
                         // Plot Events
                         //-------------------------------------------------------
-                        switch (History->Type)
+                        switch (Track->Type)
                         {
-                            case FCogDebugHistoryType::Event:
+                            case ECogDebugTrackType::Event:
                             {
-                                RenderEvents(*static_cast<FCogDebugEventHistory*>(History), Label.Get(), PlotMin, PlotMax);
+                                RenderEvents(*static_cast<FCogDebugEventTrack*>(Track), Label.Get(), PlotMin, PlotMax);
                                 break;
                             }
 
-                            case FCogDebugHistoryType::Value:
+                            case ECogDebugTrackType::Value:
                             {
-                                RenderValues(*static_cast<FCogDebugValueHistory*>(History), Label.Get());
+                                RenderValues(*static_cast<FCogDebugPlotTrack*>(Track), Label.Get());
                                 break;
                             }
                         }
@@ -505,7 +512,7 @@ void FCogEngineWindow_Plots::RenderPlots()
                     {
                         if (const ImGuiPayload* Payload = ImGui::AcceptDragDropPayload("DragAndDrop"))
                         {
-                            AssignToGraphAndAxis(GetDroppedEntryName(Payload), GraphIndex, ImAxis_Y1);
+                            AssignToGraphAndAxis(InTracker, GetDroppedEntryName(Payload), GraphIndex, ImAxis_Y1);
                         }
                         ImPlot::EndDragDropTarget();
                     }
@@ -520,7 +527,7 @@ void FCogEngineWindow_Plots::RenderPlots()
                         {
                             if (const ImGuiPayload* Payload = ImGui::AcceptDragDropPayload("DragAndDrop"))
                             {
-                                AssignToGraphAndAxis(GetDroppedEntryName(Payload), GraphIndex, YAxis);
+                                AssignToGraphAndAxis(InTracker, GetDroppedEntryName(Payload), GraphIndex, YAxis);
                             }
                             ImPlot::EndDragDropTarget();
                         }
@@ -533,7 +540,7 @@ void FCogEngineWindow_Plots::RenderPlots()
                     {
                         if (const ImGuiPayload* Payload = ImGui::AcceptDragDropPayload("DragAndDrop"))
                         {
-                            AssignToGraphAndAxis(GetDroppedEntryName(Payload), GraphIndex, ImAxis_Y1);
+                            AssignToGraphAndAxis(InTracker, GetDroppedEntryName(Payload), GraphIndex, ImAxis_Y1);
                         }
                         ImPlot::EndDragDropTarget();
                     }
@@ -557,9 +564,9 @@ void FCogEngineWindow_Plots::RenderPlots()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Plots::RenderValues(FCogDebugValueHistory& Entry, const char* Label) const
+void FCogEngineWindow_Plots::RenderValues(FCogDebugPlotTrack& Timeline, const char* Label) const
 {
-    if (Entry.Values.empty())
+    if (Timeline.Values.empty())
     {
         return;
     }
@@ -570,7 +577,7 @@ void FCogEngineWindow_Plots::RenderValues(FCogDebugValueHistory& Entry, const ch
     if (Config->ShowValueAtCursor && ImPlot::IsPlotHovered())
     {
         float Value;
-        if (Entry.FindValue(ImPlot::GetPlotMousePos().x, Value))
+        if (Timeline.FindValue(ImPlot::GetPlotMousePos().x, Value))
         {
             if (FCogWindowWidgets::BeginTableTooltip())
             {
@@ -588,26 +595,26 @@ void FCogEngineWindow_Plots::RenderValues(FCogDebugValueHistory& Entry, const ch
         }
     }
 
-    if (Entry.ShowValuesMarkers)
+    if (Timeline.ShowValuesMarkers)
     {
         ImPlot::SetNextMarkerStyle(ImPlotMarker_Circle);
     }
 
-    ImPlot::PlotLine(Label, &Entry.Values[0].x, &Entry.Values[0].y, Entry.Values.size(), ImPlotLineFlags_None, Entry.ValueOffset, 2 * sizeof(float));
+    ImPlot::PlotLine(Label, &Timeline.Values[0].x, &Timeline.Values[0].y, Timeline.Values.size(), ImPlotLineFlags_None, Timeline.ValueOffset, 2 * sizeof(float));
 
     if (ImPlot::BeginLegendPopup(Label))
     {
         if (ImGui::Button("Clear"))
         {
-            Entry.Clear();
+            Timeline.Clear();
         }
-        ImGui::Checkbox("Show Markers", &Entry.ShowValuesMarkers);
+        ImGui::Checkbox("Show Markers", &Timeline.ShowValuesMarkers);
         ImPlot::EndLegendPopup();
     }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Plots::RenderEvents(FCogDebugEventHistory& Entry, const char* Label, const ImVec2& PlotMin, const ImVec2& PlotMax) const
+void FCogEngineWindow_Plots::RenderEvents(FCogDebugEventTrack& InTrack, const char* InLabel, const ImVec2& InPlotMin, const ImVec2& InPlotMax) const
 {
     const ImVec2 Mouse = ImGui::GetMousePos();
     ImDrawList* PlotDrawList = ImPlot::GetPlotDrawList();
@@ -620,11 +627,11 @@ void FCogEngineWindow_Plots::RenderEvents(FCogDebugEventHistory& Entry, const ch
     ImVector<ImVec2> DummyData;
     DummyData.push_back(ImVec2(0, 0));
     DummyData.push_back(ImVec2(0, 8));
-    ImPlot::PlotLine(Label, &DummyData[0].x, &DummyData[0].y, DummyData.size(), Entry.EventOffset, 2 * sizeof(float));
+    ImPlot::PlotLine(InLabel, &DummyData[0].x, &DummyData[0].y, DummyData.size(), InTrack.EventOffset, 2 * sizeof(float));
 
-    const FCogDebugPlotEvent* HoveredEvent = nullptr;
+    const FCogDebugEvent* HoveredEvent = nullptr;
 
-    for (const FCogDebugPlotEvent& Event : Entry.Events)
+    for (const FCogDebugEvent& Event : InTrack.Events)
     {
         const ImVec2 PosBot = ImPlot::PlotToPixels(ImPlotPoint(Event.StartTime, Event.Row + 0.8f));
         const ImVec2 PosTop = ImPlot::PlotToPixels(ImPlotPoint(Event.StartTime, Event.Row + 0.2f));
@@ -645,7 +652,7 @@ void FCogEngineWindow_Plots::RenderEvents(FCogDebugEventHistory& Entry, const ch
         }
         else
         {
-            const float ActualEndTime = Event.GetActualEndTime(Entry);
+            const float ActualEndTime = Event.GetActualEndTime();
             const ImVec2 PosEnd = ImPlot::PlotToPixels(ImPlotPoint(ActualEndTime, 0));
             const ImVec2 Min = ImVec2(PosBot.x, PosBot.y);
             const ImVec2 Max = ImVec2(PosEnd.x, PosTop.y);
@@ -653,7 +660,7 @@ void FCogEngineWindow_Plots::RenderEvents(FCogDebugEventHistory& Entry, const ch
             const ImDrawFlags Flags = Event.EndTime == 0.0f ? ImDrawFlags_RoundCornersLeft : ImDrawFlags_RoundCornersAll;
             PlotDrawList->AddRect(Min, Max, Event.BorderColor, 6.0f, Flags);
             PlotDrawList->AddRectFilled(Min, Max, Event.FillColor, 6.0f, Flags);
-            PlotDrawList->PushClipRect(ImMax(Min, PlotMin), ImMin(Max, PlotMax));
+            PlotDrawList->PushClipRect(ImMax(Min, InPlotMin), ImMin(Max, InPlotMax));
             PlotDrawList->AddText(ImVec2(PosMid.x + 5, PosMid.y - 7), IM_COL32(255, 255, 255, 255), TCHAR_TO_ANSI(*Event.DisplayName));
             PlotDrawList->PopClipRect();
 
@@ -669,18 +676,18 @@ void FCogEngineWindow_Plots::RenderEvents(FCogDebugEventHistory& Entry, const ch
     //-------------------------------------------------------
     //char Buffer[64];
     //ImFormatString(Buffer, 64, "%0.1f %0.1f", Mouse.x, Mouse.y);
-    //PlotDrawList->AddText(ImVec2(PlotMin.x + 50, PlotMin.y + 100), IM_COL32(255, 255, 255, 255), Buffer);
+    //PlotDrawList->AddText(ImVec2(InPlotMin.x + 50, InPlotMin.y + 100), IM_COL32(255, 255, 255, 255), Buffer);
 
     //-------------------------------------------------------
     // Hovered event tooltip
     //-------------------------------------------------------
-    RenderEventTooltip(HoveredEvent, Entry);
+    RenderEventTooltip(HoveredEvent, InTrack);
 
     ImPlot::PopPlotClipRect();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Plots::RenderEventTooltip(const FCogDebugPlotEvent* HoveredEvent, const FCogDebugHistory& Entry)
+void FCogEngineWindow_Plots::RenderEventTooltip(const FCogDebugEvent* HoveredEvent, const FCogDebugTrack& Entry)
 {
     if (ImPlot::IsPlotHovered() && HoveredEvent != nullptr)
     {
@@ -711,8 +718,8 @@ void FCogEngineWindow_Plots::RenderEventTooltip(const FCogDebugPlotEvent* Hovere
                 //------------------------
                 if (HoveredEvent->EndTime != HoveredEvent->StartTime)
                 {
-                    const float ActualEndTime = HoveredEvent->GetActualEndTime(Entry);
-                    const uint64 ActualEndFrame = HoveredEvent->GetActualEndFrame(Entry);
+                    const float ActualEndTime = HoveredEvent->GetActualEndTime();
+                    const uint64 ActualEndFrame = HoveredEvent->GetActualEndFrame();
 
                     ImGui::TableNextRow();
                     ImGui::TableNextColumn();
@@ -741,7 +748,7 @@ void FCogEngineWindow_Plots::RenderEventTooltip(const FCogDebugPlotEvent* Hovere
                 //------------------------
                 // Params
                 //------------------------
-                for (FCogDebugPlotEventParams Param : HoveredEvent->Params)
+                for (FCogDebugEventParams Param : HoveredEvent->Params)
                 {
                     ImGui::TableNextRow();
                     ImGui::TableNextColumn();
@@ -764,11 +771,11 @@ FName FCogEngineWindow_Plots::GetDroppedEntryName(const ImGuiPayload* Payload)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Plots::AssignToGraphAndAxis(const FName InName, const int32 InGraphIndex, const ImAxis InYAxis) 
+void FCogEngineWindow_Plots::AssignToGraphAndAxis(FCogDebugTracker& InTracker, const FName InName, const int32 InGraphIndex, const ImAxis InYAxis) 
 {
-    UnassignToGraphAndAxis(InName);
+    UnassignToGraphAndAxis(InTracker, InName);
 
-    FCogDebugHistory* History = FCogDebugPlot::FindEntry(InName);
+    FCogDebugTrack* History = InTracker.FindTrack(InName);
     if (History == nullptr)
     { return; }
 
@@ -790,9 +797,9 @@ void FCogEngineWindow_Plots::AssignToGraphAndAxis(const FName InName, const int3
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Plots::UnassignToGraphAndAxis(const FName InName)
+void FCogEngineWindow_Plots::UnassignToGraphAndAxis(FCogDebugTracker& InTracker, const FName InName)
 {
-    const FCogDebugHistory* History = FCogDebugPlot::FindEntry(InName);
+    const FCogDebugTrack* History = InTracker.FindTrack(InName);
     if (History == nullptr)
     { return; }
 

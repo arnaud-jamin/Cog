@@ -11,7 +11,7 @@
 
 #if ENABLE_COG
 #include "CogDebugDraw.h"
-#include "CogDebugPlot.h"
+#include "CogDebug.h"
 #endif //ENABLE_COG
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -226,10 +226,10 @@ void UCogSampleCharacterMovementComponent::TickComponent(float DeltaTime, enum E
 
     if (FCogDebug::IsDebugActiveForObject(GetPawnOwner()))
     {
-        FCogDebugPlot::PlotValue(GetPawnOwner(), "Move Input X", GetPendingInputVector().X);
-        FCogDebugPlot::PlotValue(GetPawnOwner(), "Move Input Y", GetPendingInputVector().Y);
-        FCogDebugPlot::PlotValue(GetPawnOwner(), "Move Input Local X", FVector::DotProduct(GetPawnOwner()->GetActorRightVector(), GetPendingInputVector()));
-        FCogDebugPlot::PlotValue(GetPawnOwner(), "Move Input Local Y", FVector::DotProduct(GetPawnOwner()->GetActorForwardVector(), GetPendingInputVector()));
+        FCogDebug::Plot(Character, "Move Input X", GetPendingInputVector().X);
+        FCogDebug::Plot(Character, "Move Input Y", GetPendingInputVector().Y);
+        FCogDebug::Plot(Character, "Move Input Local X", FVector::DotProduct(GetPawnOwner()->GetActorRightVector(), GetPendingInputVector()));
+        FCogDebug::Plot(Character, "Move Input Local Y", FVector::DotProduct(GetPawnOwner()->GetActorForwardVector(), GetPendingInputVector()));
     }
 
 #endif //ENABLE_COG
@@ -250,29 +250,29 @@ void UCogSampleCharacterMovementComponent::TickComponent(float DeltaTime, enum E
         const FVector VelocityDelta = (Velocity - DebugLastVelocity) / DeltaTime;
         const FVector LocalVelocityDelta = Rotation.UnrotateVector(VelocityDelta);
 
-        FCogDebugPlot::PlotValue(Character, "Location X", DebugBottomLocation.X);
-        FCogDebugPlot::PlotValue(Character, "Location Y", DebugBottomLocation.Y);
-        FCogDebugPlot::PlotValue(Character, "Location Z", DebugBottomLocation.Z);
-        FCogDebugPlot::PlotValue(Character, "Rotation Yaw", Character->GetActorRotation().Yaw);
-        FCogDebugPlot::PlotValue(Character, "Acceleration X", GetCurrentAcceleration().X);
-        FCogDebugPlot::PlotValue(Character, "Acceleration Y", GetCurrentAcceleration().Y);
-        FCogDebugPlot::PlotValue(Character, "Acceleration Z", GetCurrentAcceleration().Z);
-        FCogDebugPlot::PlotValue(Character, "Acceleration Local X", LocalAcceleration.X);
-        FCogDebugPlot::PlotValue(Character, "Acceleration Local Y", LocalAcceleration.Y);
-        FCogDebugPlot::PlotValue(Character, "Acceleration Local Z", LocalAcceleration.Z);
-        FCogDebugPlot::PlotValue(Character, "Velocity X", Velocity.X);
-        FCogDebugPlot::PlotValue(Character, "Velocity Y", Velocity.Y);
-        FCogDebugPlot::PlotValue(Character, "Velocity Z", Velocity.Z);
-        FCogDebugPlot::PlotValue(Character, "Velocity Local X", LocalVelocity.X);
-        FCogDebugPlot::PlotValue(Character, "Velocity Local Y", LocalVelocity.Y);
-        FCogDebugPlot::PlotValue(Character, "Velocity Local Z", LocalVelocity.Z);
-        FCogDebugPlot::PlotValue(Character, "Velocity Delta X", VelocityDelta.X);
-        FCogDebugPlot::PlotValue(Character, "Velocity Delta Y", VelocityDelta.Y);
-        FCogDebugPlot::PlotValue(Character, "Velocity Delta Z", VelocityDelta.Z);
-        FCogDebugPlot::PlotValue(Character, "Velocity Delta Local X", LocalVelocityDelta.X);
-        FCogDebugPlot::PlotValue(Character, "Velocity Delta Local Y", LocalVelocityDelta.Y);
-        FCogDebugPlot::PlotValue(Character, "Velocity Delta Local Z", LocalVelocityDelta.Z);
-        FCogDebugPlot::PlotValue(Character, "Speed", Velocity.Length());
+        FCogDebug::Plot(Character, "Location X", DebugBottomLocation.X);
+        FCogDebug::Plot(Character, "Location Y", DebugBottomLocation.Y);
+        FCogDebug::Plot(Character, "Location Z", DebugBottomLocation.Z);
+        FCogDebug::Plot(Character, "Rotation Yaw", Character->GetActorRotation().Yaw);
+        FCogDebug::Plot(Character, "Acceleration X", GetCurrentAcceleration().X);
+        FCogDebug::Plot(Character, "Acceleration Y", GetCurrentAcceleration().Y);
+        FCogDebug::Plot(Character, "Acceleration Z", GetCurrentAcceleration().Z);
+        FCogDebug::Plot(Character, "Acceleration Local X", LocalAcceleration.X);
+        FCogDebug::Plot(Character, "Acceleration Local Y", LocalAcceleration.Y);
+        FCogDebug::Plot(Character, "Acceleration Local Z", LocalAcceleration.Z);
+        FCogDebug::Plot(Character, "Velocity X", Velocity.X);
+        FCogDebug::Plot(Character, "Velocity Y", Velocity.Y);
+        FCogDebug::Plot(Character, "Velocity Z", Velocity.Z);
+        FCogDebug::Plot(Character, "Velocity Local X", LocalVelocity.X);
+        FCogDebug::Plot(Character, "Velocity Local Y", LocalVelocity.Y);
+        FCogDebug::Plot(Character, "Velocity Local Z", LocalVelocity.Z);
+        FCogDebug::Plot(Character, "Velocity Delta X", VelocityDelta.X);
+        FCogDebug::Plot(Character, "Velocity Delta Y", VelocityDelta.Y);
+        FCogDebug::Plot(Character, "Velocity Delta Z", VelocityDelta.Z);
+        FCogDebug::Plot(Character, "Velocity Delta Local X", LocalVelocityDelta.X);
+        FCogDebug::Plot(Character, "Velocity Delta Local Y", LocalVelocityDelta.Y);
+        FCogDebug::Plot(Character, "Velocity Delta Local Z", LocalVelocityDelta.Z);
+        FCogDebug::Plot(Character, "Speed", Velocity.Length());
 
         const FVector Delta = DebugBottomLocation - DebugLastBottomLocation;
         const FColor Color = DebugIsPositionCorrected ? FColor::Blue : FColor::Yellow;

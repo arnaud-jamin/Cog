@@ -9,7 +9,7 @@
 #include "CogSampleSpawnPredictionComponent.h"
 
 #if ENABLE_COG
-#include "CogDebugPlot.h"
+#include "CogDebug.h"
 #endif
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -26,7 +26,7 @@ void UCogSampleGameplayAbility::PreActivate(const FGameplayAbilitySpecHandle Han
 
     COG_LOG_ABILITY(ELogVerbosity::Verbose, this, TEXT(""));
 
-    FCogDebugPlot::PlotEventStart(this, "Ability", GetFName())
+    FCogDebug::StartEvent(this, "Ability", GetFName())
 		.AddParam("Name", GetNameSafe(this))
 		.AddParam("Owner", GetNameSafe(ActorInfo->OwnerActor.Get()))
 		.AddParam("Avatar", GetNameSafe(ActorInfo->AvatarActor.Get()))
@@ -58,7 +58,7 @@ void UCogSampleGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Hand
 
     COG_LOG_ABILITY(ELogVerbosity::Verbose, this, TEXT(""));
 
-    FCogDebugPlot::PlotEventStop(this, "Ability", GetFName());
+    FCogDebug::StopEvent(this, "Ability", GetFName());
 
 #endif
 }

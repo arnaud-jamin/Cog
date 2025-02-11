@@ -41,7 +41,7 @@ class COGIMGUI_API FCogImguiContext : public TSharedFromThis<FCogImguiContext>
 {
 public:
 
-	void Initialize();
+	void Initialize(UGameViewportClient* InGameViewport);
 
 	void Shutdown();
 

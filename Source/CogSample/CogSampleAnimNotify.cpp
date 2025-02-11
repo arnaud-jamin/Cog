@@ -6,7 +6,7 @@
 #include "Components/SkeletalMeshComponent.h"
 
 #if ENABLE_COG
-#include "CogDebugPlot.h"
+#include "CogDebug.h"
 #endif
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ void UCogSampleAnimNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenc
     Super::Notify(MeshComp, Animation, EventReference);
 
 #if ENABLE_COG
-    FCogDebugPlot::PlotEventInstant(MeshComp->GetOwner(), "Anim Notify", GetFName())
+    FCogDebug::InstantEvent(MeshComp->GetOwner(), "Anim Notify", GetFName())
         .AddParam("Name", GetNameSafe(this))
         .AddParam("Animation", GetNameSafe(Animation))
         .AddParam("Debug Info", GetDebugInfo());

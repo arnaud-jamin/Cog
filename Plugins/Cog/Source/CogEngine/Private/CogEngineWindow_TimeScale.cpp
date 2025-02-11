@@ -66,7 +66,8 @@ void FCogEngineWindow_TimeScale::RenderMainMenuWidget()
     ACogEngineReplicator* Replicator = ACogEngineReplicator::GetLocalReplicator(*GetWorld());
     if (Replicator == nullptr)
     {
-        ImGui::TextDisabled("Invalid Replicator");
+        ImGui::TextDisabled("x?");
+        ImGui::SetItemTooltip("Invalid Replicator");
         return;
     }
 

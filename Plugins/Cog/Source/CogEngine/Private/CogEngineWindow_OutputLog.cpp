@@ -221,11 +221,6 @@ void FCogEngineWindow_OutputLog::RenderContent()
             Clear();
         }
 
-        if (ImGui::MenuItem("Test"))
-        {
-            COG_NOTIFY(TEXT("Test Notification"));
-        }
-
         ImGui::SameLine();
 
         ImGui::SetNextItemWidth(ImGui::GetFontSize() * 9);

@@ -47,7 +47,7 @@ void FCogEngineWindow_CollisionTester::RenderContent()
             NewActor->SetActorLabel(NewActor->GetName().Replace(TEXT("CogEngine"), TEXT("")));
 #endif
 
-            FCogDebug::SetSelection(GetWorld(), NewActor);
+            FCogDebug::SetSelection(NewActor);
         }
         if (ImGui::BeginItemTooltip())
         {
@@ -79,7 +79,7 @@ void FCogEngineWindow_CollisionTester::RenderContent()
         AActor* NewSelection = nullptr;
         if (FCogWindowWidgets::MenuActorsCombo("CollisionTesters", NewSelection, *GetWorld(), ACogEngineCollisionTester::StaticClass()))
         {
-            FCogDebug::SetSelection(GetWorld(), NewSelection);
+            FCogDebug::SetSelection(NewSelection);
         }
 
         ImGui::EndMenuBar();

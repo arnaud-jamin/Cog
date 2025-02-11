@@ -4,6 +4,7 @@
 #include "CogImguiContext.h"
 #include "CogWindow_Settings.h"
 #include "imgui.h"
+#include "Engine/GameInstance.h"
 #include "CogWindowManager.generated.h"
 
 class UCogCommonConfig;
@@ -19,7 +20,7 @@ struct ImGuiTextBuffer;
 struct FKey;
 
 UCLASS(Config = Cog)
-class COGWINDOW_API UCogWindowManager : public UObject
+class COGWINDOW_API UCogWindowManager : public UGameInstanceSubsystem
 {
     GENERATED_BODY()
 
@@ -27,14 +28,17 @@ public:
 
     UCogWindowManager();
 
+    virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+
+    virtual void Deinitialize() override;
+    
     virtual void Shutdown();
 
     virtual void SortMainMenu();
 
     virtual void Render(float DeltaTime);
 
-    virtual void Tick(float DeltaTime);
-
+    virtual void Tick(UWorld* World, ELevelTick TickType, float DeltaTime);
 
     virtual void AddWindow(FCogWindow* Window, const FString& Name, bool AddToMainMenu = true);
 
@@ -75,15 +79,14 @@ public:
 
     FCogImguiContext& GetContext() { return Context; }
 
-
-    static void AddCommand(UPlayerInput* PlayerInput, const FString& Command, const FKey& Key);
-
-    static void SortCommands(UPlayerInput* PlayerInput);
-
     void OnShortcutsDefined() const;
 
     bool IsRenderingMainMenu() const { return IsRenderingInMainMenu; }
 
+    static void AddCommand(UPlayerInput* PlayerInput, const FString& Command, const FKey& Key);
+
+    static void SortCommands(UPlayerInput* PlayerInput);
+    
 protected:
 
     friend class FCogWindow_Layouts;
@@ -96,7 +99,7 @@ protected:
         TArray<FMenu> SubMenus;
     };
 
-    virtual void InitializeInternal();
+    virtual void TryInitializeInternal();
 
     virtual void RenderMainMenu();
     
@@ -144,7 +147,7 @@ protected:
 
     UPROPERTY(Config)
     bool bShowMainMenu = false;
-    
+
     FCogImguiContext Context;
 
     TArray<FCogWindow*> Windows;
