@@ -453,8 +453,6 @@ public class CogSample : ModuleRules
 
 #include "CogSampleGameInstance.generated.h"
 
-class UCogSubsystem;
-
 UCLASS()
 class UCogSampleGameInstance : public UGameInstance
 {
