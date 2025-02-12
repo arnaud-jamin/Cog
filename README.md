@@ -393,11 +393,11 @@ The Cog repository has the following structure:
 - `Plugins/CogAI` - ImGui windows for AI (Behavior Tree, Blackboard)
 - `Plugins/CogInput` - ImGui windows for the Enhanced Input library (Input action, Gamepad)
 - `Plugins/Cog` - The main Cog plugin which contains the following modules
-  - `CogEngine` - ImGui windows for the core unreal engine functionalities (Log, Stats, Time, Collisions, Skeleton, ...)
-  - `CogWindow` - ImGui window management (Base Window, Layout)
-  - `CogDebug` - Debug functionalities (Log, Debug Draw, Plot, Metric, ...)
-  - `CogImGui` - Integration of Imgui for Unreal, inspired by [UnrealImGui](https://github.com/segross/UnrealImGui)
+  - `Cog` - Cog Subsystem (Manage windows, menu, settings, layout, ...)
   - `CogCommon` - Interfaces implemented by your project actor classes which cannot be excluded from a shipping build
+  - `CogDebug` - Debug functionalities (Log, Debug Draw, Plot, Metric, ...)
+  - `CogEngine` - ImGui windows for the core unreal engine functionalities (Log, Stats, Time, Collisions, Skeleton, ...)
+  - `CogImGui` - Cog own integration of Imgui for Unreal, inspired by [UnrealImGui](https://github.com/segross/UnrealImGui)
 - `Plugins/CogAll` - Only contains a utility function to easily add all the built-in windows from all the Cog plugins. Useful for projects that do not need to exclude some plugins. 
 - `Plugins/CogCommonUI` - Contains an implementation of CommonUIActionRouterBase to let the Cog shorcuts work while in a CommonUI menu. Only use this plugin if you use CommonUI.
     
@@ -433,6 +433,7 @@ public class CogSample : ModuleRules
         {
             PublicDependencyModuleNames.AddRange(new string[]
             {
+                "Cog",
                 "CogAbility",
                 "CogAI",
                 "CogAll",
@@ -440,7 +441,6 @@ public class CogSample : ModuleRules
                 "CogEngine",
                 "CogImgui",
                 "CogInput",
-                "CogWindow",
             });
         }
     }
@@ -448,98 +448,39 @@ public class CogSample : ModuleRules
 ```
 
 
-- In the class of your choice add a reference to the CogWindowManager (in the sample we use the GameState class):
+- In your GameInstance Init:
+  - Add the windows you want to the CogSubsystem. In the sample we add all the built-in windows by calling Cog::AddAllWindows and we also add a custom window from the sample itself, showcasing that you can add your own windows.
+  - Activate Cog
+
 ```cpp
-// ACogSampleGameState.h
-#pragma once
+#include "CogSampleGameInstance.h"
 
-#include "CoreMinimal.h"
-#include "CogCommon.h" 
-#include "GameFramework/GameStateBase.h"
-#include "CogSampleGameState.generated.h"
+#include "CogCommon.h"
 
-class UCogWindowManager;
-
-UCLASS()
-class ACogSampleGameState : public AGameStateBase
-{
-    GENERATED_BODY()
-
-    // To make sure it doesn't get garbage collected.
-    UPROPERTY()
-    TObjectPtr<UObject> CogWindowManagerRef = nullptr;
-
-#if ENABLE_COG
-    TObjectPtr<UCogWindowManager> CogWindowManager = nullptr;
-#endif //ENABLE_COG
-};
-```
-
-- In the cpp file, add the following includes:
-```cpp
-// ACogSampleGameState.cpp
 #if ENABLE_COG
 #include "CogAll.h"
-#include "CogWindowManager.h"
-#endif //ENABLE_COG
-```
+#include "CogSampleWindow_Team.h"
+#include "CogSubsystem.h"
+#endif 
 
-- Instantiate CogWindowManager and add some windows:
-```cpp
-// ACogSampleGameState.cpp
-void ACogSampleGameState::BeginPlay()
+void UCogSampleGameInstance::Init()
 {
-    Super::BeginPlay();
+    Super::Init();
 
 #if ENABLE_COG
-    CogWindowManager = NewObject<UCogWindowManager>(this);
-    CogWindowManagerRef = CogWindowManager;
-
-    // Add all the built-in windows. 
-    Cog::AddAllWindows(*CogWindowManager);
-
-    // Optionally, add more custom windows from your own project
-    // CogWindowManager->AddWindow<FCogSampleWindow_Team>("Gameplay.Team");
-
-#endif //ENABLE_COG
-}
-```
-
-- Shutdown CogWindowManager:
-```cpp
-// ACogSampleGameState.cpp
-void ACogSampleGameState::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-    Super::EndPlay(EndPlayReason);
-
-#if ENABLE_COG
-    if (CogWindowManager != nullptr)
+    // Get the cog subsystem  
+    if (UCogSubsystem* CogSubSystem = GetSubsystem<UCogSubsystem>())
     {
-        CogWindowManager->Shutdown();
+        // Add all the built-in windows. You copy paste this function code to organize the menu differently.
+        Cog::AddAllWindows(*CogSubSystem);
+
+        // Add a custom window
+        CogSubSystem->AddWindow<FCogSampleWindow_Team>("Gameplay.Team");
+
+        // Activate Cog
+        CogSubSystem->Activate();
     }
-#endif //ENABLE_COG
-}
-```
-
-- Tick CogWindowManager:
-```cpp
-// ACogSampleGameState.cpp
-ACogSampleGameState::ACogSampleGameState(const FObjectInitializer & ObjectInitializer)
-    : Super(ObjectInitializer)
-{
-    // Enable ticking
-    PrimaryActorTick.bCanEverTick = true;
-    PrimaryActorTick.SetTickFunctionEnable(true);
-    PrimaryActorTick.bStartWithTickEnabled = true;
-}
-
-void ACogSampleGameState::Tick(float DeltaSeconds)
-{
-    Super::Tick(DeltaSeconds);
-
-#if ENABLE_COG
-    CogWindowManager->Tick(DeltaSeconds);
-#endif //ENABLE_COG
+#endif 
 }
 ```
 
