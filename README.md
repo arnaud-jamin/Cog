@@ -447,6 +447,24 @@ public class CogSample : ModuleRules
 }
 ```
 
+- Override the Unreal GameInstance:
+```cpp
+#pragma once
+
+#include "CogSampleGameInstance.generated.h"
+
+UCLASS()
+class UCogSampleGameInstance : public UGameInstance
+{
+    GENERATED_BODY()
+
+    void Init() override;
+};
+```
+
+- Set your own game instance in the Unreal project settings:
+
+![GameInstance](https://github.com/user-attachments/assets/070f98a2-6312-4110-9395-830bc01df369)
 
 - In your GameInstance Init:
   - Add the windows you want to the CogSubsystem. In the sample we add all the built-in windows by calling Cog::AddAllWindows and we also add a custom window from the sample itself, showcasing that you can add your own windows.
