@@ -1,6 +1,6 @@
 #include "CogInputWindow_Actions.h"
 
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/World.h"
 #include "EnhancedInputSubsystems.h"
@@ -196,16 +196,16 @@ void FCogInputWindow_Actions::RenderContent()
 	                    ImGui::TableNextColumn();
 	                    ImGui::BeginDisabled();
 	                    bool Value = ActionValue.Get<bool>();
-                        FCogWindowWidgets::PushBackColor(ImVec4(0.8f, 0.8f, 0.8f, 1));
+                        FCogWidgets::PushBackColor(ImVec4(0.8f, 0.8f, 0.8f, 1));
                         ImGui::Checkbox("##Current", &Value);
-                        FCogWindowWidgets::PopBackColor();
+                        FCogWidgets::PopBackColor();
                         ImGui::EndDisabled();
 
 	                    ImGui::TableNextColumn();
 
                         ECheckBoxState State = ActionInfo.bRepeat ? ECheckBoxState::Undetermined : ActionInfo.bPressed ? ECheckBoxState::Checked : ECheckBoxState::Unchecked;
 
-                        if (FCogWindowWidgets::CheckBoxState("##Inject", State, false))
+                        if (FCogWidgets::CheckBoxState("##Inject", State, false))
                         {
                             if (IsControlDown)
                             {
@@ -320,13 +320,13 @@ void FCogInputWindow_Actions::DrawAxis(const char* Format, const char* ActionNam
     ImGui::TableNextColumn();
     ImGui::SetNextItemWidth(-1);
     ImGui::BeginDisabled();
-    FCogWindowWidgets::PushBackColor(ImVec4(0.8f, 0.8f, 0.8f, 1));
+    FCogWidgets::PushBackColor(ImVec4(0.8f, 0.8f, 0.8f, 1));
     ImGui::SliderFloat("##Value", &CurrentValue, -1.0f, 1.0f, "%0.2f");
-    FCogWindowWidgets::PopBackColor();
+    FCogWidgets::PopBackColor();
     ImGui::EndDisabled();
 
     ImGui::TableNextColumn();
     ImGui::SetNextItemWidth(-1);
-    FCogWindowWidgets::SliderWithReset("##Inject", InjectValue, -1.0f, 1.0f, 0.0f, "%0.2f");
+    FCogWidgets::SliderWithReset("##Inject", InjectValue, -1.0f, 1.0f, 0.0f, "%0.2f");
     ImGui::PopID();
 }

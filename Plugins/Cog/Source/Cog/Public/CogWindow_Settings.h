@@ -9,11 +9,13 @@
 class UCogEngineConfig_Settings;
 
 //--------------------------------------------------------------------------------------------------------------------------
-class COGWINDOW_API FCogWindow_Settings : public FCogWindow
+class COG_API FCogWindow_Settings : public FCogWindow
 {
     typedef FCogWindow Super;
 
 public:
+
+    FCogWindow_Settings();
     
     virtual void Initialize() override;
 

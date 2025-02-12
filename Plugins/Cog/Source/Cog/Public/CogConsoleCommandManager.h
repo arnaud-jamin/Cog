@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "HAL/IConsoleManager.h"
-#include "Templates/Function.h"
 
 class UWorld;
 
@@ -11,7 +10,7 @@ DECLARE_DELEGATE_TwoParams(FCogWindowConsoleCommandDelegate, const TArray<FStrin
 //--------------------------------------------------------------------------------------------------------------------------
 struct FCogCommandReceiver
 {
-    UWorld* World = nullptr;
+    int32 PIEInstance = INDEX_NONE;
 
     FCogWindowConsoleCommandDelegate Delegate;
 };
@@ -25,10 +24,8 @@ struct FCogCommandInfo
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
-struct COGWINDOW_API FCogWindowConsoleCommandManager
+struct COG_API FCogConsoleCommandManager
 {
-public:
-
     static void RegisterWorldConsoleCommand(const TCHAR* InName, const TCHAR* InHelp, UWorld* InWorld, const FCogWindowConsoleCommandDelegate& InDelegate);
     
     static void UnregisterAllWorldConsoleCommands(const UWorld* InWorld);

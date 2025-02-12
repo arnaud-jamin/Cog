@@ -5,7 +5,7 @@
 #include "GameFramework/GameStateBase.h"
 #include "CogSampleGameState.generated.h"
 
-class UCogWindowManager;
+class UCogSubsystem;
 class UCogSampleAbilitySystemComponent;
 
 UCLASS()
@@ -42,7 +42,7 @@ protected:
 
 #if ENABLE_COG
 
-    TObjectPtr<UCogWindowManager> CogWindowManager = nullptr;
+    TObjectPtr<UCogSubsystem> CogWindowManager = nullptr;
 
     float _ClientFramerateSmooth = 0.0f;
 

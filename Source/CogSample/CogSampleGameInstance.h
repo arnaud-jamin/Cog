@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "CogSampleGameInstance.generated.h"
 
-class UCogWindowManager;
+class UCogSubsystem;
 class UCogSampleAbilitySystemComponent;
 
 UCLASS()

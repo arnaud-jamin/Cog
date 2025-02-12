@@ -1,11 +1,11 @@
-#include "CogWindowConsoleCommandManager.h"
+#include "CogConsoleCommandManager.h"
 
 #include "Engine/World.h"
 
-TMap<FString, FCogCommandInfo> FCogWindowConsoleCommandManager::CommandMap;
+TMap<FString, FCogCommandInfo> FCogConsoleCommandManager::CommandMap;
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(const TCHAR* InName, const TCHAR* InHelp, UWorld* InWorld, const FCogWindowConsoleCommandDelegate& InDelegate)
+void FCogConsoleCommandManager::RegisterWorldConsoleCommand(const TCHAR* InName, const TCHAR* InHelp, UWorld* InWorld, const FCogWindowConsoleCommandDelegate& InDelegate)
 {
     FCogCommandInfo& commandInfo = CommandMap.FindOrAdd(InName);
 
@@ -20,13 +20,15 @@ void FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(const TCHAR* I
             {
                 FCogCommandInfo* commandInfo = CommandMap.Find(InName);
                 if (commandInfo == nullptr)
-                {
-                    return;
-                }
+                { return; }
 
+                FWorldContext* WorldContext = GEngine->GetWorldContextFromWorld(InCommandWorld);
+                if (WorldContext == nullptr)
+                { return; }
+                
                 for (auto& receiver : commandInfo->Receivers)
                 {
-                    if (receiver.World == InCommandWorld)
+                    if (receiver.PIEInstance == WorldContext->PIEInstance)
                     {
                         receiver.Delegate.ExecuteIfBound(Args, InCommandWorld);
                         break;
@@ -37,21 +39,28 @@ void FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(const TCHAR* I
         );
     }
 
-    FCogCommandReceiver& receiver = commandInfo.Receivers.AddDefaulted_GetRef();
-    receiver.World = InWorld;
-    receiver.Delegate = InDelegate;
+    if (const FWorldContext* WorldContext = GEngine->GetWorldContextFromWorld(InWorld))
+    {
+        FCogCommandReceiver& receiver = commandInfo.Receivers.AddDefaulted_GetRef();
+        receiver.PIEInstance = WorldContext->PIEInstance;
+        receiver.Delegate = InDelegate;
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogWindowConsoleCommandManager::UnregisterAllWorldConsoleCommands(const UWorld* InWorld)
+void FCogConsoleCommandManager::UnregisterAllWorldConsoleCommands(const UWorld* InWorld)
 {
+    FWorldContext* WorldContext = GEngine->GetWorldContextFromWorld(InWorld);
+    if (WorldContext == nullptr)
+    { return; }
+    
     for (auto& kv : CommandMap)
     {
         FCogCommandInfo& commandInfo = kv.Value;
 
         for (int32 i = commandInfo.Receivers.Num() - 1; i >= 0; --i)
         {
-            if (commandInfo.Receivers[i].World == InWorld)
+            if (commandInfo.Receivers[i].PIEInstance == WorldContext->PIEInstance)
             {
                 commandInfo.Receivers.RemoveAt(i);
             }
@@ -63,4 +72,4 @@ void FCogWindowConsoleCommandManager::UnregisterAllWorldConsoleCommands(const UW
             commandInfo.ConsoleObject = nullptr;
         }
     }
-}
+} 

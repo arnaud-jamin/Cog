@@ -1,4 +1,4 @@
-#include "CogWindowHelper.h"
+#include "CogHelper.h"
 
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetRegistry/IAssetRegistry.h"
@@ -7,7 +7,7 @@
 #include "imgui.h"
 
 //----------------------------------------------------------------------------------------------------------------------
-const UObject* FCogWindowHelper::GetFirstAssetByClass(const TSubclassOf<UObject>& AssetClass)
+const UObject* FCogHelper::GetFirstAssetByClass(const TSubclassOf<UObject>& AssetClass)
 {
     const IAssetRegistry& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry")).Get();
 
@@ -23,7 +23,7 @@ const UObject* FCogWindowHelper::GetFirstAssetByClass(const TSubclassOf<UObject>
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FString FCogWindowHelper::GetActorName(const AActor* Actor)
+FString FCogHelper::GetActorName(const AActor* Actor)
 {
 	if (Actor == nullptr)
 	{
@@ -34,7 +34,7 @@ FString FCogWindowHelper::GetActorName(const AActor* Actor)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FString FCogWindowHelper::GetActorName(const AActor& Actor)
+FString FCogHelper::GetActorName(const AActor& Actor)
 {
 #if WITH_EDITOR
 
@@ -50,7 +50,7 @@ FString FCogWindowHelper::GetActorName(const AActor& Actor)
 
 
 //-----------------------------------------------------------------------------------------
-bool FCogWindowHelper::ComputeBoundingBoxScreenPosition(const APlayerController* PlayerController, const FVector& Origin, const FVector& Extent, FVector2D& Min, FVector2D& Max)
+bool FCogHelper::ComputeBoundingBoxScreenPosition(const APlayerController* PlayerController, const FVector& Origin, const FVector& Extent, FVector2D& Min, FVector2D& Max)
 {
     FVector Corners[8];
     Corners[0].Set(-Extent.X, -Extent.Y, -Extent.Z); // - - - 

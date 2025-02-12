@@ -44,7 +44,7 @@ void FCogEngineWindow_BuildInfo::RenderTick(float DeltaTime)
     const ImVec2 WindowPadding = ImGui::GetStyle().WindowPadding;
     const ImVec2 TextSize = ImGui::CalcTextSize(TextStr.Get(), nullptr, false);
     const ImVec2 RectSize = TextSize + WindowPadding * 2;
-    const ImVec2 Pos = FCogWindowWidgets::ComputeScreenCornerLocation(Config->Alignment, Config->Padding);
+    const ImVec2 Pos = FCogWidgets::ComputeScreenCornerLocation(Config->Alignment, Config->Padding);
     const ImVec2 AlignedPos = Pos - (FCogImguiHelper::ToImVec2(Config->Alignment) * RectSize);
     
     DrawList->AddRectFilled(AlignedPos, AlignedPos + RectSize, FCogImguiHelper::ToImU32(Config->BackgroundColor), Config->Rounding);
@@ -57,7 +57,7 @@ void FCogEngineWindow_BuildInfo::RenderContent()
 {
     Super::RenderContent();
 
-    FCogWindowWidgets::ThinSeparatorText("Build Properties");
+    FCogWidgets::ThinSeparatorText("Build Properties");
 
     if (ImGui::BeginChild("Settings", ImVec2(-1, 100 * GetDpiScale()), ImGuiChildFlags_FrameStyle | ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeY))
     {
@@ -72,19 +72,19 @@ void FCogEngineWindow_BuildInfo::RenderContent()
     }
     ImGui::EndChild();
 
-    FCogWindowWidgets::ThinSeparatorText("Display");
+    FCogWidgets::ThinSeparatorText("Display");
 
     ImGui::Checkbox("Show In Editor", &Config->ShowInEditor);
     ImGui::Checkbox("Show In Package", &Config->ShowInPackage);
     ImGui::Checkbox("Show In Foreground", &Config->ShowInForeground);
 
-    FCogWindowWidgets::SetNextItemToShortWidth();
+    FCogWidgets::SetNextItemToShortWidth();
     ImGui::SliderFloat2("Alignment", &Config->Alignment.X, 0, 1.0f, "%.2f");
 
-    FCogWindowWidgets::SetNextItemToShortWidth();
+    FCogWidgets::SetNextItemToShortWidth();
     ImGui::SliderInt2("Padding", &Config->Padding.X, 0, 100);
 
-    FCogWindowWidgets::SetNextItemToShortWidth();
+    FCogWidgets::SetNextItemToShortWidth();
     ImGui::SliderInt("Rounding", &Config->Rounding, 0, 12);
     
     constexpr ImGuiColorEditFlags ColorEditFlags = ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf;

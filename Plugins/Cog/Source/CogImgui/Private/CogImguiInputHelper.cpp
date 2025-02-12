@@ -48,14 +48,14 @@ UPlayerInput* FCogImguiInputHelper::GetPlayerInput(const UWorld& World)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogImguiInputHelper::IsTopPriorityKey(const UWorld* InWorld, const FKey& InKey)
+bool FCogImguiInputHelper::IsTopPriorityKey(const UPlayerInput& PlayerInput, const FKey& InKey)
 {
     FKeyEvent KeyEvent(InKey, FModifierKeysState(), 0, false, 0, 0);
-    return IsTopPriorityKeyEvent(InWorld, KeyEvent);
+    return IsTopPriorityKeyEvent(PlayerInput, KeyEvent);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogImguiInputHelper::IsTopPriorityKeyEvent(const UWorld* InWorld, const FKeyEvent& InKeyEvent)
+bool FCogImguiInputHelper::IsTopPriorityKeyEvent(const UPlayerInput& PlayerInput, const FKeyEvent& InKeyEvent)
 {
     //------------------------------------------------------------------------------------------------
     // We want the user to be able to use Cog shortcuts when imgui has the input.
@@ -92,7 +92,7 @@ bool FCogImguiInputHelper::IsTopPriorityKeyEvent(const UWorld* InWorld, const FK
     //------------------------------------------------------------------------------------------------
     // We want the user to be able to use command bindings, even when imgui has the input. 
     //------------------------------------------------------------------------------------------------
-    if (IsKeyBoundToCommand(InWorld, InKeyEvent))
+    if (IsKeyBoundToCommand(PlayerInput, InKeyEvent))
     { return true; }
 
     return false;
@@ -190,7 +190,9 @@ void FCogImguiInputHelper::KeyInfoToKeyBind(const FCogImGuiKeyInfo& KeyInfo, FKe
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogImguiInputHelper::IsKeyBindMatchingKeyInfo(const FKeyBind& InKeyBind, const FCogImGuiKeyInfo& InKeyInfo)
 {
-    const bool Result = (InKeyInfo.Key == InKeyBind.Key)
+    const bool Result =
+        InKeyBind.bDisabled == false
+        && (InKeyInfo.Key == InKeyBind.Key)
         && IsCheckBoxStateMatchingKeyBindModifier(InKeyInfo.Shift, InKeyBind.Shift, InKeyBind.bIgnoreShift)
         && IsCheckBoxStateMatchingKeyBindModifier(InKeyInfo.Ctrl, InKeyBind.Control, InKeyBind.bIgnoreCtrl)
         && IsCheckBoxStateMatchingKeyBindModifier(InKeyInfo.Alt, InKeyBind.Alt, InKeyBind.bIgnoreAlt)
@@ -219,20 +221,9 @@ bool FCogImguiInputHelper::WasKeyInfoJustPressed(const APlayerController& Player
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogImguiInputHelper::IsKeyBoundToCommand(const UWorld* World, const FKeyEvent& KeyEvent)
+bool FCogImguiInputHelper::IsKeyBoundToCommand(const UPlayerInput& PlayerInput, const FKeyEvent& KeyEvent)
 {
-    if (World == nullptr)
-    {
-        return false;
-    }
-
-    const UPlayerInput* PlayerInput = GetPlayerInput(*World);
-    if (PlayerInput == nullptr)
-    {
-        return false;
-    }
-
-    for (const FKeyBind& KeyBind : PlayerInput->DebugExecBindings)
+    for (const FKeyBind& KeyBind : PlayerInput.DebugExecBindings)
     {
         if (IsKeyEventMatchingKeyBind(KeyEvent, KeyBind))
         {
@@ -413,16 +404,16 @@ bool FCogImguiInputHelper::IsKeyEventMatchingKeyBind(const FKeyEvent& KeyEvent, 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogImguiInputHelper::IsKeyInfoPressed(const UPlayerInput* PlayerInput, const FCogImGuiKeyInfo& InKeyInfo)
+bool FCogImguiInputHelper::IsKeyInfoPressed(const UPlayerInput& PlayerInput, const FCogImGuiKeyInfo& InKeyInfo)
 {
-    const bool bKeyPressed = PlayerInput->WasJustPressed(InKeyInfo.Key);
+    const bool bKeyPressed = PlayerInput.WasJustPressed(InKeyInfo.Key);
     if (bKeyPressed == false)
     { return false; }
     
-    if (IsCheckBoxStateMatchingValue(InKeyInfo.Ctrl, PlayerInput->IsCtrlPressed())
-        && IsCheckBoxStateMatchingValue(InKeyInfo.Shift, PlayerInput->IsShiftPressed())
-        && IsCheckBoxStateMatchingValue(InKeyInfo.Alt, PlayerInput->IsAltPressed())
-        && IsCheckBoxStateMatchingValue(InKeyInfo.Cmd, PlayerInput->IsCmdPressed()))
+    if (IsCheckBoxStateMatchingValue(InKeyInfo.Ctrl, PlayerInput.IsCtrlPressed())
+        && IsCheckBoxStateMatchingValue(InKeyInfo.Shift, PlayerInput.IsShiftPressed())
+        && IsCheckBoxStateMatchingValue(InKeyInfo.Alt, PlayerInput.IsAltPressed())
+        && IsCheckBoxStateMatchingValue(InKeyInfo.Cmd, PlayerInput.IsCmdPressed()))
     { return true; }
 
     return false;
@@ -461,29 +452,34 @@ bool FCogImguiInputHelper::IsMouseInsideMainViewport()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogImguiInputHelper::SetShortcuts(const UWorld& World, const TArray<FCogImGuiKeyInfo>& InShortcuts, bool InDisableCommandsConflictingWithShortcuts)
+bool FCogImguiInputHelper::DisableCommandsConflictingWithShortcuts(UPlayerInput& PlayerInput)
 {
-    CogShortcuts = InShortcuts;
-
-    if (InDisableCommandsConflictingWithShortcuts == false )
-    { return; }
-
-    UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(World);
-    if (PlayerInput == nullptr)
-    { return; }
+    bool HasDisabled = false;
     
     for (const FCogImGuiKeyInfo& Shortcut : CogShortcuts)
     {
-        for (FKeyBind& KeyBind : PlayerInput->DebugExecBindings)
+        for (FKeyBind& KeyBind : PlayerInput.DebugExecBindings)
         {
             if (IsKeyBindMatchingKeyInfo(KeyBind, Shortcut))
             {
                 KeyBind.bDisabled = true;
+                HasDisabled = false;
             }
         }
     }
 
-    PlayerInput->SaveConfig();
+    if (HasDisabled)
+    {
+        PlayerInput.SaveConfig();
+    }
+    
+    return false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogImguiInputHelper::SetShortcuts(const TArray<FCogImGuiKeyInfo>& InShortcuts)
+{
+    CogShortcuts = InShortcuts;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

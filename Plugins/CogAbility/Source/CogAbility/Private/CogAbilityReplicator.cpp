@@ -4,7 +4,7 @@
 #include "AbilitySystemGlobals.h"
 #include "CogAbilityDataAsset.h"
 #include "CogImguiHelper.h"
-#include "CogWindowHelper.h"
+#include "CogHelper.h"
 #include "Components/SceneComponent.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
@@ -59,7 +59,7 @@ ACogAbilityReplicator::ACogAbilityReplicator(const FObjectInitializer& ObjectIni
     bReplicates = true;
     bOnlyRelevantToOwner = true;
 
-    AbilityAsset = FCogWindowHelper::GetFirstAssetByClass<UCogAbilityDataAsset>();
+    AbilityAsset = FCogHelper::GetFirstAssetByClass<UCogAbilityDataAsset>();
 
 #endif // !UE_BUILD_SHIPPING
 }

@@ -22,9 +22,9 @@ public:
 
     static UPlayerInput* GetPlayerInput(const UWorld& World);
 
-    static bool IsTopPriorityKey(const UWorld* InWorld, const FKey& InKey);
+    static bool IsTopPriorityKey(const UPlayerInput& PlayerInput, const FKey& InKey);
 
-    static bool IsTopPriorityKeyEvent(const UWorld* InWorld, const FKeyEvent& InKeyEvent);
+    static bool IsTopPriorityKeyEvent(const UPlayerInput& PlayerInput, const FKeyEvent& InKeyEvent);
 
     static bool WasKeyInfoJustPressed(const APlayerController& PlayerController, const FCogImGuiKeyInfo& KeyInfo);
 
@@ -38,7 +38,7 @@ public:
 
     static bool IsKeyEventMatchingKeyBind(const FKeyEvent& KeyEvent, const FKeyBind& KeyBind);
 
-    static bool IsKeyInfoPressed(const UPlayerInput* PlayerInput, const FCogImGuiKeyInfo& InKeyInfo);
+    static bool IsKeyInfoPressed(const UPlayerInput& PlayerInput, const FCogImGuiKeyInfo& InKeyInfo);
 
     static ECheckBoxState MakeCheckBoxState(uint8 RequireValue, uint8 IgnoreValue);
 
@@ -48,7 +48,7 @@ public:
 
     static bool IsConsoleEvent(const FKeyEvent& KeyEvent);
 
-    static bool IsKeyBoundToCommand(const UWorld* World, const FKeyEvent& KeyEvent);
+    static bool IsKeyBoundToCommand(const UPlayerInput& PlayerInput, const FKeyEvent& KeyEvent);
 
     static bool IsStopPlaySessionEvent(const FKeyEvent& KeyEvent);
 
@@ -70,7 +70,9 @@ public:
 
     static bool IsKeyBoundToCommand(const UPlayerInput* InPlayerInput, const FKeyEvent& KeyEvent);
 
-    static void SetShortcuts(const UWorld& World, const TArray<FCogImGuiKeyInfo>& InShortcuts, bool InDisableCommandsConflictingWithShortcuts);
+    static void SetShortcuts(const TArray<FCogImGuiKeyInfo>& InShortcuts);
+
+    static bool DisableCommandsConflictingWithShortcuts(UPlayerInput& PlayerInput);
 
     template<typename T, std::enable_if_t<(sizeof(T) <= sizeof(ImWchar)), T>* = nullptr>
     static ImWchar CastInputChar(T Char)

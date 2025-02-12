@@ -6,7 +6,7 @@
 #include "CogAbilityHelper.h"
 #include "CogAbilityReplicator.h"
 #include "CogImguiHelper.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 #include "CogDebugRob.h"
 #include "imgui.h"
 
@@ -178,7 +178,7 @@ void FCogAbilityWindow_Abilities::RenderAbilitiesMenu(AActor* Selection)
             ImGui::EndMenu();
         }
 
-        FCogWindowWidgets::SearchBar("##Filter", Filter);
+        FCogWidgets::SearchBar("##Filter", Filter);
 
         ImGui::EndMenuBar();
     }
@@ -207,13 +207,13 @@ void FCogAbilityWindow_Abilities::RenderAbilitiesMenuColorSettings()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Abilities::RenderAbilityActivation(FGameplayAbilitySpec& Spec)
 {
-    FCogWindowWidgets::PushStyleCompact();
+    FCogWidgets::PushStyleCompact();
     bool IsActive = Spec.IsActive();
     if (ImGui::Checkbox("##Activation", &IsActive))
     {
         AbilityHandleToActivate = Spec.Handle;
     }
-    FCogWindowWidgets::PopStyleCompact();
+    FCogWidgets::PopStyleCompact();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -396,10 +396,10 @@ void FCogAbilityWindow_Abilities::RenderAbilitiesTableRow(UAbilitySystemComponen
     //------------------------
     // Popup
     //------------------------
-    if (FCogWindowWidgets::BeginItemTableTooltip())
+    if (FCogWidgets::BeginItemTableTooltip())
     {
         RenderAbilityInfo(AbilitySystemComponent, Spec);
-        FCogWindowWidgets::EndItemTableTooltip();
+        FCogWidgets::EndItemTableTooltip();
     }
 
     //------------------------
@@ -470,7 +470,7 @@ void FCogAbilityWindow_Abilities::RenderAbilityInputPressed(FGameplayAbilitySpec
 {
     if (Spec.InputPressed)
     {
-        FCogWindowWidgets::SmallButton("Pressed", FCogImguiHelper::ToImVec4(Config->ActiveAbilityColor));
+        FCogWidgets::SmallButton("Pressed", FCogImguiHelper::ToImVec4(Config->ActiveAbilityColor));
     }
 }
 
@@ -505,7 +505,7 @@ void FCogAbilityWindow_Abilities::RenderAbilityContextMenu(UAbilitySystemCompone
             AbilityHandleToRemove = Spec.Handle;
         }
 
-        FCogWindowWidgets::OpenObjectAssetButton(Spec.Ability, ButtonsSize);
+        FCogWidgets::OpenObjectAssetButton(Spec.Ability, ButtonsSize);
 
         ImGui::EndPopup();
     }
@@ -576,13 +576,13 @@ void FCogAbilityWindow_Abilities::RenderAbilityInfo(const UAbilitySystemComponen
         ImGui::TableNextColumn();
         ImGui::TextColored(TextColor, "Activation");
         ImGui::TableNextColumn();
-        FCogWindowWidgets::PushStyleCompact();
+        FCogWidgets::PushStyleCompact();
         bool IsActive = Spec.IsActive();
         if (ImGui::Checkbox("##Activation", &IsActive))
         {
             AbilityHandleToActivate = Spec.Handle;
         }
-        FCogWindowWidgets::PopStyleCompact();
+        FCogWidgets::PopStyleCompact();
 
         //------------------------
         // Active Count

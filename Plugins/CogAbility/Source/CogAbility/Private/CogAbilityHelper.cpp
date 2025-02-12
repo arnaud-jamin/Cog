@@ -1,7 +1,7 @@
 #include "CogAbilityHelper.h"
 
 #include "CogAbilityDataAsset.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 #include "GameplayTagContainer.h"
 #include "imgui.h"
 
@@ -20,7 +20,7 @@ void FCogAbilityHelper::RenderTagContainer(const FGameplayTagContainer& Containe
     Container.GetGameplayTagArray(GameplayTags);
     for (const FGameplayTag& Tag : GameplayTags)
     {
-        FCogWindowWidgets::SmallButton(StringCast<ANSICHAR>(*Tag.ToString()).Get(), Color);
+        FCogWidgets::SmallButton(StringCast<ANSICHAR>(*Tag.ToString()).Get(), Color);
         if (Inline)
         {
             ImGui::SameLine();
@@ -51,7 +51,7 @@ void FCogAbilityHelper::RenderTagContainer(
         }
 
         const ImVec4 Color = hasTag ? MatchColor : NormalColor;
-        FCogWindowWidgets::SmallButton(StringCast<ANSICHAR>(*Tag.ToString()).Get(), Color);
+        FCogWidgets::SmallButton(StringCast<ANSICHAR>(*Tag.ToString()).Get(), Color);
         if (Inline)
         {
             ImGui::SameLine();

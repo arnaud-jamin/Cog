@@ -3,7 +3,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
 #include "CogAbilityHelper.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Tags::Initialize()
@@ -70,7 +70,7 @@ void FCogAbilityWindow_Tags::RenderMenu()
             ImGui::EndMenu();
         }
 
-        FCogWindowWidgets::SearchBar("##Filter", Filter);
+        FCogWidgets::SearchBar("##Filter", Filter);
 
         ImGui::EndMenuBar();
     }
@@ -137,10 +137,10 @@ void FCogAbilityWindow_Tags::RenderTagContainer(const UAbilitySystemComponent& A
             //------------------------
             // Tooltip
             //------------------------
-            if (FCogWindowWidgets::BeginItemTableTooltip())
+            if (FCogWidgets::BeginItemTableTooltip())
             {
                 RenderTag(AbilitySystemComponent, Tag);
-                FCogWindowWidgets::EndItemTableTooltip();
+                FCogWidgets::EndItemTableTooltip();
             }
 
             ImGui::PopID();

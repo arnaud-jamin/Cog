@@ -18,7 +18,7 @@ public class CogEngine : ModuleRules
                 "ApplicationCore",
                 "CogCommon",
                 "CogImgui",
-                "CogWindow",
+                "Cog",
                 "Core",
                 "CoreUObject",
                 "Engine",

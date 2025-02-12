@@ -3,7 +3,7 @@
 #include "CogCommon.h"
 #include "CogCommonLogCategory.h"
 #include "CogImguiHelper.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 #include "Engine/Engine.h"
 #include "Misc/StringBuilder.h"
 
@@ -97,7 +97,7 @@ void FCogEngineWindow_Notifications::RenderNotifications()
 
     const float DpiScale = GetDpiScale();
     
-    ImVec2 WindowPos = FCogWindowWidgets::ComputeScreenCornerLocation(Config->Alignment, Config->Padding);
+    ImVec2 WindowPos = FCogWidgets::ComputeScreenCornerLocation(Config->Alignment, Config->Padding);
     const ImVec2 WindowPadding = ImGui::GetStyle().WindowPadding;
     const ImVec2 ItemSpacing = ImGui::GetStyle().ItemSpacing;
     const float MaxHeight = Config->MaxHeight * DpiScale + WindowPadding.y * 2;
@@ -199,7 +199,7 @@ void FCogEngineWindow_Notifications::RenderContent()
         Notifications.Empty();
     }
 
-    FCogWindowWidgets::ThinSeparatorText("Notification Test");
+    FCogWidgets::ThinSeparatorText("Notification Test");
 
     if (ImGui::Button("Notify Normal", ImVec2(-1, 0)))
     {
@@ -222,7 +222,7 @@ void FCogEngineWindow_Notifications::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Notifications::RenderSettings()
 {
-    FCogWindowWidgets::ThinSeparatorText("Filtering");
+    FCogWidgets::ThinSeparatorText("Filtering");
     
     ImGui::Checkbox("Disable Notifications", &Config->DisableNotifications);
 
@@ -232,36 +232,36 @@ void FCogEngineWindow_Notifications::RenderSettings()
     
     ImGui::Checkbox("Notify All Errors", &Config->NotifyAllErrors);
 
-    FCogWindowWidgets::ThinSeparatorText("Location & Size");
+    FCogWidgets::ThinSeparatorText("Location & Size");
 
-    FCogWindowWidgets::SetNextItemToShortWidth();
+    FCogWidgets::SetNextItemToShortWidth();
     ImGui::SliderFloat2("Alignment", &Config->Alignment.X, 0, 1.0f, "%.2f");
     
-    FCogWindowWidgets::SetNextItemToShortWidth();
+    FCogWidgets::SetNextItemToShortWidth();
     ImGui::SliderInt2("Padding", &Config->Padding.X, 0, 100);
     
     ImGui::Checkbox("Use Fixed Width", &Config->UseFixedWidth);
 
-    FCogWindowWidgets::SetNextItemToShortWidth();
+    FCogWidgets::SetNextItemToShortWidth();
     ImGui::SliderInt("Text Wrapping", &Config->TextWrapping, 1, 500);
 
-    FCogWindowWidgets::SetNextItemToShortWidth();
+    FCogWidgets::SetNextItemToShortWidth();
     ImGui::SliderInt("Max Height", &Config->MaxHeight, 0, 500);
 
-    FCogWindowWidgets::ThinSeparatorText("Display");
+    FCogWidgets::ThinSeparatorText("Display");
 
-    FCogWindowWidgets::SetNextItemToShortWidth();
+    FCogWidgets::SetNextItemToShortWidth();
     ImGui::SliderFloat("Duration", &Config->Duration, 1, 10, "%0.1f");
 
-    FCogWindowWidgets::SetNextItemToShortWidth();
+    FCogWidgets::SetNextItemToShortWidth();
     ImGui::SliderFloat("Fade Out", &Config->FadeOut, 0, 3, "%0.1f");
 
     ImGui::Checkbox("Show Border", &Config->ShowBorder);
     
-    FCogWindowWidgets::SetNextItemToShortWidth();
+    FCogWidgets::SetNextItemToShortWidth();
     ImGui::SliderInt("Rounding", &Config->Rounding, 0, 12);
 
-    FCogWindowWidgets::ThinSeparatorText("Colors");
+    FCogWidgets::ThinSeparatorText("Colors");
 
     constexpr ImGuiColorEditFlags ColorEditFlags = ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf;
 

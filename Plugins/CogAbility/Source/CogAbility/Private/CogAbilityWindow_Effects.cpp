@@ -7,7 +7,7 @@
 #include "CogAbilityDataAsset.h"
 #include "CogAbilityHelper.h"
 #include "CogImguiHelper.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 #include "Engine/World.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -77,7 +77,7 @@ void FCogAbilityWindow_Effects::RenderContent()
             ImGui::EndMenu();
         }
 
-        FCogWindowWidgets::SearchBar("##Filter", Filter);
+        FCogWidgets::SearchBar("##Filter", Filter);
 
         ImGui::EndMenuBar();
     }
@@ -217,10 +217,10 @@ void FCogAbilityWindow_Effects::RenderEffectRow(UAbilitySystemComponent& Ability
     //------------------------
     // Popup
     //------------------------
-    if (FCogWindowWidgets::BeginItemTableTooltip())
+    if (FCogWidgets::BeginItemTableTooltip())
     {
         RenderEffectInfo(AbilitySystemComponent, ActiveEffect, Effect);
-        FCogWindowWidgets::EndItemTableTooltip();
+        FCogWidgets::EndItemTableTooltip();
     }
 
     //------------------------
@@ -250,7 +250,7 @@ void FCogAbilityWindow_Effects::RenderEffectRow(UAbilitySystemComponent& Ability
             ImGui::CloseCurrentPopup();
         }
 
-        FCogWindowWidgets::OpenObjectAssetButton(EffectPtr, ButtonsSize);
+        FCogWidgets::OpenObjectAssetButton(EffectPtr, ButtonsSize);
 
         ImGui::EndPopup();
     }
@@ -458,7 +458,7 @@ void FCogAbilityWindow_Effects::RenderStacks(const FActiveGameplayEffect& Active
         ImGui::PushStyleColor(ImGuiCol_PlotHistogram, IM_COL32(100, 100, 100, 255));
         ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 100));
         ImGui::SetNextItemWidth(-1);
-        ImGui::ProgressBar(CurrentStackCount / (float)Effect.StackLimitCount, ImVec2(FCogWindowWidgets::GetFontWidth() * 15, ImGui::GetTextLineHeightWithSpacing() * 0.8f), TCHAR_TO_ANSI(*FString::Printf(TEXT("%d / %d"), CurrentStackCount, Effect.StackLimitCount)));
+        ImGui::ProgressBar(CurrentStackCount / (float)Effect.StackLimitCount, ImVec2(FCogWidgets::GetFontWidth() * 15, ImGui::GetTextLineHeightWithSpacing() * 0.8f), TCHAR_TO_ANSI(*FString::Printf(TEXT("%d / %d"), CurrentStackCount, Effect.StackLimitCount)));
         ImGui::PopStyleColor(2);
     }
 }
@@ -491,7 +491,7 @@ void FCogAbilityWindow_Effects::RenderInhibition(const FActiveGameplayEffect& Ac
 {
     if (ActiveEffect.bIsInhibited)
     {
-        FCogWindowWidgets::SmallButton("Yes", ImVec4(1, 0, 0, 1));
+        FCogWidgets::SmallButton("Yes", ImVec4(1, 0, 0, 1));
     }
     else
     {

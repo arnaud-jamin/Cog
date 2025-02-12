@@ -9,7 +9,7 @@
 #if ENABLE_COG
 #include "CogAll.h"
 #include "CogSampleWindow_Team.h"
-#include "CogWindowManager.h"
+#include "CogSubsystem.h"
 #endif //ENABLE_COG
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -4,7 +4,7 @@
 #include "CogCommonLogCategory.h"
 #include "CogDebugHelper.h"
 #include "CogImguiHelper.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 #include "Engine/Engine.h"
 #include "HAL/PlatformApplicationMisc.h"
 #include "Misc/StringBuilder.h"
@@ -239,7 +239,7 @@ void FCogEngineWindow_OutputLog::RenderContent()
             ImGui::EndCombo();
         }
 
-        FCogWindowWidgets::SearchBar("##Filter", Filter);
+        FCogWidgets::SearchBar("##Filter", Filter);
 
         ImGui::EndMenuBar();
     }
@@ -258,17 +258,17 @@ void FCogEngineWindow_OutputLog::RenderContent()
             IsTableShown = true;
             if (Config->ShowFrame)
             {
-                ImGui::TableSetupColumn("Frame", ImGuiTableColumnFlags_WidthFixed, FCogWindowWidgets::GetFontWidth() * 4);
+                ImGui::TableSetupColumn("Frame", ImGuiTableColumnFlags_WidthFixed, FCogWidgets::GetFontWidth() * 4);
             }
 
             if (Config->ShowCategory)
             {
-                ImGui::TableSetupColumn("Category", ImGuiTableColumnFlags_WidthFixed, FCogWindowWidgets::GetFontWidth() * 10);
+                ImGui::TableSetupColumn("Category", ImGuiTableColumnFlags_WidthFixed, FCogWidgets::GetFontWidth() * 10);
             }
 
             if (Config->ShowVerbosity)
             {
-                ImGui::TableSetupColumn("Verbosity", ImGuiTableColumnFlags_WidthFixed, FCogWindowWidgets::GetFontWidth() * 10);
+                ImGui::TableSetupColumn("Verbosity", ImGuiTableColumnFlags_WidthFixed, FCogWidgets::GetFontWidth() * 10);
             }
 
             ImGui::TableSetupColumn("Message", ImGuiTableColumnFlags_WidthStretch);

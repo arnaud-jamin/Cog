@@ -4,7 +4,7 @@
 #include "CogAbilityHelper.h"
 #include "CogAbilityReplicator.h"
 #include "CogImguiHelper.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogAbilityWindow_Tweaks::Initialize()
@@ -142,11 +142,11 @@ void FCogAbilityWindow_Tweaks::DrawTweak(ACogAbilityReplicator* Replicator, int3
 
     const FCogAbilityTweakCategory& Category = Asset->TweaksCategories[TweakCategoryIndex];
 
-    FCogWindowWidgets::PushBackColor(FCogImguiHelper::ToImVec4(Category.Color));
+    FCogWidgets::PushBackColor(FCogImguiHelper::ToImVec4(Category.Color));
     ImGui::PushItemWidth(-1);
     ImGui::SliderFloat("##Value", Value, Asset->TweakMinValue, Asset->TweakMaxValue, "%+0.0f%%", 1.0f);
     ImGui::PopItemWidth();
-    FCogWindowWidgets::PopBackColor();
+    FCogWidgets::PopBackColor();
 
     bool bUpdateValue = ImGui::IsItemDeactivatedAfterEdit();
 

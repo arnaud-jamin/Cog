@@ -11,11 +11,11 @@ struct FCogDebugContext;
 class AActor;
 class APawn;
 class APlayerController;
-class UCogWindowManager;
+class UCogSubsystem;
 class ULocalPlayer;
 class UWorld;
 
-class COGWINDOW_API FCogWindow
+class COG_API FCogWindow
 {
 public:
     
@@ -71,9 +71,9 @@ public:
 
     void SetWidgetOrderIndex(int32 Value) { WidgetOrderIndex = Value; }
 
-    void SetOwner(UCogWindowManager* InOwner) { Owner = InOwner; }
+    void SetOwner(UCogSubsystem* InOwner) { Owner = InOwner; }
 
-    UCogWindowManager* GetOwner() const { return Owner; }
+    UCogSubsystem* GetOwner() const { return Owner; }
 
     float GetDpiScale() const;
     
@@ -89,7 +89,7 @@ public:
 
 protected:
     
-    friend class UCogWindowManager;
+    friend class UCogSubsystem;
 
     virtual const FString& GetTitle() const { return Title; }
 
@@ -133,17 +133,21 @@ protected:
 
     bool bIsWidgetVisible = false;
 
+    bool bShowInMainMenu = true;
+
+    bool bUseCustomContextMenu = false;
+
     int32 WidgetOrderIndex = -1;
 
-    ImGuiID ID;
+    ImGuiID ID = 0;
 
     FString FullName;
 
     FString Name;
 
     FString Title;
-
-    UCogWindowManager* Owner = nullptr;
+    
+    UCogSubsystem* Owner = nullptr;
 
     mutable TArray<TWeakObjectPtr<UCogCommonConfig>> ConfigsToResetOnRequest;
 };

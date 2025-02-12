@@ -153,9 +153,15 @@ FReply SCogImguiWidget::HandleKeyEvent(const FKeyEvent& KeyEvent, bool Down) con
         return FReply::Unhandled();
     }
 
-    if (FCogImguiInputHelper::IsTopPriorityKeyEvent(Context->GetGameViewport()->GetWorld(), KeyEvent))
+    if (const UWorld* World = Context->GetGameViewport()->GetWorld())
     {
-        return FReply::Unhandled();
+        if (const UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*World))
+        {
+            if (FCogImguiInputHelper::IsTopPriorityKeyEvent(*PlayerInput, KeyEvent))
+            {
+                return FReply::Unhandled();
+            }
+        }
     }
 
     ImGuiIO& IO = ImGui::GetIO();

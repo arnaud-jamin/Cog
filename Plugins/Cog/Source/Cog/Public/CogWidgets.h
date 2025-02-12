@@ -20,7 +20,7 @@ struct FKeyBind;
 using FCogWindowActorContextMenuFunction = TFunction<void(AActor& Actor)>;
 
 //--------------------------------------------------------------------------------------------------------------------------
-class COGWINDOW_API FCogWindowWidgets
+class COG_API FCogWidgets
 {
 public:
 
@@ -68,7 +68,15 @@ public:
 
     static bool SearchBar(const char* InLabel, ImGuiTextFilter& InFilter, float InWidth = -1.0f);
 
+    static void PushButtonBackColor(const ImVec4& Color);
+
+    static void PopButtonBackColor();
+    static void PushFrameBackColor(const ImVec4& Color);
+    static void PushSliderBackColor(const ImVec4& Color);
+
     static void PushBackColor(const ImVec4& Color);
+    static void PopSliderBackColor();
+    static void PopFrameBackColor();
 
     static void PopBackColor();
 
@@ -163,7 +171,7 @@ public:
 };
 
 template<typename EnumType>
-bool FCogWindowWidgets::ComboboxEnum(const char* Label, const EnumType CurrentValue, EnumType& NewValue)
+bool FCogWidgets::ComboboxEnum(const char* Label, const EnumType CurrentValue, EnumType& NewValue)
 {
     int64 NewValueInt;
     if (ComboboxEnum(Label, StaticEnum<EnumType>(), static_cast<int64>(CurrentValue), NewValueInt))
@@ -176,13 +184,13 @@ bool FCogWindowWidgets::ComboboxEnum(const char* Label, const EnumType CurrentVa
 }
 
 template<typename EnumType>
-bool FCogWindowWidgets::ComboboxEnum(const char* Label, EnumType& Value)
+bool FCogWidgets::ComboboxEnum(const char* Label, EnumType& Value)
 {
     return ComboboxEnum(Label, Value, Value);
 }
 
 template<typename T>
- bool FCogWindowWidgets::ScalarArray(const char* InLabel, ImGuiDataType InDataType, TArray<T>& InArray, int32 InMaxEntries, const ImVec2& Size)
+ bool FCogWidgets::ScalarArray(const char* InLabel, ImGuiDataType InDataType, TArray<T>& InArray, int32 InMaxEntries, const ImVec2& Size)
 {
     bool Result = false;
     ImGui::PushID(InLabel);

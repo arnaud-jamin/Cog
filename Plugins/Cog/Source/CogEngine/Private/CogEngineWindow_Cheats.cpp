@@ -5,8 +5,8 @@
 #include "CogCommonAllegianceActorInterface.h"
 #include "CogEngineHelper.h"
 #include "CogImguiHelper.h"
-#include "CogWindowConsoleCommandManager.h"
-#include "CogWindowWidgets.h"
+#include "CogConsoleCommandManager.h"
+#include "CogWidgets.h"
 #include "EngineUtils.h"
 #include "GameFramework/Character.h"
 #include "imgui.h"
@@ -36,7 +36,7 @@ void FCogEngineWindow_Cheats::Initialize()
     Asset = GetAsset<UCogEngineDataAsset>();
     Config = GetConfig<UCogEngineConfig_Cheats>();
 
-    FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(
+    FCogConsoleCommandManager::RegisterWorldConsoleCommand(
         TEXT("Cog.Cheat"),
         TEXT("Apply a cheat to the selection. Cog.Cheat <CheatName> -Allies -Enemies -Controlled"),
         GetWorld(),
@@ -250,7 +250,7 @@ void FCogEngineWindow_Cheats::RenderContent()
             ImGui::EndMenu();
         }
 
-        FCogWindowWidgets::SearchBar("##Filter", Filter);
+        FCogWidgets::SearchBar("##Filter", Filter);
 
         ImGui::EndMenuBar();
     }
@@ -273,7 +273,7 @@ void FCogEngineWindow_Cheats::RenderContent()
         bool Open = true;
         if (Config->bGroupByCategories)
         {
-            Open = FCogWindowWidgets::DarkCollapsingHeader(CategoryStr.Get(), ImGuiTreeNodeFlags_DefaultOpen);
+            Open = FCogWidgets::DarkCollapsingHeader(CategoryStr.Get(), ImGuiTreeNodeFlags_DefaultOpen);
 
             if (Open && Config->bUseTwoColumns)
             {
@@ -351,7 +351,7 @@ bool FCogEngineWindow_Cheats::AddCheat(ACogEngineReplicator& Replicator, const i
 
     ImGui::PushID(Index);
 
-    FCogWindowWidgets::PushBackColor(FCogImguiHelper::ToImVec4(Cheat.CustomColor));
+    FCogWidgets::PushBackColor(FCogImguiHelper::ToImVec4(Cheat.CustomColor));
 
     const bool IsShiftDown      = (ImGui::GetCurrentContext()->IO.KeyMods & ImGuiMod_Shift) != 0;
     const bool IsAltDown        = (ImGui::GetCurrentContext()->IO.KeyMods & ImGuiMod_Alt) != 0;
@@ -387,7 +387,7 @@ bool FCogEngineWindow_Cheats::AddCheat(ACogEngineReplicator& Replicator, const i
         ImGui::EndTooltip();
     }
 
-    FCogWindowWidgets::PopBackColor();
+    FCogWidgets::PopBackColor();
 
     ImGui::PopID();
 

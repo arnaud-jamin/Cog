@@ -1,15 +1,14 @@
 #include "CogWindow_Layouts.h"
 
 #include "CogImguiInputHelper.h"
-#include "CogWindowManager.h"
+#include "CogSubsystem.h"
 #include "CogWindow_Settings.h"
 #include "InputCoreTypes.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogWindow_Layouts::Initialize()
+FCogWindow_Layouts::FCogWindow_Layouts()
 {
-    Super::Initialize();
-
+    bShowInMainMenu = false;
     bHasMenu = false;
 }
 

@@ -3,8 +3,8 @@
 #if ENABLE_COG
 
 #include "CogImguiHelper.h"
-#include "CogWindowHelper.h"
-#include "CogWindowWidgets.h"
+#include "CogHelper.h"
+#include "CogWidgets.h"
 #include "CogSampleTeamInterface.h"
 
 //--------------------------------------------------------------------------------------------------------------------------

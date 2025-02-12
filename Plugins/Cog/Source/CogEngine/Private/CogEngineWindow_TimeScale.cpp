@@ -2,7 +2,7 @@
 
 #include "CogEngineReplicator.h"
 #include "CogImguiHelper.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 
@@ -52,7 +52,7 @@ void FCogEngineWindow_TimeScale::RenderContextMenu()
     FCogImguiHelper::ColorEdit4("Time Scale Modified Color", Config->TimeScaleModifiedColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
     ImGui::SetItemTooltip("Color of the current time scale, in widget mode, when the time scale in not 1.");
     
-    FCogWindowWidgets::FloatArray("Time Scales", Config->TimeScales, 10, ImVec2(0, ImGui::GetFontSize() * 10));
+    FCogWidgets::FloatArray("Time Scales", Config->TimeScales, 10, ImVec2(0, ImGui::GetFontSize() * 10));
     
     ImGui::Separator();
     FCogWindow::RenderContextMenu();
@@ -115,7 +115,7 @@ void FCogEngineWindow_TimeScale::RenderMainMenuWidget()
 void FCogEngineWindow_TimeScale::RenderTimeScaleChoices(ACogEngineReplicator* Replicator)
 {
     float Value = Replicator->GetTimeDilation();
-    if (FCogWindowWidgets::MultiChoiceButtonsFloat(Config->TimeScales, Value, ImVec2(3.5f * FCogWindowWidgets::GetFontWidth(), 0), Config->Inline))
+    if (FCogWidgets::MultiChoiceButtonsFloat(Config->TimeScales, Value, ImVec2(3.5f * FCogWidgets::GetFontWidth(), 0), Config->Inline))
     {
         Replicator->SetTimeDilation(Value);
     }

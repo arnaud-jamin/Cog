@@ -25,7 +25,7 @@ public class CogAI : ModuleRules
                 "CogCommon",
                 "CogImgui",
                 "CogDebug",
-                "CogWindow",
+                "Cog",
             }
             );
             

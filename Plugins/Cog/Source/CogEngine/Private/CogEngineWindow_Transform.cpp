@@ -2,7 +2,7 @@
 
 #include "CogDebug.h"
 #include "CogImguiHelper.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 #include "GameFramework/Actor.h"
 #include "imgui.h"
 #include "imgui_internal.h"
@@ -39,13 +39,13 @@ void FCogEngineWindow_Transform::RenderContent()
     {
         if (ImGui::BeginMenu("Options"))
         {
-            FCogWindowWidgets::SetNextItemToShortWidth();
+            FCogWidgets::SetNextItemToShortWidth();
             ImGui::DragFloat("Drag Speed Location", &Config->LocationSpeed, 0.1f, 0.1f, 100.0f);
 
-        	FCogWindowWidgets::SetNextItemToShortWidth();
+        	FCogWidgets::SetNextItemToShortWidth();
             ImGui::DragFloat("Drag Speed Rotation", &Config->RotationSpeed, 0.1f, 0.1f, 100.0f);
 
-        	FCogWindowWidgets::SetNextItemToShortWidth();
+        	FCogWidgets::SetNextItemToShortWidth();
             ImGui::DragFloat("Drag Speed Scale", &Config->ScaleSpeed, 0.1f, 0.1f, 100.0f);
 
         	ImGui::SeparatorText("Gizmo");
@@ -113,7 +113,7 @@ void FCogEngineWindow_Transform::RenderSnap(const char* CheckboxLabel, const cha
     ImGui::Checkbox(CheckboxLabel, SnapEnable);
 
     ImGui::SameLine();
-    FCogWindowWidgets::SetNextItemToShortWidth();
+    FCogWidgets::SetNextItemToShortWidth();
     ImGui::DragFloat(InputLabel, Snap, 0.1f, 0.1f, 1000.0f, "%.1f");
 }
 

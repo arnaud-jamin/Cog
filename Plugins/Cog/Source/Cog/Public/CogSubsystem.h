@@ -5,7 +5,7 @@
 #include "CogWindow_Settings.h"
 #include "imgui.h"
 #include "Engine/GameInstance.h"
-#include "CogWindowManager.generated.h"
+#include "CogSubsystem.generated.h"
 
 class UCogCommonConfig;
 class FCogWindow;
@@ -19,31 +19,25 @@ struct ImGuiSettingsHandler;
 struct ImGuiTextBuffer;
 struct FKey;
 
-UCLASS(Config = Cog)
-class COGWINDOW_API UCogWindowManager : public UGameInstanceSubsystem
+UCLASS()
+class COG_API UCogSubsystem : public UGameInstanceSubsystem
 {
     GENERATED_BODY()
 
 public:
 
-    UCogWindowManager();
-
     virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
     virtual void Deinitialize() override;
-    
-    virtual void Shutdown();
+
+    void Activate();
 
     virtual void SortMainMenu();
 
-    virtual void Render(float DeltaTime);
-
-    virtual void Tick(UWorld* World, ELevelTick TickType, float DeltaTime);
-
-    virtual void AddWindow(FCogWindow* Window, const FString& Name, bool AddToMainMenu = true);
+    virtual void AddWindow(FCogWindow* Window, const FString& Name);
 
     template<class T>
-    T* AddWindow(const FString& Name, bool AddToMainMenu = true);
+    T* AddWindow(const FString& Name);
 
     virtual FCogWindow* FindWindowByID(ImGuiID ID);
 
@@ -54,8 +48,6 @@ public:
     virtual void LoadLayout(int32 LayoutIndex);
 
     virtual void SaveLayout(int32 LayoutIndex);
-
-    virtual bool GetHideAllWindows() const { return bIsSelectionModeActive; }
 
     virtual void SetActivateSelectionMode(bool Value);
 
@@ -70,7 +62,7 @@ public:
     template<class T>
     T* GetConfig();
 
-    const UObject* GetAsset(const TSubclassOf<UObject> AssetClass) const;
+    const UObject* GetAsset(const TSubclassOf<UObject>& AssetClass) const;
 
     template<typename T> 
     T* GetAsset();
@@ -79,7 +71,7 @@ public:
 
     FCogImguiContext& GetContext() { return Context; }
 
-    void OnShortcutsDefined() const;
+    void OnShortcutsDefined();
 
     bool IsRenderingMainMenu() const { return IsRenderingInMainMenu; }
 
@@ -99,10 +91,18 @@ protected:
         TArray<FMenu> SubMenus;
     };
 
-    virtual void TryInitializeInternal();
+    virtual void Render(float DeltaTime);
+
+    virtual void Tick(UWorld* InTickedWorld, ELevelTick InTickType, float InDeltaTime);
+    
+    virtual void TryInitialize(UWorld* World);
+
+    virtual void InitializeWindow(FCogWindow* Window);
+
+    virtual void Shutdown();
 
     virtual void RenderMainMenu();
-    
+
     virtual FMenu* AddMenu(const FString& Name);
 
     virtual void RenderOptionMenu(FMenu& Menu);
@@ -115,9 +115,13 @@ protected:
 
     virtual void DisableInputMode();
     
-    virtual void HandleInputs();
+    virtual void HandleInputs(const UPlayerInput& PlayerInput);
 
     virtual void RenderWidgets();
+
+    virtual void SaveAllSettings();
+
+    virtual void ReloadAllSettings();
 
     static void SettingsHandler_ClearAll(ImGuiContext* ctx, ImGuiSettingsHandler*);
 
@@ -129,6 +133,8 @@ protected:
 
     static void SettingsHandler_WriteAll(ImGuiContext* ctx, ImGuiSettingsHandler* handler, ImGuiTextBuffer* buf);
 
+    static FString EnableCommand;
+    
     static FString ToggleInputCommand;
 
     static FString DisableInputCommand;
@@ -140,13 +146,13 @@ protected:
     static FString ResetLayoutCommand;
 
     UPROPERTY()
+    TWeakObjectPtr<UWorld> CurrentWorld;
+    
+    UPROPERTY()
     mutable TArray<TObjectPtr<UCogCommonConfig>> Configs;
 
     UPROPERTY()
     mutable TArray<TObjectPtr<const UObject>> Assets;
-
-    UPROPERTY(Config)
-    bool bShowMainMenu = false;
 
     FCogImguiContext Context;
 
@@ -172,25 +178,30 @@ protected:
     
     bool bIsInputEnabledBeforeEnteringSelectionMode = false;
 
+    bool bEnable = false;
+
     bool bIsSelectionModeActive = false;
 
     bool IsInitialized = false;
     
     bool IsRenderingInMainMenu = false;
+    
+    int32 NumExecBindingsChecked = 0;
+    
 };
 
 //--------------------------------------------------------------------------------------------------------------------------
 template<class T>
-T* UCogWindowManager::AddWindow(const FString& Name, bool AddToMainMenu)
+T* UCogSubsystem::AddWindow(const FString& Name)
 {
     T* Window = new T();
-    AddWindow(Window, Name, AddToMainMenu);
+    AddWindow(Window, Name);
     return Window;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 template<class T>
-T* UCogWindowManager::GetConfig()
+T* UCogSubsystem::GetConfig()
 {
     static_assert(TPointerIsConvertibleFromTo<T, const UCogCommonConfig>::Value);
     return Cast<T>(GetConfig(T::StaticClass()));
@@ -198,7 +209,7 @@ T* UCogWindowManager::GetConfig()
 
 //--------------------------------------------------------------------------------------------------------------------------
 template<typename T>
-T* UCogWindowManager::GetAsset()
+T* UCogSubsystem::GetAsset()
 {
     return Cast<T>(GetAsset(T::StaticClass()));
 }

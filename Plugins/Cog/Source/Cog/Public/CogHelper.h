@@ -5,7 +5,7 @@
 #include "Templates/SubclassOf.h"
 
 
-class COGWINDOW_API FCogWindowHelper
+class COG_API FCogHelper
 {
 public:
 
@@ -23,7 +23,7 @@ public:
 
 //----------------------------------------------------------------------------------------------------------------------
 template<typename T>
-const T* FCogWindowHelper::GetFirstAssetByClass()
+const T* FCogHelper::GetFirstAssetByClass()
 {
     return Cast<T>(GetFirstAssetByClass(T::StaticClass()));
 }

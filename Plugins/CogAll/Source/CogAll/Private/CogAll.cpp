@@ -36,13 +36,13 @@
 #include "CogEngineWindow_Transform.h"
 #include "CogInputWindow_Actions.h"
 #include "CogInputWindow_Gamepad.h"
-#include "CogWindowManager.h"
+#include "CogSubsystem.h"
 
 #include "Engine/Engine.h"
 #include "GameFramework/GameUserSettings.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void Cog::AddAllWindows(UCogWindowManager& CogWindowManager)
+void Cog::AddAllWindows(UCogSubsystem& CogWindowManager)
 {
     //---------------------------------------
     // Engine

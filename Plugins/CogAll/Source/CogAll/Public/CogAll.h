@@ -2,9 +2,9 @@
 
 #include "CoreMinimal.h"
 
-class UCogWindowManager;
+class UCogSubsystem;
 
 namespace Cog
 {
-    void COGALL_API AddAllWindows(UCogWindowManager& CogWindowManager);
+    void COGALL_API AddAllWindows(UCogSubsystem& CogWindowManager);
 }

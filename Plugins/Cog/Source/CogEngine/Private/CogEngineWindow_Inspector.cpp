@@ -1,6 +1,6 @@
 #include "CogEngineWindow_Inspector.h"
 
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 #include "Containers/SortedMap.h"
 #include "Engine/Engine.h"
 #include "imgui_internal.h"
@@ -166,7 +166,7 @@ void FCogEngineWindow_Inspector::RenderMenu()
             ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 0.5f));
             ImGui::SameLine();
 
-            if (ImGui::Button(InspectedObjectName.Get(), ImVec2(FCogWindowWidgets::GetFontWidth() * 20, 0)))
+            if (ImGui::Button(InspectedObjectName.Get(), ImVec2(FCogWidgets::GetFontWidth() * 20, 0)))
             {
                 ImGui::OpenPopup("SelectionPopup");
             }
@@ -187,7 +187,7 @@ void FCogEngineWindow_Inspector::RenderMenu()
         ImGui::SetNextWindowPos(Pos + ImVec2(0, ImGui::GetFrameHeight()));
         if (ImGui::BeginPopup("SelectionPopup"))
         {
-            ImGui::BeginChild("Popup", ImVec2(FCogWindowWidgets::GetFontWidth() * 30, FCogWindowWidgets::GetFontWidth() * 40), false);
+            ImGui::BeginChild("Popup", ImVec2(FCogWidgets::GetFontWidth() * 30, FCogWidgets::GetFontWidth() * 40), false);
 
             //-----------------------------------
             // FAVORITES
@@ -251,7 +251,7 @@ void FCogEngineWindow_Inspector::RenderMenu()
         //-----------------------------------
         // Search
         //-----------------------------------
-        FCogWindowWidgets::SearchBar("##Filter", Filter, -FCogWindowWidgets::GetFontWidth() * 9);
+        FCogWidgets::SearchBar("##Filter", Filter, -FCogWidgets::GetFontWidth() * 9);
 
         //-----------------------------------
         // Options
@@ -376,7 +376,7 @@ bool FCogEngineWindow_Inspector::RenderInspector()
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogEngineWindow_Inspector::RenderBegin()
 {
-    FCogWindowWidgets::PushStyleCompact();
+    FCogWidgets::PushStyleCompact();
 
     ImGuiTableFlags TableFlags = ImGuiTableFlags_Resizable;
     if ((Config->bShowBorders) != 0)
@@ -407,7 +407,7 @@ bool FCogEngineWindow_Inspector::RenderBegin()
 void FCogEngineWindow_Inspector::RenderEnd()
 {
     ImGui::EndTable();
-    FCogWindowWidgets::PopStyleCompact();
+    FCogWidgets::PopStyleCompact();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -787,7 +787,7 @@ bool FCogEngineWindow_Inspector::RenderDouble(const FDoubleProperty* DoublePrope
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogEngineWindow_Inspector::RenderEnum(const FEnumProperty* EnumProperty, uint8* PointerToValue)
 {
-    return FCogWindowWidgets::ComboboxEnum("##Enum", EnumProperty, PointerToValue);
+    return FCogWidgets::ComboboxEnum("##Enum", EnumProperty, PointerToValue);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

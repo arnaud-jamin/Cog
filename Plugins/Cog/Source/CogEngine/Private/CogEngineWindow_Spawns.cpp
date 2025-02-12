@@ -3,7 +3,7 @@
 #include "CogEngineDataAsset.h"
 #include "CogEngineReplicator.h"
 #include "CogImguiHelper.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Spawns::RenderHelp()
@@ -58,14 +58,14 @@ void FCogEngineWindow_Spawns::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Spawns::RenderSpawnGroup(ACogEngineReplicator& Replicator, const FCogEngineSpawnGroup& SpawnGroup, int32 GroupIndex)
 {
-    if (FCogWindowWidgets::DarkCollapsingHeader(TCHAR_TO_ANSI(*SpawnGroup.Name), ImGuiTreeNodeFlags_DefaultOpen))
+    if (FCogWidgets::DarkCollapsingHeader(TCHAR_TO_ANSI(*SpawnGroup.Name), ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::PushID(GroupIndex);
 
         const bool PushColor = (SpawnGroup.Color != FColor::Transparent);
         if (PushColor)
         {
-            FCogWindowWidgets::PushBackColor(FCogImguiHelper::ToImVec4(SpawnGroup.Color));
+            FCogWidgets::PushBackColor(FCogImguiHelper::ToImVec4(SpawnGroup.Color));
         }
 
         static int32 SelectedAssetIndex = -1;
@@ -83,7 +83,7 @@ void FCogEngineWindow_Spawns::RenderSpawnGroup(ACogEngineReplicator& Replicator,
 
         if (PushColor)
         {
-            FCogWindowWidgets::PopBackColor();
+            FCogWidgets::PopBackColor();
         }
 
         ImGui::PopID();

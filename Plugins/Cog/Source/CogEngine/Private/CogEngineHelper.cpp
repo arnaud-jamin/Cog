@@ -1,7 +1,7 @@
 #include "CogEngineHelper.h"
 
 #include "CogEngineReplicator.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 #include "imgui.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/Pawn.h"
@@ -14,10 +14,10 @@
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineHelper::ActorContextMenu(AActor& Actor)
 {
-    FCogWindowWidgets::ThinSeparatorText("Object");
+    FCogWidgets::ThinSeparatorText("Object");
 
 #if WITH_EDITOR
-    FCogWindowWidgets::OpenObjectAssetButton(&Actor, ImVec2(-1, 0));
+    FCogWidgets::OpenObjectAssetButton(&Actor, ImVec2(-1, 0));
 #endif
 
     if (ImGui::Button("Delete", ImVec2(-1, 0)))
@@ -30,7 +30,7 @@ void FCogEngineHelper::ActorContextMenu(AActor& Actor)
 
     if (APawn* Pawn = Cast<APawn>(&Actor))
     {
-        FCogWindowWidgets::ThinSeparatorText("Pawn");
+        FCogWidgets::ThinSeparatorText("Pawn");
 
         if (ImGui::Button("Possess", ImVec2(-1, 0)))
         {

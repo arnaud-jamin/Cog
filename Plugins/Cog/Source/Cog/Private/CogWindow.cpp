@@ -2,7 +2,7 @@
 
 #include "CogDebug.h"
 #include "CogWindow_Settings.h"
-#include "CogWindowManager.h"
+#include "CogSubsystem.h"
 #include "Engine/World.h"
 #include "imgui_internal.h"
 #include "GameFramework/Pawn.h"
@@ -84,7 +84,7 @@ void FCogWindow::RenderSettings()
         ImGui::Checkbox("Show Menu", &bShowMenu);
     }
 
-    if (ImGui::Button("Reset Settings", ImVec2(-1, 0)))
+    if (ImGui::Button("Reset Settings", ImVec2(ImGui::GetContentRegionAvail().x, 0)))
     {
         ResetConfig();
     }
@@ -111,10 +111,13 @@ void FCogWindow::Render(float DeltaTime)
     {
         RenderContent();
 
-        if (ImGui::BeginPopupContextWindow())
+        if (bUseCustomContextMenu == false)
         {
-            RenderContextMenu();
-            ImGui::EndPopup();
+            if (ImGui::BeginPopupContextWindow())
+            {
+                RenderContextMenu();
+                ImGui::EndPopup();
+            }
         }
     }
     ImGui::End();

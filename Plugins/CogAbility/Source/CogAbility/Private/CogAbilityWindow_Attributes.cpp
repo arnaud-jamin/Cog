@@ -6,7 +6,7 @@
 #include "CogAbilityDataAsset.h"
 #include "CogAbilityHelper.h"
 #include "CogImguiHelper.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 #include "AttributeSet.h"
 #include "CogAbilityWindow_Abilities.h"
 #include "imgui_internal.h"
@@ -93,8 +93,8 @@ void FCogAbilityWindow_Attributes::RenderContent()
             ImGui::Checkbox("Group by Category", &Config->GroupByCategory);
             ImGui::Checkbox("Show Only Modified", &Config->ShowOnlyModified);
 
-            FCogWindowWidgets::SetNextItemToShortWidth();
-            FCogWindowWidgets::InputText("Attribute Set Prefixes", Config->AttributeSetPrefixes);
+            FCogWidgets::SetNextItemToShortWidth();
+            FCogWidgets::InputText("Attribute Set Prefixes", Config->AttributeSetPrefixes);
             ImGui::SetItemTooltip("Prefixes to remove from the attribute set name. Separate multiple prefixes with the semicolon character ';'");
 
             ImGui::Separator();
@@ -111,7 +111,7 @@ void FCogAbilityWindow_Attributes::RenderContent()
             ImGui::EndMenu();
         }
 
-        FCogWindowWidgets::SearchBar("##Filter", Filter);
+        FCogWidgets::SearchBar("##Filter", Filter);
 
         ImGui::EndMenuBar();
     }
@@ -292,10 +292,10 @@ void FCogAbilityWindow_Attributes::RenderContent()
                             //------------------------
                             // Popup
                             //------------------------
-                            if (FCogWindowWidgets::BeginItemTableTooltip())
+                            if (FCogWidgets::BeginItemTableTooltip())
                             {
                                 RenderAttributeDetails(*AbilitySystemComponent, AttributeSetNameStr.Get(), Attribute, true);
-                                FCogWindowWidgets::EndItemTableTooltip();
+                                FCogWidgets::EndItemTableTooltip();
                             }
 
                             //------------------------
@@ -449,7 +449,7 @@ void FCogAbilityWindow_Attributes::RenderAttributeDetails(const UAbilitySystemCo
                 char Buffer[128];
                 ImFormatString(Buffer, IM_ARRAYSIZE(Buffer), "Modifier %d", ModifierIndex);
 
-                if (FCogWindowWidgets::DarkCollapsingHeader(Buffer, ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen))
+                if (FCogWidgets::DarkCollapsingHeader(Buffer, ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_DefaultOpen))
                 {
                     if (ImGui::BeginTable("Details", 2, TableFlags))
                     {

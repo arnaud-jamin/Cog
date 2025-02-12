@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "CogCommonConfig.h"
 #include "CogWindow.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 #include "imgui.h"
 #include "Misc/OutputDevice.h"
 #include "CogEngineWindow_Notifications.generated.h"

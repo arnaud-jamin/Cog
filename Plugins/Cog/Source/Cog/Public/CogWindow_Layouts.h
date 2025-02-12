@@ -5,14 +5,14 @@
 
 class UPlayerInput;
 
-class COGWINDOW_API FCogWindow_Layouts : public FCogWindow
+class COG_API FCogWindow_Layouts : public FCogWindow
 {
     typedef FCogWindow Super;
 
 public:
-    
-    virtual void Initialize() override;
 
+    FCogWindow_Layouts();
+    
 protected: 
 
     virtual void RenderContent() override;

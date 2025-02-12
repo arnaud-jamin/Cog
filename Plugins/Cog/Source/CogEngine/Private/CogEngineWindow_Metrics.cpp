@@ -1,7 +1,7 @@
 #include "CogEngineWindow_Metrics.h"
 
 #include "CogDebugMetric.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 #include "imgui.h"
 #include "Engine/World.h"
 
@@ -32,6 +32,9 @@ void FCogEngineWindow_Metrics::PreSaveConfig()
 {
     Super::PreSaveConfig();
 
+    if (Config == nullptr)
+    { return; }
+    
     Config->MaxDurationSetting = FCogDebugMetric::MaxDurationSetting;
     Config->RestartDelaySetting = FCogDebugMetric::RestartDelaySetting;
 }
@@ -54,13 +57,13 @@ void FCogEngineWindow_Metrics::RenderContent()
     {
         if (ImGui::BeginMenu("Options"))
         {
-	        FCogWindowWidgets::PushStyleCompact();
+	        FCogWidgets::PushStyleCompact();
             ImGui::DragFloat("Auto Restart Delay", &FCogDebugMetric::RestartDelaySetting, 0.1f, 0.0f, FLT_MAX, "%0.1f");
-            FCogWindowWidgets::PopStyleCompact();
+            FCogWidgets::PopStyleCompact();
 
-            FCogWindowWidgets::PushStyleCompact();
+            FCogWidgets::PushStyleCompact();
             ImGui::DragFloat("Max Time", &FCogDebugMetric::MaxDurationSetting, 0.1f, 0.0f, FLT_MAX, "%0.1f");
-            FCogWindowWidgets::PopStyleCompact();
+            FCogWidgets::PopStyleCompact();
 
             ImGui::EndMenu();
         }
@@ -100,7 +103,7 @@ void FCogEngineWindow_Metrics::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Metrics::DrawMetric(FCogDebugMetricEntry& Metric)
 {
-    FCogWindowWidgets::PushBackColor(ImVec4(0.8f, 0.8f, 0.8f, 1.0f));
+    FCogWidgets::PushBackColor(ImVec4(0.8f, 0.8f, 0.8f, 1.0f));
 
     if (ImGui::BeginTable("MetricTable", 4, ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_NoBordersInBodyUntilResize | ImGuiTableFlags_RowBg))
     {
@@ -120,25 +123,25 @@ void FCogEngineWindow_Metrics::DrawMetric(FCogDebugMetricEntry& Metric)
     }
 
     ImGui::Text("Crits");
-    ImGui::SameLine(FCogWindowWidgets::GetFontWidth() * 20);
-    FCogWindowWidgets::ProgressBarCentered(Metric.Count == 0 ? 0.0f : Metric.Crits / static_cast<float>(Metric.Count), ImVec2(-1, 0), TCHAR_TO_ANSI(*FString::Printf(TEXT("%d / %d"), Metric.Crits, Metric.Count)));
+    ImGui::SameLine(FCogWidgets::GetFontWidth() * 20);
+    FCogWidgets::ProgressBarCentered(Metric.Count == 0 ? 0.0f : Metric.Crits / static_cast<float>(Metric.Count), ImVec2(-1, 0), TCHAR_TO_ANSI(*FString::Printf(TEXT("%d / %d"), Metric.Crits, Metric.Count)));
 
     if (FCogDebugMetric::MaxDurationSetting > 0.0f)
     {
         ImGui::Text("Timer");
-        ImGui::SameLine(FCogWindowWidgets::GetFontWidth() * 20);
-        FCogWindowWidgets::ProgressBarCentered(Metric.Timer / (float)FCogDebugMetric::MaxDurationSetting, ImVec2(-1, 0), TCHAR_TO_ANSI(*FString::Printf(TEXT("%0.1f / %0.1f"), Metric.Timer, FCogDebugMetric::MaxDurationSetting)));
+        ImGui::SameLine(FCogWidgets::GetFontWidth() * 20);
+        FCogWidgets::ProgressBarCentered(Metric.Timer / (float)FCogDebugMetric::MaxDurationSetting, ImVec2(-1, 0), TCHAR_TO_ANSI(*FString::Printf(TEXT("%0.1f / %0.1f"), Metric.Timer, FCogDebugMetric::MaxDurationSetting)));
     }
     else
     {
         ImGui::Text("Timer");
-        ImGui::SameLine(FCogWindowWidgets::GetFontWidth() * 20);
+        ImGui::SameLine(FCogWidgets::GetFontWidth() * 20);
         ImGui::Text("%0.1f", Metric.Timer);
     }
 
     ImGui::Spacing();
 
-    FCogWindowWidgets::PopBackColor();
+    FCogWidgets::PopBackColor();
 
     if (ImGui::Button("Restart"))
     {

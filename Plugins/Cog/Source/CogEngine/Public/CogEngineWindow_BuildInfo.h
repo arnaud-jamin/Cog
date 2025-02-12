@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "CogWindow.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 #include "CogEngineWindow_BuildInfo.generated.h"
 
 class UCogEngineConfig_BuildInfo;

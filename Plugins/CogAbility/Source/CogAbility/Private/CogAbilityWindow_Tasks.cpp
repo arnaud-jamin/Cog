@@ -4,7 +4,7 @@
 #include "AbilitySystemComponent.h"
 #include "CogAbilityHelper.h"
 #include "CogImguiHelper.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 #include "imgui.h"
 
 class UCogAbilityConfig_Tasks;
@@ -95,7 +95,7 @@ void FCogAbilityWindow_Tasks::RenderTaskMenu(AActor* Selection)
             ImGui::EndMenu();
         }
 
-        FCogWindowWidgets::SearchBar("##Filter", Filter);
+        FCogWidgets::SearchBar("##Filter", Filter);
 
         ImGui::EndMenuBar();
     }
@@ -229,10 +229,10 @@ void FCogAbilityWindow_Tasks::RenderTasksTable(UAbilitySystemComponent& AbilityS
                 //------------------------
                 // Popup
                 //------------------------
-                if (FCogWindowWidgets::BeginItemTableTooltip())
+                if (FCogWidgets::BeginItemTableTooltip())
                 {
                     RenderTaskInfo(Task);
-                    FCogWindowWidgets::EndItemTableTooltip();
+                    FCogWidgets::EndItemTableTooltip();
                 }
 
                 //------------------------
@@ -350,7 +350,7 @@ void FCogAbilityWindow_Tasks::RenderTaskInfo(const UGameplayTask* Task)
         ImGui::TableNextColumn();
         ImGui::TextColored(TextColor, "Debug");
         ImGui::TableNextColumn();
-        ImGui::PushTextWrapPos(FCogWindowWidgets::GetFontWidth() * 80);
+        ImGui::PushTextWrapPos(FCogWidgets::GetFontWidth() * 80);
         ImGui::Text("%s", StringCast<ANSICHAR>(*Task->GetDebugString()).Get());
         ImGui::PopTextWrapPos();
 
@@ -383,23 +383,23 @@ void FCogAbilityWindow_Tasks::RenderTaskState(const UGameplayTask* Task)
     switch (Task->GetState())
     {
     case EGameplayTaskState::Uninitialized:
-        FCogWindowWidgets::SmallButton("Uninitialized", FCogImguiHelper::ToImVec4(Config->UninitializedColor));
+        FCogWidgets::SmallButton("Uninitialized", FCogImguiHelper::ToImVec4(Config->UninitializedColor));
         break;
 
     case EGameplayTaskState::AwaitingActivation:
-        FCogWindowWidgets::SmallButton("Awaiting Activation", FCogImguiHelper::ToImVec4(Config->AwaitingActivationColor));
+        FCogWidgets::SmallButton("Awaiting Activation", FCogImguiHelper::ToImVec4(Config->AwaitingActivationColor));
         break;
 
     case EGameplayTaskState::Active:
-        FCogWindowWidgets::SmallButton("Active", FCogImguiHelper::ToImVec4(Config->ActiveColor));
+        FCogWidgets::SmallButton("Active", FCogImguiHelper::ToImVec4(Config->ActiveColor));
         break;
 
     case EGameplayTaskState::Paused:
-        FCogWindowWidgets::SmallButton("Paused", FCogImguiHelper::ToImVec4(Config->PausedColor));
+        FCogWidgets::SmallButton("Paused", FCogImguiHelper::ToImVec4(Config->PausedColor));
         break;
 
     case EGameplayTaskState::Finished:
-        FCogWindowWidgets::SmallButton("Finished", FCogImguiHelper::ToImVec4(Config->FinishedColor));
+        FCogWidgets::SmallButton("Finished", FCogImguiHelper::ToImVec4(Config->FinishedColor));
         break;
     }
 }

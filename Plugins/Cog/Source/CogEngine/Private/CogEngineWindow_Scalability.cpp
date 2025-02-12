@@ -1,7 +1,7 @@
 #include "CogEngineWindow_Scalability.h"
 
 #include "imgui.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 #include "Engine/Engine.h"
 #include "Scalability.h"
 
@@ -22,7 +22,7 @@ void FCogEngineWindow_Scalability::RenderContent()
 
     Scalability::FQualityLevels Levels = Scalability::GetQualityLevels();
     const FString CurrentQualityName = Scalability::GetQualityLevelText(Levels.GetMinQualityLevel(), SCALABILITY_NUM_LEVELS).ToString();
-    FCogWindowWidgets::SetNextItemToShortWidth();
+    FCogWidgets::SetNextItemToShortWidth();
     if (ImGui::BeginCombo("Scalability", TCHAR_TO_ANSI(*CurrentQualityName)))
     {
         for (int32 i = 0; i < SCALABILITY_NUM_LEVELS; ++i)
@@ -45,37 +45,37 @@ void FCogEngineWindow_Scalability::RenderContent()
 
     bool Modified = false;
 
-    FCogWindowWidgets::SetNextItemToShortWidth();
+    FCogWidgets::SetNextItemToShortWidth();
     Modified |= ImGui::SliderFloat("Resolution", &Levels.ResolutionQuality, 10.0f, 100.0f, "%0.f");
 
-    FCogWindowWidgets::SetNextItemToShortWidth();
+    FCogWidgets::SetNextItemToShortWidth();
     Modified |= ImGui::SliderInt("View Distance", &Levels.ViewDistanceQuality, 0, SCALABILITY_NUM_LEVELS - 1);
 
-    FCogWindowWidgets::SetNextItemToShortWidth();
+    FCogWidgets::SetNextItemToShortWidth();
     Modified |= ImGui::SliderInt("Anti Aliasing", &Levels.AntiAliasingQuality, 0, SCALABILITY_NUM_LEVELS - 1);
 
-    FCogWindowWidgets::SetNextItemToShortWidth();
+    FCogWidgets::SetNextItemToShortWidth();
     Modified |= ImGui::SliderInt("Shadow", &Levels.ShadowQuality, 0, SCALABILITY_NUM_LEVELS - 1);
 
-    FCogWindowWidgets::SetNextItemToShortWidth();
+    FCogWidgets::SetNextItemToShortWidth();
     Modified |= ImGui::SliderInt("Global Illumination", &Levels.GlobalIlluminationQuality, 0, SCALABILITY_NUM_LEVELS - 1);
 
-    FCogWindowWidgets::SetNextItemToShortWidth();
+    FCogWidgets::SetNextItemToShortWidth();
     Modified |= ImGui::SliderInt("Reflection", &Levels.ReflectionQuality, 0, SCALABILITY_NUM_LEVELS - 1);
 
-    FCogWindowWidgets::SetNextItemToShortWidth();
+    FCogWidgets::SetNextItemToShortWidth();
     Modified |= ImGui::SliderInt("Post Process", &Levels.PostProcessQuality, 0, SCALABILITY_NUM_LEVELS - 1);
 
-    FCogWindowWidgets::SetNextItemToShortWidth();
+    FCogWidgets::SetNextItemToShortWidth();
     Modified |= ImGui::SliderInt("Texture", &Levels.TextureQuality, 0, SCALABILITY_NUM_LEVELS - 1);
 
-    FCogWindowWidgets::SetNextItemToShortWidth();
+    FCogWidgets::SetNextItemToShortWidth();
     Modified |= ImGui::SliderInt("Effects", &Levels.EffectsQuality, 0, SCALABILITY_NUM_LEVELS - 1);
 
-    FCogWindowWidgets::SetNextItemToShortWidth();
+    FCogWidgets::SetNextItemToShortWidth();
     Modified |= ImGui::SliderInt("Foliage", &Levels.FoliageQuality, 0, SCALABILITY_NUM_LEVELS - 1);
 
-    FCogWindowWidgets::SetNextItemToShortWidth();
+    FCogWidgets::SetNextItemToShortWidth();
     Modified |= ImGui::SliderInt("Shading", &Levels.ShadingQuality, 0, SCALABILITY_NUM_LEVELS - 1);
 
     if (Modified)

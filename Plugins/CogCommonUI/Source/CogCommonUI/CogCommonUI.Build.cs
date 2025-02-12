@@ -25,7 +25,7 @@ public class CogCommonUI : ModuleRules
                 "CogCommon",
                 "CogImgui",
                 "CogDebug",
-                "CogWindow",
+                "Cog",
                 "CommonUI",
                 "InputCore",
             }

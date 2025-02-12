@@ -27,6 +27,8 @@ protected:
 
     virtual void PreBegin(ImGuiWindowFlags& WindowFlags) override;
 
+    virtual void PostBegin() override;
+
     virtual void RenderContent() override;
 
     virtual void RenderTick(float DeltaSeconds) override;
@@ -34,7 +36,7 @@ protected:
     virtual void RenderButton(const FKey& Key, const ImVec2& Position, const ImVec2& Size, const ImVec2& Alignment, float Rounding, ImDrawFlags Flags = 0);
     
     virtual void RenderStick(const FKey& Key2D, const FKey& KeyBool, bool& InvertY, float& Sensitivity, float Amplitude, const ImVec2& Position, float Radius);
-    
+
     virtual void OnButtonClicked(FCogInputActionInfo* ActionInfo);
 
     virtual void RenderMainContextMenu();
@@ -42,6 +44,8 @@ protected:
     virtual void RenderButtonContextMenu(const FKey& Key, FCogInputActionInfo* ActionInfoButton);
 
     virtual void RenderStickContextMenu(const FKey& Key, FCogInputActionInfo* ActionInfo2D, bool& InvertY, float& Sensitivity);
+
+    virtual void TryRefreshActions();
 
     TObjectPtr<UCogInputConfig_Gamepad> Config;
 

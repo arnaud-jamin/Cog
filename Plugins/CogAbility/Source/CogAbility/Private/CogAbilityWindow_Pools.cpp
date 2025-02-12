@@ -5,7 +5,7 @@
 #include "CogAbilityDataAsset.h"
 #include "CogAbilityHelper.h"
 #include "CogImguiHelper.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 #include "imgui_internal.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -98,6 +98,6 @@ void FCogAbilityWindow_Pools::DrawPool(const UAbilitySystemComponent* AbilitySys
     ImGui::TableNextColumn();
     ImGui::PushStyleColor(ImGuiCol_PlotHistogram, FCogImguiHelper::ToImVec4(Pool.Color));
     ImGui::PushStyleColor(ImGuiCol_FrameBg, FCogImguiHelper::ToImVec4(Pool.BackColor));
-    FCogWindowWidgets::ProgressBarCentered(Ratio, ImVec2(-1, 0), Buffer);
+    FCogWidgets::ProgressBarCentered(Ratio, ImVec2(-1, 0), Buffer);
     ImGui::PopStyleColor(2);
 }

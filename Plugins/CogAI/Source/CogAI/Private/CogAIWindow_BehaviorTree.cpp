@@ -8,7 +8,7 @@
 #include "CogAIModule.h"
 #include "CogDebugDraw.h"
 #include "CogImguiHelper.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 #include "GameFramework/Pawn.h"
 #include "imgui_internal.h"
 #include "Navigation/PathFollowingComponent.h"
@@ -140,7 +140,7 @@ void FCogAIWindow_BehaviorTree::RenderContent()
             ImGui::EndMenu();
         }
 
-        FCogWindowWidgets::SearchBar("##Filter", Filter);
+        FCogWidgets::SearchBar("##Filter", Filter);
 
         ImGui::EndMenuBar();
     }
@@ -269,7 +269,7 @@ void FCogAIWindow_BehaviorTree::RenderNode(UBehaviorTreeComponent& BehaviorTreeC
         //------------------------
         // Tooltip
         //------------------------
-        if (FCogWindowWidgets::BeginItemTableTooltip())
+        if (FCogWidgets::BeginItemTableTooltip())
         {
 	        if (ImGui::BeginTable("Effect", 2, ImGuiTableFlags_Borders))
 	        {
@@ -328,14 +328,14 @@ void FCogAIWindow_BehaviorTree::RenderNode(UBehaviorTreeComponent& BehaviorTreeC
 	            ImGui::EndTable();
 	        }
 
-	        FCogWindowWidgets::EndItemTableTooltip();
+	        FCogWidgets::EndItemTableTooltip();
         }
 
         //------------------------
         // Checkbox
         //------------------------
         ImGui::SameLine();
-        FCogWindowWidgets::PushStyleCompact();
+        FCogWidgets::PushStyleCompact();
         if (IsActive == false)
         {
             ImGui::BeginDisabled();
@@ -347,7 +347,7 @@ void FCogAIWindow_BehaviorTree::RenderNode(UBehaviorTreeComponent& BehaviorTreeC
         {
             ImGui::EndDisabled();
         }
-        FCogWindowWidgets::PopStyleCompact();
+        FCogWidgets::PopStyleCompact();
 
         //------------------------
         // Name

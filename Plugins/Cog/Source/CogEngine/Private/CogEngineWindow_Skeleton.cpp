@@ -1,7 +1,7 @@
 #include "CogEngineWindow_Skeleton.h"
 
 #include "CogDebug.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/SkeletalMesh.h"
@@ -111,12 +111,12 @@ void FCogEngineWindow_Skeleton::RenderContent()
             ImGui::EndMenu();
         }
 
-        FCogWindowWidgets::SearchBar("##Filter", Filter);
+        FCogWidgets::SearchBar("##Filter", Filter);
 
         ImGui::EndMenuBar();
     }
 
-    ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, FCogWindowWidgets::GetFontWidth());
+    ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, FCogWidgets::GetFontWidth());
 
     HoveredBoneIndex = INDEX_NONE;
     RenderBoneEntry(0, false);
@@ -207,7 +207,7 @@ void FCogEngineWindow_Skeleton::RenderBoneEntry(int32 BoneIndex, bool OpenAllChi
         // Checkbox
         //------------------------
         ImGui::SameLine();
-        FCogWindowWidgets::PushStyleCompact();
+        FCogWidgets::PushStyleCompact();
         if (ImGui::Checkbox("##Visible", &BoneInfo.ShowBone))
         {
             if (IsControlDown)
@@ -223,7 +223,7 @@ void FCogEngineWindow_Skeleton::RenderBoneEntry(int32 BoneIndex, bool OpenAllChi
                 BoneInfo.ShowTrajectory = false;
             }
         }
-        FCogWindowWidgets::PopStyleCompact();
+        FCogWidgets::PopStyleCompact();
 
         const bool HasCustomVisibility = BoneInfo.ShowName || BoneInfo.ShowAxes || BoneInfo.ShowLocalVelocity || BoneInfo.ShowTrajectory;
         if (HasCustomVisibility)

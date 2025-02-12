@@ -1,4 +1,4 @@
-#include "CogWindowManager.h"
+#include "CogSubsystem.h"
 
 #include "CogCommon.h"
 #include "CogDebugDrawImGui.h"
@@ -7,9 +7,9 @@
 #include "CogWindow_Layouts.h"
 #include "CogWindow_Settings.h"
 #include "CogWindow_Spacing.h"
-#include "CogWindowConsoleCommandManager.h"
-#include "CogWindowHelper.h"
-#include "CogWindowWidgets.h"
+#include "CogConsoleCommandManager.h"
+#include "CogHelper.h"
+#include "CogWidgets.h"
 #include "Engine/Engine.h"
 #include "GameFramework/PlayerInput.h"
 #include "HAL/IConsoleManager.h"
@@ -17,38 +17,39 @@
 #include "Misc/CoreMisc.h"
 #include "NetImgui_Api.h"
 
-FString UCogWindowManager::ToggleInputCommand   = TEXT("Cog.ToggleInput");
-FString UCogWindowManager::DisableInputCommand  = TEXT("Cog.DisableInput");
-FString UCogWindowManager::LoadLayoutCommand    = TEXT("Cog.LoadLayout");
-FString UCogWindowManager::SaveLayoutCommand    = TEXT("Cog.SaveLayout");
-FString UCogWindowManager::ResetLayoutCommand   = TEXT("Cog.ResetLayout");
+FString UCogSubsystem::ToggleInputCommand   = TEXT("Cog.ToggleInput");
+FString UCogSubsystem::DisableInputCommand  = TEXT("Cog.DisableInput");
+FString UCogSubsystem::LoadLayoutCommand    = TEXT("Cog.LoadLayout");
+FString UCogSubsystem::SaveLayoutCommand    = TEXT("Cog.SaveLayout");
+FString UCogSubsystem::ResetLayoutCommand   = TEXT("Cog.ResetLayout");
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogWindowManager::UCogWindowManager()
-{
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::Initialize(FSubsystemCollectionBase& Collection)
+void UCogSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
     Super::Initialize(Collection);
-    FWorldDelegates::OnWorldPostActorTick.AddUObject(this, &ThisClass::Tick);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::Deinitialize()
+void UCogSubsystem::Deinitialize()
 {
-    Super::Deinitialize();
     Shutdown();
+
+    Super::Deinitialize();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::TryInitializeInternal()
+void UCogSubsystem::Activate()
+{
+    FWorldDelegates::OnWorldTickStart.AddUObject(this, &ThisClass::Tick);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSubsystem::TryInitialize(UWorld* World)
 {
     if (IsInitialized)
     { return; }
 
-    FWorldContext* WorldContext = GEngine->GetWorldContextFromWorld(GetWorld());
+    FWorldContext* WorldContext = GEngine->GetWorldContextFromWorld(World);
     if (WorldContext == nullptr)
     { return; }
 
@@ -70,18 +71,23 @@ void UCogWindowManager::TryInitializeInternal()
     IniHandler.UserData = this;
     ImGui::AddSettingsHandler(&IniHandler);
 
-    SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 1", false));
-    SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 2", false));
-    SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 3", false));
-    SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 4", false));
+    SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 1"));
+    SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 2"));
+    SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 3"));
+    SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 4"));
 
     Settings = GetConfig<UCogWindowConfig_Settings>();
     OnShortcutsDefined();
     
-    LayoutsWindow = AddWindow<FCogWindow_Layouts>("Window.Layouts", false);
-    SettingsWindow = AddWindow<FCogWindow_Settings>("Window.Settings", false);
+    LayoutsWindow = AddWindow<FCogWindow_Layouts>("Window.Layouts");
+    SettingsWindow = AddWindow<FCogWindow_Settings>("Window.Settings");
 
-    FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(
+    for (FCogWindow* Window : Windows)
+    {
+        InitializeWindow(Window);   
+    }
+    
+    FCogConsoleCommandManager::RegisterWorldConsoleCommand(
         *ToggleInputCommand, 
         TEXT("Toggle the input focus between the Game and ImGui"),
         GetWorld(),
@@ -90,7 +96,7 @@ void UCogWindowManager::TryInitializeInternal()
             ToggleInputMode();
         }));
 
-    FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(
+    FCogConsoleCommandManager::RegisterWorldConsoleCommand(
         *DisableInputCommand,
         TEXT("Disable ImGui input"), 
         GetWorld(),
@@ -99,7 +105,7 @@ void UCogWindowManager::TryInitializeInternal()
             DisableInputMode();
         }));
 
-    FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(
+    FCogConsoleCommandManager::RegisterWorldConsoleCommand(
         *ResetLayoutCommand,
         TEXT("Reset the layout."),
         GetWorld(),
@@ -111,7 +117,7 @@ void UCogWindowManager::TryInitializeInternal()
             }
         }));
 
-    FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(
+    FCogConsoleCommandManager::RegisterWorldConsoleCommand(
         *LoadLayoutCommand,
         TEXT("Load the layout. Cog.LoadLayout <Index>"),
         GetWorld(),
@@ -123,7 +129,7 @@ void UCogWindowManager::TryInitializeInternal()
             }
         }));
 
-    FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(
+    FCogConsoleCommandManager::RegisterWorldConsoleCommand(
         *SaveLayoutCommand,
         TEXT("Save the layout. Cog.SaveLayout <Index>"),
         GetWorld(),
@@ -135,14 +141,40 @@ void UCogWindowManager::TryInitializeInternal()
             }
         }));
 
+
     IsInitialized = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::Shutdown()
+void UCogSubsystem::Shutdown()
 {
     FCogImGuiContextScope ImGuiContextScope(Context);
 
+    //------------------------------------------------------------------
+    // Destroy ImGui before destroying the windows to make sure 
+    // imgui serialize their visibility state in imgui.ini
+    // It also save the Cog Settings, so they are saved regularly.
+    //------------------------------------------------------------------
+    if (IsInitialized)
+    {
+        Context.Shutdown();
+    }
+    
+    for (FCogWindow* Window : Windows)
+    {
+        Window->Shutdown();
+        delete Window;
+    }
+    Windows.Empty();
+
+    FCogConsoleCommandManager::UnregisterAllWorldConsoleCommands(GetWorld());
+
+    FWorldDelegates::OnWorldTickStart.RemoveAll(this);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSubsystem::SaveAllSettings()
+{
     //------------------------------------------------------------------
     // Call PreSaveConfig before destroying imgui context
     // if PreSaveConfig needs to read ImGui IO for example
@@ -151,50 +183,73 @@ void UCogWindowManager::Shutdown()
     {
         Window->PreSaveConfig();
     }
-
-    //------------------------------------------------------------------
-    // Destroy ImGui before destroying the windows to make sure 
-    // imgui serialize their visibility state in imgui.ini
-    //------------------------------------------------------------------
-    if (IsInitialized == true)
-    {
-        Context.Shutdown();
-    }
-
-    SaveConfig();
-
-    for (FCogWindow* Window : Windows)
-    {
-        Window->Shutdown();
-        delete Window;
-    }
-    Windows.Empty();
-
+    
     for (UCogCommonConfig* Config : Configs)
     {
         Config->SaveConfig();
     }
-
-    FCogWindowConsoleCommandManager::UnregisterAllWorldConsoleCommands(GetWorld());
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::Tick(UWorld* World, ELevelTick TickType, float DeltaTime)
+void UCogSubsystem::ReloadAllSettings()
 {
+    for (UCogCommonConfig* Config : Configs)
+    {
+        Config->ReloadConfig();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSubsystem::Tick(UWorld* InTickedWorld, ELevelTick InTickType, float InDeltaTime)
+{
+    UWorld* World = GetWorld();
+
     //----------------------------------------------------------------------------------------------
-    // The tick currently gets called from a static tick function, which tick for all PIE worlds.
+    // The tick currently gets called from a static tick function, which tick for all PIEInstance worlds.
     // We must not tick for a different world than ours.
-    // TODO: find a cleaner way to tick only for our world.
+    // TODO: Find a better way to tick the subsystem only for our world.
     //----------------------------------------------------------------------------------------------
-    if (GetWorld() != World)
+    if (World != InTickedWorld)
     { return; }
     
-    FCogImGuiContextScope ImGuiContextScope(Context);
+    //----------------------------------------------------------------------------------------------
+    // When changing world the DebugExecBindings can change. 
+    //----------------------------------------------------------------------------------------------
+    if (World != CurrentWorld.Get())
+    {
+        NumExecBindingsChecked = INDEX_NONE;
+    }
+    CurrentWorld = World;
+    
+    if (World == nullptr)
+    { return; }
 
     if (IsInitialized == false)
     {
-        TryInitializeInternal();
+        TryInitialize(World);
         return;
+    }
+
+    FCogImGuiContextScope ImGuiContextScope(Context);
+
+    UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*World);
+    if (PlayerInput != nullptr)
+    {
+        HandleInputs(*PlayerInput);
+
+        //------------------------------------------------------------------
+        // We must wait for the player input to be valid to disable
+        // DebugExecBindings  conflicting with our shortcuts.
+        //------------------------------------------------------------------
+        const int32 NewNumExecBindings = PlayerInput->DebugExecBindings.Num();
+        if (NumExecBindingsChecked != NewNumExecBindings)
+        {
+            if (Settings->bDisableConflictingCommands)
+            {
+                FCogImguiInputHelper::DisableCommandsConflictingWithShortcuts(*PlayerInput);
+            }
+            NumExecBindingsChecked = NewNumExecBindings;;
+        }
     }
     
     if (LayoutToLoad != -1)
@@ -206,22 +261,21 @@ void UCogWindowManager::Tick(UWorld* World, ELevelTick TickType, float DeltaTime
 
     for (FCogWindow* Window : Windows)
     {
-        Window->GameTick(DeltaTime);
+        Window->GameTick(InDeltaTime);
     }
 
-    const bool shouldSkipRendering = NetImgui::IsConnected() && bIsSelectionModeActive == false;
-    Context.SetSkipRendering(shouldSkipRendering);
+    const bool ShouldSkipRendering = NetImgui::IsConnected() && bIsSelectionModeActive == false;
+    Context.SetSkipRendering(ShouldSkipRendering);
 
-    if (Context.BeginFrame(DeltaTime))
+    if (Context.BeginFrame(InDeltaTime))
     {
-        HandleInputs();
-        Render(DeltaTime);
+        Render(InDeltaTime);
         Context.EndFrame();
     }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::Render(float DeltaTime)
+void UCogSubsystem::Render(float DeltaTime)
 {
     FCogImGuiContextScope ImGuiContextScope(Context);
     
@@ -232,7 +286,7 @@ void UCogWindowManager::Render(float DeltaTime)
     const bool bCompactSaved = Settings->bCompactMode;
     if (bCompactSaved)
     {
-        FCogWindowWidgets::PushStyleCompact();
+        FCogWidgets::PushStyleCompact();
     }
 
     //----------------------------------------------------------------------
@@ -266,14 +320,14 @@ void UCogWindowManager::Render(float DeltaTime)
     
     if (bCompactSaved)
     {
-        FCogWindowWidgets::PopStyleCompact();
+        FCogWidgets::PopStyleCompact();
     }
 
     FCogDebugDrawImGui::Draw();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::AddWindow(FCogWindow* Window, const FString& Name, const bool AddToMainMenu /*= true*/)
+void UCogSubsystem::AddWindow(FCogWindow* Window, const FString& Name)
 {
     if (Windows.ContainsByPredicate([&](const FCogWindow* w) { return w->GetName() == Name; }))
     {
@@ -284,6 +338,11 @@ void UCogWindowManager::AddWindow(FCogWindow* Window, const FString& Name, const
     Window->SetFullName(Name);
     Window->SetOwner(this);
     Windows.Add(Window);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSubsystem::InitializeWindow(FCogWindow* Window)
+{
     Window->Initialize();
 
     if (Window->HasWidget())
@@ -292,7 +351,7 @@ void UCogWindowManager::AddWindow(FCogWindow* Window, const FString& Name, const
         //Widgets.Sort()
     }
 
-    if (AddToMainMenu)
+    if (Window->bShowInMainMenu)
     {
         if (FMenu* Menu = AddMenu(Window->GetFullName()))
         {
@@ -302,7 +361,7 @@ void UCogWindowManager::AddWindow(FCogWindow* Window, const FString& Name, const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FCogWindow* UCogWindowManager::FindWindowByID(const ImGuiID ID)
+FCogWindow* UCogSubsystem::FindWindowByID(const ImGuiID ID)
 {
     for (FCogWindow* Window : Windows)
     {
@@ -315,7 +374,7 @@ FCogWindow* UCogWindowManager::FindWindowByID(const ImGuiID ID)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::ResetLayout()
+void UCogSubsystem::ResetLayout()
 {
     FCogImGuiContextScope ImGuiContextScope(Context);
 
@@ -328,7 +387,7 @@ void UCogWindowManager::ResetLayout()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::CloseAllWindows()
+void UCogSubsystem::CloseAllWindows()
 {
     for (FCogWindow* Window : Windows)
     {
@@ -337,7 +396,7 @@ void UCogWindowManager::CloseAllWindows()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::LoadLayout(const int32 LayoutIndex)
+void UCogSubsystem::LoadLayout(const int32 LayoutIndex)
 {
     for (FCogWindow* Window : Windows)
     {
@@ -348,7 +407,7 @@ void UCogWindowManager::LoadLayout(const int32 LayoutIndex)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::SaveLayout(const int32 LayoutIndex)
+void UCogSubsystem::SaveLayout(const int32 LayoutIndex)
 {
     FCogImGuiContextScope ImGuiContextScope(Context);
 
@@ -357,7 +416,7 @@ void UCogWindowManager::SaveLayout(const int32 LayoutIndex)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::SortMainMenu()
+void UCogSubsystem::SortMainMenu()
 {
     MainMenu.SubMenus.Empty();
 
@@ -374,7 +433,7 @@ void UCogWindowManager::SortMainMenu()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogWindowManager::FMenu* UCogWindowManager::AddMenu(const FString& Name)
+UCogSubsystem::FMenu* UCogSubsystem::AddMenu(const FString& Name)
 {
     TArray<FString> Path;
     Name.ParseIntoArray(Path, TEXT("."));
@@ -400,7 +459,7 @@ UCogWindowManager::FMenu* UCogWindowManager::AddMenu(const FString& Name)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::RenderMainMenu()
+void UCogSubsystem::RenderMainMenu()
 {
     IsRenderingInMainMenu = true;
 
@@ -456,7 +515,7 @@ void UCogWindowManager::RenderMainMenu()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::RenderWidgets()
+void UCogSubsystem::RenderWidgets()
 {
     int32 NumVisibleWidgets = 0;
     for (int i = 0; i < Widgets.Num(); ++i)
@@ -563,7 +622,7 @@ void UCogWindowManager::RenderWidgets()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::RenderOptionMenu(FMenu& Menu)
+void UCogSubsystem::RenderOptionMenu(FMenu& Menu)
 {
     if (Menu.Window != nullptr)
     {
@@ -583,13 +642,13 @@ void UCogWindowManager::RenderOptionMenu(FMenu& Menu)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::RenderMenuItem(FCogWindow& Window, const char* MenuItemName)
+void UCogSubsystem::RenderMenuItem(FCogWindow& Window, const char* MenuItemName)
 {
     if (Settings->bShowWindowsInMainMenu)
     {
         ImGui::SetNextWindowSizeConstraints(
-            ImVec2(FCogWindowWidgets::GetFontWidth() * 40, ImGui::GetTextLineHeightWithSpacing() * 5),
-            ImVec2(FCogWindowWidgets::GetFontWidth() * 50, ImGui::GetTextLineHeightWithSpacing() * 60));
+            ImVec2(FCogWidgets::GetFontWidth() * 40, ImGui::GetTextLineHeightWithSpacing() * 5),
+            ImVec2(FCogWidgets::GetFontWidth() * 50, ImGui::GetTextLineHeightWithSpacing() * 60));
 
         if (ImGui::BeginMenu(MenuItemName))
         {
@@ -617,21 +676,21 @@ void UCogWindowManager::RenderMenuItem(FCogWindow& Window, const char* MenuItemN
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::RenderMenuItemHelp(FCogWindow& Window)
+void UCogSubsystem::RenderMenuItemHelp(FCogWindow& Window)
 {
     if (Settings->bShowHelp)
     {
         ImGui::SameLine();
-        ImGui::SetCursorPosX(ImGui::GetCursorPosX() - FCogWindowWidgets::GetFontWidth() * 3.0f);
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() - FCogWidgets::GetFontWidth() * 3.0f);
         ImGui::TextDisabled("(?)");
         if (ImGui::IsItemHovered())
         {
             ImGui::PushStyleColor(ImGuiCol_PopupBg, IM_COL32(29, 42, 62, 240));
-            const float HelpWidth = FCogWindowWidgets::GetFontWidth() * 80;
+            const float HelpWidth = FCogWidgets::GetFontWidth() * 80;
             ImGui::SetNextWindowSizeConstraints(ImVec2(HelpWidth / 2.0f, 0.0f), ImVec2(HelpWidth, FLT_MAX));
             if (ImGui::BeginTooltip())
             {
-                ImGui::PushTextWrapPos(HelpWidth - 1 * FCogWindowWidgets::GetFontWidth());
+                ImGui::PushTextWrapPos(HelpWidth - 1 * FCogWidgets::GetFontWidth());
                 Window.RenderHelp();
                 ImGui::Separator();
                 ImGui::TextDisabled("Help can be hidden in Window/Settings.");
@@ -641,30 +700,30 @@ void UCogWindowManager::RenderMenuItemHelp(FCogWindow& Window)
             ImGui::PopStyleColor();
         }
         ImGui::SameLine();
-        ImGui::Dummy(ImVec2(FCogWindowWidgets::GetFontWidth() * 1, 0));
+        ImGui::Dummy(ImVec2(FCogWidgets::GetFontWidth() * 1, 0));
     }
 }
 
 
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::SettingsHandler_ClearAll(ImGuiContext* Context, ImGuiSettingsHandler* Handler)
+void UCogSubsystem::SettingsHandler_ClearAll(ImGuiContext* Context, ImGuiSettingsHandler* Handler)
 {
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::SettingsHandler_ApplyAll(ImGuiContext* Context, ImGuiSettingsHandler* Handler)
+void UCogSubsystem::SettingsHandler_ApplyAll(ImGuiContext* Context, ImGuiSettingsHandler* Handler)
 {
-    UCogWindowManager* Manager = static_cast<UCogWindowManager*>(Handler->UserData);
+    UCogSubsystem* CogSubsystem = static_cast<UCogSubsystem*>(Handler->UserData);
 
-    Manager->Widgets.Sort([](const FCogWindow& Window1, const FCogWindow& Window2)
+    CogSubsystem->Widgets.Sort([](const FCogWindow& Window1, const FCogWindow& Window2)
     {
         return Window1.GetWidgetOrderIndex() < Window2.GetWidgetOrderIndex();
     });
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void* UCogWindowManager::SettingsHandler_ReadOpen(ImGuiContext* Context, ImGuiSettingsHandler* Handler, const char* Name)
+void* UCogSubsystem::SettingsHandler_ReadOpen(ImGuiContext* Context, ImGuiSettingsHandler* Handler, const char* Name)
 {
     if (strcmp(Name, "Windows") == 0)
     {
@@ -673,8 +732,8 @@ void* UCogWindowManager::SettingsHandler_ReadOpen(ImGuiContext* Context, ImGuiSe
 
     if (strcmp(Name, "Widgets") == 0)
     {
-        UCogWindowManager* Manager = static_cast<UCogWindowManager*>(Handler->UserData);
-        Manager->WidgetsOrderIndex = 0;
+        UCogSubsystem* CogSubsystem = static_cast<UCogSubsystem*>(Handler->UserData);
+        CogSubsystem->WidgetsOrderIndex = 0;
 
         return reinterpret_cast<void*>(2);
     }
@@ -683,7 +742,7 @@ void* UCogWindowManager::SettingsHandler_ReadOpen(ImGuiContext* Context, ImGuiSe
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::SettingsHandler_ReadLine(ImGuiContext* Context, ImGuiSettingsHandler* Handler, void* Entry, const char* Line)
+void UCogSubsystem::SettingsHandler_ReadLine(ImGuiContext* Context, ImGuiSettingsHandler* Handler, void* Entry, const char* Line)
 {
     //-----------------------------------------------------------------------------------
 	// Load the visibility of windows. 
@@ -698,8 +757,8 @@ void UCogWindowManager::SettingsHandler_ReadLine(ImGuiContext* Context, ImGuiSet
         if (sscanf(Line, "0x%08X", &Id) == 1)
 #endif
         {
-            UCogWindowManager* Manager = static_cast<UCogWindowManager*>(Handler->UserData);
-            if (FCogWindow* Window = Manager->FindWindowByID(Id))
+            UCogSubsystem* CogSubsystem = static_cast<UCogSubsystem*>(Handler->UserData);
+            if (FCogWindow* Window = CogSubsystem->FindWindowByID(Id))
             {
                 Window->SetIsVisible(true);
                 Window->bShowMenu = (ShowMenu > 0);
@@ -719,22 +778,25 @@ void UCogWindowManager::SettingsHandler_ReadLine(ImGuiContext* Context, ImGuiSet
         if (sscanf(Line, "0x%08X %d", &Id, &Visible) == 2)
 #endif
         {
-            UCogWindowManager* Manager = static_cast<UCogWindowManager*>(Handler->UserData);
-            if (FCogWindow* Window = Manager->FindWindowByID(Id))
+            UCogSubsystem* CogSubsystem = static_cast<UCogSubsystem*>(Handler->UserData);
+            if (FCogWindow* Window = CogSubsystem->FindWindowByID(Id))
             {
-                Window->SetWidgetOrderIndex(Manager->WidgetsOrderIndex);
+                Window->SetWidgetOrderIndex(CogSubsystem->WidgetsOrderIndex);
                 Window->SetIsWidgetVisible(Visible > 0);
             }
 
-            Manager->WidgetsOrderIndex++;
+            CogSubsystem->WidgetsOrderIndex++;
         }
     }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::SettingsHandler_WriteAll(ImGuiContext* Context, ImGuiSettingsHandler* Handler, ImGuiTextBuffer* Buffer)
+void UCogSubsystem::SettingsHandler_WriteAll(ImGuiContext* Context, ImGuiSettingsHandler* Handler, ImGuiTextBuffer* Buffer)
 {
-    const UCogWindowManager* Manager = static_cast<UCogWindowManager*>(Handler->UserData);
+    UCogSubsystem* CogSubsystem = static_cast<UCogSubsystem*>(Handler->UserData);
+
+    
+    CogSubsystem->SaveAllSettings();
 
     //-----------------------------------------------------------------------------------
 	// Save the visibility of windows. Example:
@@ -743,7 +805,7 @@ void UCogWindowManager::SettingsHandler_WriteAll(ImGuiContext* Context, ImGuiSet
     //      0xBF3390B5
 	//-----------------------------------------------------------------------------------
     Buffer->appendf("[%s][Windows]\n", Handler->TypeName);
-    for (const FCogWindow* Window : Manager->Windows)
+    for (const FCogWindow* Window : CogSubsystem->Windows)
     {
         if (Window->GetIsVisible())
         {
@@ -759,7 +821,7 @@ void UCogWindowManager::SettingsHandler_WriteAll(ImGuiContext* Context, ImGuiSet
 	//      0x52BDE3E0 1
     //-----------------------------------------------------------------------------------
     Buffer->appendf("[%s][Widgets]\n", Handler->TypeName);
-    for (const FCogWindow* Window : Manager->Widgets)
+    for (const FCogWindow* Window : CogSubsystem->Widgets)
     {
         Buffer->appendf("0x%08X %d\n", Window->GetID(), Window->GetIsWidgetVisible());
     }
@@ -767,7 +829,7 @@ void UCogWindowManager::SettingsHandler_WriteAll(ImGuiContext* Context, ImGuiSet
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::ResetAllWindowsConfig()
+void UCogSubsystem::ResetAllWindowsConfig()
 {
     for (FCogWindow* Window : Windows)
     {
@@ -776,7 +838,7 @@ void UCogWindowManager::ResetAllWindowsConfig()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::AddCommand(UPlayerInput* PlayerInput, const FString& Command, const FKey& Key)
+void UCogSubsystem::AddCommand(UPlayerInput* PlayerInput, const FString& Command, const FKey& Key)
 {
     if (PlayerInput == nullptr)
     { return; }
@@ -815,7 +877,7 @@ void UCogWindowManager::AddCommand(UPlayerInput* PlayerInput, const FString& Com
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::SortCommands(UPlayerInput* PlayerInput)
+void UCogSubsystem::SortCommands(UPlayerInput* PlayerInput)
 {
     PlayerInput->DebugExecBindings.Sort([](const FKeyBind& Key1, const FKeyBind& Key2)
     {
@@ -824,44 +886,38 @@ void UCogWindowManager::SortCommands(UPlayerInput* PlayerInput)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogCommonConfig* UCogWindowManager::GetConfig(const TSubclassOf<UCogCommonConfig> ConfigClass)
+UCogCommonConfig* UCogSubsystem::GetConfig(const TSubclassOf<UCogCommonConfig> ConfigClass)
 {
     const UClass* Class = ConfigClass.Get();
 
     for (UCogCommonConfig* Config : Configs)
     {
         if (Config && Config->IsA(Class))
-        {
-            return Cast<UCogCommonConfig>(Config);
-        }
+        { return Cast<UCogCommonConfig>(Config); }
     }
 
     UCogCommonConfig* Config = NewObject<UCogCommonConfig>(this, Class);
-    Config->Reset();
-    Config->ReloadConfig();
+    //Config->Reset();
+    //Config->ReloadConfig();
     
     Configs.Add(Config);
     return Config;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-const UObject* UCogWindowManager::GetAsset(const TSubclassOf<UObject> AssetClass) const
+const UObject* UCogSubsystem::GetAsset(const TSubclassOf<UObject>& AssetClass) const
 {
     const UClass* Class = AssetClass.Get();
 
     for (const UObject* Asset : Assets)
     {
         if (Asset && Asset->IsA(Class))
-        {
-            return Asset;
-        }
+        { return Asset; }
     }
 
-    const UObject* Asset = FCogWindowHelper::GetFirstAssetByClass(AssetClass);
+    const UObject* Asset = FCogHelper::GetFirstAssetByClass(AssetClass);
     if (Asset == nullptr)
-    {
-        return nullptr;
-    }
+    { return nullptr; }
 
     Assets.Add(Asset);
 
@@ -869,26 +925,22 @@ const UObject* UCogWindowManager::GetAsset(const TSubclassOf<UObject> AssetClass
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::ToggleInputMode()
+void UCogSubsystem::ToggleInputMode()
 {
-    UE_LOG(LogCogImGui, Verbose, TEXT("UCogWindowManager::ToggleInputMode"));
+    UE_LOG(LogCogImGui, Verbose, TEXT("UCogSubsystem::ToggleInputMode"));
     Context.SetEnableInput(!Context.GetEnableInput());
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::DisableInputMode()
+void UCogSubsystem::DisableInputMode()
 {
-    UE_LOG(LogCogImGui, Verbose, TEXT("UCogWindowManager::DisableInputMode"));
+    UE_LOG(LogCogImGui, Verbose, TEXT("UCogSubsystem::DisableInputMode"));
     Context.SetEnableInput(false);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::HandleInputs()
+void UCogSubsystem::HandleInputs(const UPlayerInput& PlayerInput)
 {
-    const UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*GetWorld());
-    if (PlayerInput == nullptr)
-    { return; }
-
     if (Settings->bDisableShortcutsWhenImGuiWantTextInput && ImGui::GetIO().WantTextInput)
     { return; }
 
@@ -900,17 +952,18 @@ void UCogWindowManager::HandleInputs()
     {
         SetActivateSelectionMode(!GetActivateSelectionMode());
     }
+    
     for (int i = 0; i < Settings->LoadLayoutShortcuts.Num(); ++i)
     {
         if (FCogImguiInputHelper::IsKeyInfoPressed(PlayerInput, Settings->LoadLayoutShortcuts[i]))
         {
-            LoadLayout(i);
+            LoadLayout(i + 1);
         }
     }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::SetActivateSelectionMode(const bool Value)
+void UCogSubsystem::SetActivateSelectionMode(const bool Value)
 {
     SelectionModeActiveCounter = FMath::Max(SelectionModeActiveCounter + (Value ? 1 : -1), 0);
     bIsSelectionModeActive = SelectionModeActiveCounter > 0;
@@ -928,21 +981,20 @@ void UCogWindowManager::SetActivateSelectionMode(const bool Value)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool UCogWindowManager::GetActivateSelectionMode() const
+bool UCogSubsystem::GetActivateSelectionMode() const
 {
     return SelectionModeActiveCounter > 0;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogWindowManager::OnShortcutsDefined() const
+void UCogSubsystem::OnShortcutsDefined()
 {
-    if (GetWorld() == nullptr)
-    { return; }
-
     TArray Shortcuts = { Settings->ToggleImGuiInputShortcut, Settings->ToggleSelectionShortcut };
     Shortcuts.Append(Settings->LoadLayoutShortcuts);
     Shortcuts.Append(Settings->SaveLayoutShortcuts);
     
-    FCogImguiInputHelper::SetShortcuts(*GetWorld(), Shortcuts, Settings->bDisableConflictingCommands);
+    FCogImguiInputHelper::SetShortcuts(Shortcuts);
+
+    NumExecBindingsChecked = INDEX_NONE;
 }
 

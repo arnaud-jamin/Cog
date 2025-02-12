@@ -4,11 +4,15 @@
 
 ERouteUIInputResult UCogCommonUI_ActionRouter::ProcessInput(FKey Key, EInputEvent InputEvent) const
 {
-	UWorld* World = GetWorld();
-
-	if (FCogImguiInputHelper::IsTopPriorityKey(World, Key))
+	if (const UWorld* World = GetWorld())
 	{
-		return ERouteUIInputResult::Unhandled;
+		if (const UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*World))
+		{
+			if (FCogImguiInputHelper::IsTopPriorityKey(*PlayerInput, Key))
+			{
+				return ERouteUIInputResult::Unhandled;
+			}
+		}
 	}
 	
 	return UCommonUIActionRouterBase::ProcessInput(Key, InputEvent);

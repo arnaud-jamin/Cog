@@ -16,7 +16,7 @@ public class CogAll : ModuleRules
                 "CogAI",
                 "CogEngine",
                 "CogInput",
-                "CogWindow",
+                "Cog",
                 "Engine",
             }
             );

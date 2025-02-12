@@ -3,8 +3,8 @@
 #include "CogDebug.h"
 #include "CogDebugTracker.h"
 #include "CogImguiHelper.h"
-#include "CogWindowManager.h"
-#include "CogWindowWidgets.h"
+#include "CogSubsystem.h"
+#include "CogWidgets.h"
 #include "Engine/World.h"
 #include "imgui.h"
 #include "implot_internal.h"
@@ -81,7 +81,7 @@ void FCogEngineWindow_Plots::RenderContent()
             | ImGuiTableFlags_NoPadOuterX))
         {
 
-            ImGui::TableSetupColumn("PlotsList", ImGuiTableColumnFlags_WidthFixed, FCogWindowWidgets::GetFontWidth() * 20.0f);
+            ImGui::TableSetupColumn("PlotsList", ImGuiTableColumnFlags_WidthFixed, FCogWidgets::GetFontWidth() * 20.0f);
             ImGui::TableSetupColumn("Plots", ImGuiTableColumnFlags_WidthStretch, 0.0f);
             ImGui::TableNextRow();
 
@@ -128,19 +128,19 @@ void FCogEngineWindow_Plots::RenderMenu(FCogDebugTracker& InTracker)
 
         if (ImGui::BeginMenu("Options"))
         {
-            FCogWindowWidgets::SetNextItemToShortWidth();
+            FCogWidgets::SetNextItemToShortWidth();
             ImGui::SliderInt("Num graphs", &Config->NumGraphs, 1, UCogEngineConfig_Plots::MaxNumGraphs);
 
-            FCogWindowWidgets::SetNextItemToShortWidth();
+            FCogWidgets::SetNextItemToShortWidth();
             ImGui::SliderInt("Num Y axis", &Config->NumYAxis, 1, 3);
             
-            FCogWindowWidgets::SetNextItemToShortWidth();
+            FCogWidgets::SetNextItemToShortWidth();
             if (ImGui::SliderFloat("Time range", &Config->TimeRange, 1.0f, 100.0f, "%0.0f"))
             {
                 bApplyTimeScale = true;
             }
 
-            FCogWindowWidgets::SetNextItemToShortWidth();
+            FCogWidgets::SetNextItemToShortWidth();
             if (ImGui::SliderInt("Num recorded values", &Config->NumRecordedValues, 100, 10000))
             {
                 Config->NumRecordedValues = (Config->NumRecordedValues / 100) * 100; 
@@ -151,10 +151,10 @@ void FCogEngineWindow_Plots::RenderMenu(FCogDebugTracker& InTracker)
                 RefreshPlotSettings();
             }
 
-            FCogWindowWidgets::SetNextItemToShortWidth();
+            FCogWidgets::SetNextItemToShortWidth();
             ImGui::SliderFloat("Auto-fit padding", &Config->AutoFitPadding, 0.0f, 0.2f, "%0.2f");
             
-            FCogWindowWidgets::SetNextItemToShortWidth();
+            FCogWidgets::SetNextItemToShortWidth();
             ImGui::SliderFloat("Drag pause sensitivity", &Config->DragPauseSensitivity, 1.0f, 50.0f, "%0.0f");
 
             ImGui::Checkbox("Record values when paused", &Config->RecordValuesWhenPaused);
@@ -163,16 +163,16 @@ void FCogEngineWindow_Plots::RenderMenu(FCogDebugTracker& InTracker)
                 RefreshPlotSettings();
             }
             
-            FCogWindowWidgets::SetNextItemToShortWidth();
+            FCogWidgets::SetNextItemToShortWidth();
             ImGui::Checkbox("Show time bar at game time", &Config->ShowTimeBarAtGameTime);
 
-            FCogWindowWidgets::SetNextItemToShortWidth();
+            FCogWidgets::SetNextItemToShortWidth();
             ImGui::Checkbox("Show time bar at cursor", &Config->ShowTimeBarAtCursor);
 
-            FCogWindowWidgets::SetNextItemToShortWidth();
+            FCogWidgets::SetNextItemToShortWidth();
             ImGui::Checkbox("Show value at cursor", &Config->ShowValueAtCursor);
 
-            FCogWindowWidgets::SetNextItemToShortWidth();
+            FCogWidgets::SetNextItemToShortWidth();
             ImGui::Checkbox("Dock entries", &Config->DockEntries);
 
             constexpr ImGuiColorEditFlags ColorEditFlags = ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf;
@@ -197,7 +197,7 @@ void FCogEngineWindow_Plots::RenderMenu(FCogDebugTracker& InTracker)
             InTracker.Clear();
         }
 
-        FCogWindowWidgets::ToggleMenuButton(&InTracker.Pause, "Pause", ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+        FCogWidgets::ToggleMenuButton(&InTracker.Pause, "Pause", ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
 
         ImGui::EndMenuBar();
     }
@@ -252,7 +252,7 @@ void FCogEngineWindow_Plots::RenderAllEntriesNames(FCogDebugTracker& InTracker, 
     {
         int Index = 0;
 
-        if (FCogWindowWidgets::DarkCollapsingHeader("Events", ImGuiTreeNodeFlags_DefaultOpen))
+        if (FCogWidgets::DarkCollapsingHeader("Events", ImGuiTreeNodeFlags_DefaultOpen))
         {
             ImGui::Indent(Indent);
             if (InTracker.Events.IsEmpty())
@@ -270,7 +270,7 @@ void FCogEngineWindow_Plots::RenderAllEntriesNames(FCogDebugTracker& InTracker, 
             ImGui::Unindent(Indent);
         }
 
-        if (FCogWindowWidgets::DarkCollapsingHeader("Plots", ImGuiTreeNodeFlags_DefaultOpen))
+        if (FCogWidgets::DarkCollapsingHeader("Plots", ImGuiTreeNodeFlags_DefaultOpen))
         {
             ImGui::Indent(Indent);
             if (InTracker.Values.IsEmpty())
@@ -579,7 +579,7 @@ void FCogEngineWindow_Plots::RenderValues(FCogDebugPlotTrack& Timeline, const ch
         float Value;
         if (Timeline.FindValue(ImPlot::GetPlotMousePos().x, Value))
         {
-            if (FCogWindowWidgets::BeginTableTooltip())
+            if (FCogWidgets::BeginTableTooltip())
             {
                 if (ImGui::BeginTable("Params", 2, ImGuiTableFlags_Borders))
                 {
@@ -590,7 +590,7 @@ void FCogEngineWindow_Plots::RenderValues(FCogDebugPlotTrack& Timeline, const ch
                     ImGui::Text("%0.2f", Value);
                     ImGui::EndTable();
                 }
-                FCogWindowWidgets::EndTableTooltip();
+                FCogWidgets::EndTableTooltip();
             }
         }
     }
@@ -691,7 +691,7 @@ void FCogEngineWindow_Plots::RenderEventTooltip(const FCogDebugEvent* HoveredEve
 {
     if (ImPlot::IsPlotHovered() && HoveredEvent != nullptr)
     {
-        if (FCogWindowWidgets::BeginTableTooltip())
+        if (FCogWidgets::BeginTableTooltip())
         {
             if (ImGui::BeginTable("Params", 2, ImGuiTableFlags_Borders))
             {
@@ -758,7 +758,7 @@ void FCogEngineWindow_Plots::RenderEventTooltip(const FCogDebugEvent* HoveredEve
                 }
                 ImGui::EndTable();
             }
-            FCogWindowWidgets::EndTableTooltip();
+            FCogWidgets::EndTableTooltip();
         }
     }
 }

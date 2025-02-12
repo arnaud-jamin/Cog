@@ -1,7 +1,7 @@
 #include "CogEngineWindow_CommandBindings.h"
 
-#include "CogWindowManager.h"
-#include "CogWindowWidgets.h"
+#include "CogSubsystem.h"
+#include "CogWidgets.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerInput.h"
 #include "imgui.h"
@@ -35,21 +35,21 @@ void FCogEngineWindow_CommandBindings::RenderContent()
     int32 Index = 0;
     int32 IndexToRemove = INDEX_NONE;
 
-    if (FCogWindowWidgets::ButtonWithTooltip("Add", "Add a new item in the array"))
+    if (FCogWidgets::ButtonWithTooltip("Add", "Add a new item in the array"))
     {
         PlayerInput->DebugExecBindings.AddDefaulted();
         PlayerInput->SaveConfig();
     }
 
     ImGui::SameLine();
-    if (FCogWindowWidgets::ButtonWithTooltip("Sort", "Sort the array"))
+    if (FCogWidgets::ButtonWithTooltip("Sort", "Sort the array"))
     {
-        UCogWindowManager::SortCommands(PlayerInput);
+        UCogSubsystem::SortCommands(PlayerInput);
         PlayerInput->SaveConfig();
     }
 
     ImGui::SameLine();
-    if (FCogWindowWidgets::ButtonWithTooltip(
+    if (FCogWidgets::ButtonWithTooltip(
         "Disable Conflicting Commands", 
         "Disable the existing Unreal command shortcuts mapped to same shortcuts Cog is using. Typically, if the F1 shortcut is used to toggle Inputs, the Unreal wireframe command will get disabled."
     ))
@@ -61,14 +61,14 @@ void FCogEngineWindow_CommandBindings::RenderContent()
     {
         ImGui::PushID(Index);
 
-        if (FCogWindowWidgets::DeleteArrayItemButton())
+        if (FCogWidgets::DeleteArrayItemButton())
         {
             IndexToRemove = Index;
         }
         
         ImGui::SameLine();
 
-        if (FCogWindowWidgets::KeyBind(KeyBind))
+        if (FCogWidgets::KeyBind(KeyBind))
         {
             PlayerInput->SaveConfig();
         }

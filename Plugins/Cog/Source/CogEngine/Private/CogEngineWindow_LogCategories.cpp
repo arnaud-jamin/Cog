@@ -2,7 +2,7 @@
 
 #include "CogDebugHelper.h"
 #include "CogDebug.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 #include "CogDebugLog.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/World.h"
@@ -76,12 +76,12 @@ void FCogEngineWindow_LogCategories::RenderContent()
 
         bool bIsFilteringBySelection = FCogDebug::GetIsFilteringBySelection();
         ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2);
-        FCogWindowWidgets::PushStyleCompact();
+        FCogWidgets::PushStyleCompact();
         if (ImGui::Checkbox("Filter", &bIsFilteringBySelection))
         {
             FCogDebug::SetIsFilteringBySelection(GetWorld(), bIsFilteringBySelection);
         }
-        FCogWindowWidgets::PopStyleCompact();
+        FCogWidgets::PopStyleCompact();
 
         if (ImGui::IsItemHovered(ImGuiHoveredFlags_Stationary))
         {
@@ -219,7 +219,7 @@ void FCogEngineWindow_LogCategories::RenderContent()
             if (IsClient)
             {
 	            const ELogVerbosity::Type CurrentVerbosity = FCogDebugLog::GetServerVerbosity(CategoryName);
-                FCogWindowWidgets::SetNextItemToShortWidth();
+                FCogWidgets::SetNextItemToShortWidth();
                 if (ImGui::BeginCombo("##Server", FCogDebugHelper::VerbosityToString(CurrentVerbosity)))
                 {
                     for (int32 i = ELogVerbosity::Error; i <= static_cast<int32>(ELogVerbosity::VeryVerbose); ++i)
@@ -249,7 +249,7 @@ void FCogEngineWindow_LogCategories::RenderContent()
 
             {
 	            const ELogVerbosity::Type CurrentVerbosity = Category->GetVerbosity();
-                FCogWindowWidgets::SetNextItemToShortWidth();
+                FCogWidgets::SetNextItemToShortWidth();
                 if (ImGui::BeginCombo("##Local", FCogDebugHelper::VerbosityToString(CurrentVerbosity)))
                 {
                     for (int32 i = ELogVerbosity::Error; i <= static_cast<int32>(ELogVerbosity::VeryVerbose); ++i)

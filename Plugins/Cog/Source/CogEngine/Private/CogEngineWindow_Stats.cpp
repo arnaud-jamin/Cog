@@ -1,7 +1,7 @@
 #include "CogEngineWindow_Stats.h"
 
 #include "CogImguiHelper.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 #include "Engine/Engine.h"
 #include "Engine/NetConnection.h"
 #include "Engine/NetDriver.h"
@@ -121,7 +121,7 @@ void FCogEngineWindow_Stats::RenderMainMenuWidgetFrameRate()
         {
             ImGui::PushID(i);
             const float Value = Config->FrameRates[i];
-            const auto ValueText = StringCast<ANSICHAR>(*FCogWindowWidgets::FormatSmallFloat(Value));
+            const auto ValueText = StringCast<ANSICHAR>(*FCogWidgets::FormatSmallFloat(Value));
             if (ImGui::Selectable(ValueText.Get(), Value == MaxFps, ImGuiSelectableFlags_None, ImVec2(Width, 0)))
             {
                 GEngine->SetMaxFPS(Value);
@@ -174,7 +174,7 @@ void FCogEngineWindow_Stats::RenderMainMenuWidgetPing()
             {
                 ImGui::PushID(i);
                 const float Value = Config->Pings[i];
-                const auto ValueText = StringCast<ANSICHAR>(*FCogWindowWidgets::FormatSmallFloat(Value));
+                const auto ValueText = StringCast<ANSICHAR>(*FCogWidgets::FormatSmallFloat(Value));
                 if (ImGui::Selectable(ValueText.Get(), Value == Settings.PktIncomingLagMin, ImGuiSelectableFlags_None, ImVec2(Width, 0)))
                 {
                     Settings.PktIncomingLagMin = Value;
@@ -232,7 +232,7 @@ void FCogEngineWindow_Stats::RenderMainMenuWidgetPacketLoss()
             {
                 ImGui::PushID(i);
                 const float Value = Config->PacketLosses[i];
-                const auto ValueText = StringCast<ANSICHAR>(*FCogWindowWidgets::FormatSmallFloat(Value));
+                const auto ValueText = StringCast<ANSICHAR>(*FCogWidgets::FormatSmallFloat(Value));
                 if (ImGui::Selectable(ValueText.Get(), Value == Settings.PktIncomingLagMin, ImGuiSelectableFlags_None, ImVec2(Width, 0)))
                 {
                     Settings.PktIncomingLoss = Value;
@@ -318,7 +318,7 @@ void UCogEngineWindowConfig_Stats::RenderFrameRateConfig()
     {
         ImGui::InputInt("Good Frame Rate", &GoodFrameRate);
         ImGui::InputInt("Medium Frame Rate", &MediumFrameRate);
-        FCogWindowWidgets::IntArray("Max Frame Rate", FrameRates, 10, ImVec2(0, ImGui::GetFontSize() * 10));
+        FCogWidgets::IntArray("Max Frame Rate", FrameRates, 10, ImVec2(0, ImGui::GetFontSize() * 10));
     }
 }
 
@@ -329,7 +329,7 @@ void UCogEngineWindowConfig_Stats::RenderPingConfig()
     {
         ImGui::InputInt("Good Ping", &GoodPing);
         ImGui::InputInt("Medium Ping", &MediumPing);
-        FCogWindowWidgets::IntArray("Ping Emulation", Pings, 10, ImVec2(0, ImGui::GetFontSize() * 10));
+        FCogWidgets::IntArray("Ping Emulation", Pings, 10, ImVec2(0, ImGui::GetFontSize() * 10));
     }
 }
 
@@ -340,6 +340,6 @@ void UCogEngineWindowConfig_Stats::RenderPacketLossConfig()
     {
         ImGui::InputInt("Good Packet Loss", &GoodPacketLoss);
         ImGui::InputInt("Medium Packet Loss", &MediumPacketLoss);
-        FCogWindowWidgets::IntArray("Packet Loss Emulation", PacketLosses, 10, ImVec2(0, ImGui::GetFontSize() * 10));
+        FCogWidgets::IntArray("Packet Loss Emulation", PacketLosses, 10, ImVec2(0, ImGui::GetFontSize() * 10));
     }
 }

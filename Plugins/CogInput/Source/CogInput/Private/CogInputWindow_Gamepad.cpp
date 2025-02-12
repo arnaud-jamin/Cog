@@ -1,7 +1,7 @@
 #include "CogInputWindow_Gamepad.h"
 
 #include "CogImguiHelper.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/World.h"
 #include "EnhancedInputSubsystems.h"
@@ -13,20 +13,60 @@ void FCogInputWindow_Gamepad::Initialize()
 {
     Super::Initialize();
 
+    bUseCustomContextMenu = true;
+
     Config = GetConfig<UCogInputConfig_Gamepad>();
+
+    Actions.FindOrAdd(EKeys::Gamepad_Left2D);
+    Actions.FindOrAdd(EKeys::Gamepad_LeftX);
+    Actions.FindOrAdd(EKeys::Gamepad_LeftY);
+    Actions.FindOrAdd(EKeys::Gamepad_Right2D);
+    Actions.FindOrAdd(EKeys::Gamepad_RightX);
+    Actions.FindOrAdd(EKeys::Gamepad_RightY);
+    Actions.FindOrAdd(EKeys::Gamepad_LeftTriggerAxis);
+    Actions.FindOrAdd(EKeys::Gamepad_RightTriggerAxis);
+    Actions.FindOrAdd(EKeys::Gamepad_LeftThumbstick);
+    Actions.FindOrAdd(EKeys::Gamepad_RightThumbstick);
+    Actions.FindOrAdd(EKeys::Gamepad_Special_Left);
+    Actions.FindOrAdd(EKeys::Gamepad_Special_Left_X);
+    Actions.FindOrAdd(EKeys::Gamepad_Special_Left_Y);
+    Actions.FindOrAdd(EKeys::Gamepad_Special_Right);
+    Actions.FindOrAdd(EKeys::Gamepad_FaceButton_Bottom);
+    Actions.FindOrAdd(EKeys::Gamepad_FaceButton_Right);
+    Actions.FindOrAdd(EKeys::Gamepad_FaceButton_Left);
+    Actions.FindOrAdd(EKeys::Gamepad_FaceButton_Top);
+    Actions.FindOrAdd(EKeys::Gamepad_LeftShoulder);
+    Actions.FindOrAdd(EKeys::Gamepad_RightShoulder);
+    Actions.FindOrAdd(EKeys::Gamepad_LeftTrigger);
+    Actions.FindOrAdd(EKeys::Gamepad_RightTrigger);
+    Actions.FindOrAdd(EKeys::Gamepad_DPad_Up);
+    Actions.FindOrAdd(EKeys::Gamepad_DPad_Down);
+    Actions.FindOrAdd(EKeys::Gamepad_DPad_Right);
+    Actions.FindOrAdd(EKeys::Gamepad_DPad_Left);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogInputWindow_Gamepad::PreBegin(ImGuiWindowFlags& WindowFlags)
 {
+    Super::PreBegin(WindowFlags);
+
     if (Config->bShowAsOverlay)
     {
         WindowFlags = ImGuiWindowFlags_NoTitleBar
             | ImGuiWindowFlags_NoScrollbar
             | ImGuiWindowFlags_NoCollapse
-            | ImGuiWindowFlags_NoBackground
-            | ImGuiWindowFlags_NoResize;
+            | ImGuiWindowFlags_NoBackground;
+            //| ImGuiWindowFlags_NoResize;
     }
+
+    ImGui::PushStyleColor(ImGuiCol_ResizeGrip, IM_COL32_BLACK_TRANS);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogInputWindow_Gamepad::PostBegin()
+{
+    Super::PostBegin();
+    ImGui::PopStyleColor();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -39,16 +79,16 @@ void FCogInputWindow_Gamepad::RenderButtonContextMenu(const FKey& Key, FCogInput
         ImGui::Checkbox("Pressed", &ActionInfoButton->bPressed);
         ImGui::Checkbox("##Repeat", &ActionInfoButton->bRepeat);
         ImGui::SameLine();
-        ImGui::SetNextItemWidth(FCogWindowWidgets::GetShortWidth() - ImGui::GetCursorPosX() + ImGui::GetStyle().ItemSpacing.x);
-        FCogWindowWidgets::SliderWithReset("Repeat", &Config->RepeatPeriod, 0.0f, 10.0f, 0.5f, "%0.1fs");
+        ImGui::SetNextItemWidth(FCogWidgets::GetShortWidth() - ImGui::GetCursorPosX() + ImGui::GetStyle().ItemSpacing.x);
+        FCogWidgets::SliderWithReset("Repeat", &Config->RepeatPeriod, 0.0f, 10.0f, 0.5f, "%0.1fs");
     }
 
     if (ActionInfoButton != nullptr && ActionInfoButton->Action != nullptr && ActionInfoButton->Action->ValueType == EInputActionValueType::Axis1D)
     {
         ImGui::Separator();
 
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        FCogWindowWidgets::SliderWithReset("X", &ActionInfoButton->X, -1.0f, 1.0f, 0.0f, "%0.2f");
+        FCogWidgets::SetNextItemToShortWidth();
+        FCogWidgets::SliderWithReset("X", &ActionInfoButton->X, -1.0f, 1.0f, 0.0f, "%0.2f");
     }
 }
 
@@ -59,13 +99,13 @@ void FCogInputWindow_Gamepad::RenderStickContextMenu(const FKey& Key, FCogInputA
     {
         ImGui::Separator();
 
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        FCogWindowWidgets::SliderWithReset("X", &ActionInfo2D->X, -1.0f, 1.0f, 0.0f, "%0.2f");
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        FCogWindowWidgets::SliderWithReset("Y", &ActionInfo2D->Y, -1.0f, 1.0f, 0.0f, "%0.2f");
+        FCogWidgets::SetNextItemToShortWidth();
+        FCogWidgets::SliderWithReset("X", &ActionInfo2D->X, -1.0f, 1.0f, 0.0f, "%0.2f");
+        FCogWidgets::SetNextItemToShortWidth();
+        FCogWidgets::SliderWithReset("Y", &ActionInfo2D->Y, -1.0f, 1.0f, 0.0f, "%0.2f");
         ImGui::Checkbox("Invert Stick Y", &InvertY);
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        FCogWindowWidgets::SliderWithReset("Sensitivity", &Sensitivity, 0.0f, 10.0f, 5.0f, "%0.1f");
+        FCogWidgets::SetNextItemToShortWidth();
+        FCogWidgets::SliderWithReset("Sensitivity", &Sensitivity, 0.0f, 10.0f, 5.0f, "%0.1f");
     }
 }
 
@@ -73,9 +113,7 @@ void FCogInputWindow_Gamepad::RenderStickContextMenu(const FKey& Key, FCogInputA
 void FCogInputWindow_Gamepad::OnButtonClicked(FCogInputActionInfo* ActionInfo)
 {
     if (ActionInfo == nullptr)
-    {
-        return;
-    }
+    { return; }
 
     if (ActionInfo->bRepeat)
     {
@@ -96,8 +134,6 @@ void FCogInputWindow_Gamepad::OnButtonClicked(FCogInputActionInfo* ActionInfo)
 void FCogInputWindow_Gamepad::RenderButton(const FKey& Key, const ImVec2& RelativePosition, const ImVec2& RelativeSize, const ImVec2& Alignment, float RelativeRounding, ImDrawFlags Flags)
 {
     ImGui::PushID((void*)(&Key));
-
-    const float Value = Input->GetKeyValue(Key);
 
     const ImVec2& Size = RelativeSize * CanvasSize.x;
     const ImVec2 Position = (CanvasMin + CanvasSize * RelativePosition) - Alignment * Size;
@@ -248,6 +284,29 @@ void FCogInputWindow_Gamepad::RenderStick(const FKey& Key2D, const FKey& KeyBool
     ImGui::PopID();
 }
 
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogInputWindow_Gamepad::TryRefreshActions()
+{
+    const CogInputMappingContextMap* AppliedMappingContexts = &PRIVATE_ACCESS_PTR(Input, UEnhancedPlayerInput_AppliedInputContexts);
+    
+    if (AppliedMappingContexts == nullptr)
+    { return; }
+
+    if (AppliedMappingContexts->Num() == 0)
+    { return; }
+
+    for (auto& kv : *AppliedMappingContexts)
+    {
+        for (const FEnhancedActionKeyMapping& Mapping : kv.Key->GetMappings())
+        {
+            if (Mapping.Action != nullptr)
+            {
+                FCogInputActionInfo& ActionInfo = Actions.FindOrAdd(Mapping.Key);
+                ActionInfo.Action = Mapping.Action;
+            }
+        }
+    }
+}
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogInputWindow_Gamepad::RenderContent()
@@ -275,50 +334,7 @@ void FCogInputWindow_Gamepad::RenderContent()
         return;
     }
 
-    if (Actions.Num() == 0)
-    {
-        Actions.FindOrAdd(EKeys:: Gamepad_Left2D);
-        Actions.FindOrAdd(EKeys:: Gamepad_LeftX);
-        Actions.FindOrAdd(EKeys:: Gamepad_LeftY);
-        Actions.FindOrAdd(EKeys:: Gamepad_Right2D);
-        Actions.FindOrAdd(EKeys:: Gamepad_RightX);
-        Actions.FindOrAdd(EKeys:: Gamepad_RightY);
-        Actions.FindOrAdd(EKeys:: Gamepad_LeftTriggerAxis);
-        Actions.FindOrAdd(EKeys:: Gamepad_RightTriggerAxis);
-        Actions.FindOrAdd(EKeys:: Gamepad_LeftThumbstick);
-        Actions.FindOrAdd(EKeys:: Gamepad_RightThumbstick);
-        Actions.FindOrAdd(EKeys:: Gamepad_Special_Left);
-        Actions.FindOrAdd(EKeys:: Gamepad_Special_Left_X);
-        Actions.FindOrAdd(EKeys:: Gamepad_Special_Left_Y);
-        Actions.FindOrAdd(EKeys:: Gamepad_Special_Right);
-        Actions.FindOrAdd(EKeys:: Gamepad_FaceButton_Bottom);
-        Actions.FindOrAdd(EKeys:: Gamepad_FaceButton_Right);
-        Actions.FindOrAdd(EKeys:: Gamepad_FaceButton_Left);
-        Actions.FindOrAdd(EKeys:: Gamepad_FaceButton_Top);
-        Actions.FindOrAdd(EKeys:: Gamepad_LeftShoulder);
-        Actions.FindOrAdd(EKeys:: Gamepad_RightShoulder);
-        Actions.FindOrAdd(EKeys:: Gamepad_LeftTrigger);
-        Actions.FindOrAdd(EKeys:: Gamepad_RightTrigger);
-        Actions.FindOrAdd(EKeys:: Gamepad_DPad_Up);
-        Actions.FindOrAdd(EKeys:: Gamepad_DPad_Down);
-        Actions.FindOrAdd(EKeys:: Gamepad_DPad_Right);
-        Actions.FindOrAdd(EKeys:: Gamepad_DPad_Left);
-
-        if (const CogInputMappingContextMap* AppliedMappingContexts = &PRIVATE_ACCESS_PTR(Input, UEnhancedPlayerInput_AppliedInputContexts))
-        {
-            for (auto& kv : *AppliedMappingContexts)
-            {
-                for (const FEnhancedActionKeyMapping& Mapping : kv.Key->GetMappings())
-                {
-                    if (Mapping.Action != nullptr)
-                    {
-                        FCogInputActionInfo& ActionInfo = Actions.FindOrAdd(Mapping.Key);
-                        ActionInfo.Action = Mapping.Action;
-                    }
-                }
-            }
-        }
-    }
+    TryRefreshActions();
 
     constexpr float AspectRatio = 0.55f;
     constexpr float StickAmplitude = 0.04f;
@@ -431,21 +447,15 @@ void FCogInputWindow_Gamepad::RenderTick(float DeltaSeconds)
     Super::RenderTick(DeltaSeconds);
 
     if (GetWorld() == nullptr)
-    {
-        return;
-    }
+    { return; }
 
     const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
     if (LocalPlayer == nullptr)
-    {
-        return;
-    }
+    { return; }
 
     UEnhancedInputLocalPlayerSubsystem* EnhancedInput = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
     if (EnhancedInput == nullptr)
-    {
-        return;
-    }
+    { return; }
 
     bool IsTimeToRepeat = false;
     const float WorldTime = GetWorld()->GetTimeSeconds();
@@ -472,7 +482,12 @@ void FCogInputWindow_Gamepad::RenderMainContextMenu()
         SetIsVisible(false);
     }
 
-    if (ImGui::MenuItem("Reset"))
+    if (ImGui::MenuItem("Reset Actions"))
+    {
+        Actions.Empty();
+    }
+    
+    if (ImGui::MenuItem("Reset Settings"))
     {
         ResetConfig();
     }
@@ -487,8 +502,8 @@ void FCogInputWindow_Gamepad::RenderMainContextMenu()
         ImGui::ColorEdit4("Pressed Color", (float*)&Config->PressedColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
         ImGui::ColorEdit4("Hovered Color", (float*)&Config->HoveredColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
         ImGui::ColorEdit4("Inject Color", (float*)&Config->InjectColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-        FCogWindowWidgets::SetNextItemToShortWidth();
-        FCogWindowWidgets::SliderWithReset("Border", &Config->Border, 0.0f, 0.1f, 0.02f, "%0.3f");
+        FCogWidgets::SetNextItemToShortWidth();
+        FCogWidgets::SliderWithReset("Border", &Config->Border, 0.0f, 0.1f, 0.02f, "%0.3f");
         ImGui::EndMenu();
     }
 }

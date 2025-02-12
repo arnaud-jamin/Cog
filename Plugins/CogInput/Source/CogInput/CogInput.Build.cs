@@ -25,7 +25,7 @@ public class CogInput : ModuleRules
                 "CogCommon",
                 "CogImgui",
                 "CogDebug",
-                "CogWindow",
+                "Cog",
                 "EnhancedInput",
                 "InputCore",
             }

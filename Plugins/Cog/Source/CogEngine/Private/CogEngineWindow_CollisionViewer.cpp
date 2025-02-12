@@ -3,7 +3,7 @@
 #include "CogDebugDrawHelper.h"
 #include "CogDebug.h"
 #include "CogImguiHelper.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 #include "Components/PrimitiveComponent.h"
 #include "Components/SceneComponent.h"
 #include "DrawDebugHelpers.h"
@@ -132,7 +132,7 @@ void FCogEngineWindow_CollisionViewer::RenderContent()
     }
     ImGui::Separator();
 
-    FCogWindowWidgets::CollisionProfileChannels(Config->ObjectTypesToQuery);
+    FCogWidgets::CollisionProfileChannels(Config->ObjectTypesToQuery);
 
     //-------------------------------------------------
     // Perform Query

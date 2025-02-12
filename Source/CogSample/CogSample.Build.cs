@@ -33,7 +33,7 @@ public class CogSample : ModuleRules
                 "CogEngine",
                 "CogImgui",
                 "CogInput",
-                "CogWindow",
+                "Cog",
             });
         }
     }

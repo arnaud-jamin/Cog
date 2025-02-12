@@ -1,17 +1,17 @@
-#include "CogWindowModule.h"
+#include "CogModule.h"
 
-#define LOCTEXT_NAMESPACE "FCogWindowModule"
+#define LOCTEXT_NAMESPACE "FCogModule"
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogWindowModule::StartupModule()
+void FCogModule::StartupModule()
 {
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogWindowModule::ShutdownModule()
+void FCogModule::ShutdownModule()
 {
 }
 
 #undef LOCTEXT_NAMESPACE
 	
-IMPLEMENT_MODULE(FCogWindowModule, CogWindow)
+IMPLEMENT_MODULE(FCogModule, CogWindow)

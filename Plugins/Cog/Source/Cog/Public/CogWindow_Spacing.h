@@ -3,14 +3,15 @@
 #include "CoreMinimal.h"
 #include "CogWindow.h"
 
-class COGWINDOW_API FCogWindow_Spacing : public FCogWindow
+class COG_API FCogWindow_Spacing : public FCogWindow
 {
     typedef FCogWindow Super;
 
-protected: 
+public:
+    
+    FCogWindow_Spacing();
 
     virtual void PreBegin(ImGuiWindowFlags& WindowFlags) override;
     
     virtual void PostBegin() override;
-
 };

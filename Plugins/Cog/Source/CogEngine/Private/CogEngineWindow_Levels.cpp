@@ -1,7 +1,7 @@
 #include "CogEngineWindow_Levels.h"
 
 #include "CogImguiHelper.h"
-#include "CogWindowWidgets.h"
+#include "CogWidgets.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -71,7 +71,7 @@ void FCogEngineWindow_Levels::RenderMenu()
             ImGui::EndMenu();
         }
         
-        FCogWindowWidgets::SearchBar("##Filter", Filter);
+        FCogWidgets::SearchBar("##Filter", Filter);
 
         ImGui::EndMenuBar();
     }
@@ -169,7 +169,7 @@ void FCogEngineWindow_Levels::RenderLevelContextMenu(int Index, const FAssetData
 {
     if (ImGui::BeginPopupContextItem())
     {
-        FCogWindowWidgets::BrowseToAssetButton(Asset);
+        FCogWidgets::BrowseToAssetButton(Asset);
         ImGui::EndPopup();
     }
 }

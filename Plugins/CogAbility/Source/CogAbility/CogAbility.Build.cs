@@ -26,7 +26,7 @@ public class CogAbility : ModuleRules
                 "CogCommon",
                 "CogDebug",
                 "CogEngine",
-                "CogWindow",
+                "Cog",
                 "GameplayAbilities",
                 "GameplayTags",
                 "NetCore", 

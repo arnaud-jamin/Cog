@@ -2,9 +2,9 @@
 
 #include "CogImguiContext.h"
 #include "CogImguiHelper.h"
-#include "CogWindowConsoleCommandManager.h"
-#include "CogWindowManager.h"
-#include "CogWindowWidgets.h"
+#include "CogConsoleCommandManager.h"
+#include "CogSubsystem.h"
+#include "CogWidgets.h"
 #include "Engine/EngineBaseTypes.h"
 #include "Engine/World.h"
 #include "imgui.h"
@@ -26,7 +26,7 @@ void FCogEngineWindow_NetImgui::Initialize()
 	
 	Config = GetConfig<UCogEngineWindowConfig_NetImgui>();
 
-	FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(
+	FCogConsoleCommandManager::RegisterWorldConsoleCommand(
 		TEXT("Cog.NetImgui.Connect"),
 		TEXT("Connect to NetImgui server"),
 		GetWorld(),
@@ -35,7 +35,7 @@ void FCogEngineWindow_NetImgui::Initialize()
 		ConnectTo();
 	}));
 
-	FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(
+	FCogConsoleCommandManager::RegisterWorldConsoleCommand(
 		TEXT("Cog.NetImgui.Listen"),
 		TEXT("Listen for NetImgui server connection"),
 		GetWorld(),
@@ -44,7 +44,7 @@ void FCogEngineWindow_NetImgui::Initialize()
 		ConnectFrom();
 	}));
 
-	FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(
+	FCogConsoleCommandManager::RegisterWorldConsoleCommand(
 		TEXT("Cog.NetImgui.Disconnect"),
 		TEXT("Disconnect from NetImgui server"),
 		GetWorld(),
@@ -53,7 +53,7 @@ void FCogEngineWindow_NetImgui::Initialize()
 		Disconnect();
 	}));
 
-	FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(
+	FCogConsoleCommandManager::RegisterWorldConsoleCommand(
 		TEXT("Cog.NetImgui.RunServer"),
 		TEXT("Run NetImgui server application"),
 		GetWorld(),
@@ -62,7 +62,7 @@ void FCogEngineWindow_NetImgui::Initialize()
 		RunServer();
 	}));
 
-	FCogWindowConsoleCommandManager::RegisterWorldConsoleCommand(
+	FCogConsoleCommandManager::RegisterWorldConsoleCommand(
 		TEXT("Cog.NetImgui.CloseServer"),
 		TEXT("Close NetImgui server application"),
 		GetWorld(),
@@ -214,38 +214,38 @@ void FCogEngineWindow_NetImgui::RenderContent()
 	{
 		ImGui::SeparatorText("Connection");
 
-		FCogWindowWidgets::SetNextItemToShortWidth();
-		FCogWindowWidgets::InputText("Server Address", Config->ServerAddress);
+		FCogWidgets::SetNextItemToShortWidth();
+		FCogWidgets::InputText("Server Address", Config->ServerAddress);
 		ImGui::SetItemTooltip("NetImgui server application address.");
 
-		FCogWindowWidgets::SetNextItemToShortWidth();
+		FCogWidgets::SetNextItemToShortWidth();
 		ImGui::InputInt("Server Port", &Config->ServerPort);
 		ImGui::SetItemTooltip("Port of the NetImgui Server application to connect to.");
 
-		FCogWindowWidgets::SetNextItemToShortWidth();
-		FCogWindowWidgets::InputText("Client Name", Config->ClientName);
+		FCogWidgets::SetNextItemToShortWidth();
+		FCogWidgets::InputText("Client Name", Config->ClientName);
 		ImGui::SetItemTooltip("Client name displayed in the server's clients list.");
 
-		FCogWindowWidgets::SetNextItemToShortWidth();
+		FCogWidgets::SetNextItemToShortWidth();
 		ImGui::InputInt("Client Port", &Config->ClientPort);
 		ImGui::SetItemTooltip("Port this client should wait for connection from server application.");
 
 		ImGui::SeparatorText("Auto-Connect");
 
-		FCogWindowWidgets::SetNextItemToShortWidth();
-		FCogWindowWidgets::ComboboxEnum("Dedicated Server", Config->AutoConnectOnDedicatedServer);
+		FCogWidgets::SetNextItemToShortWidth();
+		FCogWidgets::ComboboxEnum("Dedicated Server", Config->AutoConnectOnDedicatedServer);
 		ImGui::SetItemTooltip("Auto-connect mode to the NetImgui server when launching on dedicated server mode.");
 
-		FCogWindowWidgets::SetNextItemToShortWidth();
-		FCogWindowWidgets::ComboboxEnum("Listen Server", Config->AutoConnectOnListenServer);
+		FCogWidgets::SetNextItemToShortWidth();
+		FCogWidgets::ComboboxEnum("Listen Server", Config->AutoConnectOnListenServer);
 		ImGui::SetItemTooltip("Auto-connect mode to the NetImgui server when launching on listen server mode.");
 
-		FCogWindowWidgets::SetNextItemToShortWidth();
-		FCogWindowWidgets::ComboboxEnum("Client", Config->AutoConnectOnClient);
+		FCogWidgets::SetNextItemToShortWidth();
+		FCogWidgets::ComboboxEnum("Client", Config->AutoConnectOnClient);
 		ImGui::SetItemTooltip("Auto-connect mode to the NetImgui server when launching on client mode.");
 
-		FCogWindowWidgets::SetNextItemToShortWidth();
-		FCogWindowWidgets::ComboboxEnum("Standalone", Config->AutoConnectOnStandalone);
+		FCogWidgets::SetNextItemToShortWidth();
+		FCogWidgets::ComboboxEnum("Standalone", Config->AutoConnectOnStandalone);
 		ImGui::SetItemTooltip("Auto-connect mode to the NetImgui server when launching on standalone mode.");
 
 		ImGui::SeparatorText("Server App");
@@ -253,16 +253,16 @@ void FCogEngineWindow_NetImgui::RenderContent()
 		ImGui::Checkbox("Auto Run Server", &Config->AutoRunServer);
 		ImGui::SetItemTooltip("Automatically run the NetImgui server executable at startup.");
 
-		FCogWindowWidgets::SetNextItemToShortWidth();
-		FCogWindowWidgets::InputText("Server Executable", Config->ServerExecutable);
+		FCogWidgets::SetNextItemToShortWidth();
+		FCogWidgets::InputText("Server Executable", Config->ServerExecutable);
 		ImGui::SetItemTooltip("Filename of the NetImgui server executable.");
 
-		FCogWindowWidgets::SetNextItemToShortWidth();
-		FCogWindowWidgets::InputText("Server Directory", Config->ServerDirectory);
+		FCogWidgets::SetNextItemToShortWidth();
+		FCogWidgets::InputText("Server Directory", Config->ServerDirectory);
 		ImGui::SetItemTooltip("Directory of the NetImgui server executable.");
 
-		FCogWindowWidgets::SetNextItemToShortWidth();
-		FCogWindowWidgets::InputText("Server Arguments", Config->ServerArguments);
+		FCogWidgets::SetNextItemToShortWidth();
+		FCogWidgets::InputText("Server Arguments", Config->ServerArguments);
 		ImGui::SetItemTooltip("Argument used when launching the NetImgui server executable.");
 	}
 #endif 

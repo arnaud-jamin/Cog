@@ -22,7 +22,7 @@
 			"LoadingPhase": "Default"
 		},
 		{
-			"Name": "CogWindow",
+			"Name": "Cog",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		},

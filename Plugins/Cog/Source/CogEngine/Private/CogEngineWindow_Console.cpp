@@ -1,8 +1,8 @@
 #include "CogEngineWindow_Console.h"
 
 #include "CogImguiHelper.h"
-#include "CogWindowManager.h"
-#include "CogWindowWidgets.h"
+#include "CogSubsystem.h"
+#include "CogWidgets.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 
@@ -175,7 +175,7 @@ void FCogEngineWindow_Console::RenderMenu()
 {
     if (ImGui::BeginMenu("Options"))
     {
-        FCogWindowWidgets::ThinSeparatorText("General");
+        FCogWidgets::ThinSeparatorText("General");
 
         ImGui::Checkbox("Show Help", &Config->ShowHelp);
         
@@ -189,13 +189,13 @@ void FCogEngineWindow_Console::RenderMenu()
         //     RefreshCommandList();
         // }
 
-        FCogWindowWidgets::SetNextItemToShortWidth();
+        FCogWidgets::SetNextItemToShortWidth();
         if (ImGui::SliderInt("Completion Minimum Characters", &Config->CompletionMinimumCharacters, 0, 3))
         {
             RefreshCommandList();
         }
         
-        FCogWindowWidgets::SetNextItemToShortWidth();
+        FCogWidgets::SetNextItemToShortWidth();
         if (ImGui::SliderInt("Num History Commands", &Config->NumHistoryCommands, 0, 100))
         {
             RefreshCommandList();
@@ -203,21 +203,21 @@ void FCogEngineWindow_Console::RenderMenu()
         
         ImGui::ColorEdit4("History Color", &Config->HistoryColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
 
-        FCogWindowWidgets::ThinSeparatorText("Window");
+        FCogWidgets::ThinSeparatorText("Window");
 
         if (ImGui::Checkbox("Dock Input in Menu Bar", &Config->DockInputInMenuBar))
         {
             RefreshCommandList();
         }
 
-        FCogWindowWidgets::ThinSeparatorText("Widget");
+        FCogWidgets::ThinSeparatorText("Widget");
 
         if (ImGui::Checkbox("Focus Console Widget When Appearing", &Config->FocusWidgetWhenAppearing))
         {
             RefreshCommandList();
         }
         
-        FCogWindowWidgets::SetNextItemToShortWidth();
+        FCogWidgets::SetNextItemToShortWidth();
         ImGui::SliderInt("Widget Width", &Config->WidgetWidth, 0, 1000);
 
         ImGui::EndMenu();
@@ -243,7 +243,7 @@ void FCogEngineWindow_Console::RenderInput()
         | ImGuiInputTextFlags_CallbackEdit
         | ImGuiInputTextFlags_CallbackAlways;
     
-    const bool IsEnterPressed = FCogWindowWidgets::InputTextWithHint("##Command", "Command", CurrentUserInput, InputFlags, &OnTextInputCallbackStub, this);
+    const bool IsEnterPressed = FCogWidgets::InputTextWithHint("##Command", "Command", CurrentUserInput, InputFlags, &OnTextInputCallbackStub, this);
     InputTextId = ImGui::GetItemID();
 
     if (IsEnterPressed)
