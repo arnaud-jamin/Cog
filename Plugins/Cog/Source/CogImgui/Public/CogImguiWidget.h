@@ -51,6 +51,8 @@ public:
     virtual FReply OnMouseMove(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent) override;
 
     virtual FReply OnFocusReceived(const FGeometry& MyGeometry, const FFocusEvent& FocusEvent) override;
+    
+    virtual void OnFocusLost(const FFocusEvent& InFocusEvent) override;
 
     void SetDrawData(const ImDrawData* InDrawData);
 

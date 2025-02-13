@@ -52,7 +52,7 @@ void FCogEngineWindow_Slate::RenderContent()
 void FCogEngineWindow_Slate::RenderUser(FSlateUser& User)
 {
 
-    if (ImGui::BeginTable("SlateUser", 2, ImGuiTableFlags_Borders))
+    if (ImGui::BeginTable("SlateUser", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable))
     {
 	    constexpr ImVec4 LabelColor(1.0f, 1.0f, 1.0f, 0.5f);
 

@@ -207,6 +207,17 @@ void FCogImguiContext::Shutdown()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void FCogImguiContext::OnImGuiWidgetFocusLost()
+{
+    FCogImGuiContextScope ImGuiContextScope(Context, PlotContext);
+
+    if (bEnableInput && GameViewport->GetGameViewportWidget()->HasUserFocus(0))
+    {
+        bRetakeFocus = true;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::OnDisplayMetricsChanged(const FDisplayMetrics& DisplayMetrics) const
 {
     FCogImGuiContextScope ImGuiContextScope(Context, PlotContext);
@@ -238,7 +249,7 @@ void FCogImguiContext::OnDisplayMetricsChanged(const FDisplayMetrics& DisplayMet
 bool FCogImguiContext::BeginFrame(float InDeltaTime)
 {
     FCogImGuiContextScope ImGuiContextScope(Context, PlotContext);
-
+    
     //-------------------------------------------------------------------------------------------------------
     // Skip the first frame, to let the main widget update its TickSpaceGeometry which is returned by the 
     // platform callback ImGui_GetWindowPos. When using viewports Imgui needs to know the main viewport 
@@ -248,6 +259,16 @@ bool FCogImguiContext::BeginFrame(float InDeltaTime)
     {
         bIsFirstFrame = false;
         return false;
+    }
+
+    //-------------------------------------------------------------------------------------------------------
+    // Sometime the game can retake unaware that ImGui want to keep the focus and mouse unlock.
+    // This typically happens when switching level.  
+    //-------------------------------------------------------------------------------------------------------
+    if (bRetakeFocus)
+    {
+        SetEnableInput(true);
+        bRetakeFocus = false;
     }
 
     ImGuiIO& IO = ImGui::GetIO();
@@ -696,16 +717,14 @@ static APlayerController* GetLocalPlayerController(const UWorld* World)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogImguiContext::SetEnableInput(bool Value)
+void FCogImguiContext::SetEnableInput(const bool InValue)
 {
     FCogImGuiContextScope ImGuiContextScope(Context, PlotContext);
 
-    bEnableInput = Value; 
+    bEnableInput = InValue; 
 
     if (FSlateApplication::IsInitialized() == false)
-    {
-        return; 
-    }
+    { return; }
 
     if (bEnableInput)
     {

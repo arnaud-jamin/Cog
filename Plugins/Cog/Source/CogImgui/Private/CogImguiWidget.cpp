@@ -278,6 +278,17 @@ FReply SCogImguiWidget::OnFocusReceived(const FGeometry& MyGeometry, const FFocu
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void SCogImguiWidget::OnFocusLost(const FFocusEvent& InFocusEvent)
+{
+    SLeafWidget::OnFocusLost(InFocusEvent);
+
+    if (Context != nullptr)
+    {
+        Context->OnImGuiWidgetFocusLost();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void SCogImguiWidget::RefreshVisibility()
 {
     EVisibility DesiredVisibility;

@@ -47,7 +47,7 @@ public:
 
 	bool GetEnableInput() const { return bEnableInput; }
 
-	void SetEnableInput(bool Value);
+	void SetEnableInput(bool InValue);
 
 	bool GetWantCaptureMouse() const { return bWantCaptureMouse; }
 
@@ -80,6 +80,8 @@ public:
 	TObjectPtr<const UGameViewportClient> GetGameViewport() const { return GameViewport; }
 
 	TSharedPtr<const SCogImguiWidget> GetMainWidget() const { return MainWidget; }
+
+	void OnImGuiWidgetFocusLost();
 
 	static bool GetIsNetImguiInitialized() { return bIsNetImGuiInitialized; }
 
@@ -178,6 +180,8 @@ private:
 	float DpiScale = 1.f;
 
 	bool bSkipRendering = false;
+
+	bool bRetakeFocus = false;
 
 	static bool bIsNetImGuiInitialized;
 
