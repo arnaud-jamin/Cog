@@ -23,19 +23,22 @@ FString FCogDebugLogCategoryInfo::GetDisplayName() const
         return DisplayName;
     }
 
+#if !NO_LOGGING
     if (LogCategory != nullptr)
     {
         return LogCategory->GetCategoryName().ToString();
     }
-
+#endif
+    
     return FString("Invalid");
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 // FCogDebugLogCategoryManager
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugLog::AddLogCategory(FLogCategoryBase& LogCategory, const FString& DisplayName, const FString& Description, const bool bVisible)
+void FCogDebugLog::AddLogCategory(FCogLogCategoryAlias& LogCategory, const FString& DisplayName, const FString& Description, const bool bVisible)
 {
+#if !NO_LOGGING
     LogCategories.Add(LogCategory.GetCategoryName(), 
         FCogDebugLogCategoryInfo
         {
@@ -45,6 +48,7 @@ void FCogDebugLog::AddLogCategory(FLogCategoryBase& LogCategory, const FString& 
             Description,
             bVisible,
             });
+#endif
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -54,26 +58,34 @@ bool FCogDebugLog::IsVerbosityActive(const ELogVerbosity::Type Verbosity)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogDebugLog::IsLogCategoryActive(const FLogCategoryBase& LogCategory)
+bool FCogDebugLog::IsLogCategoryActive(const FCogLogCategoryAlias& LogCategory)
 {
+#if !NO_LOGGING
     return IsVerbosityActive(LogCategory.GetVerbosity());
+#else
+    return false;
+#endif
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogDebugLog::IsLogCategoryActive(const FName CategoryName)
 {
-    if (const FLogCategoryBase* LogCategory = FindLogCategory(CategoryName))
+#if !NO_LOGGING
+    if (const FCogLogCategoryAlias* LogCategory = FindLogCategory(CategoryName))
     {
         return IsVerbosityActive(LogCategory->GetVerbosity());
     }
+#endif
 
     return false;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugLog::SetLogCategoryActive(FLogCategoryBase& LogCategory, const bool Value)
+void FCogDebugLog::SetLogCategoryActive(FCogLogCategoryAlias& LogCategory, const bool Value)
 {
+#if !NO_LOGGING
     LogCategory.SetVerbosity(Value ? ELogVerbosity::Verbose : ELogVerbosity::Warning);
+#endif
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -124,7 +136,7 @@ FCogDebugLogCategoryInfo* FCogDebugLog::FindLogCategoryInfo(const FName Category
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FLogCategoryBase* FCogDebugLog::FindLogCategory(const FName CategoryName)
+FCogLogCategoryAlias* FCogDebugLog::FindLogCategory(const FName CategoryName)
 {
     if (const FCogDebugLogCategoryInfo* LogCategoryInfo = FindLogCategoryInfo(CategoryName))
     {
@@ -148,14 +160,9 @@ void FCogDebugLog::DeactivateAllLogCategories(UWorld& World)
 
 
 //--------------------------------------------------------------------------------------------------------------------------
-FLogCategoryBase* FCogDebugLog::GetLogCategoryBase(const FCogLogCategory& LogCategory)
+FCogLogCategoryAlias* FCogDebugLog::GetLogCategoryBase(const FCogLogCategory& LogCategory)
 {
-#if NO_LOGGING
-
-    return nullptr;
-
-#else
-
+#if !NO_LOGGING
     if (LogCategory.Name.IsNone() || LogCategory.Name.IsValid() == false)
     {
         return nullptr;
@@ -170,7 +177,8 @@ FLogCategoryBase* FCogDebugLog::GetLogCategoryBase(const FCogLogCategory& LogCat
     }
 
     return LogCategory.LogCategory;
-
-#endif //NO_LOGGING
+#else
+    return nullptr;
+#endif // !NO_LOGGING
 }
 

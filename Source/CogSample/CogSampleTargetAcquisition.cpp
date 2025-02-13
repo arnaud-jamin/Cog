@@ -546,7 +546,7 @@ bool UCogSampleTargetAcquisition::EvaluateCandidate(
     //--------------------------------------------------------------------------------------------------------------
     // Draw the score of each candidate
     //--------------------------------------------------------------------------------------------------------------
-#if ENABLE_COG
+#if ENABLE_COG && !NO_LOGGING
 
     if (FCogDebugLog::IsLogCategoryActive(LogCogTargetAcquisition))
     {
