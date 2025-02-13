@@ -14,4 +14,4 @@ void FCogModule::ShutdownModule()
 
 #undef LOCTEXT_NAMESPACE
 	
-IMPLEMENT_MODULE(FCogModule, CogWindow)
+IMPLEMENT_MODULE(FCogModule, Cog)
