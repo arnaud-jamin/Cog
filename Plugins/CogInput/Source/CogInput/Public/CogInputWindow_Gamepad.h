@@ -47,6 +47,8 @@ protected:
 
     virtual void TryRefreshActions();
 
+    static void ConstrainAspectRatio(ImGuiSizeCallbackData* InData);
+
     TObjectPtr<UCogInputConfig_Gamepad> Config;
 
     TMap<FKey, FCogInputActionInfo> Actions;

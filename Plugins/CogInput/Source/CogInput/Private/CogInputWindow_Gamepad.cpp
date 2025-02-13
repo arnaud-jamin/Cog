@@ -50,16 +50,25 @@ void FCogInputWindow_Gamepad::PreBegin(ImGuiWindowFlags& WindowFlags)
 {
     Super::PreBegin(WindowFlags);
 
+    WindowFlags |= ImGuiWindowFlags_NoScrollbar;
+    
     if (Config->bShowAsOverlay)
     {
         WindowFlags = ImGuiWindowFlags_NoTitleBar
             | ImGuiWindowFlags_NoScrollbar
             | ImGuiWindowFlags_NoCollapse
             | ImGuiWindowFlags_NoBackground;
-            //| ImGuiWindowFlags_NoResize;
     }
 
+    ImGui::SetNextWindowSizeConstraints(ImVec2(100, 100), ImVec2(FLT_MAX, FLT_MAX), FCogInputWindow_Gamepad::ConstrainAspectRatio); 
     ImGui::PushStyleColor(ImGuiCol_ResizeGrip, IM_COL32_BLACK_TRANS);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogInputWindow_Gamepad::ConstrainAspectRatio(ImGuiSizeCallbackData* InData)
+{
+    constexpr float AspectRatio = 0.65f;
+    InData->DesiredSize.y = static_cast<int>(InData->DesiredSize.x * AspectRatio + ImGui::GetFrameHeight());
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -482,23 +491,23 @@ void FCogInputWindow_Gamepad::RenderMainContextMenu()
         SetIsVisible(false);
     }
 
-    if (ImGui::MenuItem("Reset Settings"))
+    if (ImGui::BeginMenu("Display"))
     {
-        ResetConfig();
+        ImGui::ColorEdit4("Background Color", &Config->BackgroundColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        ImGui::ColorEdit4("Border Color", &Config->BorderColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        ImGui::ColorEdit4("Button Color", &Config->ButtonColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        ImGui::ColorEdit4("Pressed Color", &Config->PressedColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        ImGui::ColorEdit4("Hovered Color", &Config->HoveredColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        ImGui::ColorEdit4("Inject Color", &Config->InjectColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+        FCogWidgets::SetNextItemToShortWidth();
+        FCogWidgets::SliderWithReset("Border", &Config->Border, 0.0f, 0.1f, 0.02f, "%0.3f");
+        ImGui::EndMenu();
     }
 
     ImGui::Separator();
 
-    if (ImGui::BeginMenu("Display"))
+    if (ImGui::MenuItem("Reset Settings"))
     {
-        ImGui::ColorEdit4("Background Color", (float*)&Config->BackgroundColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-        ImGui::ColorEdit4("Border Color", (float*)&Config->BorderColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-        ImGui::ColorEdit4("Button Color", (float*)&Config->ButtonColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-        ImGui::ColorEdit4("Pressed Color", (float*)&Config->PressedColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-        ImGui::ColorEdit4("Hovered Color", (float*)&Config->HoveredColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-        ImGui::ColorEdit4("Inject Color", (float*)&Config->InjectColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
-        FCogWidgets::SetNextItemToShortWidth();
-        FCogWidgets::SliderWithReset("Border", &Config->Border, 0.0f, 0.1f, 0.02f, "%0.3f");
-        ImGui::EndMenu();
+        ResetConfig();
     }
 }
