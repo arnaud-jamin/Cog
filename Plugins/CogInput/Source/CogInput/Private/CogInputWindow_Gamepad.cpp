@@ -482,11 +482,6 @@ void FCogInputWindow_Gamepad::RenderMainContextMenu()
         SetIsVisible(false);
     }
 
-    if (ImGui::MenuItem("Reset Actions"))
-    {
-        Actions.Empty();
-    }
-    
     if (ImGui::MenuItem("Reset Settings"))
     {
         ResetConfig();
