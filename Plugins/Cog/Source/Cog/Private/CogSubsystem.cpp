@@ -886,7 +886,7 @@ void UCogSubsystem::SortCommands(UPlayerInput* PlayerInput)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-UCogCommonConfig* UCogSubsystem::GetConfig(const TSubclassOf<UCogCommonConfig> ConfigClass)
+UCogCommonConfig* UCogSubsystem::GetConfig(const TSubclassOf<UCogCommonConfig>& ConfigClass)
 {
     const UClass* Class = ConfigClass.Get();
 
@@ -897,8 +897,8 @@ UCogCommonConfig* UCogSubsystem::GetConfig(const TSubclassOf<UCogCommonConfig> C
     }
 
     UCogCommonConfig* Config = NewObject<UCogCommonConfig>(this, Class);
-    //Config->Reset();
-    //Config->ReloadConfig();
+    Config->Reset();
+    Config->ReloadConfig();
     
     Configs.Add(Config);
     return Config;

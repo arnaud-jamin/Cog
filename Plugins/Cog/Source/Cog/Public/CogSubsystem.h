@@ -57,7 +57,7 @@ public:
 
     const UCogWindowConfig_Settings* GetSettings() const { return Settings.Get(); }
 
-    UCogCommonConfig* GetConfig(const TSubclassOf<UCogCommonConfig> ConfigClass);
+    UCogCommonConfig* GetConfig(const TSubclassOf<UCogCommonConfig>& ConfigClass);
 
     template<class T>
     T* GetConfig();
