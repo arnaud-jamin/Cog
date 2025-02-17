@@ -78,6 +78,15 @@ public:
     bool bShowAsOverlay = false;
 
     UPROPERTY(Config)
+    bool bLockPosition = false;
+
+    UPROPERTY(Config)
+    FVector2f Alignment = FVector2f(0.0f, 0.0f);
+
+    UPROPERTY(Config)
+    FIntVector2 Padding = FIntVector2(10, 10);
+    
+    UPROPERTY(Config)
     bool bInvertRightStickY = false;
 
     UPROPERTY(Config)
@@ -116,8 +125,11 @@ public:
     virtual void Reset() override
     {
         Super::Reset();
-        
+
         bShowAsOverlay = false;
+        bLockPosition = false;
+        Alignment = { 0, 0 };
+        Padding = { 10, 10 };
         bInvertRightStickY = false;
         bInvertLeftStickY = false;
         LeftStickSensitivity = 5.0f;

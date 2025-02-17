@@ -60,6 +60,13 @@ void FCogInputWindow_Gamepad::PreBegin(ImGuiWindowFlags& WindowFlags)
             | ImGuiWindowFlags_NoBackground;
     }
 
+    if (Config->bLockPosition)
+    {
+        ImVec2 WindowPos = FCogWidgets::ComputeScreenCornerLocation(Config->Alignment, Config->Padding);
+        WindowPos.y -= Config->bShowAsOverlay && Config->Alignment.Y < 0.5f ? ImGui::GetFrameHeight() : 0.0f;
+        ImGui::SetNextWindowPos(WindowPos, ImGuiCond_Always, FCogImguiHelper::ToImVec2(Config->Alignment));
+    }
+
     ImGui::SetNextWindowSizeConstraints(ImVec2(100, 100), ImVec2(FLT_MAX, FLT_MAX), FCogInputWindow_Gamepad::ConstrainAspectRatio); 
     ImGui::PushStyleColor(ImGuiCol_ResizeGrip, IM_COL32_BLACK_TRANS);
 }
@@ -67,7 +74,7 @@ void FCogInputWindow_Gamepad::PreBegin(ImGuiWindowFlags& WindowFlags)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogInputWindow_Gamepad::ConstrainAspectRatio(ImGuiSizeCallbackData* InData)
 {
-    constexpr float AspectRatio = 0.65f;
+    constexpr float AspectRatio = 0.60f;
     InData->DesiredSize.y = static_cast<int>(InData->DesiredSize.x * AspectRatio + ImGui::GetFrameHeight());
 }
 
@@ -380,7 +387,7 @@ void FCogInputWindow_Gamepad::RenderContent()
         ImGui::EndPopup();
     }
 
-    DrawList->PushClipRect(ContentMin, ContentMax, true);
+    //DrawList->PushClipRect(ContentMin, ContentMax, true);
 
     constexpr ImVec2 LS_Pos(0.35f, 0.7f);
     constexpr ImVec2 RS_Pos(0.65f, 0.7f);
@@ -447,7 +454,7 @@ void FCogInputWindow_Gamepad::RenderContent()
     RenderButton(EKeys::Gamepad_Special_Left,  ImVec2(0.5f - SpecialButtonDistance * 0.5f, 0.35f), SpecialButtonSize, ImVec2(0.5f, 0.5f), SpecialButtonRound);
     RenderButton(EKeys::Gamepad_Special_Right, ImVec2(0.5f + SpecialButtonDistance * 0.5f, 0.35f), SpecialButtonSize, ImVec2(0.5f, 0.5f), SpecialButtonRound);
 
-    DrawList->PopClipRect();
+    //DrawList->PopClipRect();
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -484,8 +491,6 @@ void FCogInputWindow_Gamepad::RenderTick(float DeltaSeconds)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogInputWindow_Gamepad::RenderMainContextMenu()
 {
-    ImGui::MenuItem("Overlay", nullptr, &Config->bShowAsOverlay);
-
     if (ImGui::MenuItem("Close"))
     {
         SetIsVisible(false);
@@ -493,6 +498,17 @@ void FCogInputWindow_Gamepad::RenderMainContextMenu()
 
     if (ImGui::BeginMenu("Display"))
     {
+        ImGui::Checkbox("Overlay", &Config->bShowAsOverlay);
+        ImGui::Checkbox("Lock Position", &Config->bLockPosition);
+        ImGui::BeginDisabled(Config->bLockPosition);
+        FCogWidgets::SetNextItemToShortWidth();
+        ImGui::SliderFloat2("Alignment", &Config->Alignment.X, 0, 1.0f, "%.2f");
+        FCogWidgets::SetNextItemToShortWidth();
+        ImGui::SliderInt2("Padding", &Config->Padding.X, 0, 100);
+        ImGui::EndDisabled();
+        
+        ImGui::Separator();
+
         ImGui::ColorEdit4("Background Color", &Config->BackgroundColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
         ImGui::ColorEdit4("Border Color", &Config->BorderColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
         ImGui::ColorEdit4("Button Color", &Config->ButtonColor.X, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
