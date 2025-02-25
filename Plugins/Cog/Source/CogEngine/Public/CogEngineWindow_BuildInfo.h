@@ -79,6 +79,9 @@ public:
 
     UPROPERTY(Config)
     int32 Rounding = 6;
+
+    UPROPERTY(Config)
+    FString Separator = "|";
     
     UPROPERTY(Config)
     FColor BackgroundColor = FColor(0, 0, 0, 80);
@@ -107,6 +110,7 @@ public:
         Alignment =  { 0, 1 }; 
         Padding = { 10, 10 };
         Rounding = 6;
+        Separator = " | ";
         BackgroundColor = FColor(0, 0, 0, 80);
         BorderColor = FColor(255, 255, 255, 50);
         TextColor = FColor(255, 255, 255, 100);

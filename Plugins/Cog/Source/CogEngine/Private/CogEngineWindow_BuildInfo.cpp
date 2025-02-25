@@ -86,7 +86,12 @@ void FCogEngineWindow_BuildInfo::RenderContent()
 
     FCogWidgets::SetNextItemToShortWidth();
     ImGui::SliderInt("Rounding", &Config->Rounding, 0, 12);
-    
+
+    if (FCogWidgets::InputText("Separator", Config->Separator))
+    {
+        BuildText();
+    }
+
     constexpr ImGuiColorEditFlags ColorEditFlags = ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf;
     FCogImguiHelper::ColorEdit4("Background Color", Config->BackgroundColor, ColorEditFlags);
     FCogImguiHelper::ColorEdit4("Border Color", Config->BorderColor, ColorEditFlags);
@@ -104,14 +109,18 @@ void FCogEngineWindow_BuildInfo::RenderContent()
 void FCogEngineWindow_BuildInfo::BuildText()
 {
     FStringBuilderBase S;
-    if (Config->ShowBranchName) { S.Append(BuildSettings::GetBranchName()); S.Append(" "); }
-    if  (Config->ShowBuildDate) { S.Append(BuildSettings::GetBuildDate());  S.Append(" "); }
-    if  (Config->ShowBuildConfiguration) { S.Append(LexToString(FApp::GetBuildConfiguration())); S.Append(" "); }
-    if  (Config->ShowBuildTargetType) { S.Append(LexToString(FApp::GetBuildTargetType())); S.Append(" "); }
-    if  (Config->ShowBuildUser) { S.Append(BuildSettings::GetBuildUser()); S.Append(" "); }
-    if  (Config->ShowBuildMachine) { S.Append(BuildSettings::GetBuildMachine()); S.Append(" "); }
-    if  (Config->ShowCurrentChangelist) { S.Appendf(TEXT("%d"), BuildSettings::GetCurrentChangelist()); S.Append(" "); }
-    if  (Config->ShowCompatibleChangelist) { S.Appendf(TEXT("%d"),BuildSettings::GetCompatibleChangelist()); }
+    bool AddSeparator = false;
 
-    Text = FString(S).TrimEnd();
+    if (Config->ShowBranchName) { S.Append(BuildSettings::GetBranchName()); S.Append(Config->Separator); }
+    if (Config->ShowBuildDate) { S.Append(BuildSettings::GetBuildDate()); S.Append(Config->Separator); }
+    if (Config->ShowBuildConfiguration) { S.Append(LexToString(FApp::GetBuildConfiguration())); S.Append(Config->Separator); }
+    if (Config->ShowBuildTargetType) { S.Append(LexToString(FApp::GetBuildTargetType())); S.Append(Config->Separator); }
+    if (Config->ShowBuildUser) { S.Append(BuildSettings::GetBuildUser()); S.Append(Config->Separator); }
+    if (Config->ShowBuildMachine) { S.Append(BuildSettings::GetBuildMachine()); S.Append(Config->Separator); }
+    if (Config->ShowCurrentChangelist) { S.Appendf(TEXT("%d"), BuildSettings::GetCurrentChangelist()); S.Append(Config->Separator); }
+    if (Config->ShowCompatibleChangelist) { S.Appendf(TEXT("%d"),BuildSettings::GetCompatibleChangelist()); S.Append(Config->Separator); }
+
+    S.RemoveSuffix(Config->Separator.Len());
+    
+    Text = FString(S);
 } 
