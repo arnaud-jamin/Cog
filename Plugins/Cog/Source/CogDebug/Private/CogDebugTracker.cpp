@@ -71,7 +71,6 @@ void FCogDebugTracker::InitializeTrack(FCogDebugTrack& OutTrack, const UWorld* I
     }
 
     OutTrack.Id = InTrackId;
-    OutTrack.World = InWorld;
     OutTrack.Time = InWorld->GetTimeSeconds();
     OutTrack.Frame = GFrameCounter;
 }

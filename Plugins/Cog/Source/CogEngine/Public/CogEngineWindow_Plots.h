@@ -47,7 +47,7 @@ protected:
 
     virtual void RenderEvents(FCogDebugEventTrack& InTrack, const char* InLabel, const ImVec2& InPlotMin, const ImVec2& InPlotMax) const;
 
-    static void RenderEventTooltip(const FCogDebugEvent* HoveredEvent, const FCogDebugTrack& Entry);
+    virtual void RenderEventTooltip(const FCogDebugEvent* HoveredEvent, const FCogDebugTrack& Entry) const;
 
     virtual void AssignToGraphAndAxis(FCogDebugTracker& InTracker, FName InName, int32 InGraphIndex, ImAxis InYAxis);
 

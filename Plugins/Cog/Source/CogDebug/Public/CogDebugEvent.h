@@ -17,7 +17,7 @@ struct COGDEBUG_API FCogDebugEventParams
 //--------------------------------------------------------------------------------------------------------------------------
 struct COGDEBUG_API FCogDebugEvent
 {
-    float GetActualEndTime() const;
+    float GetActualEndTime(const UWorld& World) const;
 
     uint64 GetActualEndFrame() const;
 

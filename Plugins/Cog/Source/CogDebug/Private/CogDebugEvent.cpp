@@ -4,12 +4,13 @@
 #include "CogDebugTracker.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
-float FCogDebugEvent::GetActualEndTime() const
+float FCogDebugEvent::GetActualEndTime(const UWorld& World) const
 {
-    const UWorld* World = Track != nullptr ? Track->World.Get() : nullptr;
-    const float WorldTime = World != nullptr ? World->GetTimeSeconds() : 0.0f;
-    const float ActualEndTime = EndTime != 0.0f ? EndTime : WorldTime;
-    return ActualEndTime;
+    if (EndTime != 0.0f)
+    { return EndTime; }
+    
+    const float WorldTime = World.GetTimeSeconds();
+    return WorldTime;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

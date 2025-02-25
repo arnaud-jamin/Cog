@@ -383,7 +383,8 @@ void FCogEngineWindow_Plots::RenderPlots(FCogDebugTracker& InTracker)
                         Config->TimeRange = TimeRange;
                     }
 
-                    const float Time = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.0;
+                    const UWorld* World = GetWorld();
+                    const float Time = World != nullptr ? World->GetTimeSeconds() : 0.0;
 
                     //------------------------------------------------------------------
                     // Setup all the X axis limits. Must be done before calling
@@ -633,9 +634,14 @@ void FCogEngineWindow_Plots::RenderEvents(FCogDebugEventTrack& InTrack, const ch
 
     for (const FCogDebugEvent& Event : InTrack.Events)
     {
-        const ImVec2 PosBot = ImPlot::PlotToPixels(ImPlotPoint(Event.StartTime, Event.Row + 0.8f));
-        const ImVec2 PosTop = ImPlot::PlotToPixels(ImPlotPoint(Event.StartTime, Event.Row + 0.2f));
-        const ImVec2 PosMid(PosBot.x, PosBot.y + (PosTop.y - PosBot.y) * 0.5f);
+        const ImVec2 PosStartBot = ImPlot::PlotToPixels(ImPlotPoint(Event.StartTime, Event.Row + 0.8f));
+        const ImVec2 PosStartTop = ImPlot::PlotToPixels(ImPlotPoint(Event.StartTime, Event.Row + 0.2f));
+        const ImVec2 PosMid(PosStartBot.x, PosStartBot.y + (PosStartTop.y - PosStartBot.y) * 0.5f);
+        const ImVec2 PosEnd = ImPlot::PlotToPixels(ImPlotPoint(Event.GetActualEndTime(*GetWorld()), 0));
+
+        // Clipping
+        if (PosStartBot.x > InPlotMax.x || PosEnd.x < InPlotMin.x)
+        { continue; }
 
         const bool IsInstant = Event.StartTime == Event.EndTime;
         if (IsInstant)
@@ -652,10 +658,8 @@ void FCogEngineWindow_Plots::RenderEvents(FCogDebugEventTrack& InTrack, const ch
         }
         else
         {
-            const float ActualEndTime = Event.GetActualEndTime();
-            const ImVec2 PosEnd = ImPlot::PlotToPixels(ImPlotPoint(ActualEndTime, 0));
-            const ImVec2 Min = ImVec2(PosBot.x, PosBot.y);
-            const ImVec2 Max = ImVec2(PosEnd.x, PosTop.y);
+            const ImVec2 Min = ImVec2(PosStartBot.x, PosStartBot.y);
+            const ImVec2 Max = ImVec2(PosEnd.x, PosStartTop.y);
 
             const ImDrawFlags Flags = Event.EndTime == 0.0f ? ImDrawFlags_RoundCornersLeft : ImDrawFlags_RoundCornersAll;
             PlotDrawList->AddRect(Min, Max, Event.BorderColor, 6.0f, Flags);
@@ -687,7 +691,7 @@ void FCogEngineWindow_Plots::RenderEvents(FCogDebugEventTrack& InTrack, const ch
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Plots::RenderEventTooltip(const FCogDebugEvent* HoveredEvent, const FCogDebugTrack& Entry)
+void FCogEngineWindow_Plots::RenderEventTooltip(const FCogDebugEvent* HoveredEvent, const FCogDebugTrack& Entry) const 
 {
     if (ImPlot::IsPlotHovered() && HoveredEvent != nullptr)
     {
@@ -718,7 +722,7 @@ void FCogEngineWindow_Plots::RenderEventTooltip(const FCogDebugEvent* HoveredEve
                 //------------------------
                 if (HoveredEvent->EndTime != HoveredEvent->StartTime)
                 {
-                    const float ActualEndTime = HoveredEvent->GetActualEndTime();
+                    const float ActualEndTime = HoveredEvent->GetActualEndTime(*GetWorld());
                     const uint64 ActualEndFrame = HoveredEvent->GetActualEndFrame();
 
                     ImGui::TableNextRow();
