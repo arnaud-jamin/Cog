@@ -1,5 +1,5 @@
 > [!IMPORTANT]
-> The way Cog integrates in your project has been simplified. If you update Cog, please read the [integration guide](#Integrating-Cog-in-your-project). If you didn't modify Cog sources, you should remove all your existing Cog files before updating. If you did modify Cog sources and stil have a `CogWindow` folder, consider deleting it before updating.
+> The way Cog integrates in your project has been simplified. If you update Cog, please read the [integration guide](#Integrating-Cog-in-your-project). If you didn't modify Cog sources, you should remove all your existing Cog source files before updating. If you did modify Cog sources and stil have a `CogWindow` folder, consider deleting it before updating.
 
 
 # Cog
@@ -392,7 +392,7 @@ You must have Unreal 5.5 or greater and Visual Studio to launch the sample
 ### Integrating Cog in your project
 
 > [!IMPORTANT]
-> The way Cog integrates in your project has been simplified. If you didn't modify Cog sources, you should remove all your existing Cog files before updating. If you did modify Cog sources and stil have a `CogWindow` folder, consider deleting it before updating.
+> The way Cog integrates in your project has been simplified. If you didn't modify Cog sources, you should remove all your existing Cog source files before updating. If you did modify Cog sources and stil have a `CogWindow` folder, consider deleting it before updating.
 
 The Cog repository has the following structure:
 - `CogSample` - A Sample that demonstrate various Cog functionalities. The project was saved in Unreal 5.5
