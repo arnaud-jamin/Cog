@@ -265,7 +265,7 @@ bool FCogImguiContext::BeginFrame(float InDeltaTime)
     // Sometime the game can retake unaware that ImGui want to keep the focus and mouse unlock.
     // This typically happens when switching level.  
     //-------------------------------------------------------------------------------------------------------
-    if (bRetakeFocus)
+    if (bRetakeFocus && IsConsoleOpened() == false)
     {
         SetEnableInput(true);
         bRetakeFocus = false;

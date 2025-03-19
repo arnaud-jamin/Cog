@@ -339,7 +339,7 @@ void FCogEngineWindow_Selection::RenderPickButtonTooltip()
 {
     if (FCogWidgets::BeginItemTooltipWrappedText())
     {
-        const FString Shortcut = FCogImguiInputHelper::KeyInfoToString(GetOwner()->GetSettings()->ToggleSelectionShortcut);
+        const FString Shortcut = FCogImguiInputHelper::InputChordToString(GetOwner()->GetSettings()->Shortcut_ToggleSelection);
         ImGui::Text("Enter selection mode to select an actor on screen. Change which actor type is selectable by clicking the selection combobox\n"
         "%s", TCHAR_TO_ANSI(*Shortcut));
         FCogWidgets::EndItemTooltipWrappedText();

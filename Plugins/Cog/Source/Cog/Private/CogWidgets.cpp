@@ -515,18 +515,18 @@ bool FCogWidgets::CheckBoxState(const char* Label, ECheckBoxState& State, bool S
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogWidgets::InputKey(const char* Label, FCogImGuiKeyInfo& KeyInfo)
+bool FCogWidgets::InputChord(const char* Label, FInputChord& InInputChord)
 {
     ImGui::PushID(Label);
    
     ImGui::AlignTextToFramePadding();
     ImGui::BeginDisabled();
-    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 10);
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 15);
     ImGui::InputText("##Shortcut", const_cast<char*>(Label), IM_ARRAYSIZE(Label));
     ImGui::EndDisabled();
 
     ImGui::SameLine();
-    const bool HasChanged = InputKey(KeyInfo);
+    const bool HasChanged = InputChord(InInputChord);
 
     ImGui::PopID();
 
@@ -534,18 +534,50 @@ bool FCogWidgets::InputKey(const char* Label, FCogImGuiKeyInfo& KeyInfo)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogWidgets::InputKey(FCogImGuiKeyInfo& KeyInfo)
+bool FCogWidgets::InputChord(FInputChord& InInputChord)
 {
     bool HasKeyChanged = false;
 
-    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 6);
-    if (ImGui::BeginCombo("##Key", TCHAR_TO_ANSI(*KeyInfo.Key.ToString()), ImGuiComboFlags_HeightLarge))
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 8);
+    HasKeyChanged |= Key(InInputChord.Key);
+
+    bool Value = false;
+    
+    ImGui::SameLine();
+    Value = static_cast<bool>(InInputChord.bCtrl);
+    HasKeyChanged |=  ImGui::Selectable("Ctrl", &Value, ImGuiSelectableFlags_None, ImVec2(ImGui::GetFontSize() * 2, 0));
+    InInputChord.bCtrl = Value;
+
+    ImGui::SameLine();
+    Value = static_cast<bool>(InInputChord.bShift);
+    HasKeyChanged |= ImGui::Selectable("Shift", &Value, ImGuiSelectableFlags_None, ImVec2(ImGui::GetFontSize() * 3, 0));
+    InInputChord.bShift = Value;
+
+    ImGui::SameLine();
+    Value = static_cast<bool>(InInputChord.bAlt);
+    HasKeyChanged |= ImGui::Selectable("Alt", &Value, ImGuiSelectableFlags_None, ImVec2(ImGui::GetFontSize() * 2, 0));
+    InInputChord.bAlt = Value;
+
+    ImGui::SameLine();
+    Value = static_cast<bool>(InInputChord.bCmd);
+    HasKeyChanged |= ImGui::Selectable("Cmd", &Value, ImGuiSelectableFlags_None, ImVec2(ImGui::GetFontSize() * 2, 0));
+    InInputChord.bCmd = Value;
+
+    return HasKeyChanged;
+}
+
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWidgets::Key(FKey& InKey)
+{
+    bool HasKeyChanged = false;
+    if (ImGui::BeginCombo("##Key", TCHAR_TO_ANSI(*InKey.ToString()), ImGuiComboFlags_HeightLarge))
     {
         {
-            bool IsSelected = KeyInfo.Key == FKey();
+            bool IsSelected = InKey == FKey();
             if (ImGui::Selectable("None", IsSelected))
             {
-                KeyInfo.Key = FKey();
+                InKey = FKey();
                 HasKeyChanged = true;
             }
         }
@@ -566,45 +598,33 @@ bool FCogWidgets::InputKey(FCogImGuiKeyInfo& KeyInfo)
                 continue;
             }
 
-            bool IsSelected = KeyInfo.Key == Key;
+            bool IsSelected = InKey == Key;
             if (ImGui::Selectable(TCHAR_TO_ANSI(*Key.ToString()), IsSelected))
             {
-                KeyInfo.Key = Key;
+                InKey = Key;
                 HasKeyChanged = true;
             }
         }
         ImGui::EndCombo();
     }
 
-    ImGui::SameLine();
-    HasKeyChanged |= CheckBoxState("Ctrl", KeyInfo.Ctrl);
-
-    ImGui::SameLine();
-    HasKeyChanged |= CheckBoxState("Shift", KeyInfo.Shift);
-
-    ImGui::SameLine();
-    HasKeyChanged |= CheckBoxState("Alt", KeyInfo.Alt);
-
-    ImGui::SameLine();
-    HasKeyChanged |= CheckBoxState("Cmd", KeyInfo.Cmd);
-
     return HasKeyChanged;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogWidgets::KeyBind(FKeyBind& KeyBind)
+bool FCogWidgets::KeyBind(FKeyBind& InKeyBind)
 {
     static char Buffer[256] = "";
 
-    const auto Str = StringCast<ANSICHAR>(*KeyBind.Command);
+    const auto Str = StringCast<ANSICHAR>(*InKeyBind.Command);
     ImStrncpy(Buffer, Str.Get(), IM_ARRAYSIZE(Buffer));
 
-    bool Disable = !KeyBind.bDisabled; 
+    bool Disable = !InKeyBind.bDisabled; 
     if (ImGui::Checkbox("##Disable", &Disable))
     {
-        KeyBind.bDisabled = !Disable;
+        InKeyBind.bDisabled = !Disable;
     }
-    if (KeyBind.bDisabled)
+    if (InKeyBind.bDisabled)
     {
         ImGui::SetItemTooltip("Enable command");
     }
@@ -613,7 +633,7 @@ bool FCogWidgets::KeyBind(FKeyBind& KeyBind)
         ImGui::SetItemTooltip("Disable command");
     }        
 
-    if (KeyBind.bDisabled)
+    if (InKeyBind.bDisabled)
     {
         ImGui::BeginDisabled();
     }
@@ -624,21 +644,43 @@ bool FCogWidgets::KeyBind(FKeyBind& KeyBind)
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 15);
     if (ImGui::InputText("##Command", Buffer, IM_ARRAYSIZE(Buffer)))
     {
-        KeyBind.Command = FString(Buffer);
+        InKeyBind.Command = FString(Buffer);
         HasChanged = true;
     }
 
-    FCogImGuiKeyInfo KeyInfo;
-    FCogImguiInputHelper::KeyBindToKeyInfo(KeyBind, KeyInfo);
-       
     ImGui::SameLine();
-    if (InputKey(KeyInfo))
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 6);
+    HasChanged |= Key(InKeyBind.Key);
+
     {
-        HasChanged = true;
-        FCogImguiInputHelper::KeyInfoToKeyBind(KeyInfo, KeyBind);
+        ImGui::SameLine();
+        ECheckBoxState State = FCogImguiInputHelper::MakeCheckBoxState(InKeyBind.Control, InKeyBind.bIgnoreCtrl);
+        HasChanged |= CheckBoxState("Ctrl", State);
+        BREAK_CHECKBOX_STATE(State, InKeyBind.Control, InKeyBind.bIgnoreCtrl);
     }
 
-    if (KeyBind.bDisabled)
+    {
+        ImGui::SameLine();
+        ECheckBoxState State = FCogImguiInputHelper::MakeCheckBoxState(InKeyBind.Shift, InKeyBind.bIgnoreShift);
+        HasChanged |= CheckBoxState("Shift", State);
+        BREAK_CHECKBOX_STATE(State, InKeyBind.Shift, InKeyBind.bIgnoreShift);
+    }
+
+    {
+        ImGui::SameLine();
+        ECheckBoxState State = FCogImguiInputHelper::MakeCheckBoxState(InKeyBind.Alt, InKeyBind.bIgnoreAlt);
+        HasChanged |= CheckBoxState("Alt", State);
+        BREAK_CHECKBOX_STATE(State, InKeyBind.Alt, InKeyBind.bIgnoreAlt);
+    }
+
+    {
+        ImGui::SameLine();
+        ECheckBoxState State = FCogImguiInputHelper::MakeCheckBoxState(InKeyBind.Cmd, InKeyBind.bIgnoreCmd);
+        HasChanged |= CheckBoxState("Cmd", State);
+        BREAK_CHECKBOX_STATE(State, InKeyBind.Cmd, InKeyBind.bIgnoreCmd);
+    }
+
+    if (InKeyBind.bDisabled)
     {
         ImGui::EndDisabled();
     }
@@ -746,7 +788,7 @@ FString FCogWidgets::FormatSmallFloat(float InValue)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogWidgets::MultiChoiceButtonsFloat(TArray<float>& InValues, float& InValue, const ImVec2& InSize, bool InInline)
+bool FCogWidgets::MultiChoiceButtonsFloat(TArray<float>& InValues, float& InValue, const ImVec2& InSize, bool InInline, float InTolerance)
 {
     ImGuiStyle& Style = ImGui::GetStyle();
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(Style.WindowPadding.x * 0.40f, static_cast<int>(Style.WindowPadding.y * 0.60f)));
@@ -762,7 +804,7 @@ bool FCogWidgets::MultiChoiceButtonsFloat(TArray<float>& InValues, float& InValu
         const auto Text = StringCast<ANSICHAR>(*FormatSmallFloat(ButtonValue));
 
         ImGui::PushID(i);
-        if (MultiChoiceButton(Text.Get(), ButtonValue == InValue, InSize))
+        if (MultiChoiceButton(Text.Get(), FMath::IsNearlyEqual(ButtonValue, InValue, InTolerance) , InSize))
         {
             IsPressed = true;
             InValue = ButtonValue;
@@ -1444,3 +1486,60 @@ ImVec2 FCogWidgets::ComputeScreenCornerLocation(const ImVec2& InAlignment, const
     ImVec2 Position = Viewport->WorkPos + (InAlignment * Viewport->WorkSize) - Offset;
     return Position;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+FString FCogWidgets::GetStringAfterCharacter(const FString& InString, const TCHAR InChar)
+{
+    int32 Index = 0;
+    if (InString.FindChar(InChar, Index)) 
+    {
+        return InString.RightChop(Index + 1);
+    }
+
+    return FString();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FString FCogWidgets::FormatConfigName(const FString& InConfigName)
+{
+    return FName::NameToDisplayString(GetStringAfterCharacter(InConfigName, '_'), false);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+FString FCogWidgets::FormatShortcutName(const FString& InShortcutName)
+{
+    return FName::NameToDisplayString(InShortcutName.Replace(TEXT("Shortcut_"), TEXT("")), false);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogWidgets::TextInputChordProperty(UObject& InConfig, const FProperty& InInputChordProperty)
+{
+    const FInputChord* InputChord = InInputChordProperty.ContainerPtrToValuePtr<FInputChord>(&InConfig);
+    if (InputChord == nullptr)
+    { return; }
+
+    const auto Name = StringCast<ANSICHAR>(*FormatShortcutName(InInputChordProperty.GetName()));
+    const auto Shortcut = StringCast<ANSICHAR>(*FCogImguiInputHelper::InputChordToString(*InputChord));
+
+    ImGui::Text("%s", Name.Get());
+    ImGui::SameLine();
+    if (BeginRightAlign(Name.Get()))
+    {
+        ImGui::TextDisabled("%s", Shortcut.Get());
+        EndRightAlign();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWidgets::InputChordProperty(UObject& InConfig, const FProperty& InInputChordProperty)
+{
+    FInputChord* InputChord = InInputChordProperty.ContainerPtrToValuePtr<FInputChord>(&InConfig);
+    if (InputChord == nullptr)
+    { return false; }
+    
+    const auto Name = StringCast<ANSICHAR>(*FormatShortcutName(InInputChordProperty.GetName()));
+
+    return FCogWidgets::InputChord(Name.Get(), *InputChord); 
+}
+
+        

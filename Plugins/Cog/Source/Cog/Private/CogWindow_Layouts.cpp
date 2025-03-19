@@ -27,45 +27,40 @@ void FCogWindow_Layouts::RenderContent()
     }
 
     ImGui::Separator();
-    for (int32 i = 0; i < 4; ++i)
-    {
-        RenderLoadLayoutMenuItem(PlayerInput, i);
-    }
+
+    UCogWindowConfig_Settings* Settings = GetOwner()->GetSettings();
+    RenderLoadLayoutMenuItem(1, Settings->Shortcut_LoadLayout1);
+    RenderLoadLayoutMenuItem(2, Settings->Shortcut_LoadLayout2);
+    RenderLoadLayoutMenuItem(3, Settings->Shortcut_LoadLayout3);
+    RenderLoadLayoutMenuItem(4, Settings->Shortcut_LoadLayout4);
 
     ImGui::Separator();
-    for (int32 i = 0; i < 4; ++i)
-    {
-        RenderSaveLayoutMenuItem(PlayerInput, i);
-    }
-
+    RenderSaveLayoutMenuItem(1, Settings->Shortcut_SaveLayout1);
+    RenderSaveLayoutMenuItem(2, Settings->Shortcut_SaveLayout2);
+    RenderSaveLayoutMenuItem(3, Settings->Shortcut_SaveLayout3);
+    RenderSaveLayoutMenuItem(4, Settings->Shortcut_SaveLayout4);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogWindow_Layouts::RenderLoadLayoutMenuItem(const UPlayerInput* PlayerInput, int LayoutIndex)
+void FCogWindow_Layouts::RenderLoadLayoutMenuItem(int InLayoutIndex, const FInputChord& InInputChord)
 {
-    FString Shortcut;
-    if (GetOwner()->GetSettings()->LoadLayoutShortcuts.IsValidIndex(LayoutIndex))
-    {
-        Shortcut = FCogImguiInputHelper::KeyInfoToString(GetOwner()->GetSettings()->LoadLayoutShortcuts[LayoutIndex]);
-    }
+    const auto Shortcut = StringCast<ANSICHAR>(*FCogImguiInputHelper::InputChordToString(InInputChord));
+    const auto Text = StringCast<ANSICHAR>(*FString::Printf(TEXT("Load Layout %d"), InLayoutIndex));
     
-    if (ImGui::MenuItem(TCHAR_TO_ANSI(*FString::Printf(TEXT("Load Layout %d"), LayoutIndex + 1)), TCHAR_TO_ANSI(*Shortcut)))
+    if (ImGui::MenuItem(Text.Get(), Shortcut.Get()))
     {
-        GetOwner()->LoadLayout(LayoutIndex + 1);
+        GetOwner()->LoadLayout(InLayoutIndex + 1);
     }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogWindow_Layouts::RenderSaveLayoutMenuItem(const UPlayerInput* PlayerInput, int LayoutIndex)
+void FCogWindow_Layouts::RenderSaveLayoutMenuItem(int InLayoutIndex, const FInputChord& InInputChord)
 {
-    FString Shortcut;
-    if (GetOwner()->GetSettings()->LoadLayoutShortcuts.IsValidIndex(LayoutIndex))
-    {
-        Shortcut = FCogImguiInputHelper::KeyInfoToString(GetOwner()->GetSettings()->SaveLayoutShortcuts[LayoutIndex]);
-    }
+    const auto Shortcut = StringCast<ANSICHAR>(*FCogImguiInputHelper::InputChordToString(InInputChord));
+    const auto Text = StringCast<ANSICHAR>(*FString::Printf(TEXT("Save Layout %d"), InLayoutIndex));
     
-    if (ImGui::MenuItem(TCHAR_TO_ANSI(*FString::Printf(TEXT("Save Layout %d"), LayoutIndex + 1)), TCHAR_TO_ANSI(*Shortcut)))
+    if (ImGui::MenuItem(Text.Get(), Shortcut.Get()))
     {
-        GetOwner()->SaveLayout(LayoutIndex + 1);
+        GetOwner()->SaveLayout(InLayoutIndex + 1);
     }
 }

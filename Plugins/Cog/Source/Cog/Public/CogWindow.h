@@ -43,6 +43,8 @@ public:
 
     virtual void RenderSettings();
 
+    virtual void BindInputs(UInputComponent* InputComponent) {}
+    
     ImGuiID GetID() const { return ID; }
 
     /** The full name of the window, that contains the path in the main menu. For example "Gameplay.Character.Effect" */
@@ -86,6 +88,7 @@ public:
     const T* GetAsset() const { return Cast<T>(GetAsset(T::StaticClass())); }
 
     const UObject* GetAsset(const TSubclassOf<UObject>& AssetClass) const;
+
 
 protected:
     

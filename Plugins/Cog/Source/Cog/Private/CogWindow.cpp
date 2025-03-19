@@ -254,4 +254,3 @@ float FCogWindow::GetDpiScale() const
 {
     return GetOwner()->GetContext().GetDpiScale();
 }
-

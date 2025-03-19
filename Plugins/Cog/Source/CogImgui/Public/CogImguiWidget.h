@@ -59,7 +59,7 @@ public:
     TSharedPtr<const SWindow> GetWindow() const { return Window; }
 
     void SetWindow(const TSharedPtr<SWindow>& Value) { Window = Value; }
-
+    
 protected:
 
     FReply HandleKeyEvent(const FKeyEvent& KeyEvent, bool Down) const;

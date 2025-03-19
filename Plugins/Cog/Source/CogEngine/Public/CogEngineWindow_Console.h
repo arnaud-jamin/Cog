@@ -123,7 +123,7 @@ public:
 
         SortCommands = false;
         DockInputInMenuBar = false;
-        FocusWidgetWhenAppearing = true;
+        FocusWidgetWhenAppearing = false;
         UseClipper = false;
         NumHistoryCommands = 10;
         CompletionMinimumCharacters = 1;

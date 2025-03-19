@@ -8,11 +8,29 @@ class APlayerController;
 class UPlayerInput;
 class UWorld;
 enum class ECheckBoxState : uint8;
-struct FCogImGuiKeyInfo;
-struct FCogImGuiKeyInfo;
 struct FKey;
 struct FKeyBind;
 struct FKeyEvent;
+
+//--------------------------------------------------------------------------------------------------------------------------
+#define BREAK_CHECKBOX_STATE(CheckBoxState, RequireValue, IgnoreValue)  \
+{                                                                       \
+    if (CheckBoxState == ECheckBoxState::Checked)                       \
+    {                                                                   \
+        RequireValue = true;                                            \
+        IgnoreValue = false;                                            \
+    }                                                                   \
+    else if (CheckBoxState == ECheckBoxState::Unchecked)                \
+    {                                                                   \
+        RequireValue = false;                                           \
+        IgnoreValue = true;                                             \
+    }                                                                   \
+    else if (CheckBoxState == ECheckBoxState::Undetermined)             \
+    {                                                                   \
+        RequireValue = false;                                           \
+        IgnoreValue = false;                                            \
+    }                                                                   \
+}                                                                       \
 
 class COGIMGUI_API FCogImguiInputHelper
 {
@@ -26,25 +44,17 @@ public:
 
     static bool IsTopPriorityKeyEvent(const UPlayerInput& PlayerInput, const FKeyEvent& InKeyEvent);
 
-    static bool WasKeyInfoJustPressed(const APlayerController& PlayerController, const FCogImGuiKeyInfo& KeyInfo);
-
     static bool IsCheckBoxStateMatchingValue(ECheckBoxState CheckBoxState, bool bValue);
 
     static bool IsCheckBoxStateMatchingKeyBindModifier(ECheckBoxState InCheckBoxState, bool InRequireModifier, bool InIgnoreModifier);
 
-    static bool IsKeyEventMatchingKeyInfo(const FKeyEvent& InKeyEvent, const FCogImGuiKeyInfo& InKeyInfo);
-
-    static bool IsKeyBindMatchingKeyInfo(const FKeyBind& InKeyBind, const FCogImGuiKeyInfo& InKeyInfo);
-
     static bool IsKeyEventMatchingKeyBind(const FKeyEvent& KeyEvent, const FKeyBind& KeyBind);
-
-    static bool IsKeyInfoPressed(const UPlayerInput& PlayerInput, const FCogImGuiKeyInfo& InKeyInfo);
 
     static ECheckBoxState MakeCheckBoxState(uint8 RequireValue, uint8 IgnoreValue);
 
-    static void KeyBindToKeyInfo(const FKeyBind& KeyBind, FCogImGuiKeyInfo& KeyInfo);
+    static bool IsInputChordMatchingKeyInfo(const FKeyEvent& InKeyEvent, const FInputChord& InInputChord);
 
-    static void KeyInfoToKeyBind(const FCogImGuiKeyInfo& KeyInfo, FKeyBind& KeyBind);
+    static bool IsKeyBindMatchingInputChord(const FKeyBind& InKeyBind, const FInputChord& InInputChord);
 
     static bool IsConsoleEvent(const FKeyEvent& KeyEvent);
 
@@ -58,19 +68,13 @@ public:
 
     static EMouseCursor::Type ToSlateMouseCursor(ImGuiMouseCursor MouseCursor);
 
-    static FString CommandToString(const UWorld& World, const FString& Command);
-
-    static FString CommandToString(const UPlayerInput* PlayerInput, const FString& Command);
-
-    static FString KeyBindToString(const FKeyBind& InKeyBind);
-
-    static FString KeyInfoToString(const FCogImGuiKeyInfo& InKeyInfo);
+    static FString InputChordToString(const FInputChord& InInputChord);
 
     static bool IsMouseInsideMainViewport();
 
     static bool IsKeyBoundToCommand(const UPlayerInput* InPlayerInput, const FKeyEvent& KeyEvent);
 
-    static void SetShortcuts(const TArray<FCogImGuiKeyInfo>& InShortcuts);
+    static TArray<FInputChord>& GetPrioritizedShortcuts() { return CogPrioritizedShortcuts; }
 
     static bool DisableCommandsConflictingWithShortcuts(UPlayerInput& PlayerInput);
 
@@ -81,5 +85,5 @@ public:
     }
 
 private:
-    static TArray<FCogImGuiKeyInfo> CogShortcuts; 
+    static TArray<FInputChord> CogPrioritizedShortcuts; 
 };

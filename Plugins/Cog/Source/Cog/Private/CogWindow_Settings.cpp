@@ -80,7 +80,7 @@ void FCogWindow_Settings::RenderContent()
             Context.SetEnableInput(bEnableInput);
         }
         FCogWidgets::ItemTooltipWrappedText("Enable ImGui inputs. When enabled the ImGui menu is shown and inputs are forwarded to ImGui.");
-        FCogWidgets::MenuItemShortcut("EnableInputShortcut", FCogImguiInputHelper::KeyInfoToString(Config->ToggleImGuiInputShortcut));
+        FCogWidgets::MenuItemShortcut("EnableInputShortcut", FCogImguiInputHelper::InputChordToString(Config->Shortcut_ToggleImguiInput));
 
         //-------------------------------------------------------------------------------------------
         bool bShareKeyboard = Context.GetShareKeyboard();
@@ -244,24 +244,34 @@ void FCogWindow_Settings::RenderContent()
     //-------------------------------------------------------------------------------------------
     if (ImGui::CollapsingHeader("Shortcuts", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        RenderShortcut("Toggle ImGui Input", Config->ToggleImGuiInputShortcut);
-        RenderShortcut("Toggle Selection", Config->ToggleSelectionShortcut);
-        
-        ImGui::Separator();
-
-        static char Buffer[32];
-        
-        for (int32 i = 0; i < Config->LoadLayoutShortcuts.Num(); ++i)
+        TArray<TObjectPtr<UCogCommonConfig>>& Configs = GetOwner()->GetConfigs();
+        for (TObjectPtr<UCogCommonConfig> SomeConfig : Configs)
         {
-            ImFormatString(Buffer, IM_ARRAYSIZE(Buffer), "Load Layout  %d", i + 1);
-            RenderShortcut(Buffer, Config->LoadLayoutShortcuts[i]);
-        }
+            TArray<FProperty*> Properties;
+            for (TFieldIterator<FProperty> It(SomeConfig->GetClass()); It; ++It)
+            {
+                if (FStructProperty* StructProperty = CastField<FStructProperty>(*It))
+                {
+                    if (StructProperty->Struct == FInputChord::StaticStruct())
+                    {
+                        Properties.Add(StructProperty);
+                    }
+                }
+            }
 
-        ImGui::Separator();
-        for (int32 i = 0; i < Config->SaveLayoutShortcuts.Num(); ++i)
-        {
-            ImFormatString(Buffer, IM_ARRAYSIZE(Buffer), "Save Layout  %d", i + 1);
-            RenderShortcut(Buffer, Config->SaveLayoutShortcuts[i]);
+            if (Properties.Num() > 0)
+            {
+                auto ConfigName = StringCast<ANSICHAR>(*FCogWidgets::FormatConfigName(SomeConfig->GetClass()->GetName()));
+                ImGui::SeparatorText(ConfigName.Get());
+
+                for (const FProperty* Property : Properties)
+                {
+                    if (FCogWidgets::InputChordProperty(*SomeConfig, *Property))
+                    {
+                        GetOwner()->RebindShortcut(*SomeConfig, *Property);
+                    }
+                }
+            }
         }
     }
     
@@ -311,14 +321,4 @@ void FCogWindow_Settings::SetDPIScale(float Value) const
 {
     Config->DPIScale = Value;
     GetOwner()->GetContext().SetDPIScale(Config->DPIScale);
-    //COG_NOTIFY(TEXT("DPI Scale: %0.2f"), Value);
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void FCogWindow_Settings::RenderShortcut(const char* Label, FCogImGuiKeyInfo& KeyInfo)
-{
-    if (FCogWidgets::InputKey(Label, KeyInfo))
-    {
-        GetOwner()->OnShortcutsDefined();
-    }
 }

@@ -6,6 +6,8 @@
 
 #include <Templates/SubclassOf.h>
 
+#include "CogHelper.h"
+
 class AActor;
 class APawn;
 class FEnumProperty;
@@ -14,7 +16,6 @@ class UEnum;
 class UObject;
 enum class ECheckBoxState : uint8;
 enum ECollisionChannel : int;
-struct FCogImGuiKeyInfo;
 struct FKeyBind;
 
 using FCogWindowActorContextMenuFunction = TFunction<void(AActor& Actor)>;
@@ -54,7 +55,7 @@ public:
 
     static bool MultiChoiceButtonsInt(TArray<int32>& Values, int32& Value, const ImVec2& Size = ImVec2(0, 0), bool InInline = true);
 
-    static bool MultiChoiceButtonsFloat(TArray<float>& InValues, float& InValue, const ImVec2& InSize = ImVec2(0, 0), bool InInline = true);
+    static bool MultiChoiceButtonsFloat(TArray<float>& InValues, float& InValue, const ImVec2& InSize = ImVec2(0, 0), bool InInline = true, float InTolerance = UE_SMALL_NUMBER);
 
     static void SliderWithReset(const char* Name, float* Value, float Min, float Max, const float& ResetValue, const char* Format);
 
@@ -93,18 +94,21 @@ public:
     static bool ComboboxEnum(const char* Label, EnumType& Value);
 
     static bool ComboboxEnum(const char* Label, const UEnum* Enum, int64 CurrentValue, int64& NewValue);
-    
+
+
     static bool ComboboxEnum(const char* Label, const UObject* Object, const char* FieldName, uint8* PointerToEnumValue);
     
     static bool ComboboxEnum(const char* Label, const FEnumProperty* EnumProperty, uint8* PointerToEnumValue);
 
     static bool CheckBoxState(const char* Label, ECheckBoxState& State, bool ShowTooltip = true);
 
-    static bool InputKey(const char* Label, FCogImGuiKeyInfo& KeyInfo);
+    static bool InputChord(const char* Label, FInputChord& InInputChord);
 
-    static bool InputKey(FCogImGuiKeyInfo& KeyInfo);
+    static bool InputChord(FInputChord& InInputChord);
     
-    static bool KeyBind(FKeyBind& KeyBind);
+    static bool Key(FKey& InKey);
+    
+    static bool KeyBind(FKeyBind& InKeyBind);
 
     static bool ButtonWithTooltip(const char* Text, const char* Tooltip);
 
@@ -140,6 +144,12 @@ public:
 
     static void MenuItemShortcut(const char* Id, const FString& Text);
 
+    template <typename TCLass, typename TMember>
+    static void InputChordProperty(TCLass* InConfig, TMember TCLass::* InInputChordPointerToMember);
+    
+    template <typename TCLass, typename TMember>
+    static void TextInputChordProperty(TCLass* InConfig, TMember TCLass::* InInputChordPointerToMember);
+
     static bool BrowseToAssetButton(const UObject* InAsset, const ImVec2& InSize = ImVec2(0, 0));
     
     static bool BrowseToAssetButton(const FAssetData& InAssetData, const ImVec2& InSize = ImVec2(0, 0));
@@ -168,6 +178,16 @@ public:
     static ImVec2 ComputeScreenCornerLocation(const FVector2f& InAlignment, const FIntVector2& InPadding);
 
     static ImVec2 ComputeScreenCornerLocation(const ImVec2& InAlignment, const ImVec2& InPadding);
+
+    static FString GetStringAfterCharacter(const FString& InString, TCHAR InChar);
+
+    static FString FormatConfigName(const FString& InConfigName);
+
+    static FString FormatShortcutName(const FString& InShortcutName);
+
+    static void TextInputChordProperty(UObject& InConfig, const FProperty& InInputChordProperty);
+
+    static bool InputChordProperty(UObject& InConfig, const FProperty& InInputChordProperty);
 };
 
 template<typename EnumType>
@@ -227,4 +247,30 @@ template<typename T>
     ImGui::PopID();
 
     return Result;
+}
+
+template <typename TCLass, typename TMember>
+void FCogWidgets::InputChordProperty(TCLass* InConfig, TMember TCLass::* InInputChordPointerToMember)
+{
+    if (InConfig == nullptr)
+    { return; }
+    
+    FProperty* Property = FCogHelper::FindProperty(InConfig, InInputChordPointerToMember);
+    if (Property == nullptr)
+    { return; }
+
+    InputChordProperty(*InConfig, *Property);
+}
+
+template <typename TCLass, typename TMember>
+void FCogWidgets::TextInputChordProperty(TCLass* InConfig, TMember TCLass::* InInputChordPointerToMember)
+{
+    if (InConfig == nullptr)
+    { return; }
+    
+    FProperty* Property = FCogHelper::FindProperty(InConfig, InInputChordPointerToMember);
+    if (Property == nullptr)
+    { return; }
+
+    TextInputChordProperty(*InConfig, *Property);
 }

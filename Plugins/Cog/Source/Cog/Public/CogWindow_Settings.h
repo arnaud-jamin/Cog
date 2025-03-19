@@ -31,8 +31,6 @@ protected:
 
     virtual void PreSaveConfig() override;
 
-    virtual void RenderShortcut(const char* Label, FCogImGuiKeyInfo& KeyInfo);
-
     TObjectPtr<UCogWindowConfig_Settings> Config = nullptr;
 };
 
@@ -98,19 +96,40 @@ public:
 
     UPROPERTY(Config)
     bool ShowWidgetBorders = false;
+
+    UPROPERTY(Config)
+    FInputChord Shortcut_ToggleImguiInput =  FInputChord(EKeys::F1);
+
+    UPROPERTY(Config)
+    FInputChord Shortcut_ToggleSelection = FInputChord(EKeys::F5);
+
+    UPROPERTY(Config)
+    FInputChord Shortcut_LoadLayout1 = FInputChord(EKeys::F2);
+
+    UPROPERTY(Config)
+    FInputChord Shortcut_LoadLayout2 = FInputChord(EKeys::F3);
+
+    UPROPERTY(Config)
+    FInputChord Shortcut_LoadLayout3 = FInputChord(EKeys::F4);
+
+    UPROPERTY(Config)
+    FInputChord Shortcut_LoadLayout4 = FInputChord();
+
+    UPROPERTY(Config)
+    FInputChord Shortcut_SaveLayout1 = FInputChord();
+
+    UPROPERTY(Config)
+    FInputChord Shortcut_SaveLayout2 = FInputChord();
+
+    UPROPERTY(Config)
+    FInputChord Shortcut_SaveLayout3 = FInputChord();
+
+    UPROPERTY(Config)
+    FInputChord Shortcut_SaveLayout4 = FInputChord();
     
     UPROPERTY(Config)
-    FCogImGuiKeyInfo ToggleImGuiInputShortcut =  FCogImGuiKeyInfo(EKeys::F1);
+    FInputChord Shortcut_ResetLayout = FInputChord();
 
-    UPROPERTY(Config)
-    FCogImGuiKeyInfo ToggleSelectionShortcut = FCogImGuiKeyInfo(EKeys::F5);
-
-    UPROPERTY(Config)
-    TArray<FCogImGuiKeyInfo> LoadLayoutShortcuts = { FCogImGuiKeyInfo(EKeys::F2), FCogImGuiKeyInfo(EKeys::F3), FCogImGuiKeyInfo(EKeys::F4), FCogImGuiKeyInfo()};
-
-    UPROPERTY(Config)
-    TArray<FCogImGuiKeyInfo> SaveLayoutShortcuts = { FCogImGuiKeyInfo(), FCogImGuiKeyInfo(), FCogImGuiKeyInfo(), FCogImGuiKeyInfo()};
-    
     //UPROPERTY(Config)
     //bool bNavEnableGamepad = false;
 
@@ -129,17 +148,23 @@ public:
         bShowWindowsInMainMenu = true;
         bEnableInput = false;
         bShareMouse = false;
+        bShareMouseWithGameplay = false;
         bShareKeyboard = false;
         bNavEnableKeyboard = false;
-         bDisableConflictingCommands = true;
+        bDisableConflictingCommands = true;
         bDisableShortcutsWhenImGuiWantTextInput = false;
-        //bNavEnableGamepad = false;
-        //bNavNoCaptureInput = true;
-
-
-        ToggleImGuiInputShortcut =  FCogImGuiKeyInfo(EKeys::F1);
-        ToggleSelectionShortcut = FCogImGuiKeyInfo(EKeys::F5);
-        LoadLayoutShortcuts = { FCogImGuiKeyInfo(EKeys::F2), FCogImGuiKeyInfo(EKeys::F3), FCogImGuiKeyInfo(EKeys::F4), FCogImGuiKeyInfo()};
-        SaveLayoutShortcuts = { FCogImGuiKeyInfo(), FCogImGuiKeyInfo(), FCogImGuiKeyInfo(), FCogImGuiKeyInfo()};
+        WidgetAlignment = ECogWidgetAlignment::Right;
+        ShowWidgetBorders = false;
+        Shortcut_ToggleImguiInput =  FInputChord(EKeys::F1);
+        Shortcut_ToggleSelection = FInputChord(EKeys::F5);
+        Shortcut_LoadLayout1 = FInputChord(EKeys::F2);
+        Shortcut_LoadLayout2 = FInputChord(EKeys::F3);
+        Shortcut_LoadLayout3 = FInputChord(EKeys::F4);
+        Shortcut_LoadLayout4 = FInputChord();
+        Shortcut_SaveLayout1 = FInputChord();
+        Shortcut_SaveLayout2 = FInputChord();
+        Shortcut_SaveLayout3 = FInputChord();
+        Shortcut_SaveLayout4 = FInputChord();
+        Shortcut_ResetLayout = FInputChord();
     }
 };

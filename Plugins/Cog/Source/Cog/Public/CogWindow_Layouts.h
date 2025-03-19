@@ -17,7 +17,7 @@ protected:
 
     virtual void RenderContent() override;
 
-    virtual void RenderLoadLayoutMenuItem(const UPlayerInput* PlayerInput, int LayoutIndex);
+    virtual void RenderLoadLayoutMenuItem(int InLayoutIndex, const FInputChord& InInputChord);
 
-    virtual void RenderSaveLayoutMenuItem(const UPlayerInput* PlayerInput, int LayoutIndex);
+    virtual void RenderSaveLayoutMenuItem(int InLayoutIndex, const FInputChord& InInputChord);
 };

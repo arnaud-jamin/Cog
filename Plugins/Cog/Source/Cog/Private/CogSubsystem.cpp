@@ -8,6 +8,7 @@
 #include "CogWindow_Settings.h"
 #include "CogWindow_Spacing.h"
 #include "CogConsoleCommandManager.h"
+#include "CogDebugPluginSubsystem.h"
 #include "CogHelper.h"
 #include "CogWidgets.h"
 #include "Engine/Engine.h"
@@ -44,12 +45,12 @@ void UCogSubsystem::Activate()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogSubsystem::TryInitialize(UWorld* World)
+void UCogSubsystem::TryInitialize(UWorld& World)
 {
     if (IsInitialized)
     { return; }
 
-    FWorldContext* WorldContext = GEngine->GetWorldContextFromWorld(World);
+    FWorldContext* WorldContext = GEngine->GetWorldContextFromWorld(&World);
     if (WorldContext == nullptr)
     { return; }
 
@@ -77,7 +78,19 @@ void UCogSubsystem::TryInitialize(UWorld* World)
     SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 4"));
 
     Settings = GetConfig<UCogWindowConfig_Settings>();
-    OnShortcutsDefined();
+
+    UCogWindowConfig_Settings* SettingsPtr = Settings.Get();
+    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_ToggleImguiInput).BindLambda([this] () { ToggleInputMode(); });
+    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_ToggleSelection).BindLambda([this] (){ SetActivateSelectionMode(!GetActivateSelectionMode()); });
+    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_LoadLayout1).BindLambda([this] (){ LoadLayout(1); });
+    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_LoadLayout2).BindLambda([this] (){ LoadLayout(2); });
+    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_LoadLayout3).BindLambda([this] (){ LoadLayout(3); });
+    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_LoadLayout4).BindLambda([this] (){ LoadLayout(4); });
+    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_SaveLayout1).BindLambda([this] (){ SaveLayout(1); });
+    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_SaveLayout2).BindLambda([this] (){ SaveLayout(2); });
+    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_SaveLayout3).BindLambda([this] (){ SaveLayout(3); });
+    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_SaveLayout4).BindLambda([this] (){ SaveLayout(4); });    
+    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_ResetLayout).BindLambda([this] (){ ResetLayout(); });
     
     LayoutsWindow = AddWindow<FCogWindow_Layouts>("Window.Layouts");
     SettingsWindow = AddWindow<FCogWindow_Settings>("Window.Settings");
@@ -86,7 +99,7 @@ void UCogSubsystem::TryInitialize(UWorld* World)
     {
         InitializeWindow(Window);   
     }
-    
+
     FCogConsoleCommandManager::RegisterWorldConsoleCommand(
         *ToggleInputCommand, 
         TEXT("Toggle the input focus between the Game and ImGui"),
@@ -217,7 +230,7 @@ void UCogSubsystem::Tick(UWorld* InTickedWorld, ELevelTick InTickType, float InD
     //----------------------------------------------------------------------------------------------
     if (World != CurrentWorld.Get())
     {
-        NumExecBindingsChecked = INDEX_NONE;
+        RequestDisableCommandsConflictingWithShortcuts();
     }
     CurrentWorld = World;
     
@@ -226,30 +239,21 @@ void UCogSubsystem::Tick(UWorld* InTickedWorld, ELevelTick InTickType, float InD
 
     if (IsInitialized == false)
     {
-        TryInitialize(World);
+        TryInitialize(*World);
         return;
     }
 
     FCogImGuiContextScope ImGuiContextScope(Context);
 
-    UPlayerInput* PlayerInput = FCogImguiInputHelper::GetPlayerInput(*World);
-    if (PlayerInput != nullptr)
+    UpdateServerPlayerControllers(*World);
+    
+    if (UPlayerInput* PlayerInput = (LocalPlayerController != nullptr) ? LocalPlayerController->PlayerInput : nullptr)
     {
-        HandleInputs(*PlayerInput);
-
         //------------------------------------------------------------------
         // We must wait for the player input to be valid to disable
         // DebugExecBindings  conflicting with our shortcuts.
         //------------------------------------------------------------------
-        const int32 NewNumExecBindings = PlayerInput->DebugExecBindings.Num();
-        if (NumExecBindingsChecked != NewNumExecBindings)
-        {
-            if (Settings->bDisableConflictingCommands)
-            {
-                FCogImguiInputHelper::DisableCommandsConflictingWithShortcuts(*PlayerInput);
-            }
-            NumExecBindingsChecked = NewNumExecBindings;;
-        }
+        TryDisableCommandsConflictingWithShortcuts(PlayerInput);
     }
     
     if (LayoutToLoad != -1)
@@ -271,6 +275,77 @@ void UCogSubsystem::Tick(UWorld* InTickedWorld, ELevelTick InTickType, float InD
     {
         Render(InDeltaTime);
         Context.EndFrame();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSubsystem::RequestDisableCommandsConflictingWithShortcuts()
+{
+    NumExecBindingsChecked = INDEX_NONE;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSubsystem::SetLocalPlayerController(APlayerController* PlayerController)
+{
+    if (LocalPlayerController == PlayerController)
+    { return; }
+    
+    LocalPlayerController = PlayerController;
+
+    if (LocalPlayerController == nullptr)
+    { return; }
+
+    UInputComponent* InputComponentPtr = NewObject<UInputComponent>(PlayerController, TEXT("Cog_Input"));
+    InputComponent = InputComponentPtr;
+    if (InputComponentPtr)
+    {
+        PlayerController->PushInputComponent(InputComponentPtr);
+    }
+                
+    for (FCogShortcut& Shortcut : Shortcuts)
+    {
+        BindShortcut(Shortcut);
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSubsystem::UpdateServerPlayerControllers(UWorld& World)
+{
+    TArray<UCogDebugPluginSubsystem*> PluginSubsystems;
+
+    ServerPlayerControllers.RemoveAll([] (TWeakObjectPtr<APlayerController> PlayerController)
+    {
+        return PlayerController.IsValid() == false;
+    });
+    
+    for (FConstPlayerControllerIterator It = World.GetPlayerControllerIterator(); It; ++It)
+    {
+        APlayerController* PlayerController = It->Get();
+        if (PlayerController == nullptr)
+        { continue; }
+
+        if (PlayerController->IsLocalController())
+        {
+            SetLocalPlayerController(PlayerController);
+        }
+
+        if (World.GetNetMode() != NM_Client)
+        {
+            if (ServerPlayerControllers.Contains(PlayerController))
+            { continue; }
+
+            ServerPlayerControllers.Add(PlayerController);
+        
+            if (PluginSubsystems.IsEmpty())
+            {
+                PluginSubsystems = GetOuterUGameInstance()->GetSubsystemArrayCopy<UCogDebugPluginSubsystem>();
+            }
+        
+            for (UCogDebugPluginSubsystem* PluginSubsystem : PluginSubsystems)
+            {
+                PluginSubsystem->OnPlayerControllerReady(PlayerController);
+            }
+        }
     }
 }
 
@@ -939,30 +1014,6 @@ void UCogSubsystem::DisableInputMode()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogSubsystem::HandleInputs(const UPlayerInput& PlayerInput)
-{
-    if (Settings->bDisableShortcutsWhenImGuiWantTextInput && ImGui::GetIO().WantTextInput)
-    { return; }
-
-    if (FCogImguiInputHelper::IsKeyInfoPressed(PlayerInput, Settings->ToggleImGuiInputShortcut))
-    {
-        ToggleInputMode();
-    }
-    else if (FCogImguiInputHelper::IsKeyInfoPressed(PlayerInput, Settings->ToggleSelectionShortcut))
-    {
-        SetActivateSelectionMode(!GetActivateSelectionMode());
-    }
-    
-    for (int i = 0; i < Settings->LoadLayoutShortcuts.Num(); ++i)
-    {
-        if (FCogImguiInputHelper::IsKeyInfoPressed(PlayerInput, Settings->LoadLayoutShortcuts[i]))
-        {
-            LoadLayout(i + 1);
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void UCogSubsystem::SetActivateSelectionMode(const bool Value)
 {
     SelectionModeActiveCounter = FMath::Max(SelectionModeActiveCounter + (Value ? 1 : -1), 0);
@@ -987,14 +1038,79 @@ bool UCogSubsystem::GetActivateSelectionMode() const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogSubsystem::OnShortcutsDefined()
+FInputActionHandlerSignature& UCogSubsystem::AddShortcut(const UObject& InInstance, const FProperty& InProperty)
 {
-    TArray Shortcuts = { Settings->ToggleImGuiInputShortcut, Settings->ToggleSelectionShortcut };
-    Shortcuts.Append(Settings->LoadLayoutShortcuts);
-    Shortcuts.Append(Settings->SaveLayoutShortcuts);
-    
-    FCogImguiInputHelper::SetShortcuts(Shortcuts);
-
-    NumExecBindingsChecked = INDEX_NONE;
+    FCogShortcut& Shortcut = Shortcuts.AddDefaulted_GetRef();
+    Shortcut.PropertyName = InProperty.GetFName();
+    Shortcut.Config = &InInstance;
+    return Shortcut.Delegate;
 }
 
+//--------------------------------------------------------------------------------------------------------------------------
+bool UCogSubsystem::BindShortcut(FCogShortcut& InShortcut) const
+{
+    UObject* Config = const_cast<UObject*>(InShortcut.Config.Get());
+    if (Config == nullptr)
+    { return false; }
+    
+    const FStructProperty* StructProperty = CastField<FStructProperty>(Config->GetClass()->FindPropertyByName(InShortcut.PropertyName));
+    if (StructProperty == nullptr)
+    { return false; }
+
+    const FInputChord* InputChord = static_cast<FInputChord*>(StructProperty->ContainerPtrToValuePtr<void>(Config));
+    if (InputChord == nullptr)
+    { return false; }
+        
+    FInputKeyBinding InputBinding(*InputChord, IE_Pressed);
+    InputBinding.KeyDelegate.GetDelegateForManualSet() = InShortcut.Delegate;
+    InputComponent.Get()->KeyBindings.Add(InputBinding);
+    
+    InShortcut.InputChord = *InputChord;
+
+    FCogImguiInputHelper::GetPrioritizedShortcuts().Add(*InputChord);
+    return true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSubsystem::RebindShortcut(const UCogCommonConfig& InConfig, const FProperty& InProperty)
+{
+    // Ideally would unbind and rebind only the provided shortcut, but we currently rebind all shortcuts. 
+
+    UInputComponent* InputComponentPtr = InputComponent.Get();
+    if (InputComponentPtr ==  nullptr)
+    { return; }
+    
+    for (auto& KeyBinding : InputComponentPtr->KeyBindings)
+    {
+        KeyBinding.KeyDelegate.Unbind();
+    }
+    InputComponent.Get()->KeyBindings.Empty();
+    
+    for (FCogShortcut& Shortcut : Shortcuts)
+    {
+        BindShortcut(Shortcut);
+    }
+
+    RequestDisableCommandsConflictingWithShortcuts();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void UCogSubsystem::TryDisableCommandsConflictingWithShortcuts(UPlayerInput* PlayerInput)
+{
+    const int32 NewNumExecBindings = PlayerInput->DebugExecBindings.Num();
+    if (NumExecBindingsChecked == NewNumExecBindings)
+    { return; }
+
+    NumExecBindingsChecked = NewNumExecBindings;;
+
+    if (Settings->bDisableConflictingCommands == false)
+    { return; }
+    
+    TArray<FInputChord>& PrioritizedShortcuts = FCogImguiInputHelper::GetPrioritizedShortcuts();
+    for (const FCogShortcut& Shortcut : Shortcuts)
+    {
+        PrioritizedShortcuts.Add(Shortcut.InputChord);
+    }
+        
+    FCogImguiInputHelper::DisableCommandsConflictingWithShortcuts(*PlayerInput);
+}

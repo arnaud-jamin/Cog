@@ -30,7 +30,5 @@ struct COGDEBUG_API FCogDebugTrack
 
     ECogDebugTrackType Type = ECogDebugTrackType::Value;
 
-    TWeakObjectPtr<const UWorld> World;
-
     FCogDebugTracker* Owner = nullptr;
-    };
+};

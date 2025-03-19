@@ -372,7 +372,7 @@ void FCogInputWindow_Gamepad::RenderContent()
     const ImVec2 ContentMin = ImGui::GetCursorScreenPos();
     const ImVec2 ContentSize = ImGui::GetContentRegionAvail();
     const ImVec2 ContentMax = ContentMin + ContentSize;
-    const ImVec2 OverlayOffset = ImVec2(0.0f, Config->bShowAsOverlay ? ImGui::GetFrameHeight() : 0.0f);
+    const ImVec2 OverlayOffset = ImVec2(0.0f, Config->bShowAsOverlay && IsWindowRenderedInMainMenu() == false ? ImGui::GetFrameHeight() : 0.0f);
     
     const ImVec2 Padding = ImVec2(Config->Border * 0.5f * ContentSize.x, Config->Border * 0.5f * ContentSize.x);
     CanvasMin = ContentMin + OverlayOffset + Padding;

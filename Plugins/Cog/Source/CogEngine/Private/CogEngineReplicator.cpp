@@ -3,6 +3,7 @@
 #include "CogCommon.h"
 #include "CogCommonPossessorInterface.h"
 #include "CogEngineDataAsset.h"
+#include "CogSubsystem.h"
 #include "Engine/EngineTypes.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
