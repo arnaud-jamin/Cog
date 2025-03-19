@@ -1,3 +1,7 @@
+> [!IMPORTANT]
+> The way Cog integrates in your project has been simplified. If you update Cog, please read the [integration guide](#Integrating-Cog-in-your-project). If you didn't modify Cog sources, you should remove all your existing Cog files before updating. If you did modify Cog sources and stil have a `CogWindow` folder, consider deleting it before updating.
+
+
 # Cog
 Cog is a set of debug tools for Unreal Engine built on top of [Dear ImGui](https://github.com/ocornut/imgui)
 
@@ -387,6 +391,9 @@ You must have Unreal 5.5 or greater and Visual Studio to launch the sample
 
 ### Integrating Cog in your project
 
+> [!IMPORTANT]
+> The way Cog integrates in your project has been simplified. If you update Cog, please read the [integration guide](#Integrating-Cog-in-your-project). If you didn't modify Cog sources, you should remove all your existing Cog files before updating. If you did modify Cog sources and stil have a `CogWindow` folder, consider deleting it before updating.
+
 The Cog repository has the following structure:
 - `CogSample` - A Sample that demonstrate various Cog functionalities. The project was saved in Unreal 5.5
 - `Plugins/CogAbility` - ImGui windows for the Gameplay Ability System (Abilities, Effects, Tags, ...)
@@ -532,6 +539,7 @@ class ACogSamplePlayerController
 - Reference the added Data Assets in the projet Asset Manager for them to be found in package mode:
 
 ![Data Assets](https://github.com/user-attachments/assets/39d0fcc2-1e82-4bb7-aa5e-0661ed9ab58b)
+
 
 
 
