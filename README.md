@@ -502,29 +502,6 @@ void UCogSampleGameInstance::Init()
 }
 ```
 
-- In your PlayerController class, spawn the Cog Replicators. The Replicator are used to communicate between the client and the server, for example to apply cheats, spawn actors, etc.
-```cpp
-
-#if ENABLE_COG
-#include "CogAbilityReplicator.h"
-#include "CogDebugDraw.h"
-#include "CogDebugReplicator.h"
-#include "CogEngineReplicator.h"
-#endif //ENABLE_COG
-
-void ACogSamplePlayerController::BeginPlay()
-{
-    Super::BeginPlay();
-
-#if ENABLE_COG
-    // Spawn the Replicator of each plugin
-    ACogDebugReplicator::Spawn(this);
-    ACogAbilityReplicator::Spawn(this);
-    ACogEngineReplicator::Spawn(this);
-#endif //ENABLE_COG
-}
-```
-
 - Implement Cog Interfaces on your desired actor classes:
 ```cpp
 // CogSampleCharacter.h
