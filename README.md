@@ -43,6 +43,8 @@ Displays the state of Input Action.
 - Can be used to inject inputs to help debugging, as loosing window focus when breaking in the code doesn't affect the state of injected inputs unlike real inputs.
 - The display input action are read from a Input Mapping Context defined in a Data Asset.
 
+https://github.com/user-attachments/assets/2497900e-d2d9-4af9-abef-44f7f31c2726
+
 ---
 
 ### Attributes
