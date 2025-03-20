@@ -66,7 +66,7 @@ void FCogInputWindow_Actions::RenderContent()
 
         if (ImGui::MenuItem("Reset"))
         {
-            for (FCogInputMappingContextInfo Mapping : Mappings)
+            for (FCogInputMappingContextInfo& Mapping : Mappings)
             {
                 for (FCogInputActionInfo& Action : Mapping.Actions)
                 {

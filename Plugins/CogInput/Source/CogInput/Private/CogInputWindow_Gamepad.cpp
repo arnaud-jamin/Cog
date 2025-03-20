@@ -500,7 +500,7 @@ void FCogInputWindow_Gamepad::RenderMainContextMenu()
     {
         ImGui::Checkbox("Overlay", &Config->bShowAsOverlay);
         ImGui::Checkbox("Lock Position", &Config->bLockPosition);
-        ImGui::BeginDisabled(Config->bLockPosition);
+        ImGui::BeginDisabled(!Config->bLockPosition);
         FCogWidgets::SetNextItemToShortWidth();
         ImGui::SliderFloat2("Alignment", &Config->Alignment.X, 0, 1.0f, "%.2f");
         FCogWidgets::SetNextItemToShortWidth();
