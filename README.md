@@ -340,7 +340,7 @@ Used to change the game global time scale.
 ![Time Scale](https://github.com/user-attachments/assets/fc5a49e7-a04d-42b3-9d83-a8290e261665)
 - If changed on a client the time scale is also modified on the game server, and replicated to the other clients.
 - Time Scale can be viewed as a widget in the main menu bar.
-- Right cliking the Time Scale display the settings, where the specific Time Scale values can be defined.
+- Right clicking the Time Scale display the settings, where the specific Time Scale values can be defined.
 
 ![image](https://github.com/user-attachments/assets/130f6250-af5b-41fb-8ae2-016c66fbdedc)
 
