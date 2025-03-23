@@ -100,9 +100,6 @@ public:
     FInputChord Shortcut_ToggleImguiInput =  FInputChord(EKeys::F1);
 
     UPROPERTY(Config)
-    FInputChord Shortcut_ToggleSelection = FInputChord(EKeys::F5);
-
-    UPROPERTY(Config)
     FInputChord Shortcut_LoadLayout1 = FInputChord(EKeys::F2);
 
     UPROPERTY(Config)
@@ -155,7 +152,6 @@ public:
         WidgetAlignment = ECogWidgetAlignment::Right;
         ShowWidgetBorders = false;
         Shortcut_ToggleImguiInput =  FInputChord(EKeys::F1);
-        Shortcut_ToggleSelection = FInputChord(EKeys::F5);
         Shortcut_LoadLayout1 = FInputChord(EKeys::F2);
         Shortcut_LoadLayout2 = FInputChord(EKeys::F3);
         Shortcut_LoadLayout3 = FInputChord(EKeys::F4);

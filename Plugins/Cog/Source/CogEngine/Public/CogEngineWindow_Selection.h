@@ -86,6 +86,9 @@ public:
     UPROPERTY(Config)
     int32 SelectedClassIndex = 0;
 
+    UPROPERTY(Config)
+    FInputChord Shortcut_ToggleSelection = FInputChord(EKeys::F5);
+    
     virtual void Reset() override
     {
         Super::Reset();
@@ -93,5 +96,6 @@ public:
         bReapplySelection = true;
         SelectionName.Reset();
         SelectedClassIndex = 0;
+        Shortcut_ToggleSelection = FInputChord(EKeys::F5);
     }
 };

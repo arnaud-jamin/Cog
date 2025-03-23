@@ -81,7 +81,6 @@ void UCogSubsystem::TryInitialize(UWorld& World)
 
     UCogWindowConfig_Settings* SettingsPtr = Settings.Get();
     AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_ToggleImguiInput).BindLambda([this] () { ToggleInputMode(); });
-    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_ToggleSelection).BindLambda([this] (){ SetActivateSelectionMode(!GetActivateSelectionMode()); });
     AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_LoadLayout1).BindLambda([this] (){ LoadLayout(1); });
     AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_LoadLayout2).BindLambda([this] (){ LoadLayout(2); });
     AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_LoadLayout3).BindLambda([this] (){ LoadLayout(3); });

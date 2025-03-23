@@ -129,13 +129,13 @@ void FCogEngineWindow_TimeScale::RenderMainMenuWidget()
     }
     else
     {
-        if (ImGui::BeginItemTooltip())
+        if (FCogWidgets::BeginItemTooltipWrappedText())
         {
             ImGui::Text("Time Scale: x%g", TimeDilation);
             ImGui::Spacing();
             ImGui::Separator();
             FCogWidgets::TextOfAllInputChordsOfConfig(*Config.Get());
-            ImGui::EndTooltip();
+            FCogWidgets::EndItemTooltipWrappedText();
         }
     }
 }

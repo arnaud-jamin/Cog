@@ -30,6 +30,8 @@ void FCogEngineWindow_Selection::Initialize()
 
     Config = GetConfig<UCogEngineConfig_Selection>();
 
+    GetOwner()->AddShortcut(Config.Get(), &UCogEngineConfig_Selection::Shortcut_ToggleSelection).BindLambda([this] (){ GetOwner()->SetActivateSelectionMode(!GetOwner()->GetActivateSelectionMode()); });
+
     Asset = GetAsset<UCogEngineDataAsset>();
 
     FCogConsoleCommandManager::RegisterWorldConsoleCommand(
@@ -339,9 +341,11 @@ void FCogEngineWindow_Selection::RenderPickButtonTooltip()
 {
     if (FCogWidgets::BeginItemTooltipWrappedText())
     {
-        const FString Shortcut = FCogImguiInputHelper::InputChordToString(GetOwner()->GetSettings()->Shortcut_ToggleSelection);
-        ImGui::Text("Enter selection mode to select an actor on screen. Change which actor type is selectable by clicking the selection combobox\n"
-        "%s", TCHAR_TO_ANSI(*Shortcut));
+        ImGui::Text("Enter selection mode to select an actor on screen. Change which actor type is selectable by clicking the selection combobox\n");
+        ImGui::Spacing();
+        ImGui::Separator();
+        FCogWidgets::TextOfAllInputChordsOfConfig(*Config.Get());
+        
         FCogWidgets::EndItemTooltipWrappedText();
     }
 }
