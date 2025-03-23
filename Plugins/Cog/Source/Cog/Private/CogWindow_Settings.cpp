@@ -244,32 +244,20 @@ void FCogWindow_Settings::RenderContent()
     //-------------------------------------------------------------------------------------------
     if (ImGui::CollapsingHeader("Shortcuts", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        TArray<TObjectPtr<UCogCommonConfig>>& Configs = GetOwner()->GetConfigs();
-        for (TObjectPtr<UCogCommonConfig> SomeConfig : Configs)
+        for (TObjectPtr SomeConfig : GetOwner()->GetConfigs())
         {
-            TArray<FProperty*> Properties;
-            for (TFieldIterator<FProperty> It(SomeConfig->GetClass()); It; ++It)
-            {
-                if (FStructProperty* StructProperty = CastField<FStructProperty>(*It))
-                {
-                    if (StructProperty->Struct == FInputChord::StaticStruct())
-                    {
-                        Properties.Add(StructProperty);
-                    }
-                }
-            }
-
-            if (Properties.Num() > 0)
+            if (SomeConfig == nullptr)
+            { continue; }
+            
+            if (FCogWidgets::IsConfigContainingInputChords(*SomeConfig))
             {
                 auto ConfigName = StringCast<ANSICHAR>(*FCogWidgets::FormatConfigName(SomeConfig->GetClass()->GetName()));
                 ImGui::SeparatorText(ConfigName.Get());
 
-                for (const FProperty* Property : Properties)
+                FProperty* InModifiedProperty = nullptr;
+                if (FCogWidgets::AllInputChordsOfConfig(*SomeConfig, &InModifiedProperty))
                 {
-                    if (FCogWidgets::InputChordProperty(*SomeConfig, *Property))
-                    {
-                        GetOwner()->RebindShortcut(*SomeConfig, *Property);
-                    }
+                    GetOwner()->RebindShortcut(*SomeConfig, *InModifiedProperty);
                 }
             }
         }

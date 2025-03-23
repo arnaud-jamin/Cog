@@ -188,6 +188,12 @@ public:
     static void TextInputChordProperty(UObject& InConfig, const FProperty& InInputChordProperty);
 
     static bool InputChordProperty(UObject& InConfig, const FProperty& InInputChordProperty);
+
+    static bool IsConfigContainingInputChords(const UObject& InConfig);
+
+    static bool AllInputChordsOfConfig(UObject& InConfig, FProperty** InModifiedProperty = nullptr);
+
+    static void TextOfAllInputChordsOfConfig(UObject& InConfig);
 };
 
 template<typename EnumType>

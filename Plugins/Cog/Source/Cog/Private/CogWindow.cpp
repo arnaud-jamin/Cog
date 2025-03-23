@@ -3,6 +3,7 @@
 #include "CogDebug.h"
 #include "CogWindow_Settings.h"
 #include "CogSubsystem.h"
+#include "CogWidgets.h"
 #include "Engine/World.h"
 #include "imgui_internal.h"
 #include "GameFramework/Pawn.h"
@@ -253,4 +254,14 @@ bool FCogWindow::IsWindowRenderedInMainMenu()
 float FCogWindow::GetDpiScale() const
 {
     return GetOwner()->GetContext().GetDpiScale();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogWindow::RenderConfigShortcuts(UCogCommonConfig& InConfig) const
+{
+    FProperty* InModifiedProperty = nullptr;
+    if (FCogWidgets::AllInputChordsOfConfig(InConfig, &InModifiedProperty))
+    {
+        GetOwner()->RebindShortcut(InConfig, *InModifiedProperty);
+    }
 }

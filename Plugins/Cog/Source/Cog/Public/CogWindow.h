@@ -79,6 +79,7 @@ public:
 
     float GetDpiScale() const;
     
+
     template<class T>
     T* GetConfig(bool InResetConfigOnRequest = true) const { return Cast<T>(GetConfig(T::StaticClass(), InResetConfigOnRequest)); }
 
@@ -117,7 +118,9 @@ protected:
     virtual void OnSelectionChanged(AActor* OldSelection, AActor* NewSelection) {}
 
     virtual bool IsWindowRenderedInMainMenu();
-    
+
+    virtual void RenderConfigShortcuts(UCogCommonConfig& InConfig) const;
+
     APawn* GetLocalPlayerPawn() const;
 
     APlayerController* GetLocalPlayerController() const;

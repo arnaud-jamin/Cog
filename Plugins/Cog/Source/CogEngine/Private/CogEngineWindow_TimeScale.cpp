@@ -54,21 +54,21 @@ void FCogEngineWindow_TimeScale::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_TimeScale::RenderContextMenu()
 {
+    UCogEngineWindowConfig_TimeScale* ConfigPtr = Config.Get();
+    
     if (IsWindowRenderedInMainMenu() == false)
     {
-        ImGui::Checkbox("Inline", &Config->Inline);
+        ImGui::Checkbox("Inline", &ConfigPtr->Inline);
     }
 
-    FCogImguiHelper::ColorEdit4("Time Scale Modified Color", Config->TimeScaleModifiedColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
+    FCogImguiHelper::ColorEdit4("Time Scale Modified Color", ConfigPtr->TimeScaleModifiedColor, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_AlphaPreviewHalf);
     ImGui::SetItemTooltip("Color of the current time scale, in widget mode, when the time scale in not 1.");
     
-    FCogWidgets::FloatArray("Time Scales", Config->TimeScales, 10, ImVec2(0, ImGui::GetFontSize() * 10));
+    FCogWidgets::FloatArray("Time Scales", ConfigPtr->TimeScales, 10, ImVec2(0, ImGui::GetFontSize() * 10));
 
     if (ImGui::CollapsingHeader("Shortcuts", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        FCogWidgets::InputChord("Speed Up", Config->Shortcut_FasterTimeScale);
-        FCogWidgets::InputChord("Speed Down", Config->Shortcut_SlowerTimeScale);
-        FCogWidgets::InputChord("Reset Time", Config->Shortcut_ResetTimeScale);
+        RenderConfigShortcuts(*ConfigPtr);
     }
 
     ImGui::Separator();
@@ -134,10 +134,7 @@ void FCogEngineWindow_TimeScale::RenderMainMenuWidget()
             ImGui::Text("Time Scale: x%g", TimeDilation);
             ImGui::Spacing();
             ImGui::Separator();
-            FCogWidgets::TextInputChordProperty(Config.Get(), &UCogEngineWindowConfig_TimeScale::Shortcut_FasterTimeScale);
-            FCogWidgets::TextInputChordProperty(Config.Get(), &UCogEngineWindowConfig_TimeScale::Shortcut_SlowerTimeScale);
-            FCogWidgets::TextInputChordProperty(Config.Get(), &UCogEngineWindowConfig_TimeScale::Shortcut_ResetTimeScale);
-            FCogWidgets::TextInputChordProperty(Config.Get(), &UCogEngineWindowConfig_TimeScale::Shortcut_ZeroTimeScale);
+            FCogWidgets::TextOfAllInputChordsOfConfig(*Config.Get());
             ImGui::EndTooltip();
         }
     }

@@ -1541,4 +1541,65 @@ bool FCogWidgets::InputChordProperty(UObject& InConfig, const FProperty& InInput
     return FCogWidgets::InputChord(Name.Get(), *InputChord); 
 }
 
-        
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWidgets::IsConfigContainingInputChords(const UObject& InConfig)
+{
+    for (TFieldIterator<FProperty> It(InConfig.GetClass()); It; ++It)
+    {
+        if (const FStructProperty* StructProperty = CastField<FStructProperty>(*It))
+        {
+            if (StructProperty->Struct == FInputChord::StaticStruct())
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogWidgets::AllInputChordsOfConfig(UObject& InConfig, FProperty** InModifiedProperty)
+{
+    bool HasChanged = false;
+    TArray<FProperty*> Properties;
+    for (TFieldIterator<FProperty> It(InConfig.GetClass()); It; ++It)
+    {
+        if (FStructProperty* StructProperty = CastField<FStructProperty>(*It))
+        {
+            if (StructProperty->Struct == FInputChord::StaticStruct())
+            {
+                if (FCogWidgets::InputChordProperty(InConfig, *StructProperty))
+                {
+                    HasChanged = true;
+                    if (InModifiedProperty != nullptr)
+                    {
+                        *InModifiedProperty = StructProperty;
+                    }
+                }
+            }
+        }
+    }
+    
+    return HasChanged;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogWidgets::TextOfAllInputChordsOfConfig(UObject& InConfig)
+{
+    TArray<FProperty*> Properties;
+    for (TFieldIterator<FProperty> It(InConfig.GetClass()); It; ++It)
+    {
+        if (const FStructProperty* StructProperty = CastField<FStructProperty>(*It))
+        {
+            if (StructProperty->Struct == FInputChord::StaticStruct())
+            {
+                TextInputChordProperty(InConfig, *StructProperty);
+            }
+        }
+    }
+}
+
+
+
