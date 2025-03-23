@@ -132,7 +132,7 @@ void FCogEngineWindow_CollisionViewer::RenderContent()
     }
     ImGui::Separator();
 
-    FCogWidgets::CollisionProfileChannels(Config->ObjectTypesToQuery);
+    FCogWidgets::CollisionObjectTypeChannels(Config->ObjectTypesToQuery);
 
     //-------------------------------------------------
     // Perform Query

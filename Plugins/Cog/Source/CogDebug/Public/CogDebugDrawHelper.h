@@ -64,7 +64,7 @@ public:
 
     static void DrawPrimitiveComponent(const UPrimitiveComponent& PrimitiveComponent, const int32 BodyIndex, const FColor& Color, const bool Persistent, const float LifeTime, const uint8 DepthPriority, const float Thickness, const bool DrawName = true, const bool DrawNameShadow = true, const float DrawNameSize = 1.0f);
 
-    static void DrawOverlap(const UWorld* World, const FCollisionShape& Shape, const FVector& Location, const FQuat& Rotation, TArray<FOverlapResult>& OverlapResults, const FCogDebugDrawOverlapParams& Settings);
+    static void DrawOverlap(const UWorld* World, const FCollisionShape& Shape, const FVector& Location, const FQuat& Rotation, const bool HasHits, const TArray<FOverlapResult>& OverlapResults, const FCogDebugDrawOverlapParams& Settings);
 
     static void DrawHitResult(const UWorld* World, const FHitResult& HitResult, const FCogDebugDrawLineTraceParams& Settings);
 

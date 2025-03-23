@@ -90,3 +90,11 @@ bool FCogHelper::ComputeBoundingBoxScreenPosition(const APlayerController* Playe
 
     return true;
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
+bool FCogHelper::IsTraceChannelHidden(const UCollisionProfile& InCollisionProfile, const ECollisionChannel InCollisionChannel)
+{
+
+	
+	return false;
+}

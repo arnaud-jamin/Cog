@@ -702,7 +702,7 @@ void FCogDebugDraw::Sweep(const FLogCategoryBase& LogCategory, const UObject* Wo
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Overlap(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FCollisionShape& Shape, const FVector& Location, const FQuat& Rotation, TArray<FOverlapResult>& OverlapResults, const FCogDebugDrawOverlapParams& Settings)
+void FCogDebugDraw::Overlap(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FCollisionShape& Shape, const FVector& Location, const FQuat& Rotation, const bool HasHits, TArray<FOverlapResult>& OverlapResults, const FCogDebugDrawOverlapParams& Settings)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     { return; }
@@ -711,7 +711,7 @@ void FCogDebugDraw::Overlap(const FLogCategoryBase& LogCategory, const UObject* 
     if (World == nullptr)
     { return; }
 
-    FCogDebugDrawHelper::DrawOverlap(World, Shape, Location, Rotation, OverlapResults, Settings);
+    FCogDebugDrawHelper::DrawOverlap(World, Shape, Location, Rotation, HasHits, OverlapResults, Settings);
 
     const FColor Color = OverlapResults.Num() > 0
                        ? Settings.HitColor

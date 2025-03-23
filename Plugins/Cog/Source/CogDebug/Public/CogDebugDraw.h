@@ -59,7 +59,7 @@ struct COGDEBUG_API FCogDebugDraw
 
     static void Sweep(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FCollisionShape& Shape, const FVector& Start, const FVector& End, const FQuat& Rotation, const bool HasHits, TArray<FHitResult>& HitResults, const FCogDebugDrawSweepParams& Settings);
 
-    static void Overlap(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FCollisionShape& Shape, const FVector& Location, const FQuat& Rotation, TArray<FOverlapResult>& OverlapResults, const FCogDebugDrawOverlapParams& Settings);
+    static void Overlap(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FCollisionShape& Shape, const FVector& Location, const FQuat& Rotation, const bool HasHits, TArray<FOverlapResult>& OverlapResults, const FCogDebugDrawOverlapParams& Settings);
 
     static void ReplicateShape(const UObject* WorldContextObject, const FCogDebugShape& Shape);
 

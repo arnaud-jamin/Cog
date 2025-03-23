@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 #include "Templates/SubclassOf.h"
 
+class UCollisionProfile;
 
 class COG_API FCogHelper
 {
@@ -22,6 +23,8 @@ public:
 
     template<typename TCLass, typename TMember>
     static FProperty* FindProperty(TCLass* Instance,  TMember TCLass::*PointerToMember);
+
+    static bool IsTraceChannelHidden(const UCollisionProfile& InCollisionProfile, ECollisionChannel InCollisionChannel);
 };
 
 //----------------------------------------------------------------------------------------------------------------------

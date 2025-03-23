@@ -291,12 +291,6 @@ void FCogDebug::GetDebugChannelColors(FColor ChannelColors[ECC_MAX])
     ChannelColors[ECC_PhysicsBody]            = Settings.ChannelColorPhysicsBody;
     ChannelColors[ECC_Vehicle]                = Settings.ChannelColorVehicle;
     ChannelColors[ECC_Destructible]           = Settings.ChannelColorDestructible;
-    ChannelColors[ECC_EngineTraceChannel1]    = Settings.ChannelColorEngineTraceChannel1;
-    ChannelColors[ECC_EngineTraceChannel2]    = Settings.ChannelColorEngineTraceChannel2;
-    ChannelColors[ECC_EngineTraceChannel3]    = Settings.ChannelColorEngineTraceChannel3;
-    ChannelColors[ECC_EngineTraceChannel4]    = Settings.ChannelColorEngineTraceChannel4;
-    ChannelColors[ECC_EngineTraceChannel5]    = Settings.ChannelColorEngineTraceChannel5;
-    ChannelColors[ECC_EngineTraceChannel6]    = Settings.ChannelColorEngineTraceChannel6;
     ChannelColors[ECC_GameTraceChannel1]      = Settings.ChannelColorGameTraceChannel1;
     ChannelColors[ECC_GameTraceChannel2]      = Settings.ChannelColorGameTraceChannel2;
     ChannelColors[ECC_GameTraceChannel3]      = Settings.ChannelColorGameTraceChannel3;

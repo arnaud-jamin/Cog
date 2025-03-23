@@ -56,7 +56,7 @@ public:
     static bool MultiChoiceButtonsInt(TArray<int32>& Values, int32& Value, const ImVec2& Size = ImVec2(0, 0), bool InInline = true);
 
     static bool MultiChoiceButtonsFloat(TArray<float>& InValues, float& InValue, const ImVec2& InSize = ImVec2(0, 0), bool InInline = true, float InTolerance = UE_SMALL_NUMBER);
-
+    
     static void SliderWithReset(const char* Name, float* Value, float Min, float Max, const float& ResetValue, const char* Format);
 
     static void HelpMarker(const char* Text);
@@ -114,11 +114,15 @@ public:
 
     static bool DeleteArrayItemButton();
 
-    static bool ComboCollisionChannel(const char* Label, ECollisionChannel& Channel);
+    static bool ComboTraceChannel(const char* Label, ECollisionChannel& Channel);
 
-    static bool CollisionProfileChannel(const UCollisionProfile& CollisionProfile, int32 ChannelIndex, FColor& ChannelColor, int32& Channels);
+    static bool CollisionProfileChannels(int32& OutChannels);
 
-    static bool CollisionProfileChannels(int32& Channels);
+    static bool CollisionTraceChannels(int32& OutChannels);
+
+    static bool CollisionObjectTypeChannels(int32& OutChannels);
+
+    static bool CollisionProfileChannel(const UCollisionProfile& InCollisionProfile, int32 InChannelIndex, FColor& InChannelColor, int32& InChannels);
 
     static bool MenuActorsCombo(const char* StrID, AActor*& NewSelection, const UWorld& World, const TSubclassOf<AActor>& ActorClass, const FCogWindowActorContextMenuFunction& ContextMenuFunction = nullptr);
 

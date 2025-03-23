@@ -68,7 +68,7 @@ public:
     ECogEngine_CollisionQueryType Type;
 
     UPROPERTY(Config)
-    ECogEngine_CollisionQueryMode Mode;
+    ECogEngine_CollisionQueryTraceMode Mode;
 
     UPROPERTY(Config)
     ECogEngine_CollisionQueryBy By;
@@ -97,7 +97,7 @@ public:
 
         Type = ECogEngine_CollisionQueryType::LineTrace;
         By = ECogEngine_CollisionQueryBy::Channel;
-        Mode = ECogEngine_CollisionQueryMode::Multi;
+        Mode = ECogEngine_CollisionQueryTraceMode::Multi;
         Channel = ECC_WorldStatic;
         TraceComplex = false;
         Shape = ECogEngine_CollisionQueryShape::Sphere;

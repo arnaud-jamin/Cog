@@ -459,11 +459,12 @@ void FCogDebugDrawHelper::DrawOverlap(
     const FCollisionShape& Shape,
     const FVector& Location,
     const FQuat& Rotation,
-    TArray<FOverlapResult>& OverlapResults,
+    const bool HasHits,
+    const TArray<FOverlapResult>& OverlapResults,
     const FCogDebugDrawOverlapParams& Settings
 )
 {
-    const FColor Color = OverlapResults.Num() > 0 ? Settings.HitColor : Settings.NoHitColor;
+    const FColor Color = HasHits ? Settings.HitColor : Settings.NoHitColor;
     DrawShape(World, Shape, Location, Rotation, FVector::OneVector, Color, Settings.Persistent, Settings.LifeTime, Settings.DepthPriority, Settings.Thickness);
 
     if (Settings.DrawHitPrimitives)

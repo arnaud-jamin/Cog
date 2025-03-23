@@ -3,12 +3,12 @@
 #include "CogDebug.h"
 #include "CogDebugDrawHelper.h"
 #include "CogImguiHelper.h"
+#include "DrawDebugHelpers.h"
+#include "imgui.h"
 #include "Components/PrimitiveComponent.h"
 #include "Components/SceneComponent.h"
-#include "DrawDebugHelpers.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
-#include "imgui.h"
 #include "Kismet/GameplayStatics.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -78,7 +78,7 @@ float ScreenDistanceToArc(const APlayerController& InPlayerController, const FVe
 
     FVector P0 = Center + Radius * (AxisZ * FMath::Sin(CurrentAngle) + AxisY * FMath::Cos(CurrentAngle));
 
-	FVector2D ScreenP0;
+    FVector2D ScreenP0;
     UGameplayStatics::ProjectWorldToScreen(&InPlayerController, P0, ScreenP0);
 
     float MinDistanceSqr = FLT_MAX;
@@ -163,14 +163,14 @@ void DrawGizmoText(const ImVec2& Position, ImU32 Color, const char* Text)
 bool RenderComponent(const char* Label, double* Value, double Reset)
 {
     ImGui::TableNextColumn();
-	ImGui::PushItemWidth(-1);
+    ImGui::PushItemWidth(-1);
     bool Result = FCogImguiHelper::DragDouble(Label, Value, 0.1f, 0.0f, 0.0f, "%.1f");
-	if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
-	{
+    if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+    {
         *Value = Reset;
         Result = true;
-	}
-	ImGui::PopItemWidth();
+    }
+    ImGui::PopItemWidth();
     return Result;
 }
 
@@ -240,7 +240,7 @@ bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
     const float GizmoScale = Settings.GizmoScale * ScaleToKeepGizmoScreenSizeConstant;
 
     const FQuat RotX = Settings.GizmoUseLocalSpace ? InOutTransform.GetRotation() : FQuat(FVector(0.0f, 0.0f, 1.0f), 0.0f);
-    const FQuat RotY = RotX * FQuat(FVector(0.0f, 0.0f,-1.0f), UE_HALF_PI);
+    const FQuat RotY = RotX * FQuat(FVector(0.0f, 0.0f, -1.0f), UE_HALF_PI);
     const FQuat RotZ = RotX * FQuat(FVector(0.0f, 1.0f, 0.0f), UE_HALF_PI);
 
     const FVector UnitAxisX = Settings.GizmoUseLocalSpace ? RotX.GetAxisX() : FVector::XAxisVector;
@@ -255,9 +255,9 @@ bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
     const ImVec2 ImMousePos = ImGui::GetMousePos() - Viewport->Pos;
     const FVector2D MousePos = FCogImguiHelper::ToFVector2D(ImMousePos);
 
-    const FColor GizmoAxisColorsZLow[]      = { Settings.GizmoAxisColorsZLowX,         Settings.GizmoAxisColorsZLowY,         Settings.GizmoAxisColorsZLowZ,         Settings.GizmoAxisColorsZLowW };
-    const FColor GizmoAxisColorsZHigh[]     = { Settings.GizmoAxisColorsZHighX,        Settings.GizmoAxisColorsZHighY,        Settings.GizmoAxisColorsZHighZ,        Settings.GizmoAxisColorsZHighW };
-    const FColor GizmoAxisColorsSelection[] = { Settings.GizmoAxisColorsSelectionX,    Settings.GizmoAxisColorsSelectionY,    Settings.GizmoAxisColorsSelectionZ,    Settings.GizmoAxisColorsSelectionW };
+    const FColor GizmoAxisColorsZLow[]  = {Settings.GizmoAxisColorsZLowX, Settings.GizmoAxisColorsZLowY, Settings.GizmoAxisColorsZLowZ, Settings.GizmoAxisColorsZLowW};
+    const FColor GizmoAxisColorsZHigh[] = {Settings.GizmoAxisColorsZHighX, Settings.GizmoAxisColorsZHighY, Settings.GizmoAxisColorsZHighZ, Settings.GizmoAxisColorsZHighW};
+    const FColor GizmoAxisColorsSelection[] = {Settings.GizmoAxisColorsSelectionX, Settings.GizmoAxisColorsSelectionY, Settings.GizmoAxisColorsSelectionZ, Settings.GizmoAxisColorsSelectionW};
 
     FCogDebug_GizmoElement GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::MAX)];
     for (FCogDebug_GizmoElement& GizmoElement : GizmoElements)
@@ -267,35 +267,35 @@ bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
 
     if (EnumHasAnyFlags(Flags, ECogDebug_GizmoFlags::NoTranslationAxis) == false)
     {
-        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::MoveX)] = { ECogDebug_GizmoType::MoveAxis, ECogDebug_GizmoAxis::X, FVector::XAxisVector, UnitAxisX, RotX, GizmoCenter + UnitAxisX * Settings.GizmoTranslationAxisLength * GizmoScale };
-        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::MoveY)] = { ECogDebug_GizmoType::MoveAxis, ECogDebug_GizmoAxis::Y, FVector::YAxisVector, UnitAxisY, RotY, GizmoCenter + UnitAxisY * Settings.GizmoTranslationAxisLength * GizmoScale };
-        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::MoveZ)] = { ECogDebug_GizmoType::MoveAxis, ECogDebug_GizmoAxis::Z, FVector::ZAxisVector, UnitAxisZ, RotZ, GizmoCenter + UnitAxisZ * Settings.GizmoTranslationAxisLength * GizmoScale };
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::MoveX)] = {ECogDebug_GizmoType::MoveAxis, ECogDebug_GizmoAxis::X, FVector::XAxisVector, UnitAxisX, RotX, GizmoCenter + UnitAxisX * Settings.GizmoTranslationAxisLength * GizmoScale};
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::MoveY)] = {ECogDebug_GizmoType::MoveAxis, ECogDebug_GizmoAxis::Y, FVector::YAxisVector, UnitAxisY, RotY, GizmoCenter + UnitAxisY * Settings.GizmoTranslationAxisLength * GizmoScale};
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::MoveZ)] = {ECogDebug_GizmoType::MoveAxis, ECogDebug_GizmoAxis::Z, FVector::ZAxisVector, UnitAxisZ, RotZ, GizmoCenter + UnitAxisZ * Settings.GizmoTranslationAxisLength * GizmoScale};
     }
 
     if (EnumHasAnyFlags(Flags, ECogDebug_GizmoFlags::NoTranslationPlane) == false)
     {
-        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::MoveXY)] = { ECogDebug_GizmoType::MovePlane, ECogDebug_GizmoAxis::Z, FVector::ZAxisVector, UnitAxisZ, RotZ, GizmoCenter + ((UnitAxisX + UnitAxisY) * Settings.GizmoTranslationPlaneOffset * GizmoScale) };
-        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::MoveXZ)] = { ECogDebug_GizmoType::MovePlane, ECogDebug_GizmoAxis::Y, FVector::YAxisVector, UnitAxisY, RotY, GizmoCenter + ((UnitAxisX + UnitAxisZ) * Settings.GizmoTranslationPlaneOffset * GizmoScale) };
-        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::MoveYZ)] = { ECogDebug_GizmoType::MovePlane, ECogDebug_GizmoAxis::X, FVector::XAxisVector, UnitAxisX, RotX, GizmoCenter + ((UnitAxisY + UnitAxisZ) * Settings.GizmoTranslationPlaneOffset * GizmoScale) };
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::MoveXY)] = {ECogDebug_GizmoType::MovePlane, ECogDebug_GizmoAxis::Z, FVector::ZAxisVector, UnitAxisZ, RotZ, GizmoCenter + ((UnitAxisX + UnitAxisY) * Settings.GizmoTranslationPlaneOffset * GizmoScale)};
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::MoveXZ)] = {ECogDebug_GizmoType::MovePlane, ECogDebug_GizmoAxis::Y, FVector::YAxisVector, UnitAxisY, RotY, GizmoCenter + ((UnitAxisX + UnitAxisZ) * Settings.GizmoTranslationPlaneOffset * GizmoScale)};
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::MoveYZ)] = {ECogDebug_GizmoType::MovePlane, ECogDebug_GizmoAxis::X, FVector::XAxisVector, UnitAxisX, RotX, GizmoCenter + ((UnitAxisY + UnitAxisZ) * Settings.GizmoTranslationPlaneOffset * GizmoScale)};
     }
 
     if (EnumHasAnyFlags(Flags, ECogDebug_GizmoFlags::NoRotation) == false)
     {
-        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::RotateX)] = { ECogDebug_GizmoType::Rotate, ECogDebug_GizmoAxis::X, FVector::XAxisVector, UnitAxisX, RotX, FVector::ZeroVector };
-        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::RotateY)] = { ECogDebug_GizmoType::Rotate, ECogDebug_GizmoAxis::Y, FVector::YAxisVector, UnitAxisY, RotY, FVector::ZeroVector };
-        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::RotateZ)] = { ECogDebug_GizmoType::Rotate, ECogDebug_GizmoAxis::Z, FVector::ZAxisVector, UnitAxisZ, RotZ, FVector::ZeroVector };
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::RotateX)] = {ECogDebug_GizmoType::Rotate, ECogDebug_GizmoAxis::X, FVector::XAxisVector, UnitAxisX, RotX, FVector::ZeroVector};
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::RotateY)] = {ECogDebug_GizmoType::Rotate, ECogDebug_GizmoAxis::Y, FVector::YAxisVector, UnitAxisY, RotY, FVector::ZeroVector};
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::RotateZ)] = {ECogDebug_GizmoType::Rotate, ECogDebug_GizmoAxis::Z, FVector::ZAxisVector, UnitAxisZ, RotZ, FVector::ZeroVector};
     }
 
     if (EnumHasAnyFlags(Flags, ECogDebug_GizmoFlags::NoScaleUniform) == false)
     {
-        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::ScaleXYZ)] = { ECogDebug_GizmoType::ScaleUniform, ECogDebug_GizmoAxis::MAX, FVector::OneVector, FVector::OneVector, RotX, GizmoCenter };
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::ScaleXYZ)] = {ECogDebug_GizmoType::ScaleUniform, ECogDebug_GizmoAxis::MAX, FVector::OneVector, FVector::OneVector, RotX, GizmoCenter};
     }
 
     if (EnumHasAnyFlags(Flags, ECogDebug_GizmoFlags::NoScaleAxis) == false)
     {
-        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::ScaleX)] = { ECogDebug_GizmoType::ScaleAxis, ECogDebug_GizmoAxis::X, FVector::XAxisVector, UnitAxisX, RotX, GizmoCenter + UnitAxisX * Settings.GizmoScaleBoxOffset * GizmoScale };
-        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::ScaleY)] = { ECogDebug_GizmoType::ScaleAxis, ECogDebug_GizmoAxis::Y, FVector::YAxisVector, UnitAxisY, RotY, GizmoCenter + UnitAxisY * Settings.GizmoScaleBoxOffset * GizmoScale };
-        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::ScaleZ)] = { ECogDebug_GizmoType::ScaleAxis, ECogDebug_GizmoAxis::Z, FVector::ZAxisVector, UnitAxisZ, RotZ, GizmoCenter + UnitAxisZ * Settings.GizmoScaleBoxOffset * GizmoScale };
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::ScaleX)] = {ECogDebug_GizmoType::ScaleAxis, ECogDebug_GizmoAxis::X, FVector::XAxisVector, UnitAxisX, RotX, GizmoCenter + UnitAxisX * Settings.GizmoScaleBoxOffset * GizmoScale};
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::ScaleY)] = {ECogDebug_GizmoType::ScaleAxis, ECogDebug_GizmoAxis::Y, FVector::YAxisVector, UnitAxisY, RotY, GizmoCenter + UnitAxisY * Settings.GizmoScaleBoxOffset * GizmoScale};
+        GizmoElements[static_cast<uint8>(ECogDebug_GizmoElementType::ScaleZ)] = {ECogDebug_GizmoType::ScaleAxis, ECogDebug_GizmoAxis::Z, FVector::ZAxisVector, UnitAxisZ, RotZ, GizmoCenter + UnitAxisZ * Settings.GizmoScaleBoxOffset * GizmoScale};
     }
 
     ECogDebug_GizmoElementType HoveredElementType = ECogDebug_GizmoElementType::MAX;
@@ -340,7 +340,7 @@ bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
                     break;
                 }
 
-            	default:;
+                default: ;
             }
 
             if (DistanceToMouse < Settings.GizmoCursorSelectionThreshold && DistanceToMouse < MinDistanceToMouse)
@@ -394,7 +394,7 @@ bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
                 break;
             }
 
-			default:
+            default:
                 break;
         }
     }
@@ -409,7 +409,7 @@ bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
             const FRotationTranslationMatrix Matrix(FRotator(90.0f, 0, 0), GroundHit.ImpactPoint);
             FCogDebugDrawHelper::DrawArc(World, Matrix, Settings.GizmoGroundRaycastCircleRadius, Settings.GizmoGroundRaycastCircleRadius, 0.0f, 360.0f, 24, Settings.GizmoGroundRaycastCircleColor, false, 0.0f, Settings.GizmoZLow, ThicknessZLow);
         }
-		DrawDebugLine(World, GizmoCenter, Bottom, Settings.GizmoGroundRaycastColor, false, 0.0f, Settings.GizmoZLow, ThicknessZLow);
+        DrawDebugLine(World, GizmoCenter, Bottom, Settings.GizmoGroundRaycastColor, false, 0.0f, Settings.GizmoZLow, ThicknessZLow);
     }
 
     if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
@@ -418,7 +418,7 @@ bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
     }
     else if (DraggedElementType != ECogDebug_GizmoElementType::MAX)
     {
-		if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
         {
             InOutTransform = InitialTransform;
             DraggedElementType = ECogDebug_GizmoElementType::MAX;
@@ -429,7 +429,7 @@ bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
 
             switch (DraggedElement.Type)
             {
-                case ECogDebug_GizmoType::MoveAxis: 
+                case ECogDebug_GizmoType::MoveAxis:
                 {
                     const FVector CursorOnLine = GetMouseCursorOnLine(InPlayerController, InitialTransform.GetTranslation(), DraggedElement.Direction, MousePos - CursorOffset);
                     const float Delta = FVector::DotProduct(DraggedElement.Direction, CursorOnLine - InitialTransform.GetTranslation());
@@ -472,8 +472,8 @@ bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
                     DrawGizmoText(FCogImguiHelper::ToImVec2(Center2D), FCogImguiHelper::ToImU32(Settings.GizmoTextColor), StringCast<ANSICHAR>(*Text).Get());
 
                     //DrawDebugPoint(World, InitialTransform.GetTranslation(), 5.0f, FColor::White);
-					//DrawDebugLine(World, InitialTransform.GetTranslation(), InitialTransform.GetTranslation() + WorldDeltaU, FColor::White);
-					//DrawDebugLine(World, InitialTransform.GetTranslation() + WorldDeltaU, InitialTransform.GetTranslation() + WorldDeltaU + WorldDeltaV, FColor::White);
+                    //DrawDebugLine(World, InitialTransform.GetTranslation(), InitialTransform.GetTranslation() + WorldDeltaU, FColor::White);
+                    //DrawDebugLine(World, InitialTransform.GetTranslation() + WorldDeltaU, InitialTransform.GetTranslation() + WorldDeltaU + WorldDeltaV, FColor::White);
 
                     break;
                 }
@@ -485,7 +485,7 @@ bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
                     const float NormalizedAngle = FRotator::NormalizeAxis(DragAmount * Settings.GizmoRotationSpeed);
                     const float SnappedAngle = FMath::GridSnap(NormalizedAngle, Settings.GizmoRotationSnapEnable ? Settings.GizmoRotationSnapValue : 0.0f);
                     const FQuat RotDelta(-DraggedElement.Axis, FMath::DegreesToRadians(SnappedAngle));
-					const FQuat NewRot = (Settings.GizmoUseLocalSpace) ? InitialTransform.GetRotation() * RotDelta : RotDelta * InitialTransform.GetRotation();
+                    const FQuat NewRot = (Settings.GizmoUseLocalSpace) ? InitialTransform.GetRotation() * RotDelta : RotDelta * InitialTransform.GetRotation();
                     InOutTransform.SetRotation(NewRot);
                     Result = true;
 
@@ -526,84 +526,136 @@ bool FCogDebug_Gizmo::Draw(const char* Id, const APlayerController& InPlayerCont
                     break;
                 }
 
-                default: 
+                default:
                     break;
             }
-            
         }
     }
     else if (HoveredElementType != ECogDebug_GizmoElementType::MAX)
     {
-		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
         {
-			DraggedElementType = HoveredElementType;
+            DraggedElementType = HoveredElementType;
             CursorOffset = MousePos - Center2D;
             InitialTransform = InOutTransform;
         }
-        //else if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
-        //{
-        //    ImGui::OpenPopup(Id);
-        //}
+        else if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+        {
+            if (Settings.GizmoSupportContextMenu)
+            {
+                ImGui::OpenPopup(Id);
+            }
+        }
     }
 
-    //if (ImGui::BeginPopup(Id))
-    //{
-    //    FVector Translation = InOutTransform.GetTranslation();
-    //    FRotator Rotation = InOutTransform.GetRotation().Rotator();
-    //    FVector Scale = InOutTransform.GetScale3D();
+    if (Settings.GizmoSupportContextMenu)
+    {
+        if (ImGui::BeginPopup(Id))
+        {
+            FVector Translation = InOutTransform.GetTranslation();
+            FRotator Rotation = InOutTransform.GetRotation().Rotator();
+            FVector Scale = InOutTransform.GetScale3D();
 
-    //    ImGui::Checkbox("Local Space", &Settings.GizmoUseLocalSpace);
+            ImGui::Checkbox("Local Space", &Settings.GizmoUseLocalSpace);
 
-    //    ImGui::Separator();
+            ImGui::Separator();
 
-    //    ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(1.0f, 1.0f));
+            ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(1.0f, 1.0f));
 
-    //    if (ImGui::BeginTable("Pools", 6, ImGuiTableFlags_SizingFixedFit))
-    //    {
-    //        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFontSize() * 5);
-    //        ImGui::TableSetupColumn("X", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFontSize() * 4);
-    //        ImGui::TableSetupColumn("Y", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFontSize() * 4);
-    //        ImGui::TableSetupColumn("Z", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFontSize() * 4);
-    //        ImGui::TableSetupColumn("SnapEnable", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFontSize() * 4);
-    //        ImGui::TableSetupColumn("Snap", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFontSize() * 3);
+            if (ImGui::BeginTable("Pools", 6, ImGuiTableFlags_SizingFixedFit))
+            {
+                ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFontSize() * 5);
+                ImGui::TableSetupColumn("X", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFontSize() * 4);
+                ImGui::TableSetupColumn("Y", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFontSize() * 4);
+                ImGui::TableSetupColumn("Z", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFontSize() * 4);
+                ImGui::TableSetupColumn("SnapEnable", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFontSize() * 4);
+                ImGui::TableSetupColumn("Snap", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFontSize() * 3);
 
-    //        ImGui::PushID("Location");
-    //        ImGui::TableNextRow();
-    //        ImGui::TableNextColumn();
-    //        ImGui::Text("Location");
-    //        if (RenderComponent("##X", &Translation.X, 0.0)) { InOutTransform.SetTranslation(Translation); }
-    //        if (RenderComponent("##Y", &Translation.Y, 0.0)) { InOutTransform.SetTranslation(Translation); }
-    //        if (RenderComponent("##Z", &Translation.Z, 0.0)) { InOutTransform.SetTranslation(Translation); }
-    //        RenderSnap(&Settings.GizmoTranslationSnapEnable, &Settings.GizmoTranslationSnapValue);
-    //        ImGui::PopID();
+                ImGui::PushID("Location");
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("Location");
+                
+                bool Translate = false;
+                Translate |= RenderComponent("##X", &Translation.X, 0.0);
+                Translate |=  RenderComponent("##Y", &Translation.Y, 0.0);
+                Translate |=  RenderComponent("##Z", &Translation.Z, 0.0);
+                if (Translate)
+                {
+                    if (Settings.GizmoTranslationSnapEnable)
+                    {
+                        Translation.X = FMath::GridSnap(Translation.X, Settings.GizmoTranslationSnapValue);
+                        Translation.Y = FMath::GridSnap(Translation.Y, Settings.GizmoTranslationSnapValue);
+                        Translation.Z = FMath::GridSnap(Translation.Z, Settings.GizmoTranslationSnapValue);
+                    }
+                    
+                    InOutTransform.SetTranslation(Translation);
+                    Result = true;
+                }
+                
+                RenderSnap(&Settings.GizmoTranslationSnapEnable, &Settings.GizmoTranslationSnapValue);
+                ImGui::PopID();
 
-    //        ImGui::PushID("Rotation");
-    //        ImGui::TableNextRow();
-    //        ImGui::TableNextColumn();
-    //        ImGui::Text("Rotation");
-    //        if (RenderComponent("##X", &Rotation.Yaw, 0.0))   { InOutTransform.SetRotation(Rotation.Quaternion()); }
-    //        if (RenderComponent("##Y", &Rotation.Pitch, 0.0)) { InOutTransform.SetRotation(Rotation.Quaternion()); }
-    //        if (RenderComponent("##Z", &Rotation.Roll, 0.0))  { InOutTransform.SetRotation(Rotation.Quaternion()); }
-    //        RenderSnap(&Settings.GizmoRotationSnapEnable, &Settings.GizmoRotationSnapValue);
-    //        ImGui::PopID();
+                ImGui::PushID("Rotation");
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("Rotation");
 
-    //        ImGui::PushID("Scale");
-    //        ImGui::TableNextRow();
-    //        ImGui::TableNextColumn();
-    //        ImGui::Text("Scale");
-    //        if (RenderComponent("##X", &Scale.X, 0.0)) { InOutTransform.SetScale3D(Scale); }
-    //        if (RenderComponent("##Y", &Scale.Y, 0.0)) { InOutTransform.SetScale3D(Scale); }
-    //        if (RenderComponent("##Z", &Scale.Z, 0.0)) { InOutTransform.SetScale3D(Scale); }
-    //        RenderSnap(&Settings.GizmoScaleSnapEnable, &Settings.GizmoScaleSnapValue);
-    //        ImGui::PopID();
+                bool Rotate = false;
+                Rotate |= RenderComponent("##X", &Rotation.Yaw, 0.0);
+                Rotate |= RenderComponent("##Y", &Rotation.Pitch, 0.0); 
+                Rotate |= RenderComponent("##Z", &Rotation.Roll, 0.0); 
 
-    //        ImGui::EndTable();
-    //    }
+                if (Rotate)
+                {
+                    if (Settings.GizmoRotationSnapEnable)
+                    {
+                        Rotation.Yaw = FMath::GridSnap(Rotation.Yaw, Settings.GizmoRotationSnapValue);
+                        Rotation.Pitch = FMath::GridSnap(Rotation.Pitch, Settings.GizmoRotationSnapValue);
+                        Rotation.Roll = FMath::GridSnap(Rotation.Roll, Settings.GizmoRotationSnapValue);
+                    }
+                    
+                    InOutTransform.SetRotation(Rotation.Quaternion());
+                    Result = true;
+                }
+                
+                RenderSnap(&Settings.GizmoRotationSnapEnable, &Settings.GizmoRotationSnapValue);
+                ImGui::PopID();
 
-    //    ImGui::PopStyleVar();
+                ImGui::PushID("Scale");
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("Scale");
 
-    //    ImGui::EndPopup();
-    //}
+                bool Rescale = false;
+                Rescale |= RenderComponent("##X", &Scale.X, 1.0);
+                Rescale |= RenderComponent("##Y", &Scale.Y, 1.0);
+                Rescale |= RenderComponent("##Z", &Scale.Z, 1.0);
+
+                if (Rescale)
+                {
+                    if (Settings.GizmoScaleSnapEnable)
+                    {
+                        Scale.X = FMath::GridSnap(Scale.X, Settings.GizmoScaleSnapValue);
+                        Scale.Y = FMath::GridSnap(Scale.Y, Settings.GizmoScaleSnapValue);
+                        Scale.Z = FMath::GridSnap(Scale.Z, Settings.GizmoScaleSnapValue);
+                    }
+                    
+                    InOutTransform.SetScale3D(Scale);
+                    Result = true;
+                }
+                
+                RenderSnap(&Settings.GizmoScaleSnapEnable, &Settings.GizmoScaleSnapValue);
+                ImGui::PopID();
+
+                ImGui::EndTable();
+            }
+
+            ImGui::PopStyleVar();
+
+            ImGui::EndPopup();
+        }
+    }
 
     return Result;
 }

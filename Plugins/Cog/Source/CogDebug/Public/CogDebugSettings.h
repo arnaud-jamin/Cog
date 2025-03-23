@@ -87,6 +87,9 @@ struct FCogDebugSettings
     float GizmoScale = 1.0f;
 
     UPROPERTY(Config)
+    bool GizmoSupportContextMenu = true;
+    
+    UPROPERTY(Config)
     bool GizmoUseLocalSpace = false;
 
     UPROPERTY(Config)
@@ -276,76 +279,58 @@ struct FCogDebugSettings
     FColor ChannelColorDestructible = FColor(255, 255, 0, 0);
 
     UPROPERTY(Config)
-    FColor ChannelColorEngineTraceChannel1 = FColor(0, 0, 0, 0);
+    FColor ChannelColorGameTraceChannel1 = FColor(255, 255, 255, 5);
 
     UPROPERTY(Config)
-    FColor ChannelColorEngineTraceChannel2 = FColor(0, 0, 0, 0);
+    FColor ChannelColorGameTraceChannel2 = FColor(255, 255, 255, 5);
 
     UPROPERTY(Config)
-    FColor ChannelColorEngineTraceChannel3 = FColor(0, 0, 0, 0);
+    FColor ChannelColorGameTraceChannel3 = FColor(255, 255, 255, 5);
 
     UPROPERTY(Config)
-    FColor ChannelColorEngineTraceChannel4 = FColor(0, 0, 0, 0);
+    FColor ChannelColorGameTraceChannel4 = FColor(255, 255, 255, 5);
 
     UPROPERTY(Config)
-    FColor ChannelColorEngineTraceChannel5 = FColor(0, 0, 0, 0);
+    FColor ChannelColorGameTraceChannel5 = FColor(255, 255, 255, 5);
 
     UPROPERTY(Config)
-    FColor ChannelColorEngineTraceChannel6 = FColor(0, 0, 0, 0);
+    FColor ChannelColorGameTraceChannel6 = FColor(255, 255, 255, 5);
 
     UPROPERTY(Config)
-    FColor ChannelColorGameTraceChannel1 = FColor(255, 105, 0, 5);
+    FColor ChannelColorGameTraceChannel7 = FColor(255, 255, 255, 5);
 
     UPROPERTY(Config)
-    FColor ChannelColorGameTraceChannel2 = FColor(255, 30, 0, 5);
+    FColor ChannelColorGameTraceChannel8 = FColor(255, 255, 255, 5);
 
     UPROPERTY(Config)
-    FColor ChannelColorGameTraceChannel3 = FColor(0, 0, 0, 0);
+    FColor ChannelColorGameTraceChannel9 = FColor(255, 255, 255, 5);
 
     UPROPERTY(Config)
-    FColor ChannelColorGameTraceChannel4 = FColor(0, 0, 0, 0);
+    FColor ChannelColorGameTraceChannel10 = FColor(255, 255, 255, 5);
 
     UPROPERTY(Config)
-    FColor ChannelColorGameTraceChannel5 = FColor(0, 0, 0, 0);
+    FColor ChannelColorGameTraceChannel11 = FColor(255, 255, 255, 5);
 
     UPROPERTY(Config)
-    FColor ChannelColorGameTraceChannel6 = FColor(0, 0, 0, 0);
+    FColor ChannelColorGameTraceChannel12 = FColor(255, 255, 255, 5);
 
     UPROPERTY(Config)
-    FColor ChannelColorGameTraceChannel7 = FColor(0, 0, 0, 0);
+    FColor ChannelColorGameTraceChannel13 = FColor(255, 255, 255, 5);
 
     UPROPERTY(Config)
-    FColor ChannelColorGameTraceChannel8 = FColor(0, 0, 0, 0);
+    FColor ChannelColorGameTraceChannel14 = FColor(255, 255, 255, 5);
 
     UPROPERTY(Config)
-    FColor ChannelColorGameTraceChannel9 = FColor(0, 0, 0, 0);
+    FColor ChannelColorGameTraceChannel15 = FColor(255, 255, 255, 5);
 
     UPROPERTY(Config)
-    FColor ChannelColorGameTraceChannel10 = FColor(0, 0, 0, 0);
+    FColor ChannelColorGameTraceChannel16 = FColor(255, 255, 255, 5);
 
     UPROPERTY(Config)
-    FColor ChannelColorGameTraceChannel11 = FColor(0, 0, 0, 0);
+    FColor ChannelColorGameTraceChannel17 = FColor(255, 255, 255, 5);
 
     UPROPERTY(Config)
-    FColor ChannelColorGameTraceChannel12 = FColor(0, 0, 0, 0);
-
-    UPROPERTY(Config)
-    FColor ChannelColorGameTraceChannel13 = FColor(0, 0, 0, 0);
-
-    UPROPERTY(Config)
-    FColor ChannelColorGameTraceChannel14 = FColor(0, 0, 0, 0);
-
-    UPROPERTY(Config)
-    FColor ChannelColorGameTraceChannel15 = FColor(0, 0, 0, 0);
-
-    UPROPERTY(Config)
-    FColor ChannelColorGameTraceChannel16 = FColor(0, 0, 0, 0);
-
-    UPROPERTY(Config)
-    FColor ChannelColorGameTraceChannel17 = FColor(0, 0, 0, 0);
-
-    UPROPERTY(Config)
-    FColor ChannelColorGameTraceChannel18 = FColor(0, 0, 0, 0);
+    FColor ChannelColorGameTraceChannel18 = FColor(255, 255, 255, 5);
 
     UPROPERTY(Config)
     TArray<FString> SecondaryBoneWildcards = {

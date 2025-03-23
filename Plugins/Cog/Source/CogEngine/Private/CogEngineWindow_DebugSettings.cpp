@@ -41,6 +41,9 @@ void FCogEngineWindow_DebugSettings::PreSaveConfig()
 //--------------------------------------------------------------------------------------------------------------------------
 void RenderCollisionChannelColor(const UCollisionProfile& CollisionProfile, FColor& Color, ECollisionChannel Channel, ImGuiColorEditFlags ColorEditFlags)
 {
+	if (CollisionProfile.ConvertToObjectType(Channel) == TraceTypeQuery_MAX && CollisionProfile.ConvertToTraceType(Channel) == TraceTypeQuery_MAX)
+	{ return; }
+
     const FString ChannelName = CollisionProfile.ReturnChannelNameFromContainerIndex(Channel).ToString();
     FCogImguiHelper::ColorEdit4(StringCast<ANSICHAR>(*ChannelName).Get(), Color, ColorEditFlags);
 }
@@ -169,8 +172,11 @@ void FCogEngineWindow_DebugSettings::RenderContent()
 
         ImGui::Checkbox("Use Local Space", &Settings.GizmoUseLocalSpace);
 
+    	ImGui::Checkbox("Support Context Menu", &Settings.GizmoSupportContextMenu);
+    	ImGui::SetItemTooltip("Does right clicking on the gizmo displays a context menu ?");
+
         FCogWidgets::SetNextItemToShortWidth();
-        ImGui::DragFloat("Gizmo Scale", &Settings.GizmoScale, 0.1f, 0.1f, 10.0f, "%.1f");
+        ImGui::DragFloat("Scale", &Settings.GizmoScale, 0.1f, 0.1f, 10.0f, "%.1f");
         ImGui::SetItemTooltip("The scale of the gizmo.");
 
         FCogWidgets::SetNextItemToShortWidth();
@@ -249,7 +255,7 @@ void FCogEngineWindow_DebugSettings::RenderContent()
 
         FCogWidgets::SetNextItemToShortWidth();
         ECollisionChannel Channel = Settings.GizmoGroundRaycastChannel.GetValue();
-        if (FCogWidgets::ComboCollisionChannel("Channel", Channel))
+        if (FCogWidgets::ComboTraceChannel("Channel", Channel))
         {
             Settings.GizmoGroundRaycastChannel = Channel;
         }
@@ -292,12 +298,7 @@ void FCogEngineWindow_DebugSettings::RenderContent()
             RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorPhysicsBody, ECC_PhysicsBody, ColorEditFlags);
             RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorVehicle, ECC_Vehicle, ColorEditFlags);
             RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorDestructible, ECC_Destructible, ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorEngineTraceChannel1, ECC_EngineTraceChannel1, ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorEngineTraceChannel2, ECC_EngineTraceChannel2, ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorEngineTraceChannel3, ECC_EngineTraceChannel3, ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorEngineTraceChannel4, ECC_EngineTraceChannel4, ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorEngineTraceChannel5, ECC_EngineTraceChannel5, ColorEditFlags);
-            RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorEngineTraceChannel6, ECC_EngineTraceChannel6, ColorEditFlags);
+        	
             RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel1, ECC_GameTraceChannel1, ColorEditFlags);
             RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel2, ECC_GameTraceChannel2, ColorEditFlags);
             RenderCollisionChannelColor(*CollisionProfile, Settings.ChannelColorGameTraceChannel3, ECC_GameTraceChannel3, ColorEditFlags);
