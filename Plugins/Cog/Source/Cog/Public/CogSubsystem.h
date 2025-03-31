@@ -117,7 +117,7 @@ protected:
     
     virtual void TryInitialize(UWorld& World);
 
-    virtual void UpdateServerPlayerControllers(UWorld& World);
+    virtual void UpdatePlayerControllers(UWorld& World);
 
     virtual void InitializeWindow(FCogWindow* Window);
 
@@ -133,7 +133,7 @@ protected:
 
     virtual void RenderMenuItemHelp(FCogWindow& Window);
 
-    void SetLocalPlayerController(APlayerController* PlayerController);
+    void SetLocalPlayerController(APlayerController& PlayerController);
 
     virtual void ToggleInputMode();
 
@@ -183,7 +183,7 @@ protected:
     mutable TArray<TObjectPtr<const UObject>> Assets;
 
     TArray<TWeakObjectPtr<APlayerController>> ServerPlayerControllers;
-
+    
     TWeakObjectPtr<APlayerController> LocalPlayerController;
 
     TWeakObjectPtr<UInputComponent> InputComponent;

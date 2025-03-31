@@ -244,15 +244,18 @@ void UCogSubsystem::Tick(UWorld* InTickedWorld, ELevelTick InTickType, float InD
 
     FCogImGuiContextScope ImGuiContextScope(Context);
 
-    UpdateServerPlayerControllers(*World);
-    
-    if (UPlayerInput* PlayerInput = (LocalPlayerController != nullptr) ? LocalPlayerController->PlayerInput : nullptr)
+    UpdatePlayerControllers(*World);
+
+    if (auto* LocalPlayerControllerPtr = LocalPlayerController.Get())
     {
-        //------------------------------------------------------------------
-        // We must wait for the player input to be valid to disable
-        // DebugExecBindings  conflicting with our shortcuts.
-        //------------------------------------------------------------------
-        TryDisableCommandsConflictingWithShortcuts(PlayerInput);
+        if (UPlayerInput* PlayerInput = LocalPlayerControllerPtr->PlayerInput)
+        {
+            //------------------------------------------------------------------
+            // We must wait for the player input to be valid to disable
+            // DebugExecBindings  conflicting with our shortcuts.
+            //------------------------------------------------------------------
+            TryDisableCommandsConflictingWithShortcuts(PlayerInput);
+        }
     }
     
     if (LayoutToLoad != -1)
@@ -284,49 +287,51 @@ void UCogSubsystem::RequestDisableCommandsConflictingWithShortcuts()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogSubsystem::SetLocalPlayerController(APlayerController* PlayerController)
+void UCogSubsystem::SetLocalPlayerController(APlayerController& PlayerController)
 {
-    if (LocalPlayerController == PlayerController)
+    if (LocalPlayerController.Get() == &PlayerController)
     { return; }
+
+    LocalPlayerController = &PlayerController;
+    InputComponent.Reset();
     
-    LocalPlayerController = PlayerController;
-
-    if (LocalPlayerController == nullptr)
-    { return; }
-
-    UInputComponent* InputComponentPtr = NewObject<UInputComponent>(PlayerController, TEXT("Cog_Input"));
-    InputComponent = InputComponentPtr;
-    if (InputComponentPtr)
+    if (UInputComponent* InputComponentPtr = NewObject<UInputComponent>(&PlayerController, TEXT("Cog_Input")))
     {
-        PlayerController->PushInputComponent(InputComponentPtr);
+        InputComponent = InputComponentPtr;
+        PlayerController.PushInputComponent(InputComponentPtr);
     }
                 
     for (FCogShortcut& Shortcut : Shortcuts)
     {
         BindShortcut(Shortcut);
     }
+
+    if (LocalPlayerController->PlayerInput != nullptr)
+    {
+        FCogImguiInputHelper::DisableCommandsConflictingWithShortcuts(*LocalPlayerController->PlayerInput);
+    }
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogSubsystem::UpdateServerPlayerControllers(UWorld& World)
+void UCogSubsystem::UpdatePlayerControllers(UWorld& World)
 {
+    if (APlayerController* PlayerController = GetGameInstance()->GetFirstLocalPlayerController())
+    {
+        SetLocalPlayerController(*PlayerController);
+    }
+    
     TArray<UCogDebugPluginSubsystem*> PluginSubsystems;
 
     ServerPlayerControllers.RemoveAll([] (TWeakObjectPtr<APlayerController> PlayerController)
     {
         return PlayerController.IsValid() == false;
     });
-    
+
     for (FConstPlayerControllerIterator It = World.GetPlayerControllerIterator(); It; ++It)
     {
         APlayerController* PlayerController = It->Get();
         if (PlayerController == nullptr)
         { continue; }
-
-        if (PlayerController->IsLocalController())
-        {
-            SetLocalPlayerController(PlayerController);
-        }
 
         if (World.GetNetMode() != NM_Client)
         {
@@ -1062,7 +1067,11 @@ bool UCogSubsystem::BindShortcut(FCogShortcut& InShortcut) const
         
     FInputKeyBinding InputBinding(*InputChord, IE_Pressed);
     InputBinding.KeyDelegate.GetDelegateForManualSet() = InShortcut.Delegate;
-    InputComponent.Get()->KeyBindings.Add(InputBinding);
+
+    if (UInputComponent* InputComponentPtr = InputComponent.Get())
+    {
+        InputComponentPtr->KeyBindings.Add(InputBinding);
+    }
     
     InShortcut.InputChord = *InputChord;
 
@@ -1078,13 +1087,13 @@ void UCogSubsystem::RebindShortcut(const UCogCommonConfig& InConfig, const FProp
     UInputComponent* InputComponentPtr = InputComponent.Get();
     if (InputComponentPtr ==  nullptr)
     { return; }
-    
+
     for (auto& KeyBinding : InputComponentPtr->KeyBindings)
     {
         KeyBinding.KeyDelegate.Unbind();
     }
-    InputComponent.Get()->KeyBindings.Empty();
-    
+    InputComponentPtr->KeyBindings.Empty();
+
     for (FCogShortcut& Shortcut : Shortcuts)
     {
         BindShortcut(Shortcut);
