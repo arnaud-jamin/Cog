@@ -60,6 +60,13 @@ void FCogImguiContext::Initialize(UGameViewportClient* InGameViewport)
 
     GameViewport = InGameViewport;
 
+    // ImGui Context must be created before creating widgets as widgets can receive events that uses the ImGui context right away.
+    Context = ImGui::CreateContext();
+    PlotContext = ImPlot::CreateContext();
+    ImGui::SetCurrentContext(Context);
+    ImPlot::SetImGuiContext(Context);
+    ImPlot::SetCurrentContext(PlotContext);
+
     if (GameViewport != nullptr)
     {
         SAssignNew(MainWidget, SCogImguiWidget).Context(this);
@@ -68,12 +75,6 @@ void FCogImguiContext::Initialize(UGameViewportClient* InGameViewport)
         SAssignNew(InputCatcherWidget, SCogImguiInputCatcherWidget).Context(this);
         GameViewport->AddViewportWidgetContent(InputCatcherWidget.ToSharedRef(), -TNumericLimits<int32>::Max());
     }
-
-    Context = ImGui::CreateContext();
-    PlotContext = ImPlot::CreateContext();
-    ImGui::SetCurrentContext(Context);
-    ImPlot::SetImGuiContext(Context);
-    ImPlot::SetCurrentContext(PlotContext);
 
     ImGuiIO& IO = ImGui::GetIO();
     IO.UserData = this;
@@ -209,12 +210,20 @@ void FCogImguiContext::Shutdown()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::OnImGuiWidgetFocusLost()
 {
-    FCogImGuiContextScope ImGuiContextScope(Context, PlotContext);
+    if (bEnableInput == false)
+    { return; }
+    
+    if (GameViewport == nullptr)
+    { return; }
 
-    if (bEnableInput && GameViewport->GetGameViewportWidget()->HasUserFocus(0))
-    {
-        bRetakeFocus = true;
-    }
+    const SViewport* ViewportWidget = GameViewport->GetGameViewportWidget().Get();
+    if (ViewportWidget == nullptr)
+    { return; }
+    
+    if (!ViewportWidget->HasUserFocus(0))
+    { return; }
+
+    bRetakeFocus = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

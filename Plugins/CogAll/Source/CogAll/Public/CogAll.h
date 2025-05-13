@@ -6,5 +6,5 @@ class UCogSubsystem;
 
 namespace Cog
 {
-    void COGALL_API AddAllWindows(UCogSubsystem& CogWindowManager);
+    void COGALL_API AddAllWindows(UCogSubsystem& CogSubsystem);
 }

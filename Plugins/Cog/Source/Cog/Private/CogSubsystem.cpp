@@ -25,9 +25,22 @@ FString UCogSubsystem::SaveLayoutCommand    = TEXT("Cog.SaveLayout");
 FString UCogSubsystem::ResetLayoutCommand   = TEXT("Cog.ResetLayout");
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogSubsystem::Initialize(FSubsystemCollectionBase& Collection)
+bool UCogSubsystem::ShouldCreateSubsystem(UObject* Outer) const
 {
-    Super::Initialize(Collection);
+    if (Super::ShouldCreateSubsystem(Outer) == false)
+    { return false; }
+
+#if ENABLE_COG
+    return true;
+#else
+    return false;
+#endif
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+TStatId UCogSubsystem::GetStatId() const
+{
+    RETURN_QUICK_DECLARE_CYCLE_STAT(UCogSubsystemBase, STATGROUP_Tickables);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -36,12 +49,6 @@ void UCogSubsystem::Deinitialize()
     Shutdown();
 
     Super::Deinitialize();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
-void UCogSubsystem::Activate()
-{
-    FWorldDelegates::OnWorldTickStart.AddUObject(this, &ThisClass::Tick);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -60,7 +67,7 @@ void UCogSubsystem::TryInitialize(UWorld& World)
     Context.Initialize(WorldContext->GameViewport.Get());
 
     FCogImGuiContextScope ImGuiContextScope(Context);
-
+    
     ImGuiSettingsHandler IniHandler;
     IniHandler.TypeName = "Cog";
     IniHandler.TypeHash = ImHashStr("Cog");
@@ -71,14 +78,14 @@ void UCogSubsystem::TryInitialize(UWorld& World)
     IniHandler.WriteAllFn = SettingsHandler_WriteAll;
     IniHandler.UserData = this;
     ImGui::AddSettingsHandler(&IniHandler);
-
+    
     SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 1"));
     SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 2"));
     SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 3"));
     SpaceWindows.Add(AddWindow<FCogWindow_Spacing>("Spacing 4"));
-
-    Settings = GetConfig<UCogWindowConfig_Settings>();
-
+    
+     Settings = GetConfig<UCogWindowConfig_Settings>();
+    
     UCogWindowConfig_Settings* SettingsPtr = Settings.Get();
     AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_ToggleImguiInput).BindLambda([this] () { ToggleInputMode(); });
     AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_LoadLayout1).BindLambda([this] (){ LoadLayout(1); });
@@ -91,14 +98,14 @@ void UCogSubsystem::TryInitialize(UWorld& World)
     AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_SaveLayout4).BindLambda([this] (){ SaveLayout(4); });    
     AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_ResetLayout).BindLambda([this] (){ ResetLayout(); });
     
-    LayoutsWindow = AddWindow<FCogWindow_Layouts>("Window.Layouts");
-    SettingsWindow = AddWindow<FCogWindow_Settings>("Window.Settings");
+     LayoutsWindow = AddWindow<FCogWindow_Layouts>("Window.Layouts");
+     SettingsWindow = AddWindow<FCogWindow_Settings>("Window.Settings");
 
     for (FCogWindow* Window : Windows)
     {
         InitializeWindow(Window);   
     }
-
+    
     FCogConsoleCommandManager::RegisterWorldConsoleCommand(
         *ToggleInputCommand, 
         TEXT("Toggle the input focus between the Game and ImGui"),
@@ -107,7 +114,7 @@ void UCogSubsystem::TryInitialize(UWorld& World)
         {
             ToggleInputMode();
         }));
-
+    
     FCogConsoleCommandManager::RegisterWorldConsoleCommand(
         *DisableInputCommand,
         TEXT("Disable ImGui input"), 
@@ -116,7 +123,7 @@ void UCogSubsystem::TryInitialize(UWorld& World)
         {
             DisableInputMode();
         }));
-
+    
     FCogConsoleCommandManager::RegisterWorldConsoleCommand(
         *ResetLayoutCommand,
         TEXT("Reset the layout."),
@@ -128,7 +135,7 @@ void UCogSubsystem::TryInitialize(UWorld& World)
                 ResetLayout();
             }
         }));
-
+    
     FCogConsoleCommandManager::RegisterWorldConsoleCommand(
         *LoadLayoutCommand,
         TEXT("Load the layout. Cog.LoadLayout <Index>"),
@@ -140,7 +147,7 @@ void UCogSubsystem::TryInitialize(UWorld& World)
                 LoadLayout(FCString::Atoi(*InArgs[0]));
             }
         }));
-
+    
     FCogConsoleCommandManager::RegisterWorldConsoleCommand(
         *SaveLayoutCommand,
         TEXT("Save the layout. Cog.SaveLayout <Index>"),
@@ -167,10 +174,6 @@ void UCogSubsystem::Shutdown()
     // imgui serialize their visibility state in imgui.ini
     // It also save the Cog Settings, so they are saved regularly.
     //------------------------------------------------------------------
-    if (IsInitialized)
-    {
-        Context.Shutdown();
-    }
     
     for (FCogWindow* Window : Windows)
     {
@@ -179,9 +182,12 @@ void UCogSubsystem::Shutdown()
     }
     Windows.Empty();
 
+    if (IsInitialized)
+    {
+        Context.Shutdown();
+    }
+    
     FCogConsoleCommandManager::UnregisterAllWorldConsoleCommands(GetWorld());
-
-    FWorldDelegates::OnWorldTickStart.RemoveAll(this);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -212,18 +218,10 @@ void UCogSubsystem::ReloadAllSettings()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void UCogSubsystem::Tick(UWorld* InTickedWorld, ELevelTick InTickType, float InDeltaTime)
+void UCogSubsystem::Tick(float InDeltaTime)
 {
     UWorld* World = GetWorld();
 
-    //----------------------------------------------------------------------------------------------
-    // The tick currently gets called from a static tick function, which tick for all PIEInstance worlds.
-    // We must not tick for a different world than ours.
-    // TODO: Find a better way to tick the subsystem only for our world.
-    //----------------------------------------------------------------------------------------------
-    if (World != InTickedWorld)
-    { return; }
-    
     //----------------------------------------------------------------------------------------------
     // When changing world the DebugExecBindings can change. 
     //----------------------------------------------------------------------------------------------
@@ -315,11 +313,6 @@ void UCogSubsystem::SetLocalPlayerController(APlayerController& PlayerController
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSubsystem::UpdatePlayerControllers(UWorld& World)
 {
-    if (APlayerController* PlayerController = GetGameInstance()->GetFirstLocalPlayerController())
-    {
-        SetLocalPlayerController(*PlayerController);
-    }
-    
     TArray<UCogDebugPluginSubsystem*> PluginSubsystems;
 
     ServerPlayerControllers.RemoveAll([] (TWeakObjectPtr<APlayerController> PlayerController)
@@ -330,8 +323,13 @@ void UCogSubsystem::UpdatePlayerControllers(UWorld& World)
     for (FConstPlayerControllerIterator It = World.GetPlayerControllerIterator(); It; ++It)
     {
         APlayerController* PlayerController = It->Get();
-        if (PlayerController == nullptr)
+        if (IsValid(PlayerController) == false)
         { continue; }
+
+        if (PlayerController->IsLocalController())
+        {
+            SetLocalPlayerController(*PlayerController);
+        }
 
         if (World.GetNetMode() != NM_Client)
         {
@@ -342,7 +340,7 @@ void UCogSubsystem::UpdatePlayerControllers(UWorld& World)
         
             if (PluginSubsystems.IsEmpty())
             {
-                PluginSubsystems = GetOuterUGameInstance()->GetSubsystemArrayCopy<UCogDebugPluginSubsystem>();
+                PluginSubsystems = World.GetGameInstance()->GetSubsystemArrayCopy<UCogDebugPluginSubsystem>();
             }
         
             for (UCogDebugPluginSubsystem* PluginSubsystem : PluginSubsystems)
@@ -874,7 +872,6 @@ void UCogSubsystem::SettingsHandler_WriteAll(ImGuiContext* Context, ImGuiSetting
 {
     UCogSubsystem* CogSubsystem = static_cast<UCogSubsystem*>(Handler->UserData);
 
-    
     CogSubsystem->SaveAllSettings();
 
     //-----------------------------------------------------------------------------------

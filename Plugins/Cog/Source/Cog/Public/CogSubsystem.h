@@ -5,7 +5,8 @@
 #include "CogImguiContext.h"
 #include "CogWindow_Settings.h"
 #include "imgui.h"
-#include "Engine/GameInstance.h"
+#include "Subsystems/WorldSubsystem.h"
+
 #include "CogSubsystem.generated.h"
 
 class UCogCommonConfig;
@@ -22,25 +23,26 @@ struct FKey;
 
 //--------------------------------------------------------------------------------------------------------------------------
 UCLASS()
-class COG_API UCogSubsystem : public UGameInstanceSubsystem
+class COG_API UCogSubsystem : public UTickableWorldSubsystem
 {
     GENERATED_BODY()
 
 public:
+    virtual bool ShouldCreateSubsystem(UObject* Outer) const override;
 
-    virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+    virtual TStatId GetStatId() const override;
 
     virtual void Deinitialize() override;
 
-    void Activate();
-
-    virtual void SortMainMenu();
+    virtual void Tick(float DeltaTime) override;
 
     virtual void AddWindow(FCogWindow* Window, const FString& Name);
 
     template<class T>
     T* AddWindow(const FString& Name);
-
+    
+    virtual void SortMainMenu();
+    
     virtual FCogWindow* FindWindowByID(ImGuiID ID);
 
     virtual void CloseAllWindows();
@@ -113,8 +115,6 @@ protected:
 
     virtual void Render(float DeltaTime);
 
-    virtual void Tick(UWorld* InTickedWorld, ELevelTick InTickType, float InDeltaTime);
-    
     virtual void TryInitialize(UWorld& World);
 
     virtual void UpdatePlayerControllers(UWorld& World);
