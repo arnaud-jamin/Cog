@@ -38,8 +38,6 @@ public:
 
     virtual void Tick(float DeltaTime) override;
 
-    virtual void Activate();
-    
     virtual void AddWindow(FCogWindow* Window, const FString& Name);
 
     template<class T>
