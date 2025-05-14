@@ -13,7 +13,6 @@
 #include "CogWidgets.h"
 #include "Engine/Engine.h"
 #include "GameFramework/PlayerInput.h"
-#include "HAL/IConsoleManager.h"
 #include "imgui_internal.h"
 #include "Misc/CoreMisc.h"
 #include "NetImgui_Api.h"
@@ -44,6 +43,12 @@ TStatId UCogSubsystem::GetStatId() const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void UCogSubsystem::PostInitialize()
+{
+    Super::PostInitialize();
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void UCogSubsystem::Deinitialize()
 {
     Shutdown();
@@ -54,7 +59,7 @@ void UCogSubsystem::Deinitialize()
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSubsystem::TryInitialize(UWorld& World)
 {
-    if (IsInitialized)
+    if (bIsInitialized)
     { return; }
 
     FWorldContext* WorldContext = GEngine->GetWorldContextFromWorld(&World);
@@ -64,6 +69,8 @@ void UCogSubsystem::TryInitialize(UWorld& World)
     if (WorldContext->GameViewport == nullptr && IsRunningDedicatedServer() == false)
     { return; }
 
+    UE_LOG(LogCogImGui, Verbose, TEXT("UCogSubsystem::TryInitialize | World:%s %p"), *World.GetName(), &World);
+    
     Context.Initialize(WorldContext->GameViewport.Get());
 
     FCogImGuiContextScope ImGuiContextScope(Context);
@@ -161,7 +168,7 @@ void UCogSubsystem::TryInitialize(UWorld& World)
         }));
 
 
-    IsInitialized = true;
+    bIsInitialized = true;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -169,11 +176,10 @@ void UCogSubsystem::Shutdown()
 {
     FCogImGuiContextScope ImGuiContextScope(Context);
 
-    //------------------------------------------------------------------
-    // Destroy ImGui before destroying the windows to make sure 
-    // imgui serialize their visibility state in imgui.ini
-    // It also save the Cog Settings, so they are saved regularly.
-    //------------------------------------------------------------------
+    if (bIsInitialized)
+    {
+        Context.SaveSettings();
+    }
     
     for (FCogWindow* Window : Windows)
     {
@@ -182,7 +188,7 @@ void UCogSubsystem::Shutdown()
     }
     Windows.Empty();
 
-    if (IsInitialized)
+    if (bIsInitialized)
     {
         Context.Shutdown();
     }
@@ -233,8 +239,8 @@ void UCogSubsystem::Tick(float InDeltaTime)
     
     if (World == nullptr)
     { return; }
-
-    if (IsInitialized == false)
+    
+    if (bIsInitialized == false)
     {
         TryInitialize(*World);
         return;
@@ -538,7 +544,7 @@ UCogSubsystem::FMenu* UCogSubsystem::AddMenu(const FString& Name)
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSubsystem::RenderMainMenu()
 {
-    IsRenderingInMainMenu = true;
+    bIsRenderingInMainMenu = true;
 
     //-----------------------------------------------------------------------------------------------
     // Prevent having a small gap on the right of the main menu, where some widgets are displayed
@@ -588,7 +594,7 @@ void UCogSubsystem::RenderMainMenu()
         ImGui::EndMainMenuBar();
     }    
     
-    IsRenderingInMainMenu = false;
+    bIsRenderingInMainMenu = false;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

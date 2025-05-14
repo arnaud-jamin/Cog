@@ -32,10 +32,14 @@ public:
 
     virtual TStatId GetStatId() const override;
 
+    virtual void PostInitialize() override;
+
     virtual void Deinitialize() override;
 
     virtual void Tick(float DeltaTime) override;
 
+    virtual void Activate();
+    
     virtual void AddWindow(FCogWindow* Window, const FString& Name);
 
     template<class T>
@@ -82,7 +86,7 @@ public:
 
     FCogImguiContext& GetContext() { return Context; }
 
-    bool IsRenderingMainMenu() const { return IsRenderingInMainMenu; }
+    bool IsRenderingMainMenu() const { return bIsRenderingInMainMenu; }
 
     static void AddCommand(UPlayerInput* PlayerInput, const FString& Command, const FKey& Key);
 
@@ -215,12 +219,11 @@ protected:
     bool bIsInputEnabledBeforeEnteringSelectionMode = false;
 
     bool bEnable = false;
-
     bool bIsSelectionModeActive = false;
 
-    bool IsInitialized = false;
+    bool bIsInitialized = false;
     
-    bool IsRenderingInMainMenu = false;
+    bool bIsRenderingInMainMenu = false;
     
     int32 NumExecBindingsChecked = 0;
 

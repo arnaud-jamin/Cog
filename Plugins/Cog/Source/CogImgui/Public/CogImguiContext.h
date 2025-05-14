@@ -45,6 +45,8 @@ public:
 
 	void Shutdown();
 
+	void SaveSettings() const;
+
 	bool GetEnableInput() const { return bEnableInput; }
 
 	void SetEnableInput(bool InValue);

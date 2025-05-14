@@ -202,8 +202,18 @@ void FCogImguiContext::Shutdown()
 
     if (Context)
     {
+        Context->IO.IniFilename = nullptr;
         ImGui::DestroyContext(Context);
         Context = nullptr;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogImguiContext::SaveSettings() const
+{
+    if (Context && Context->SettingsLoaded && Context->IO.IniFilename != nullptr)
+    {
+        ImGui::SaveIniSettingsToDisk(Context->IO.IniFilename);
     }
 }
 
