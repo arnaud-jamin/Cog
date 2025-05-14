@@ -218,7 +218,6 @@ protected:
     
     bool bIsInputEnabledBeforeEnteringSelectionMode = false;
 
-    bool bEnable = false;
     bool bIsSelectionModeActive = false;
 
     bool bIsInitialized = false;
