@@ -72,7 +72,7 @@ struct COGDEBUG_API FCogDebug
     static void GetDebugDrawSweepSettings(FCogDebugDrawSweepParams& Params);
 
     static FCogDebugContext& Get(int32 InPieId);
-    
+
     static FCogDebugContext& Get();
 
     static int32 GetPieSessionId();

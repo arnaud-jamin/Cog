@@ -15,8 +15,16 @@ FCogDebugSettings FCogDebug::Settings = FCogDebugSettings();
 //--------------------------------------------------------------------------------------------------------------------------
 FCogDebugContext& FCogDebug::Get(const int32 InPieId)
 {
+    if (InPieId == INDEX_NONE)
+    {
+        if (FCogDebugContext* Context = DebugContexts.Find(1))
+        {
+            return *Context;
+        }
+    }
+
     FCogDebugContext& Context = DebugContexts.FindOrAdd(InPieId);
-    return Context;
+    return Context;  
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -62,7 +62,8 @@ void FCogEngineWindow_Cheats::Initialize()
                     const bool ApplyToAllies = InArgs.Contains("-Allies");
                     const bool ApplyToControlled = InArgs.Contains("-Controlled");
 
-                    RequestCheat(*Replicator, GetLocalPlayerPawn(), GetSelection(), *Cheat, ApplyToEnemies, ApplyToAllies, ApplyToControlled);
+                    AActor* Selection = GetSelection();
+                    RequestCheat(*Replicator, GetLocalPlayerPawn(), Selection, *Cheat, ApplyToEnemies, ApplyToAllies, ApplyToControlled);
                 }
             }));
 
