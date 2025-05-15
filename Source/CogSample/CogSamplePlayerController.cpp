@@ -9,10 +9,7 @@
 #include "GameFramework/PlayerState.h"
 
 #if ENABLE_COG
-#include "CogAbilityReplicator.h"
 #include "CogDebugDraw.h"
-#include "CogDebugReplicator.h"
-#include "CogEngineReplicator.h"
 #endif //ENABLE_COG
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -24,12 +21,6 @@ ACogSamplePlayerController::ACogSamplePlayerController()
 void ACogSamplePlayerController::BeginPlay()
 {
     Super::BeginPlay();
-
-#if ENABLE_COG
-    ACogDebugReplicator::Spawn(this);
-    ACogAbilityReplicator::Spawn(this);
-    ACogEngineReplicator::Spawn(this);
-#endif //ENABLE_COG
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
