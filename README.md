@@ -440,7 +440,6 @@ public class CogSample : ModuleRules
         {
             PublicDependencyModuleNames.AddRange(new string[]
             {
-                "Cog",
                 "CogAbility",
                 "CogAI",
                 "CogAll",
