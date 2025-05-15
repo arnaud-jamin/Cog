@@ -158,6 +158,8 @@ Display the state of the gamepad
 - Can be displayed as an overlay
 - Can be used to inject inputs to help debugging, as loosing window focus when breaking in the code doesn't affect the state of injected inputs unlike real inputs.
 
+https://github.com/user-attachments/assets/56edc823-7130-4cfe-9af9-1c565f7286b9
+
 ---
 
 ### Inspector
