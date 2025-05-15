@@ -531,8 +531,8 @@ void UCogSampleConfigurationSubsystem::PostInitialize()
 }
 ```
 
-> [!TIP]
-> The reason you need to manually add this code is because all Cog code appart from CogCommon is stripped in `Shipping` build.
+> [!NOTE]
+> The reason you need to manually add this code is because you can customize which windows are displayed in the main menu, and because all Cog code appart from the `CogCommon` module is stripped in `Shipping` build.
 
 - Implement Cog Interfaces on your desired actor classes:
 ```cpp
