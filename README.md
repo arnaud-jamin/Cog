@@ -24,7 +24,8 @@ General Info:
 
 ## Cog Windows
 
-### Abilities 
+<details>
+<summary>Abilities</summary>
 
 Displays the gameplay abilities of the selected actor.
 
@@ -32,10 +33,11 @@ Displays the gameplay abilities of the selected actor.
 - Click the ability checkbox to force its activation or deactivation.
 - Right-click an ability to remove it, or open/close the ability separate window.
 - Use the 'Give Ability' menu to manually give an ability from a list defined in a Data Asset.
-
 ---
+</details>
+<details>
+<summary>Actions</summary>
 
-### Actions
 Displays the state of Input Action.
 
 ![Actions](https://github.com/user-attachments/assets/e4b60f69-efa0-4a23-b78e-9f261e5f78f5)
@@ -44,8 +46,10 @@ Displays the state of Input Action.
 https://github.com/user-attachments/assets/2497900e-d2d9-4af9-abef-44f7f31c2726
 
 ---
+</details>
+<details>
+<summary>Attributes</summary>
 
-### Attributes
 Displays the gameplay attributes of the selected actor.
 
 ![Attributes](https://github.com/user-attachments/assets/ff010ac5-d8e5-44ca-b46f-263c45a0fc47)
@@ -55,29 +59,36 @@ Displays the gameplay attributes of the selected actor.
 - Use the options 'Show Only Modified' to only show the attributes that have modifiers.
 
 ---
-
-### Behavior Tree
+</details>
+<details>
+<summary>Behavior Tree</summary>
+  
 Displays the behavior tree of the selected actor.
 
 ![Behavior Tree](https://github.com/arnaud-jamin/Cog/assets/13844285/c799e85f-b641-4d6f-9476-54a5cbd73c65)
 
----
-
-### Blackboard 
+</details>
+<details>
+<summary>Blackboard</summary>
+  
 Displays the blackboard of the selected actor.
 
 ![Blackboard](https://github.com/arnaud-jamin/Cog/assets/13844285/649d46d5-386c-4990-9f45-e4eb95a6b81a)
 
 ---
-
-### Build Info 
+</details>
+<details>
+<summary>Build Info</summary>
+  
 Display the build information such as the build version, changelist, date, target, and so on.
 
 ![image](https://github.com/user-attachments/assets/b0383dea-a372-4ce2-94e2-6e1f9d3d6807)
 
 ---
-
-### Cheats
+</details>
+<details>
+<summary>Cheats</summary>
+  
 Used to apply cheats to the selected actor.
 
 ![Cheats](https://github.com/user-attachments/assets/e3bbf157-904f-40e9-a0bf-e8152ff24af4)
@@ -96,8 +107,10 @@ Used to apply cheats to the selected actor.
 ![Cheats Asset](https://github.com/user-attachments/assets/46a14b89-ebab-4628-b97b-e5ccd2b63576)
 
 ---
-
-### Collisions Tester
+</details>
+<details>
+<summary>Collisions Tester</summary>
+  
 Used to test collision queries
 
 ![Collisions Tester](https://github.com/arnaud-jamin/Cog/assets/13844285/12f7cb7e-13c9-4eed-8ea4-f3eb7475cf34)
@@ -105,8 +118,10 @@ Used to test collision queries
 <video src="https://github.com/user-attachments/assets/95106f62-8a70-43ed-871d-c2f9380418a3" />
 
 ---
-
-### Collisions Viewer
+</details>
+<details>
+<summary>Collisions Viewer</summary>
+  
 Used to inspect collisions in the world 
 
 ![Collisions Viewer](https://github.com/arnaud-jamin/Cog/assets/13844285/ccee855b-b33b-4dfc-ba14-dff87e1150cf)
@@ -114,16 +129,20 @@ Used to inspect collisions in the world
 - It can be used to better understand what object collisions are blocking a raycast.
 
 ---
-
-### Command Bindings
+</details>
+<details>
+<summary>Command Bindings</summary>
+  
 Used to configure the command bindings. 
         
 ![Command Bindings](https://github.com/arnaud-jamin/Cog/assets/13844285/47179de9-ee28-427f-951f-5773b66cdeb2)
 - Bindings are used to trigger console commands from a keyboard shortcuts, which are saved in `Saved/Config/WindowEditor/Input.ini` (in editor).
 
 ---
-
-### Console
+</details>
+<details>
+<summary>Console</summary>
+  
 Used as a replacement of the Unreal console command.
 
 ![Console](https://github.com/user-attachments/assets/224b8913-61fb-4a63-b63a-fc3522fafe5f)
@@ -135,23 +154,29 @@ Used as a replacement of the Unreal console command.
 ![Console Settings](https://github.com/user-attachments/assets/92bd2e0e-e860-403d-ade3-e780fb3a88c7)
 
 ---
-
-### Debug Settings
+</details>
+<details>
+<summary>Debug Settings</summary>
+  
 Used to tweak how the debug display is drawn.
 
 ![Debug Settings](https://github.com/arnaud-jamin/Cog/assets/13844285/1c078311-2395-45e6-9a13-ddc405e1c914)
 
 ---
-
-### Effects
+</details>
+<details>
+<summary>Effects</summary>
+  
 Displays the gameplay effects of the selected actor.
 
 ![Effects](https://github.com/user-attachments/assets/ff9c0baa-80d8-4916-a81a-9914443bd88b)
 - Mouse over an effect to see its details such as its modifiers, the gameplay tags it grants, the remaining time, etc.
 
 ---
-
-### Gamepad
+</details>
+<details>
+<summary>Gamepad</summary>
+  
 Display the state of the gamepad
 
 ![Gamepad](https://github.com/arnaud-jamin/Cog/assets/13844285/734dd08a-5b9f-44cf-8d24-9bf257f08ec6)
@@ -161,8 +186,10 @@ Display the state of the gamepad
 https://github.com/user-attachments/assets/56edc823-7130-4cfe-9af9-1c565f7286b9
 
 ---
-
-### Inspector
+</details>
+<details>
+<summary>Inspector</summary>
+  
 Used to inspect and modify an Object properties 
 
 ![Inspector](https://github.com/arnaud-jamin/Cog/assets/13844285/e6ed8841-40cc-4491-b46f-517e6cd7f296)
@@ -171,15 +198,19 @@ Used to inspect and modify an Object properties
 - Manage a history of inspected objects.
 
 ---
-
-### Levels
+</details>
+<details>
+<summary>Levels</summary>
+  
 Can be used to load specific levels
 
 ![image](https://github.com/user-attachments/assets/473ea0c8-05c6-4246-b295-995d4c43b6af)
 
 ---
-
-### Log Categories
+</details>
+<details>
+<summary>Log Categories</summary>
+  
 Can be used to activate and deactivate log categories
 
 ![Log Categories](https://github.com/arnaud-jamin/Cog/assets/13844285/b35ba24b-85e2-4264-8230-fb4a3899715b)
@@ -190,8 +221,10 @@ Can be used to activate and deactivate log categories
 - The log categories are used to filter both the output log and the debug draw.
 
 ---
-
-### Metric
+</details>
+<details>
+<summary>Metric</summary>
+  
 Gather various values sent by the selected actor and compute their rate per second. This is typically used to compute the damage dealt or received per second.
 
 ![Metric](https://github.com/arnaud-jamin/Cog/assets/13844285/64d3cb7c-8731-4897-9ef9-b0868148ebe2)
@@ -202,15 +235,19 @@ FCogDebugMetric::AddMetric(this, "Damage Dealt", MitigatedDamage, UnmitigatedDam
 ```
 
 ---
-
-### Net Emulation
+</details>
+<details>
+<summary>Net Emulation</summary>
+  
 Used to configure the network emulation
 
 ![Net Emulation](https://github.com/arnaud-jamin/Cog/assets/13844285/97103f15-fae8-4fe9-8189-8fdbcab5cb20)
 
 ---
-
-### NetImgui
+</details>
+<details>
+<summary>NetImgui</summary>
+  
 Handle connections to a [NetImgui](https://github.com/sammyfreg/netImgui) server.
 
 ![NetImgui](https://github.com/user-attachments/assets/ea1d4a28-4c2f-460c-ac7d-5f6ef8e6e6dd)
@@ -220,8 +257,10 @@ This can be used to debug the state of the game server. For example the behavior
 ![image](https://github.com/user-attachments/assets/3cd788c9-9884-4c1c-8333-7a311bdcd20a)
 
 ---
-
-### Notifications
+</details>
+<details>
+<summary>Notifications</summary>
+  
 Use to display and configure notifications
 
 ![Notification](https://github.com/user-attachments/assets/84db0359-f002-4c35-9d45-11187b3f9228)
@@ -232,24 +271,30 @@ Use to display and configure notifications
 ![Notification Settings](https://github.com/user-attachments/assets/aa47495e-4544-4e33-925e-d87cb9125e76)
 
 ---
-
-### Output Log
+</details>
+<details>
+<summary>Output Log</summary>
+  
 Display the output log based on each log categories verbosity.
     
 ![Output Log](https://github.com/arnaud-jamin/Cog/assets/13844285/71b1de06-a3d0-4e4d-83f3-c3f482c0d8f4)
 - The verbosity of each log category can be configured in the 'Log Categories' window.
 
 ---
-
-### Pools
+</details>
+<details>
+<summary>Pools</summary>
+  
 Displays attributes of the selected actor as pools.
 
 ![Pools](https://github.com/arnaud-jamin/Cog/assets/13844285/7bb1aadd-9c0b-439f-b263-5ed842d0cd69)
 - The pools can be configured in a data asset.
 
 ---
-
-### Plots 
+</details>
+<details>
+<summary>Plots</summary>
+  
 Plots values and events overtime. When applicable, only the values and events of the selected actor are displayed.
 
 ![Plots](https://github.com/arnaud-jamin/Cog/assets/13844285/def95b7b-ae59-4a8b-bc21-b07922e1fc6f)
@@ -270,15 +315,19 @@ Plots values and events overtime. When applicable, only the values and events of
 ```
 
 ---
-
-### Scalability
+</details>
+<details>
+<summary>Scalability</summary>
+  
 Used to configure the rendering quality.
 
 ![Scalability](https://github.com/arnaud-jamin/Cog/assets/13844285/4866b54c-5efa-4efa-a841-74ac8e1713c0)
        
 ---
-
-### Selection
+</details>
+<details>
+<summary>Selection</summary>
+  
 Used to select an actor either by picking an actor in the world or by selecting an actor in the actor list.
 
 ![Selection](https://github.com/arnaud-jamin/Cog/assets/13844285/67cf9019-85c0-449f-88bf-0fc4841f8795)
@@ -286,8 +335,10 @@ Used to select an actor either by picking an actor in the world or by selecting 
 - The current selection is used by various debug windows to filter out their content.
 
 ---
-
-### Settings
+</details>
+<details>
+<summary>Settings</summary>
+  
 Configure the settings of Cog.
 
 ![Settings](https://github.com/user-attachments/assets/6587d44d-bf40-4ff1-8d26-71f79a3110f2)
@@ -297,8 +348,10 @@ Configure the settings of Cog.
 - Change the DPI Scaling. Use `[Ctrl][MouseWheel]` to change the DPI.
 
 ---
-
-### Skeleton
+</details>
+<details>
+<summary>Skeleton</summary>
+  
 Display the bone hierarchy and the skeleton debug draw of the selected actor if it has a Skeletal Mesh.
 
 ![Skeleton](https://github.com/arnaud-jamin/Cog/assets/13844285/19648e3d-70dc-45bc-940d-e53eb9a99871)
@@ -307,15 +360,19 @@ Display the bone hierarchy and the skeleton debug draw of the selected actor if 
 - Use the `[Ctrl]` key to toggle the bone debug draw recursively.
 
 ---
-
-### Spawn
+</details>
+<details>
+<summary>Spawn</summary>
+  
 Used to spawn new actors in the world. The spawn list can be configured in a Data Asset.
 
 ![Spawn](https://github.com/arnaud-jamin/Cog/assets/13844285/b37f9307-5fd5-4ea5-9652-c265a8f63e32)
 
 ---
-
-### Stats
+</details>
+<details>
+<summary>Stats</summary>
+  
 Displays engine stats such as FPS, Ping, Packet Loss.
 
 ![Stats](https://github.com/user-attachments/assets/424bac6a-76df-4d69-9d34-445a4a4bf536)
@@ -327,15 +384,19 @@ Displays engine stats such as FPS, Ping, Packet Loss.
 ![Stats Settings](https://github.com/user-attachments/assets/a3545a8f-e742-4e8e-8758-03af133d932e)
 
 ---
-
-### Tags
+</details>
+<details>
+<summary>Tags</summary>
+  
 Displays the gameplay tags of the selected actor.
 
 ![Tags](https://github.com/user-attachments/assets/9aef871c-5af0-4ee0-8eb8-5fd706b43e51)
 
 ---
-
-### Time Scale
+</details>
+<details>
+<summary>Time Scale</summary>
+  
 Used to change the game global timescale. 
 
 ![Time Scale](https://github.com/user-attachments/assets/fc5a49e7-a04d-42b3-9d83-a8290e261665)
@@ -346,8 +407,10 @@ Used to change the game global timescale.
 ![image](https://github.com/user-attachments/assets/130f6250-af5b-41fb-8ae2-016c66fbdedc)
 
 ---
-
-### Transform
+</details>
+<details>
+<summary>Transform</summary>
+  
 Used to read and set the selected actor transform. 
 
 ![Transform](https://github.com/arnaud-jamin/Cog/assets/13844285/f4fa2aeb-2e06-4820-8500-6eb14536b5b3)
@@ -356,8 +419,10 @@ Used to read and set the selected actor transform.
 ![Transform](https://github.com/arnaud-jamin/Cog/assets/13844285/34657828-9fda-4af4-bdd0-4ea4514c23a0)
 
 ---
-
-### Tweaks
+</details>
+<details>
+<summary>Tweaks</summary>
+  
 Used to apply tweaks to all the spawned actors
 
 ![Tweaks](https://github.com/arnaud-jamin/Cog/assets/13844285/e8a5cdd5-908d-4ae3-901a-48addd4ce353)
@@ -365,6 +430,7 @@ Used to apply tweaks to all the spawned actors
 - The tweaks can be configured in a data asset.
 
 ---
+</details>
 
 ## Debug Functionalities
 
