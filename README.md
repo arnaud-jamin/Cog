@@ -24,6 +24,8 @@ General Info:
 
 ## Cog Windows
 
+Cog comes with the following windows:
+
 <details>
 <summary>Abilities</summary>
 
