@@ -453,7 +453,7 @@ You must have Unreal 5.5 or greater and Visual Studio to launch the sample
 3. Open Cog.sln
 4. Select the `DebugGame Editor` or `Development Editor` solution configuration
 5. Make sure `Cog` is set as the startup project
-6. Start Debugging (F5)
+6. Start Debugging `[F5]`
 7. Once in Unreal, press Play (Alt+P)
 8. Press the `[F1]` key or use the `Cog.ToggleInput` console command to open the Imgui Main Menu.
 
