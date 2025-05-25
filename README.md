@@ -285,16 +285,6 @@ Display the output log based on each log categories verbosity.
 ---
 </details>
 <details>
-<summary>Pools</summary>
-  
-Displays attributes of the selected actor as pools.
-
-![Pools](https://github.com/arnaud-jamin/Cog/assets/13844285/7bb1aadd-9c0b-439f-b263-5ed842d0cd69)
-- The pools can be configured in a data asset.
-
----
-</details>
-<details>
 <summary>Plots</summary>
   
 Plots values and events overtime. When applicable, only the values and events of the selected actor are displayed.
@@ -315,6 +305,16 @@ Plots values and events overtime. When applicable, only the values and events of
     // Stopping an event
     FCogDebug::StopEvent(this, "Effects", RemovedGameplayEffect.Spec.Def->GetFName());
 ```
+
+---
+</details>
+<details>
+<summary>Pools</summary>
+  
+Displays attributes of the selected actor as pools.
+
+![Pools](https://github.com/arnaud-jamin/Cog/assets/13844285/7bb1aadd-9c0b-439f-b263-5ed842d0cd69)
+- The pools can be configured in a data asset.
 
 ---
 </details>
