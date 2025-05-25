@@ -462,7 +462,7 @@ You must have Unreal 5.5 or greater and Visual Studio to launch the sample
 ### Integrating Cog in your project
 
 > [!IMPORTANT]
-> The way Cog integrates in your project has changed. If you didn't modify Cog sources, you should remove all your existing Cog source files before updating. If you did modify Cog sources and still have a `CogWindow` folder, consider deleting it before updating.
+> The way Cog integrates in your project has changed. If you didn't modify Cog sources, you should remove all your existing Cog source files before updating. If you did modify Cog sources and still have a `CogWindow` folder, consider deleting it before updating. Previously Cog was integrated from your project GameState class. Now it is integrated from UWorldSubsystem in your project as described in the integration guide below.
 
 The Cog repository has the following structure:
 - `CogSample` - A Sample that demonstrate various Cog functionalities. The project was saved in Unreal 5.5
