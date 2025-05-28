@@ -190,6 +190,9 @@ void UCogSubsystem::Shutdown()
 
     if (bIsInitialized)
     {
+        // Prevent ImGuiContextScope to contain dangling pointers when the contexts get destroyed.
+        ImGuiContextScope.ClearPreviousContexts();
+
         Context.Shutdown();
     }
     

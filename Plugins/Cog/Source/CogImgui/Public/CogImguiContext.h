@@ -31,9 +31,10 @@ struct COGIMGUI_API FCogImGuiContextScope
 	UE_NODISCARD_CTOR explicit FCogImGuiContextScope(const FCogImguiContext& CogImguiContext);
 	UE_NODISCARD_CTOR explicit FCogImGuiContextScope(ImGuiContext* GuiCtx, ImPlotContext* PlotCtx);
 	~FCogImGuiContextScope();
+	void ClearPreviousContexts();
 
 private:
-	ImGuiContext* PrevContext = nullptr;
+	ImGuiContext* PrevImGuiContext = nullptr;
 	ImPlotContext* PrevPlotContext = nullptr;
 };
 

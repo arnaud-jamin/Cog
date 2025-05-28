@@ -26,7 +26,7 @@
 //--------------------------------------------------------------------------------------------------------------------------
 FCogImGuiContextScope::FCogImGuiContextScope(const FCogImguiContext& CogImguiContext)
 {
-    PrevContext = ImGui::GetCurrentContext();
+    PrevImGuiContext = ImGui::GetCurrentContext();
     PrevPlotContext = ImPlot::GetCurrentContext();
 
     ImGui::SetCurrentContext(CogImguiContext.Context);
@@ -36,7 +36,7 @@ FCogImGuiContextScope::FCogImGuiContextScope(const FCogImguiContext& CogImguiCon
 //--------------------------------------------------------------------------------------------------------------------------
 FCogImGuiContextScope::FCogImGuiContextScope(ImGuiContext* GuiCtx, ImPlotContext* PlotCtx)
 {
-    PrevContext = ImGui::GetCurrentContext();
+    PrevImGuiContext = ImGui::GetCurrentContext();
     PrevPlotContext = ImPlot::GetCurrentContext();
 
     ImGui::SetCurrentContext(GuiCtx);
@@ -46,8 +46,15 @@ FCogImGuiContextScope::FCogImGuiContextScope(ImGuiContext* GuiCtx, ImPlotContext
 //--------------------------------------------------------------------------------------------------------------------------
 FCogImGuiContextScope::~FCogImGuiContextScope()
 {
-    ImGui::SetCurrentContext(PrevContext);
+    ImGui::SetCurrentContext(PrevImGuiContext);
     ImPlot::SetCurrentContext(PrevPlotContext);
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
+void FCogImGuiContextScope::ClearPreviousContexts()
+{
+    PrevImGuiContext = nullptr;
+    PrevPlotContext = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -194,15 +201,20 @@ void FCogImguiContext::Shutdown()
         GameViewport->RemoveViewportWidgetContent(InputCatcherWidget.ToSharedRef());
     }
 
-    if (PlotContext)
+    //Make sure ImGuiContextScope does not contain dangling pointer as we will destroy the contexts.
+    ImGuiContextScope.ClearPreviousContexts();
+
+    if (PlotContext != nullptr)
     {
         ImPlot::DestroyContext(PlotContext);
         PlotContext = nullptr;
     }
 
-    if (Context)
+    if (Context != nullptr)
     {
+        // Prevent triggering the saving of ImGui config. This is done manually by calling SaveSettings.
         Context->IO.IniFilename = nullptr;
+        
         ImGui::DestroyContext(Context);
         Context = nullptr;
     }
