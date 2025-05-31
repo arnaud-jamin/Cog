@@ -81,3 +81,4 @@ DerivedDataCache/*
 .vsconfig
 enc_temp_folder/*
 *.user
+.DS_Store
