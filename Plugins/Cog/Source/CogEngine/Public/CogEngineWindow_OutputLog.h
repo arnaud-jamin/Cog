@@ -8,6 +8,7 @@
 #include "CogEngineWindow_OutputLog.generated.h"
 
 class UCogEngineConfig_OutputLog;
+class FCogEngineWindow_OutputLog;
 
 //--------------------------------------------------------------------------------------------------------------------------
 class FCogLogOutputDevice : public FOutputDevice
