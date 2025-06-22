@@ -39,6 +39,8 @@ public:
     virtual void Tick(float DeltaTime) override;
 
     virtual void AddWindow(FCogWindow* Window, const FString& Name);
+    
+    virtual bool IsTickableWhenPaused() const { return true; }
 
     template<class T>
     T* AddWindow(const FString& Name);

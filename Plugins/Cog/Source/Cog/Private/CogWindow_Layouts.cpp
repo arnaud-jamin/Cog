@@ -49,7 +49,7 @@ void FCogWindow_Layouts::RenderLoadLayoutMenuItem(int InLayoutIndex, const FInpu
     
     if (ImGui::MenuItem(Text.Get(), Shortcut.Get()))
     {
-        GetOwner()->LoadLayout(InLayoutIndex + 1);
+        GetOwner()->LoadLayout(InLayoutIndex);
     }
 }
 
@@ -61,6 +61,6 @@ void FCogWindow_Layouts::RenderSaveLayoutMenuItem(int InLayoutIndex, const FInpu
     
     if (ImGui::MenuItem(Text.Get(), Shortcut.Get()))
     {
-        GetOwner()->SaveLayout(InLayoutIndex + 1);
+        GetOwner()->SaveLayout(InLayoutIndex);
     }
 }
