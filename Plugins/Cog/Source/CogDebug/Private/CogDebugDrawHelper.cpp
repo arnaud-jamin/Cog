@@ -22,10 +22,10 @@ namespace
                 return nullptr;
             }
 
-            bool persistant = bPersistentLines || (LifeTime > 0.f);
+            bool persistent = bPersistentLines || (LifeTime > 0.f);
             UWorld::ELineBatcherType batcherType = bDepthIsForeground ?
-                (persistant ? UWorld::ELineBatcherType::ForegroundPersistent : UWorld::ELineBatcherType::Foreground) :
-                (persistant ? UWorld::ELineBatcherType::WorldPersistent : UWorld::ELineBatcherType::World);
+                (persistent ? UWorld::ELineBatcherType::ForegroundPersistent : UWorld::ELineBatcherType::Foreground) :
+                (persistent ? UWorld::ELineBatcherType::WorldPersistent : UWorld::ELineBatcherType::World);
             return InWorld->GetLineBatcher(batcherType);
         #else
             return (InWorld ? (bDepthIsForeground ? InWorld->ForegroundLineBatcher : ((bPersistentLines || (LifeTime > 0.f)) ? InWorld->PersistentLineBatcher : InWorld->LineBatcher)) : nullptr);
