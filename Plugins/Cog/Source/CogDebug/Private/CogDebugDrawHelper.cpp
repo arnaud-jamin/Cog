@@ -16,7 +16,20 @@ namespace
     //----------------------------------------------------------------------------------------------------------------------
     ULineBatchComponent* GetDebugLineBatcher(const UWorld* InWorld, const bool bPersistentLines, const float LifeTime, const bool bDepthIsForeground)
     {
-        return (InWorld ? (bDepthIsForeground ? InWorld->ForegroundLineBatcher : ((bPersistentLines || (LifeTime > 0.f)) ? InWorld->PersistentLineBatcher : InWorld->LineBatcher)) : nullptr);
+        #if ENGINE_MAJOR_VERSION >= 5 && ENGINE_MINOR_VERSION >= 6
+            if (InWorld == nullptr)
+            {
+                return nullptr;
+            }
+
+            bool persistant = bPersistentLines || (LifeTime > 0.f);
+            UWorld::ELineBatcherType batcherType = bDepthIsForeground ?
+                (persistant ? UWorld::ELineBatcherType::ForegroundPersistent : UWorld::ELineBatcherType::Foreground) :
+                (persistant ? UWorld::ELineBatcherType::WorldPersistent : UWorld::ELineBatcherType::World);
+            return InWorld->GetLineBatcher(batcherType);
+        #else
+            return (InWorld ? (bDepthIsForeground ? InWorld->ForegroundLineBatcher : ((bPersistentLines || (LifeTime > 0.f)) ? InWorld->PersistentLineBatcher : InWorld->LineBatcher)) : nullptr);
+        #endif
     }
 
     //----------------------------------------------------------------------------------------------------------------------
