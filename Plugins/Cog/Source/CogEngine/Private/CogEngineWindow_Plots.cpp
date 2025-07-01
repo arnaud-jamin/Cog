@@ -438,7 +438,7 @@ void FCogEngineWindow_Plots::RenderPlots(FCogDebugTracker& InTracker)
                     //---------------------------------------------------------------------------
                     // Draw a vertical lines representing the current time and the mouse time
                     //---------------------------------------------------------------------------
-                    if (Config->ShowTimeBarAtGameTime || Config->ShowTimeBarAtGameTime)
+                    if (Config->ShowTimeBarAtGameTime || Config->ShowTimeBarAtCursor)
                     {
                         ImDrawList* PlotDrawList = ImPlot::GetPlotDrawList();
 
