@@ -248,16 +248,20 @@ bool FCogEngineWindow_Selection::TickSelectionMode()
         {
             if (UKismetSystemLibrary::LineTraceSingle(GetWorld(), WorldOrigin, WorldOrigin + WorldDirection * 10000, GetSelectionTraceChannel(), false, IgnoreList, EDrawDebugTrace::None, HitResult, true))
             {
-                if (SelectedActorClass == nullptr || HitResult.GetActor()->GetClass()->IsChildOf(SelectedActorClass))
+                AActor* HitActor = HitResult.GetActor();
+                if (HitActor != nullptr)
                 {
-                    HoveredActor = HitResult.GetActor();
-                    break;
-                }
+                    if (SelectedActorClass == nullptr || HitActor->GetClass()->IsChildOf(SelectedActorClass))
+                    {
+                        HoveredActor = HitActor;
+                        break;
+                    }
 
-                //------------------------------------------------
-                // The second time we accept the selected actor
-                //------------------------------------------------
-                IgnoreList.Empty();
+                    //------------------------------------------------
+                    // The second time we accept the selected actor
+                    //------------------------------------------------
+                    IgnoreList.Empty();
+                }
             }
         }
     }
