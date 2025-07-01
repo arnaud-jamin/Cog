@@ -774,6 +774,7 @@ void FCogImguiContext::SetEnableInput(const bool InValue)
         if (bIsThrottleDisabled)
         {
             FSlateThrottleManager::Get().DisableThrottle(false);
+            bIsThrottleDisabled = false;
         }
         
         if (ULocalPlayer* LocalPlayer = GetLocalPlayer())
