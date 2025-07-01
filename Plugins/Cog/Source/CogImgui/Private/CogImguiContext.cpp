@@ -898,10 +898,15 @@ void FCogImguiContext::BuildFont()
     FontAtlasTexture->AddressX = TA_Wrap;
     FontAtlasTexture->AddressY = TA_Wrap;
 
-    uint8* FontAtlasTextureData = static_cast<uint8*>(FontAtlasTexture->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE));
-    FMemory::Memcpy(FontAtlasTextureData, TextureDataRaw, TextureWidth * TextureHeight * BytesPerPixel);
-    FontAtlasTexture->GetPlatformData()->Mips[0].BulkData.Unlock();
     FontAtlasTexture->UpdateResource();
+
+    FUpdateTextureRegion2D* TextureRegion = new FUpdateTextureRegion2D(0, 0, 0, 0, TextureWidth, TextureHeight);
+    auto DataCleanup = [](uint8* Data, const FUpdateTextureRegion2D* UpdateRegion)
+    {
+        delete UpdateRegion;
+    };
+    FontAtlasTexture->UpdateTextureRegions(0, 1u, TextureRegion, BytesPerPixel * TextureWidth, BytesPerPixel, TextureDataRaw, DataCleanup);
+    FlushRenderingCommands();
 
     IO.Fonts->SetTexID(FontAtlasTexture);
     FontAtlasTexturePtr.Reset(FontAtlasTexture);
