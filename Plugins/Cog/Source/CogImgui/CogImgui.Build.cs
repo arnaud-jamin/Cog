@@ -21,9 +21,10 @@ public class CogImgui : ModuleRules
             "CoreUObject",
             "Engine",
             "InputCore",
+            "RenderCore",
             "Slate",
             "SlateCore",
-            "Sockets"
+            "Sockets",
         });
 
         if (Target.bBuildEditor)
