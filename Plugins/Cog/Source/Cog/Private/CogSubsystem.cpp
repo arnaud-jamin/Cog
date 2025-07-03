@@ -1081,7 +1081,7 @@ bool UCogSubsystem::BindShortcut(FCogShortcut& InShortcut) const
     
     InShortcut.InputChord = *InputChord;
 
-    FCogImguiInputHelper::GetPrioritizedShortcuts().Add(*InputChord);
+    FCogImguiInputHelper::GetPrioritizedShortcuts().AddUnique(*InputChord);
     return true;
 }
 
