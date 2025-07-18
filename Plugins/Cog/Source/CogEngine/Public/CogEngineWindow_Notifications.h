@@ -9,6 +9,7 @@
 #include "CogEngineWindow_Notifications.generated.h"
 
 class UCogEngineConfig_Notifications;
+class FCogEngineWindow_Notifications;
 
 //--------------------------------------------------------------------------------------------------------------------------
 class FCogNotificationOutputDevice : public FOutputDevice
@@ -56,7 +57,7 @@ protected:
 
     virtual void RenderNotifications();
 
-    virtual void RenderSettings();
+    virtual void RenderSettings() override;
 
     ImGuiTextFilter Filter;
 

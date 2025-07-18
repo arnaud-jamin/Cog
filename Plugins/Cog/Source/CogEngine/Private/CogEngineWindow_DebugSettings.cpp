@@ -41,7 +41,7 @@ void FCogEngineWindow_DebugSettings::PreSaveConfig()
 //--------------------------------------------------------------------------------------------------------------------------
 void RenderCollisionChannelColor(const UCollisionProfile& CollisionProfile, FColor& Color, ECollisionChannel Channel, ImGuiColorEditFlags ColorEditFlags)
 {
-	if (CollisionProfile.ConvertToObjectType(Channel) == TraceTypeQuery_MAX && CollisionProfile.ConvertToTraceType(Channel) == TraceTypeQuery_MAX)
+	if (CollisionProfile.ConvertToObjectType(Channel) == ObjectTypeQuery_MAX && CollisionProfile.ConvertToTraceType(Channel) == TraceTypeQuery_MAX)
 	{ return; }
 
     const FString ChannelName = CollisionProfile.ReturnChannelNameFromContainerIndex(Channel).ToString();
