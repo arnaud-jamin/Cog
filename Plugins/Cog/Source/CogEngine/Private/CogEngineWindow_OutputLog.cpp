@@ -154,7 +154,7 @@ void FCogEngineWindow_OutputLog::DrawRow(const char* InBufferStart, const FLogIn
 void FCogEngineWindow_OutputLog::Copy() const
 {
     const auto Buffer = StringCast<TCHAR>(TextBuffer.c_str());
-    const wchar_t* BufferData = Buffer.Get();
+    const auto BufferData = Buffer.Get();
     if (BufferData == nullptr)
     { return; }
 
