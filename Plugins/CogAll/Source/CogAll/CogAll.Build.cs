@@ -18,6 +18,7 @@ public class CogAll : ModuleRules
                 "CogInput",
                 "Cog",
                 "Engine",
+                "CogImgui",
             }
             );
     }
