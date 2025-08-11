@@ -19,9 +19,9 @@ public:
 
     virtual bool GetColor(const FCogWindow& InCallingWindow, FLinearColor& OutColor) const override;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Cog")
     TSubclassOf<UGameplayAbility> Ability;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, Category = "Cog")
     bool RemoveAbilityOnEnd = true;
 };

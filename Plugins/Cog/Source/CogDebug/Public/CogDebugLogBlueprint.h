@@ -14,10 +14,10 @@ class COGDEBUG_API UCogDebugLogBlueprint : public UBlueprintFunctionLibrary
 
 public:
 
-    UFUNCTION(BlueprintCallable, meta = (DevelopmentOnly, WorldContext = "WorldContextObject"))
+    UFUNCTION(BlueprintCallable, meta = (DevelopmentOnly, WorldContext = "WorldContextObject"), Category = "Cog")
     static void Log(const UObject* WorldContextObject, FCogLogCategory LogCategory, ECogLogVerbosity Verbosity = ECogLogVerbosity::Verbose, const FString& Text = FString(""));
 
-    UFUNCTION(BlueprintPure, meta = (DevelopmentOnly, WorldContext = "WorldContextObject"))
+    UFUNCTION(BlueprintPure, meta = (DevelopmentOnly, WorldContext = "WorldContextObject"), Category = "Cog")
     static bool IsLogActive(const UObject* WorldContextObject, const FCogLogCategory LogCategory);
 
 };
