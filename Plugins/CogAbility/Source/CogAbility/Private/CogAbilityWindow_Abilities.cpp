@@ -5,6 +5,7 @@
 #include "CogAbilityDataAsset.h"
 #include "CogAbilityHelper.h"
 #include "CogAbilityReplicator.h"
+#include "CogCommon.h"
 #include "CogImguiHelper.h"
 #include "CogWidgets.h"
 #include "CogDebugRob.h"
@@ -87,7 +88,7 @@ void FCogAbilityWindow_Abilities::RenderOpenAbilities()
         }
 
         bool Open = true;
-        if (ImGui::Begin(TCHAR_TO_ANSI(*GetAbilityName(Ability)), &Open))
+        if (ImGui::Begin(COG_TCHAR_TO_CHAR(*GetAbilityName(Ability)), &Open))
         {
             RenderAbilityInfo(*AbilitySystemComponent, *Spec);
             ImGui::End();
@@ -140,7 +141,7 @@ void FCogAbilityWindow_Abilities::RenderAbilitiesMenu(AActor* Selection)
                     {
                         ImGui::PushID(Index);
 
-                        if (ImGui::MenuItem(TCHAR_TO_ANSI(*GetNameSafe(AbilityClass))))
+                        if (ImGui::MenuItem(COG_TCHAR_TO_CHAR(*GetNameSafe(AbilityClass))))
                         {
                             if (ACogAbilityReplicator* Replicator = ACogAbilityReplicator::GetFirstReplicator(*GetWorld()))
                             {
@@ -222,7 +223,7 @@ void FCogAbilityWindow_Abilities::RenderAbilitiesTableAbilityName(UAbilitySystem
     const ImVec4 Color = GetAbilityColor(AbilitySystemComponent, Spec);
     ImGui::PushStyleColor(ImGuiCol_Text, Color);
 
-    if (ImGui::Selectable(TCHAR_TO_ANSI(*GetAbilityName(Ability)), SelectedIndex == Index, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap | ImGuiSelectableFlags_AllowDoubleClick))
+    if (ImGui::Selectable(COG_TCHAR_TO_CHAR(*GetAbilityName(Ability)), SelectedIndex == Index, ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowOverlap | ImGuiSelectableFlags_AllowDoubleClick))
     {
         SelectedIndex = Index;
                 
@@ -454,7 +455,7 @@ void FCogAbilityWindow_Abilities::RenderAbilityCooldown(const UAbilitySystemComp
     {
         ImGui::PushStyleColor(ImGuiCol_PlotHistogram, IM_COL32(100, 100, 100, 255));
         ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 100));
-        ImGui::ProgressBar(RemainingTime / CooldownDuration, ImVec2(-1, ImGui::GetTextLineHeightWithSpacing() * 0.8f), TCHAR_TO_ANSI(*FString::Printf(TEXT("%.2f / %.2f"), RemainingTime, CooldownDuration)));
+        ImGui::ProgressBar(RemainingTime / CooldownDuration, ImVec2(-1, ImGui::GetTextLineHeightWithSpacing() * 0.8f), COG_TCHAR_TO_CHAR(*FString::Printf(TEXT("%.2f / %.2f"), RemainingTime, CooldownDuration)));
         ImGui::PopStyleColor(2);
     }
 }
@@ -566,7 +567,7 @@ void FCogAbilityWindow_Abilities::RenderAbilityInfo(const UAbilitySystemComponen
         ImGui::TextColored(TextColor, "Name");
         ImGui::TableNextColumn();
         ImGui::PushStyleColor(ImGuiCol_Text, Color);
-        ImGui::Text("%s", TCHAR_TO_ANSI(*GetAbilityName(Ability)));
+        ImGui::Text("%s", COG_TCHAR_TO_CHAR(*GetAbilityName(Ability)));
         ImGui::PopStyleColor(1);
 
         //------------------------
@@ -609,7 +610,7 @@ void FCogAbilityWindow_Abilities::RenderAbilityInfo(const UAbilitySystemComponen
         ImGui::TableNextColumn();
         ImGui::TextColored(TextColor, "Handle");
         ImGui::TableNextColumn();
-        ImGui::Text("%s", TCHAR_TO_ANSI(*Spec.Handle.ToString()));
+        ImGui::Text("%s", COG_TCHAR_TO_CHAR(*Spec.Handle.ToString()));
 
         //------------------------
         // Level

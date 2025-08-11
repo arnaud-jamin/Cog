@@ -1,5 +1,6 @@
 #include "CogEngineWindow_Spawns.h"
 
+#include "CogCommon.h"
 #include "CogEngineDataAsset.h"
 #include "CogEngineReplicator.h"
 #include "CogImguiHelper.h"
@@ -11,7 +12,7 @@ void FCogEngineWindow_Spawns::RenderHelp()
     ImGui::Text(
         "This window can be used to spawn new actors in the world. "
         "The spawn list can be configured in the '%s' data asset. "
-        , TCHAR_TO_ANSI(*GetNameSafe(Asset.Get()))
+        , COG_TCHAR_TO_CHAR(*GetNameSafe(Asset.Get()))
     );
 }
 
@@ -58,7 +59,7 @@ void FCogEngineWindow_Spawns::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Spawns::RenderSpawnGroup(ACogEngineReplicator& Replicator, const FCogEngineSpawnGroup& SpawnGroup, int32 GroupIndex)
 {
-    if (FCogWidgets::DarkCollapsingHeader(TCHAR_TO_ANSI(*SpawnGroup.Name), ImGuiTreeNodeFlags_DefaultOpen))
+    if (FCogWidgets::DarkCollapsingHeader(COG_TCHAR_TO_CHAR(*SpawnGroup.Name), ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::PushID(GroupIndex);
 
@@ -108,7 +109,7 @@ bool FCogEngineWindow_Spawns::RenderSpawnAsset(ACogEngineReplicator& Replicator,
         EntryName = GetNameSafe(SpawnEntry.Class);
     }
 
-    if (ImGui::Button(TCHAR_TO_ANSI(*EntryName), ImVec2(-1, 0)))
+    if (ImGui::Button(COG_TCHAR_TO_CHAR(*EntryName), ImVec2(-1, 0)))
     {
         IsPressed = true;
         Replicator.Server_Spawn(SpawnEntry);

@@ -1,5 +1,6 @@
 #include "CogDebugDrawImGui.h"
 
+#include "CogCommon.h"
 #include "imgui_internal.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -194,5 +195,5 @@ void FCogDebugDrawImGui::Draw()
     DrawShapes(TrianglesFilled, [DrawList](const FTriangle& Triangle, const ImColor Color) { DrawList->AddTriangleFilled(Triangle.P1, Triangle.P2, Triangle.P3, Color); });
     DrawShapes(Circles, [DrawList](const FCircle& Circle, const ImColor Color) { DrawList->AddCircle(Circle.Center, Circle.Radius, Color, Circle.Segments, Circle.Thickness); });
     DrawShapes(CirclesFilled, [DrawList](const FCircle& Circle, const ImColor Color) { DrawList->AddCircleFilled(Circle.Center, Circle.Radius, Color, Circle.Segments); });
-    DrawShapes(Texts, [DrawList](const FText& Text, const ImColor Color) { DrawList->AddText(Text.Pos, Color, TCHAR_TO_ANSI(*Text.Text)); });
+    DrawShapes(Texts, [DrawList](const FText& Text, const ImColor Color) { DrawList->AddText(Text.Pos, Color, COG_TCHAR_TO_CHAR(*Text.Text)); });
 }

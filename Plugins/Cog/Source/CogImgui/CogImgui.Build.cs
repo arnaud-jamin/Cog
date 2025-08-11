@@ -13,6 +13,7 @@ public class CogImgui : ModuleRules
             "ImGui",
             "ImPlot",
             "NetImgui",
+			"CogCommon",
         });
 
         PrivateDependencyModuleNames.AddRange(new[]

@@ -22,6 +22,7 @@
 #include "TextureResource.h"
 #include "Widgets/SViewport.h"
 #include "Widgets/SWindow.h"
+#include "CogLocalizationConfig.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 FCogImGuiContextScope::FCogImGuiContextScope(const FCogImguiContext& CogImguiContext)
@@ -879,8 +880,24 @@ void FCogImguiContext::BuildFont()
 
     ImFontConfig FontConfig;
     FontConfig.SizePixels = FMath::RoundFromZero(13.f * DpiScale);
-    IO.Fonts->AddFontDefault(&FontConfig);
-
+	
+    // if engine's font file exist, use it as truetype font, else use fallback one
+	FString FontFile = FPaths::EngineContentDir() / TEXT("Slate/Fonts/DroidSansFallback.ttf");
+	if (!FPaths::FileExists(FontFile))
+	{
+		IO.Fonts->AddFontDefault(&FontConfig);
+	}
+	else
+	{
+		// support chinese if needed
+#if COG_SUPPORT_CHINESE
+		const ImWchar* glyphRange = IO.Fonts->GetGlyphRangesChineseFull();
+#else
+		const ImWchar* glyphRange = IO.Fonts->GetGlyphRangesDefault();
+#endif
+		IO.Fonts->AddFontFromFileTTF(TCHAR_TO_UTF8(*FontFile), 16.f * DpiScale, nullptr, glyphRange );
+	}
+	
     uint8* TextureDataRaw;
     int32 TextureWidth, TextureHeight, BytesPerPixel;
     IO.Fonts->GetTexDataAsRGBA32(&TextureDataRaw, &TextureWidth, &TextureHeight, &BytesPerPixel);
@@ -948,7 +965,7 @@ void FCogImguiContext::DrawDebug() const
             Focus = KeyboardFocusedWidget->ToString();
         }
         static char Buffer[256] = "";
-        ImStrncpy(Buffer, TCHAR_TO_ANSI(*Focus), IM_ARRAYSIZE(Buffer));
+        ImStrncpy(Buffer, COG_TCHAR_TO_CHAR(*Focus), IM_ARRAYSIZE(Buffer));
         ImGui::InputText("Keyboard Focus", Buffer, IM_ARRAYSIZE(Buffer));
 
         ImGui::EndDisabled();

@@ -1,5 +1,6 @@
 #include "CogEngineWindow_CollisionViewer.h"
 
+#include "CogCommon.h"
 #include "CogDebugDrawHelper.h"
 #include "CogDebug.h"
 #include "CogImguiHelper.h"
@@ -104,12 +105,12 @@ void FCogEngineWindow_CollisionViewer::RenderContent()
     const FCollisionResponseTemplate* SelectedProfile = CollisionProfile->GetProfileByIndex(Config->ProfileIndex);
     FName SelectedProfileName = SelectedProfile != nullptr ? SelectedProfile->Name : FName("Custom");
 
-    if (ImGui::BeginCombo("Profile", TCHAR_TO_ANSI(*SelectedProfileName.ToString()), ImGuiComboFlags_HeightLargest))
+    if (ImGui::BeginCombo("Profile", COG_TCHAR_TO_CHAR(*SelectedProfileName.ToString()), ImGuiComboFlags_HeightLargest))
     {
         for (int i = 0; i < CollisionProfile->GetNumOfProfiles(); ++i)
         {
             const FCollisionResponseTemplate* Profile = CollisionProfile->GetProfileByIndex(i);
-            if (ImGui::Selectable(TCHAR_TO_ANSI(*Profile->Name.ToString()), false))
+            if (ImGui::Selectable(COG_TCHAR_TO_CHAR(*Profile->Name.ToString()), false))
             {
                 Config->ProfileIndex = i;
                 Config->ObjectTypesToQuery = 0;

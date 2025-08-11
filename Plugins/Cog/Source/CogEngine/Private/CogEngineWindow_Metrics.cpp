@@ -89,7 +89,7 @@ void FCogEngineWindow_Metrics::RenderContent()
         FName MetricName = Entry.Key;
         FCogDebugMetricEntry& Metric = Entry.Value;
 
-        if (ImGui::CollapsingHeader(TCHAR_TO_ANSI(*MetricName.ToString()), ImGuiTreeNodeFlags_DefaultOpen))
+        if (ImGui::CollapsingHeader(COG_TCHAR_TO_CHAR(*MetricName.ToString()), ImGuiTreeNodeFlags_DefaultOpen))
         {
             ImGui::PushID(Index);
             DrawMetric(Metric);
@@ -124,13 +124,13 @@ void FCogEngineWindow_Metrics::DrawMetric(FCogDebugMetricEntry& Metric)
 
     ImGui::Text("Crits");
     ImGui::SameLine(FCogWidgets::GetFontWidth() * 20);
-    FCogWidgets::ProgressBarCentered(Metric.Count == 0 ? 0.0f : Metric.Crits / static_cast<float>(Metric.Count), ImVec2(-1, 0), TCHAR_TO_ANSI(*FString::Printf(TEXT("%d / %d"), Metric.Crits, Metric.Count)));
+    FCogWidgets::ProgressBarCentered(Metric.Count == 0 ? 0.0f : Metric.Crits / static_cast<float>(Metric.Count), ImVec2(-1, 0), COG_TCHAR_TO_CHAR(*FString::Printf(TEXT("%d / %d"), Metric.Crits, Metric.Count)));
 
     if (FCogDebugMetric::MaxDurationSetting > 0.0f)
     {
         ImGui::Text("Timer");
         ImGui::SameLine(FCogWidgets::GetFontWidth() * 20);
-        FCogWidgets::ProgressBarCentered(Metric.Timer / (float)FCogDebugMetric::MaxDurationSetting, ImVec2(-1, 0), TCHAR_TO_ANSI(*FString::Printf(TEXT("%0.1f / %0.1f"), Metric.Timer, FCogDebugMetric::MaxDurationSetting)));
+        FCogWidgets::ProgressBarCentered(Metric.Timer / (float)FCogDebugMetric::MaxDurationSetting, ImVec2(-1, 0), COG_TCHAR_TO_CHAR(*FString::Printf(TEXT("%0.1f / %0.1f"), Metric.Timer, FCogDebugMetric::MaxDurationSetting)));
     }
     else
     {

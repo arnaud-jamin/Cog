@@ -1,5 +1,6 @@
 #include "CogEngineWindow_Scalability.h"
 
+#include "CogCommon.h"
 #include "imgui.h"
 #include "CogWidgets.h"
 #include "Engine/Engine.h"
@@ -23,18 +24,18 @@ void FCogEngineWindow_Scalability::RenderContent()
     Scalability::FQualityLevels Levels = Scalability::GetQualityLevels();
     const FString CurrentQualityName = Scalability::GetQualityLevelText(Levels.GetMinQualityLevel(), SCALABILITY_NUM_LEVELS).ToString();
     FCogWidgets::SetNextItemToShortWidth();
-    if (ImGui::BeginCombo("Scalability", TCHAR_TO_ANSI(*CurrentQualityName)))
+    if (ImGui::BeginCombo("Scalability", COG_TCHAR_TO_CHAR(*CurrentQualityName)))
     {
         for (int32 i = 0; i < SCALABILITY_NUM_LEVELS; ++i)
         {
             FString QualityName = Scalability::GetQualityLevelText(i, SCALABILITY_NUM_LEVELS).ToString();
-            if (ImGui::Selectable(TCHAR_TO_ANSI(*QualityName)))
+            if (ImGui::Selectable(COG_TCHAR_TO_CHAR(*QualityName)))
             {
                 Levels.SetFromSingleQualityLevel(i);
                 Scalability::SetQualityLevels(Levels);
 
                 ImGui::LogToClipboard();
-                ImGui::LogText("%s", TCHAR_TO_ANSI(*FString::Printf(TEXT("Setting Quality Level to %s"), *QualityName)));
+                ImGui::LogText("%s", COG_TCHAR_TO_CHAR(*FString::Printf(TEXT("Setting Quality Level to %s"), *QualityName)));
                 ImGui::LogFinish();
             }
         }

@@ -1,5 +1,6 @@
 #include "CogEngineWindow_Stats.h"
 
+#include "CogCommon.h"
 #include "CogImguiHelper.h"
 #include "CogWidgets.h"
 #include "Engine/Engine.h"
@@ -97,7 +98,7 @@ void FCogEngineWindow_Stats::RenderMainMenuWidgetFrameRate()
     const int32 Fps = static_cast<int32>(GAverageFPS);
 
     ImGui::PushStyleColor(ImGuiCol_Text, Config->GetFpsColor(Fps));
-    const bool Open = ImGui::BeginMenu(TCHAR_TO_ANSI(*FString::Printf(TEXT("%3dfps###FrameRateButton"), Fps)));
+    const bool Open = ImGui::BeginMenu(COG_TCHAR_TO_CHAR(*FString::Printf(TEXT("%3dfps###FrameRateButton"), Fps)));
     const float Width = ImGui::GetItemRectSize().x;
     ImGui::PopStyleColor(1);
 
@@ -144,7 +145,7 @@ void FCogEngineWindow_Stats::RenderMainMenuWidgetPing()
 
     const int32 Ping = static_cast<int32>(PlayerState->GetPingInMilliseconds());
     ImGui::PushStyleColor(ImGuiCol_Text, Config->GetPingColor(Ping));
-    const bool Open = ImGui::BeginMenu(TCHAR_TO_ANSI(*FString::Printf(TEXT("%3dms###PingButton"), Ping)));
+    const bool Open = ImGui::BeginMenu(COG_TCHAR_TO_CHAR(*FString::Printf(TEXT("%3dms###PingButton"), Ping)));
     const float Width = ImGui::GetItemRectSize().x;
     ImGui::PopStyleColor(1);
     
@@ -202,7 +203,7 @@ void FCogEngineWindow_Stats::RenderMainMenuWidgetPacketLoss()
     const float TotalPacketLost = (OutPacketLost + InPacketLost) / 2;
 
     ImGui::PushStyleColor(ImGuiCol_Text, Config->GetPacketLossColor(TotalPacketLost));
-    const bool Open = ImGui::BeginMenu(TCHAR_TO_ANSI(*FString::Printf(TEXT("%2d%% ###PacketLossButton"), static_cast<int32>(TotalPacketLost))));
+    const bool Open = ImGui::BeginMenu(COG_TCHAR_TO_CHAR(*FString::Printf(TEXT("%2d%% ###PacketLossButton"), static_cast<int32>(TotalPacketLost))));
     const float Width = ImGui::GetItemRectSize().x;
     ImGui::PopStyleColor(1);
 

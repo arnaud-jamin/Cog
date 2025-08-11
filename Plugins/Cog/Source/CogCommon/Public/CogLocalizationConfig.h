@@ -1,0 +1,11 @@
+#pragma once
+
+#ifndef COG_SUPPORT_CHINESE
+#define COG_SUPPORT_CHINESE 0
+#endif
+
+#if COG_SUPPORT_CHINESE
+#define COG_TCHAR_TO_CHAR TCHAR_TO_UTF8
+#else
+#define COG_TCHAR_TO_CHAR TCHAR_TO_ANSI
+#endif

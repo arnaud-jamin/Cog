@@ -1,5 +1,6 @@
 #include "CogEngineWindow_NetEmulation.h"
 
+#include "CogCommon.h"
 #include "CogEngineWindow_Stats.h"
 #include "CogImguiHelper.h"
 #include "CogWidgets.h"
@@ -103,14 +104,14 @@ void FCogEngineWindow_NetEmulation::DrawControls()
     }
 
     FCogWidgets::SetNextItemToShortWidth();
-    if (ImGui::BeginCombo("Driver", TCHAR_TO_ANSI(*SelectedNetDriver->NetDriver->GetName())))
+    if (ImGui::BeginCombo("Driver", COG_TCHAR_TO_CHAR(*SelectedNetDriver->NetDriver->GetName())))
     {
         int i = 0;
         for (FNamedNetDriver& NamedNetDriver : WorldContext.ActiveNetDrivers)
         {
             if (NamedNetDriver.NetDriver != nullptr)
             {
-                if (ImGui::Selectable(TCHAR_TO_ANSI(*NamedNetDriver.NetDriver->GetName())))
+                if (ImGui::Selectable(COG_TCHAR_TO_CHAR(*NamedNetDriver.NetDriver->GetName())))
                 {
                     SelectedIndex = i;
                     SelectedNetDriver = &WorldContext.ActiveNetDrivers[i];

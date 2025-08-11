@@ -1,5 +1,6 @@
 #include "CogEngineWindow_Slate.h"
 
+#include "CogCommon.h"
 #include "CogImguiHelper.h"
 #include "Framework/Application/SlateApplication.h"
 #include "Framework/Application/SlateUser.h"
@@ -29,11 +30,11 @@ void FCogEngineWindow_Slate::RenderContent()
     static int32 SelectedUserIndex = 0;
 
     ImGui::SetNextItemWidth(-1);
-    if (ImGui::BeginCombo("##User", TCHAR_TO_ANSI(*FString::Printf(TEXT("%d"), SelectedUserIndex))))
+    if (ImGui::BeginCombo("##User", COG_TCHAR_TO_CHAR(*FString::Printf(TEXT("%d"), SelectedUserIndex))))
     {
         SlateApp.ForEachUser([this](const FSlateUser& User)
         {
-            if (ImGui::Selectable(TCHAR_TO_ANSI(*FString::Printf(TEXT("%d"), SelectedUserIndex)), false))
+            if (ImGui::Selectable(COG_TCHAR_TO_CHAR(*FString::Printf(TEXT("%d"), SelectedUserIndex)), false))
             {
                 SelectedUserIndex = User.GetUserIndex();
             }
@@ -72,7 +73,7 @@ void FCogEngineWindow_Slate::RenderUser(FSlateUser& User)
         {
             FocusedWidgetText = FocusedWidget->ToString();
         }
-        ImGui::Text("%s", TCHAR_TO_ANSI(*FocusedWidgetText));
+        ImGui::Text("%s", COG_TCHAR_TO_CHAR(*FocusedWidgetText));
 
         //------------------------
         // Cursor Captor
@@ -86,7 +87,7 @@ void FCogEngineWindow_Slate::RenderUser(FSlateUser& User)
         {
             CursorCaptorWidgetText = CursorCaptorWidget->ToString();
         }
-        ImGui::Text("%s", TCHAR_TO_ANSI(*CursorCaptorWidgetText));
+        ImGui::Text("%s", COG_TCHAR_TO_CHAR(*CursorCaptorWidgetText));
 
         //------------------------
         // Cursor Position
