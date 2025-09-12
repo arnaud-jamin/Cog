@@ -1,5 +1,6 @@
 #include "CogConsoleCommandManager.h"
 
+#include "Engine/Engine.h"
 #include "Engine/World.h"
 
 TMap<FString, FCogCommandInfo> FCogConsoleCommandManager::CommandMap;

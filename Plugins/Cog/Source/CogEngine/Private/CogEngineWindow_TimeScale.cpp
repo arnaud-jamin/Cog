@@ -7,7 +7,7 @@
 #include "CogWidgets.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
-
+#include "GameFramework/WorldSettings.h"
 
 
 //--------------------------------------------------------------------------------------------------------------------------

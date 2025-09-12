@@ -8,6 +8,7 @@
 #include "imgui_internal.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
+#include "Styling/SlateTypes.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogInputWindow_Actions::Initialize()

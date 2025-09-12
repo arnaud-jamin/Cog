@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "CogEngineReplicator.h"
 #include "CogWindow.h"
+#include "Framework/Commands/InputChord.h"
 #include "CogEngineWindow_TimeScale.generated.h"
 
 class UCogEngineWindowConfig_TimeScale;

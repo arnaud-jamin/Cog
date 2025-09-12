@@ -9,6 +9,5 @@ public class CogSampleEditorTarget : TargetRules
         DefaultBuildSettings = BuildSettingsVersion.Latest;
         IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
         ExtraModuleNames.Add("CogSample");
-        bUseUnityBuild = false;
 	}
 }

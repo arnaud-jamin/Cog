@@ -5,6 +5,7 @@
 #include "CogImguiContext.h"
 #include "CogWindow_Settings.h"
 #include "imgui.h"
+#include "Components/InputComponent.h"
 #include "Subsystems/WorldSubsystem.h"
 
 #include "CogSubsystem.generated.h"

@@ -5,6 +5,7 @@
 #include "CogWidgets.h"
 #include "imgui.h"
 #include "imgui_internal.h"
+#include "Engine/Engine.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Console::RenderHelp()

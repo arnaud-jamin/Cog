@@ -1,6 +1,9 @@
 #include "CogSampleGameState.h"
 
 #include "CogSampleAbilitySystemComponent.h"
+#include "Engine/LocalPlayer.h"
+#include "Engine/NetConnection.h"
+#include "Engine/World.h"
 #include "GameFramework/GameState.h"
 #include "GameFramework/PlayerState.h"
 #include "Modules/ModuleManager.h"

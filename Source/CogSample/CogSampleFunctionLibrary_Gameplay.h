@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "CogSampleDefines.h"
+#include "CollisionQueryParams.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "CogSampleFunctionLibrary_Gameplay.generated.h"
 

@@ -6,6 +6,8 @@
 #include "CogSampleLogCategories.h"
 #include "CogSampleProjectileComponent.h"
 #include "CogSampleTargetAcquisition.h"
+#include "Engine/Engine.h"
+#include "Engine/GameInstance.h"
 #include "GameFramework/PlayerState.h"
 
 #if ENABLE_COG

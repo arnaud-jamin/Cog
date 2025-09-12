@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "CogCommonConfig.h"
+#include "CogEngineDataAsset.h"
 #include "CogWindow.h"
 #include "CogEngineWindow_Cheats.generated.h"
 
@@ -9,7 +10,6 @@ class ACogEngineReplicator;
 class AActor;
 class UCogEngineConfig_Cheats;
 class UCogEngineDataAsset;
-struct FCogEngineCheat;
 
 //--------------------------------------------------------------------------------------------------------------------------
 class COGENGINE_API FCogEngineWindow_Cheats : public FCogWindow

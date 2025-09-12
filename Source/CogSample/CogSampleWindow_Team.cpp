@@ -2,6 +2,7 @@
 
 #if ENABLE_COG
 
+#include "GameFramework/Actor.h"
 #include "CogImguiHelper.h"
 #include "CogHelper.h"
 #include "CogWidgets.h"

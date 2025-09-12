@@ -4,6 +4,7 @@
 #include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
 #include "CogHelper.h"
+#include "Editor.h"
 #include "Components/PrimitiveComponent.h"
 #include "EngineUtils.h"
 #include "imgui.h"

@@ -7,6 +7,7 @@
 #include "UObject/ReflectedTypeAccessors.h"
 #include "UObject/WeakObjectPtrTemplates.h"
 
+class UInputComponent;
 struct FCogDebugContext;
 class AActor;
 class APawn;
