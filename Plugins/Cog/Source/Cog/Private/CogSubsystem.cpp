@@ -837,7 +837,7 @@ void UCogSubsystem::SettingsHandler_ReadLine(ImGuiContext* Context, ImGuiSetting
     if (Entry == reinterpret_cast<void*>(1))
     {
         ImGuiID Id;
-        int32 ShowMenu;
+        int32 ShowMenu = 0;
 #if PLATFORM_WINDOWS || PLATFORM_MICROSOFT
         if (sscanf_s(Line, "0x%08X %d", &Id, &ShowMenu) == 2)
 #else
