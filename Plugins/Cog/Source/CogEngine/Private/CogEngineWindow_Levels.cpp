@@ -3,6 +3,8 @@
 #include "CogImguiHelper.h"
 #include "CogWidgets.h"
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "Engine/World.h"
+#include "GameFramework/PlayerController.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Levels::RenderHelp()

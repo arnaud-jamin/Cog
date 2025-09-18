@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "CogCommonConfig.h"
 #include "CogWindow.h"
+#include "Framework/Commands/InputChord.h"
 #include "CogWindow_Settings.generated.h"
 
 class UCogEngineConfig_Settings;

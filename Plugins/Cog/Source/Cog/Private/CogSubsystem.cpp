@@ -16,6 +16,7 @@
 #include "imgui_internal.h"
 #include "Misc/CoreMisc.h"
 #include "NetImgui_Api.h"
+#include "GameFramework/PlayerController.h"
 
 FString UCogSubsystem::ToggleInputCommand   = TEXT("Cog.ToggleInput");
 FString UCogSubsystem::DisableInputCommand  = TEXT("Cog.DisableInput");

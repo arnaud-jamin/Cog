@@ -1,6 +1,7 @@
 #include "CogSampleConfigurationSubsystem.h"
 
 #include "CogCommon.h"
+#include "Subsystems/SubsystemCollection.h"
 
 #if ENABLE_COG
 #include "CogAll.h"

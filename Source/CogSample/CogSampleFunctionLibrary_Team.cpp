@@ -1,5 +1,6 @@
 #include "CogSampleFunctionLibrary_Team.h"
 
+#include "GameFramework/Actor.h"
 #include "CogSampleTeamInterface.h"
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -7,6 +7,7 @@
 #include "CogSampleFunctionLibrary_Team.h"
 #include "CogSampleLogCategories.h"
 #include "CogSamplePlayerController.h"
+#include "Engine/World.h"
 #include "GameFramework/Character.h"
 #include "Net/Core/PushModel/PushModel.h"
 #include "Net/UnrealNetwork.h"

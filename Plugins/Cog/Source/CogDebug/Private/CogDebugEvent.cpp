@@ -2,6 +2,7 @@
 
 #include "CogDebugTrack.h"
 #include "CogDebugTracker.h"
+#include "Engine/World.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 float FCogDebugEvent::GetActualEndTime(const UWorld& World) const

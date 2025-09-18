@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AssetRegistry/AssetData.h"
 #include "CogWindow.h"
 #include "CogEngineWindow_Levels.generated.h"
 

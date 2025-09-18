@@ -9,6 +9,7 @@
 #include "CogSampleSpawnableInterface.h"
 #include "CogSampleTargetableInterface.h"
 #include "Components/CapsuleComponent.h"
+#include "Engine/World.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/GameStateBase.h"
 #include "GameplayCueNotifyTypes.h"

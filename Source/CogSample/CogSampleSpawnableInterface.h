@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UObject/Interface.h"
 #include "CogSampleSpawnableInterface.generated.h"
 
 UINTERFACE(MinimalAPI, Blueprintable)

@@ -3,7 +3,9 @@
 #include "AssetRegistry/AssetData.h"
 #include "CoreMinimal.h"
 #include "Templates/SubclassOf.h"
+#include "UObject/FieldIterator.h"
 
+enum ECollisionChannel : int;
 class UCollisionProfile;
 
 class COG_API FCogHelper

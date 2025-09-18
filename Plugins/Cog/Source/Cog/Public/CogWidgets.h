@@ -7,6 +7,7 @@
 #include <Templates/SubclassOf.h>
 
 #include "CogHelper.h"
+#include "InputCoreTypes.h"
 
 class AActor;
 class APawn;

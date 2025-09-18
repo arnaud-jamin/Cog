@@ -1,5 +1,6 @@
 #include "CogSampleBasicActor.h"
 
+#include "Engine/World.h"
 #include "GameFramework/GameStateBase.h"
 #include "Net/Core/PushModel/PushModel.h"
 #include "Net/UnrealNetwork.h"

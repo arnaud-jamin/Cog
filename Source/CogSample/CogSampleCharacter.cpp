@@ -16,6 +16,8 @@
 #include "Engine/CollisionProfile.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Engine/LocalPlayer.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/CheatManagerDefines.h"
 #include "GameFramework/Controller.h"

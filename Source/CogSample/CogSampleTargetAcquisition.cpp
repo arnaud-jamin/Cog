@@ -6,8 +6,13 @@
 #include "CogSampleFunctionLibrary_Gameplay.h"
 #include "CogSampleLogCategories.h"
 #include "CogSampleTargetableInterface.h"
+#include "SceneView.h"
 #include "Components/CapsuleComponent.h"
+#include "Curves/CurveFloat.h"
+#include "Engine/GameViewportClient.h"
+#include "Engine/LocalPlayer.h"
 #include "Engine/OverlapResult.h"
+#include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 
 #if ENABLE_COG

@@ -5,6 +5,7 @@
 #include "CogEngineDataAsset.h"
 #include "GameFramework/Actor.h"
 #include "CogWindow.h"
+#include "Framework/Commands/InputChord.h"
 #include "CogEngineWindow_Selection.generated.h"
 
 class IConsoleObject;
