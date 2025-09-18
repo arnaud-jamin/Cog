@@ -269,7 +269,7 @@ void UCogSubsystem::Tick(float InDeltaTime)
     if (LayoutToLoad != -1)
     {
 	    const FString Filename = FCogImguiHelper::GetIniFilePath(FString::Printf(TEXT("ImGui_Layout_%d"), LayoutToLoad));
-        ImGui::LoadIniSettingsFromDisk(TCHAR_TO_ANSI(*Filename));
+        ImGui::LoadIniSettingsFromDisk(COG_TCHAR_TO_CHAR(*Filename));
         LayoutToLoad = -1;
     }
 
@@ -467,7 +467,7 @@ void UCogSubsystem::ResetLayout()
 
     for (const FCogWindow* Window : Windows)
     {
-        ImGui::SetWindowPos(TCHAR_TO_ANSI(*Window->GetName()), ImVec2(10, 10), ImGuiCond_Always);
+        ImGui::SetWindowPos(COG_TCHAR_TO_CHAR(*Window->GetName()), ImVec2(10, 10), ImGuiCond_Always);
     }
 
     ImGui::ClearIniSettings();
@@ -499,7 +499,7 @@ void UCogSubsystem::SaveLayout(const int32 LayoutIndex)
     FCogImGuiContextScope ImGuiContextScope(Context);
 
 	const FString Filename = *FCogImguiHelper::GetIniFilePath(FString::Printf(TEXT("imgui_layout_%d"), LayoutIndex));
-    ImGui::SaveIniSettingsToDisk(TCHAR_TO_ANSI(*Filename));
+    ImGui::SaveIniSettingsToDisk(COG_TCHAR_TO_CHAR(*Filename));
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -583,7 +583,7 @@ void UCogSubsystem::RenderMainMenu()
                 for (FCogWindow* SpaceWindow : SpaceWindows)
                 {
                     bool bSpaceVisible = SpaceWindow->GetIsVisible();
-                    if (ImGui::MenuItem(TCHAR_TO_ANSI(*SpaceWindow->GetName()), nullptr, &bSpaceVisible))
+                    if (ImGui::MenuItem(COG_TCHAR_TO_CHAR(*SpaceWindow->GetName()), nullptr, &bSpaceVisible))
                     {
                         SpaceWindow->SetIsVisible(bSpaceVisible);
                     }
@@ -713,11 +713,11 @@ void UCogSubsystem::RenderOptionMenu(FMenu& Menu)
 {
     if (Menu.Window != nullptr)
     {
-        RenderMenuItem(*Menu.Window, TCHAR_TO_ANSI(*Menu.Name));
+        RenderMenuItem(*Menu.Window, COG_TCHAR_TO_CHAR(*Menu.Name));
     }
     else
     {
-        if (ImGui::BeginMenu(TCHAR_TO_ANSI(*Menu.Name)))
+        if (ImGui::BeginMenu(COG_TCHAR_TO_CHAR(*Menu.Name)))
         {
             for (FMenu& SubMenu : Menu.SubMenus)
             {

@@ -1,5 +1,6 @@
 #include "CogEngineWindow_Inspector.h"
 
+#include "CogCommon.h"
 #include "CogWidgets.h"
 #include "Containers/SortedMap.h"
 #include "Engine/Engine.h"
@@ -204,7 +205,7 @@ void FCogEngineWindow_Inspector::RenderMenu()
             for (FFavorite& Favorite : Favorites)
             {
                 const TWeakObjectPtr<UObject>& Object = Favorite.Object;
-                if (ImGui::MenuItem(TCHAR_TO_ANSI(*GetNameSafe(Object.Get()))))
+                if (ImGui::MenuItem(COG_TCHAR_TO_CHAR(*GetNameSafe(Object.Get()))))
                 {
                     SetInspectedObject(Object.Get());
                     ImGui::CloseCurrentPopup();
@@ -222,7 +223,7 @@ void FCogEngineWindow_Inspector::RenderMenu()
             {
                 ImGui::PushID(i);
                 const TWeakObjectPtr<const UObject>& Object = History[i];
-                if (ImGui::MenuItem(TCHAR_TO_ANSI(*GetNameSafe(Object.Get())), nullptr, i == HistoryIndex))
+                if (ImGui::MenuItem(COG_TCHAR_TO_CHAR(*GetNameSafe(Object.Get())), nullptr, i == HistoryIndex))
                 {
                     NewHistoryIndex = i;
                     ImGui::CloseCurrentPopup();
@@ -305,7 +306,7 @@ bool FCogEngineWindow_Inspector::RenderInspector()
     {
         const FProperty* Property = *It;
 
-        if (Filter.IsActive() == false || Filter.PassFilter(TCHAR_TO_ANSI(*Property->GetName())))
+        if (Filter.IsActive() == false || Filter.PassFilter(COG_TCHAR_TO_CHAR(*Property->GetName())))
         {
             Properties.Add(Property);
         }
@@ -482,11 +483,11 @@ bool FCogEngineWindow_Inspector::RenderProperty(const FProperty* Property, uint8
     bool ShowChildren = false;
     if (HasPropertyAnyChildren(Property, PointerToValue))
     {
-        ShowChildren = ImGui::TreeNodeEx(TCHAR_TO_ANSI(*PropertyName), ImGuiTreeNodeFlags_SpanFullWidth);
+        ShowChildren = ImGui::TreeNodeEx(COG_TCHAR_TO_CHAR(*PropertyName), ImGuiTreeNodeFlags_SpanFullWidth);
     }
     else
     {
-        ImGui::TreeNodeEx(TCHAR_TO_ANSI(*PropertyName), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanFullWidth);
+        ImGui::TreeNodeEx(COG_TCHAR_TO_CHAR(*PropertyName), ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen | ImGuiTreeNodeFlags_SpanFullWidth);
     }
 
     //--------------------------------------------------------------------------------------
@@ -503,7 +504,7 @@ bool FCogEngineWindow_Inspector::RenderProperty(const FProperty* Property, uint8
             ImGui::TableNextColumn();
             ImGui::Text("Type:");
             ImGui::TableNextColumn();
-            ImGui::Text("%s", TCHAR_TO_ANSI(*Property->GetClass()->GetName()));
+            ImGui::Text("%s", COG_TCHAR_TO_CHAR(*Property->GetClass()->GetName()));
 
 #if WITH_EDITORONLY_DATA
             ImGui::TableNextRow();
@@ -517,7 +518,7 @@ bool FCogEngineWindow_Inspector::RenderProperty(const FProperty* Property, uint8
             ImGui::TableNextColumn();
             ImGui::Text("FullName:");
             ImGui::TableNextColumn();
-            ImGui::Text("%s", TCHAR_TO_ANSI(*Property->GetFullName()));
+            ImGui::Text("%s", COG_TCHAR_TO_CHAR(*Property->GetFullName()));
 
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
@@ -655,7 +656,7 @@ bool FCogEngineWindow_Inspector::RenderProperty(const FProperty* Property, uint8
     else
     {
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 128));
-        ImGui::Text("Unmanaged Type: %s", TCHAR_TO_ANSI(*Property->GetClass()->GetName()));
+        ImGui::Text("Unmanaged Type: %s", COG_TCHAR_TO_CHAR(*Property->GetClass()->GetName()));
         ImGui::PopStyleColor();
     }
 
@@ -815,7 +816,7 @@ bool FCogEngineWindow_Inspector::RenderName(const FNameProperty* NameProperty, u
     FString NameValue;
     NameProperty->ExportTextItem_Direct(NameValue, PointerToValue, nullptr, nullptr, PPF_None, nullptr);
     ImGui::BeginDisabled();
-    ImGui::Text("%s", TCHAR_TO_ANSI(*NameValue));
+    ImGui::Text("%s", COG_TCHAR_TO_CHAR(*NameValue));
     ImGui::EndDisabled();
 
     return false;
@@ -846,7 +847,7 @@ bool FCogEngineWindow_Inspector::RenderObject(UObject* Object, bool ShowChildren
     }
 
     ImGui::BeginDisabled();
-    ImGui::Text("%s", TCHAR_TO_ANSI(*Object->GetClass()->GetName()));
+    ImGui::Text("%s", COG_TCHAR_TO_CHAR(*Object->GetClass()->GetName()));
     ImGui::EndDisabled();
 
     ImGui::SameLine();
@@ -877,7 +878,7 @@ bool FCogEngineWindow_Inspector::RenderObject(UObject* Object, bool ShowChildren
 bool FCogEngineWindow_Inspector::RenderStruct(const FStructProperty* StructProperty, uint8* PointerToValue, bool ShowChildren)
 {
     ImGui::BeginDisabled();
-    ImGui::Text("%s", TCHAR_TO_ANSI(*StructProperty->Struct->GetStructCPPName()));
+    ImGui::Text("%s", COG_TCHAR_TO_CHAR(*StructProperty->Struct->GetStructCPPName()));
     ImGui::EndDisabled();
 
     bool HasChanged = false;
@@ -910,7 +911,7 @@ bool FCogEngineWindow_Inspector::RenderClass(const FClassProperty* ClassProperty
     else
     {
         ImGui::BeginDisabled();
-        ImGui::Text("%s", TCHAR_TO_ANSI(*ClassProperty->MetaClass->GetName()));
+        ImGui::Text("%s", COG_TCHAR_TO_CHAR(*ClassProperty->MetaClass->GetName()));
         ImGui::EndDisabled();
     }
 
@@ -930,7 +931,7 @@ bool FCogEngineWindow_Inspector::RenderInterface(const FInterfaceProperty* Inter
     else
     {
         ImGui::BeginDisabled();
-        ImGui::Text("%s", TCHAR_TO_ANSI(*Class->GetName()));
+        ImGui::Text("%s", COG_TCHAR_TO_CHAR(*Class->GetName()));
         ImGui::EndDisabled();
     }
 

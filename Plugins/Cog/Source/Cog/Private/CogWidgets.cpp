@@ -1,5 +1,6 @@
 #include "CogWidgets.h"
 
+#include "CogCommon.h"
 #include "CogDebug.h"
 #include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
@@ -418,7 +419,7 @@ bool FCogWidgets::ComboboxEnum(const char* Label, const UEnum* Enum, int64 Curre
 
     FString CurrentEntryName = Enum->GetNameStringByValue(CurrentValue);
 
-    if (ImGui::BeginCombo(Label, TCHAR_TO_ANSI(*CurrentEntryName)))
+    if (ImGui::BeginCombo(Label, COG_TCHAR_TO_CHAR(*CurrentEntryName)))
     {
         for (int32 EnumIndex = 0; EnumIndex < Enum->NumEnums() - 1; ++EnumIndex)
         {
@@ -434,7 +435,7 @@ bool FCogWidgets::ComboboxEnum(const char* Label, const UEnum* Enum, int64 Curre
 
             bool IsSelected = EnumEntryName == CurrentEntryName;
 
-            if (ImGui::Selectable(TCHAR_TO_ANSI(*EnumEntryName), IsSelected))
+            if (ImGui::Selectable(COG_TCHAR_TO_CHAR(*EnumEntryName), IsSelected))
             {
                 HasChanged = true;
                 NewValue = EnumEntryValue;
@@ -571,7 +572,7 @@ bool FCogWidgets::InputChord(FInputChord& InInputChord)
 bool FCogWidgets::Key(FKey& InKey)
 {
     bool HasKeyChanged = false;
-    if (ImGui::BeginCombo("##Key", TCHAR_TO_ANSI(*InKey.ToString()), ImGuiComboFlags_HeightLarge))
+    if (ImGui::BeginCombo("##Key", COG_TCHAR_TO_CHAR(*InKey.ToString()), ImGuiComboFlags_HeightLarge))
     {
         {
             bool IsSelected = InKey == FKey();
@@ -599,7 +600,7 @@ bool FCogWidgets::Key(FKey& InKey)
             }
 
             bool IsSelected = InKey == Key;
-            if (ImGui::Selectable(TCHAR_TO_ANSI(*Key.ToString()), IsSelected))
+            if (ImGui::Selectable(COG_TCHAR_TO_CHAR(*Key.ToString()), IsSelected))
             {
                 InKey = Key;
                 HasKeyChanged = true;
@@ -836,7 +837,7 @@ bool FCogWidgets::ComboTraceChannel(const char* Label, ECollisionChannel& Channe
     const FName SelectedChannelName = CollisionProfile->ReturnChannelNameFromContainerIndex(Channel);
     
     bool Result = false;
-    if (ImGui::BeginCombo(Label, TCHAR_TO_ANSI(*SelectedChannelName.ToString()), ImGuiComboFlags_HeightLarge))
+    if (ImGui::BeginCombo(Label, COG_TCHAR_TO_CHAR(*SelectedChannelName.ToString()), ImGuiComboFlags_HeightLarge))
     {
         for (int32 ChannelIndex = 0; ChannelIndex < static_cast<int32>(ECC_OverlapAll_Deprecated); ++ChannelIndex)
         {
@@ -852,7 +853,7 @@ bool FCogWidgets::ComboTraceChannel(const char* Label, ECollisionChannel& Channe
             const FName ChannelName = CollisionProfile->ReturnChannelNameFromContainerIndex(ChannelIndex);
             if (ChannelName.IsValid())
             {
-                if (ImGui::Selectable(TCHAR_TO_ANSI(*ChannelName.ToString())))
+                if (ImGui::Selectable(COG_TCHAR_TO_CHAR(*ChannelName.ToString())))
                 {
                     Channel = static_cast<ECollisionChannel>(ChannelIndex);
                     Result = true;
@@ -877,7 +878,7 @@ bool FCogWidgets::CollisionProfileChannel(const UCollisionProfile& InCollisionPr
 
     bool IsCollisionActive = (InChannels & ECC_TO_BITFIELD(InChannelIndex)) > 0;
     const FName ChannelName = InCollisionProfile.ReturnChannelNameFromContainerIndex(InChannelIndex);
-    if (ImGui::Checkbox(TCHAR_TO_ANSI(*ChannelName.ToString()), &IsCollisionActive))
+    if (ImGui::Checkbox(COG_TCHAR_TO_CHAR(*ChannelName.ToString()), &IsCollisionActive))
     {
         Result = true;
 
@@ -974,12 +975,12 @@ bool FCogWidgets::ActorsListWithFilters(AActor*& NewSelection, const UWorld& Wor
     if (ActorClasses.Num() > 1)
     {
         ImGui::SetNextItemWidth(18 * GetFontWidth());
-        if (ImGui::BeginCombo("##SelectionType", TCHAR_TO_ANSI(*GetNameSafe(SelectedClass))))
+        if (ImGui::BeginCombo("##SelectionType", COG_TCHAR_TO_CHAR(*GetNameSafe(SelectedClass))))
         {
             for (int32 i = 0; i < ActorClasses.Num(); ++i)
             {
                 TSubclassOf<AActor> SubClass = ActorClasses[i];
-                if (ImGui::Selectable(TCHAR_TO_ANSI(*GetNameSafe(SubClass)), false))
+                if (ImGui::Selectable(COG_TCHAR_TO_CHAR(*GetNameSafe(SubClass)), false))
                 {
                     SelectedActorClassIndex = i;
                     SelectedClass = SubClass;
@@ -1055,7 +1056,7 @@ bool FCogWidgets::ActorsList(AActor*& NewSelection, const UWorld& World, const T
             ImGui::PushStyleColor(ImGuiCol_Text, Actor == LocalPlayerPawn ? IM_COL32(255, 255, 0, 255) : IM_COL32(255, 255, 255, 255));
 
             const bool bIsSelected = Actor == FCogDebug::GetSelection();
-            if (ImGui::Selectable(TCHAR_TO_ANSI(*FCogHelper::GetActorName(*Actor)), bIsSelected))
+            if (ImGui::Selectable(COG_TCHAR_TO_CHAR(*FCogHelper::GetActorName(*Actor)), bIsSelected))
             {
                 //FCogDebug::SetSelection(&World, Actor);
                 NewSelection = Actor;
@@ -1124,13 +1125,13 @@ bool FCogWidgets::MenuActorsCombo(const char* StrID, AActor*& NewSelection, cons
         }
 
         const FString CurrentSelectionName = FCogHelper::GetActorName(Selection);
-        if (ImGui::Button(TCHAR_TO_ANSI(*CurrentSelectionName), ImVec2(Width, 0.0f)))
+        if (ImGui::Button(COG_TCHAR_TO_CHAR(*CurrentSelectionName), ImVec2(Width, 0.0f)))
         {
             ImGui::OpenPopup("ActorListPopup");
         }
         if (ImGui::IsItemHovered())
         {
-            ImGui::SetTooltip("Current Selection: %s", TCHAR_TO_ANSI(*CurrentSelectionName));
+            ImGui::SetTooltip("Current Selection: %s", COG_TCHAR_TO_CHAR(*CurrentSelectionName));
         }
 
         ImGui::PopStyleColor(1);
@@ -1240,7 +1241,7 @@ void FCogWidgets::ActorFrame(const AActor& Actor)
         {
             DrawList->AddRect(FCogImguiHelper::ToImVec2(ScreenPosMin) + Viewport->Pos, FCogImguiHelper::ToImVec2(ScreenPosMax) + Viewport->Pos, Color, 0.0f, 0, 1.0f);
         }
-        AddTextWithShadow(DrawList, FCogImguiHelper::ToImVec2(ScreenPosMin + FVector2D(0, -14.0f)) + Viewport->Pos, Color, TCHAR_TO_ANSI(*FCogHelper::GetActorName(Actor)));
+        AddTextWithShadow(DrawList, FCogImguiHelper::ToImVec2(ScreenPosMin + FVector2D(0, -14.0f)) + Viewport->Pos, Color, COG_TCHAR_TO_CHAR(*FCogHelper::GetActorName(Actor)));
     }
 }
 
@@ -1258,7 +1259,7 @@ void FCogWidgets::SmallButton(const char* Text, const ImVec4& Color)
 bool FCogWidgets::InputText(const char* Text, FString& Value, ImGuiInputTextFlags InFlags, ImGuiInputTextCallback InCallback, void* InUserData)
 {
     static char ValueBuffer[256] = "";
-    ImStrncpy(ValueBuffer, TCHAR_TO_ANSI(*Value), IM_ARRAYSIZE(ValueBuffer));
+    ImStrncpy(ValueBuffer, COG_TCHAR_TO_CHAR(*Value), IM_ARRAYSIZE(ValueBuffer));
     
     bool result = ImGui::InputText(Text, ValueBuffer, IM_ARRAYSIZE(ValueBuffer), InFlags, InCallback, InUserData);
     if (result)
@@ -1273,7 +1274,7 @@ bool FCogWidgets::InputText(const char* Text, FString& Value, ImGuiInputTextFlag
 bool FCogWidgets::InputTextWithHint(const char* InText, const char* InHint, FString& InValue, ImGuiInputTextFlags InFlags, ImGuiInputTextCallback InCallback, void* InUserData)
 {
     static char ValueBuffer[256] = "";
-    ImStrncpy(ValueBuffer, TCHAR_TO_ANSI(*InValue), IM_ARRAYSIZE(ValueBuffer));
+    ImStrncpy(ValueBuffer, COG_TCHAR_TO_CHAR(*InValue), IM_ARRAYSIZE(ValueBuffer));
 
     bool result = ImGui::InputTextWithHint(InText, InHint, ValueBuffer, IM_ARRAYSIZE(ValueBuffer), InFlags, InCallback, InUserData);
     if (result)

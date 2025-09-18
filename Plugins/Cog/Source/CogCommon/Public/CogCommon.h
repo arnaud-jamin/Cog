@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Templates/IsArrayOrRefOfType.h"
 #include "CogCommonLogCategory.h"
+#include "CogLocalizationConfig.h"
 
 #ifndef ENABLE_COG
 #define ENABLE_COG !UE_BUILD_SHIPPING

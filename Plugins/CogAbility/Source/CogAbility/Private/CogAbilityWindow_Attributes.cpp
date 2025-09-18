@@ -9,6 +9,7 @@
 #include "CogWidgets.h"
 #include "AttributeSet.h"
 #include "CogAbilityWindow_Abilities.h"
+#include "CogCommon.h"
 #include "imgui_internal.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -149,7 +150,7 @@ void FCogAbilityWindow_Attributes::RenderContent()
             if (AttributeSet == nullptr)
             { continue; }
 
-            ImGui::PushID(TCHAR_TO_ANSI(*AttributeSet->GetName()));
+            ImGui::PushID(COG_TCHAR_TO_CHAR(*AttributeSet->GetName()));
 
             FString AttributeSetName = AttributeSet->GetName();
             FormatAttributeSetName(AttributeSetName);
@@ -232,7 +233,7 @@ void FCogAbilityWindow_Attributes::RenderContent()
                         ImGui::TableNextRow();
                         ImGui::TableNextColumn();
                         ImGui::PushStyleColor(ImGuiCol_Text, FCogImguiHelper::ToImVec4(Config->CategoryColor));
-                        bOpenCategory = ImGui::TreeNodeEx(TCHAR_TO_ANSI(*It.Key), ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_SpanAllColumns | ImGuiTreeNodeFlags_LabelSpanAllColumns);
+                        bOpenCategory = ImGui::TreeNodeEx(COG_TCHAR_TO_CHAR(*It.Key), ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_SpanAllColumns | ImGuiTreeNodeFlags_LabelSpanAllColumns);
                         ImGui::PopStyleColor();
                     }
 
@@ -400,7 +401,7 @@ void FCogAbilityWindow_Attributes::RenderAttributeDetails(const UAbilitySystemCo
         ImGui::TableNextColumn();
         ImGui::TextColored(TextColor, "Name");
         ImGui::TableNextColumn();
-        ImGui::Text("%s", TCHAR_TO_ANSI(*Attribute.GetName()));
+        ImGui::Text("%s", COG_TCHAR_TO_CHAR(*Attribute.GetName()));
 
         //------------------------
         // Base Value
@@ -462,13 +463,13 @@ void FCogAbilityWindow_Attributes::RenderAttributeDetails(const UAbilitySystemCo
                         ImGui::TableNextColumn();
                         ImGui::TextColored(TextColor, "Effect");
                         ImGui::TableNextColumn();
-                        ImGui::Text("%s", TCHAR_TO_ANSI(*FCogAbilityHelper::CleanupName(GetNameSafe(ActiveEffect->Spec.Def))));
+                        ImGui::Text("%s", COG_TCHAR_TO_CHAR(*FCogAbilityHelper::CleanupName(GetNameSafe(ActiveEffect->Spec.Def))));
 
                         ImGui::TableNextRow();
                         ImGui::TableNextColumn();
                         ImGui::TextColored(TextColor, "Operation");
                         ImGui::TableNextColumn();
-                        ImGui::Text("%s", TCHAR_TO_ANSI(*EGameplayModOpToString(ModInfo.ModifierOp)));
+                        ImGui::Text("%s", COG_TCHAR_TO_CHAR(*EGameplayModOpToString(ModInfo.ModifierOp)));
 
                         ImGui::TableNextRow();
                         ImGui::TableNextColumn();

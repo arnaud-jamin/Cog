@@ -11,6 +11,6 @@ class COGDEBUG_API UCogDebugPlotBlueprint : public UBlueprintFunctionLibrary
 
 public:
 
-    UFUNCTION(BlueprintCallable, meta = (DevelopmentOnly))
+    UFUNCTION(BlueprintCallable, meta = (DevelopmentOnly), Category = "Cog")
     static void Plot(const UObject* Owner, const FName Name, const float Value);
 };

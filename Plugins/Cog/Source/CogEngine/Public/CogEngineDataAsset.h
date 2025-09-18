@@ -42,13 +42,13 @@ struct COGENGINE_API FCogEngineCheat
 {
     GENERATED_BODY()
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, Category = "Cog")
     FString Name;
 
-    UPROPERTY(EditAnywhere, Instanced)
+    UPROPERTY(EditAnywhere, Instanced, Category = "Cog")
     TObjectPtr<UCogEngineCheat_Execution> Execution;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, Category = "Cog")
     FLinearColor Color = FLinearColor::White;
 
     mutable FLinearColor CustomColor = FLinearColor::White;
@@ -76,10 +76,10 @@ struct COGENGINE_API FCogEngineSpawnEntry
 {
     GENERATED_BODY()
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, Category = "Cog")
     TSubclassOf<AActor> Class;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, Category = "Cog")
     TObjectPtr<const UObject> Asset = nullptr;
 };
 
@@ -89,13 +89,13 @@ struct COGENGINE_API FCogEngineSpawnGroup
 {
     GENERATED_BODY()
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, Category = "Cog")
     FString Name;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, Category = "Cog")
     FLinearColor Color = FLinearColor(0.5f, 0.5f, 0.5f, 1.0f);
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, Category = "Cog")
     TArray<FCogEngineSpawnEntry> Spawns;
 };
 
@@ -106,7 +106,7 @@ class COGENGINE_API UCogEngineDataAsset : public UPrimaryDataAsset
     GENERATED_BODY()
 
 public:
-    
+
     UCogEngineDataAsset() {}
 
     UPROPERTY(Category = "Cheats", EditAnywhere, meta = (TitleProperty = "Name"))
@@ -117,7 +117,7 @@ public:
 
     UPROPERTY(Category = "Selection", EditAnywhere)
     TArray<TSubclassOf<AActor>> SelectionFilters = { ACharacter::StaticClass(), AActor::StaticClass(), AGameModeBase::StaticClass(), AGameStateBase::StaticClass() };
-    
+
     UPROPERTY(Category = "Selection", EditAnywhere)
     TEnumAsByte<ETraceTypeQuery> SelectionTraceChannel = UEngineTypes::ConvertToTraceType(ECC_Pawn);
 };

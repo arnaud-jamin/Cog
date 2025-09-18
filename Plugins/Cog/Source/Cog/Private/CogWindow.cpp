@@ -1,5 +1,6 @@
 #include "CogWindow.h"
 
+#include "CogCommon.h"
 #include "CogDebug.h"
 #include "CogWindow_Settings.h"
 #include "CogSubsystem.h"
@@ -41,7 +42,7 @@ void FCogWindow::SetFullName(const FString& InFullName)
 
     Title = Name;
 
-    ID = ImHashStr(TCHAR_TO_ANSI(*FullName));
+    ID = ImHashStr(COG_TCHAR_TO_CHAR(*FullName));
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

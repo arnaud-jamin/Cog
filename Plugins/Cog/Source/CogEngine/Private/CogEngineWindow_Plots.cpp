@@ -1,5 +1,6 @@
 #include "CogEngineWindow_Plots.h"
 
+#include "CogCommon.h"
 #include "CogDebug.h"
 #include "CogDebugTracker.h"
 #include "CogImguiHelper.h"
@@ -220,7 +221,7 @@ void FCogEngineWindow_Plots::RenderEntryName(FCogDebugTracker& InTracker, const 
         }
     }
 
-    if (ImGui::Selectable(TCHAR_TO_ANSI(*Entry.Id.ToString()), IsAssignedToGraph, ImGuiSelectableFlags_AllowDoubleClick))
+    if (ImGui::Selectable(COG_TCHAR_TO_CHAR(*Entry.Id.ToString()), IsAssignedToGraph, ImGuiSelectableFlags_AllowDoubleClick))
     {
         if (IsAssignedToGraph)
         {
@@ -649,7 +650,7 @@ void FCogEngineWindow_Plots::RenderEvents(FCogDebugEventTrack& InTrack, const ch
             constexpr float Radius = 10.0f;
             PlotDrawList->AddNgon(PosMid, 10, Event.BorderColor, 4);
             PlotDrawList->AddNgonFilled(PosMid, 10, Event.FillColor, 4);
-            PlotDrawList->AddText(ImVec2(PosMid.x + 15, PosMid.y - 6), IM_COL32(255, 255, 255, 255), TCHAR_TO_ANSI(*Event.DisplayName));
+            PlotDrawList->AddText(ImVec2(PosMid.x + 15, PosMid.y - 6), IM_COL32(255, 255, 255, 255), COG_TCHAR_TO_CHAR(*Event.DisplayName));
 
             if ((Mouse.x > PosMid.x - Radius) && (Mouse.x < PosMid.x + Radius) && (Mouse.y > PosMid.y - Radius) && (Mouse.y < PosMid.y + Radius))
             {
@@ -665,7 +666,7 @@ void FCogEngineWindow_Plots::RenderEvents(FCogDebugEventTrack& InTrack, const ch
             PlotDrawList->AddRect(Min, Max, Event.BorderColor, 6.0f, Flags);
             PlotDrawList->AddRectFilled(Min, Max, Event.FillColor, 6.0f, Flags);
             PlotDrawList->PushClipRect(ImMax(Min, InPlotMin), ImMin(Max, InPlotMax));
-            PlotDrawList->AddText(ImVec2(PosMid.x + 5, PosMid.y - 7), IM_COL32(255, 255, 255, 255), TCHAR_TO_ANSI(*Event.DisplayName));
+            PlotDrawList->AddText(ImVec2(PosMid.x + 5, PosMid.y - 7), IM_COL32(255, 255, 255, 255), COG_TCHAR_TO_CHAR(*Event.DisplayName));
             PlotDrawList->PopClipRect();
 
             if (Mouse.x > Min.x && Mouse.x < Max.x && Mouse.y > Min.y && Mouse.y < Max.y)
@@ -706,7 +707,7 @@ void FCogEngineWindow_Plots::RenderEventTooltip(const FCogDebugEvent* HoveredEve
                 ImGui::TableNextColumn();
                 ImGui::Text("Name");
                 ImGui::TableNextColumn();
-                ImGui::Text("%s", TCHAR_TO_ANSI(*HoveredEvent->DisplayName));
+                ImGui::Text("%s", COG_TCHAR_TO_CHAR(*HoveredEvent->DisplayName));
 
                 //------------------------
                 // Owner Name
@@ -715,7 +716,7 @@ void FCogEngineWindow_Plots::RenderEventTooltip(const FCogDebugEvent* HoveredEve
                 ImGui::TableNextColumn();
                 ImGui::Text("Owner");
                 ImGui::TableNextColumn();
-                ImGui::Text("%s", TCHAR_TO_ANSI(*HoveredEvent->OwnerName));
+                ImGui::Text("%s", COG_TCHAR_TO_CHAR(*HoveredEvent->OwnerName));
 
                 //------------------------
                 // Times
@@ -756,9 +757,9 @@ void FCogEngineWindow_Plots::RenderEventTooltip(const FCogDebugEvent* HoveredEve
                 {
                     ImGui::TableNextRow();
                     ImGui::TableNextColumn();
-                    ImGui::Text("%s", TCHAR_TO_ANSI(*Param.Name.ToString()));
+                    ImGui::Text("%s", COG_TCHAR_TO_CHAR(*Param.Name.ToString()));
                     ImGui::TableNextColumn();
-                    ImGui::Text("%s", TCHAR_TO_ANSI(*Param.Value));
+                    ImGui::Text("%s", COG_TCHAR_TO_CHAR(*Param.Value));
                 }
                 ImGui::EndTable();
             }

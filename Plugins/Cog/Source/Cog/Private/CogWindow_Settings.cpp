@@ -1,5 +1,6 @@
 #include "CogWindow_Settings.h"
 
+#include "CogCommon.h"
 #include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
 #include "CogSubsystem.h"
@@ -215,7 +216,7 @@ void FCogWindow_Settings::RenderContent()
                 }
                 
                 ImGui::SameLine();
-                ImGui::Selectable(TCHAR_TO_ANSI(*Window->GetName()), false, ImGuiSelectableFlags_SpanAvailWidth);
+                ImGui::Selectable(COG_TCHAR_TO_CHAR(*Window->GetName()), false, ImGuiSelectableFlags_SpanAvailWidth);
                 {
                     Window->SetIsWidgetVisible(Visible);
                 }
