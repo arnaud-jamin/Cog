@@ -136,7 +136,6 @@ void FCogWindow::RenderHelp()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogWindow::RenderTick(float DeltaTime)
 {
-    SetSelection(FCogDebug::GetSelection());
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -147,10 +146,7 @@ void FCogWindow::GameTick(float DeltaTime)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogWindow::SetSelection(AActor* NewSelection)
 {
-    AActor* OldActor = GetSelection();
     FCogDebug::SetSelection(NewSelection);
-
-    OnSelectionChanged(OldActor, NewSelection);
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

@@ -49,8 +49,6 @@ protected:
 
     virtual void RenderTick(float DeltaTime) override;
 
-    virtual void OnSelectionChanged(AActor* OldSelection, AActor* NewSelection) override;
-
 private:
     void RenderBoneEntry(int32 BoneIndex, bool OpenAllChildren);
 
@@ -61,6 +59,8 @@ private:
     void RefreshSkeleton();
 
     TWeakObjectPtr<USkeletalMeshComponent> CurrentSkeleton = nullptr;
+
+    TWeakObjectPtr<AActor> CurrentSelection = nullptr;
 
     bool ShowBones = true;
 

@@ -28,12 +28,6 @@ void FCogEngineWindow_Skeleton::RenderHelp()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogEngineWindow_Skeleton::OnSelectionChanged(AActor* OldSelection, AActor* NewSelection)
-{
-    RefreshSkeleton();
-}
-
-//--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_Skeleton::RenderTick(float DeltaTime)
 {
     Super::RenderTick(DeltaTime);
@@ -41,6 +35,12 @@ void FCogEngineWindow_Skeleton::RenderTick(float DeltaTime)
     if (GetIsVisible() == false)
     {
         return;
+    }
+
+    if (CurrentSelection.Get() != GetSelection())
+    {
+        CurrentSelection = GetSelection();
+        RefreshSkeleton();
     }
 
     DrawSkeleton();
@@ -52,7 +52,6 @@ void FCogEngineWindow_Skeleton::RefreshSkeleton()
 {
     CurrentSkeleton = nullptr;
     BonesInfos.Empty();
-
 
     AActor* Selection = GetSelection();
     if (Selection == nullptr)

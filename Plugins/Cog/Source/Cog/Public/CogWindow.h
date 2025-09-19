@@ -116,8 +116,6 @@ protected:
 
     virtual void OnWindowVisibilityChanged(bool NewVisibility) { }
 
-    virtual void OnSelectionChanged(AActor* OldSelection, AActor* NewSelection) {}
-
     virtual bool IsWindowRenderedInMainMenu();
 
     virtual void RenderConfigShortcuts(UCogCommonConfig& InConfig) const;

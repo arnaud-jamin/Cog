@@ -30,9 +30,9 @@ struct COGDEBUG_API FCogDebug
     static bool IsReplicatedDebugActiveForObject(const UObject* WorldContextObject, const AActor* ServerSelection, bool IsServerFilteringBySelection);
 
     static AActor* GetSelection();
-    
+
     static void SetSelection(AActor* InValue);
-    
+
     static bool GetIsFilteringBySelection();
 
     static void SetIsFilteringBySelection(const UWorld* World, bool Value);
