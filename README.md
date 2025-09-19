@@ -343,9 +343,11 @@ Used to select an actor either by picking an actor in the world or by selecting 
   
 Configure the settings of Cog.
 
-![Settings](https://github.com/user-attachments/assets/6587d44d-bf40-4ff1-8d26-71f79a3110f2)
+![Settings](https://github.com/user-attachments/assets/0d55f3c4-465e-42e1-a95f-6d0e00b21c1d)
+
 - Configure how ImGui behaves
 - Change the visibility and ordering of the widgets appearing in the main menu bar
+- Change the ImGui Font
 - Change Cog Shortcuts
 - Change the DPI Scaling. Use `[Ctrl][MouseWheel]` to change the DPI.
 
