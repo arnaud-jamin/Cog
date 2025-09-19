@@ -98,6 +98,9 @@ public:
     bool ShowWidgetBorders = false;
 
     UPROPERTY(Config)
+    FString Font;
+
+    UPROPERTY(Config)
     FInputChord Shortcut_ToggleImguiInput =  FInputChord(EKeys::F1);
 
     UPROPERTY(Config)
@@ -162,5 +165,6 @@ public:
         Shortcut_SaveLayout3 = FInputChord();
         Shortcut_SaveLayout4 = FInputChord();
         Shortcut_ResetLayout = FInputChord();
+        Font = FString();
     }
 };

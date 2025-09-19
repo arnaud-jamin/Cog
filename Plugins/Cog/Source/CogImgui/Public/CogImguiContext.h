@@ -80,6 +80,10 @@ public:
 
 	ImVec2 GetImguiMousePos() const;
 
+	FString GetFont() const { return Font; }
+
+	void SetFont(FString Value);
+
 	TObjectPtr<const UGameViewportClient> GetGameViewport() const { return GameViewport; }
 
 	TSharedPtr<const SCogImguiWidget> GetMainWidget() const { return MainWidget; }
@@ -185,6 +189,8 @@ private:
 	bool bSkipRendering = false;
 
 	bool bRetakeFocus = false;
+
+	FString Font;
 
 	static bool bIsNetImGuiInitialized;
 

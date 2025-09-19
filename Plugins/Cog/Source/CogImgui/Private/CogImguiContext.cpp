@@ -865,6 +865,13 @@ void FCogImguiContext::SetDPIScale(float Value)
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
+void FCogImguiContext::SetFont(FString Value)
+{
+    Font = Value;
+    bRefreshDPIScale = true;
+}
+
+//--------------------------------------------------------------------------------------------------------------------------
 void FCogImguiContext::BuildFont()
 {
     FCogImGuiContextScope ImGuiContextScope(Context, PlotContext);
@@ -882,21 +889,20 @@ void FCogImguiContext::BuildFont()
     FontConfig.SizePixels = FMath::RoundFromZero(13.f * DpiScale);
 	
     // if engine's font file exist, use it as truetype font, else use fallback one
-	FString FontFile = FPaths::EngineContentDir() / TEXT("Slate/Fonts/DroidSansFallback.ttf");
-	if (!FPaths::FileExists(FontFile))
-	{
-		IO.Fonts->AddFontDefault(&FontConfig);
-	}
-	else
-	{
-		// support chinese if needed
+    if (FPaths::FileExists(Font))
+    {
+        // support chinese if needed
 #if COG_SUPPORT_CHINESE
-		const ImWchar* glyphRange = IO.Fonts->GetGlyphRangesChineseFull();
+        const ImWchar* glyphRange = IO.Fonts->GetGlyphRangesChineseFull();
 #else
-		const ImWchar* glyphRange = IO.Fonts->GetGlyphRangesDefault();
+        const ImWchar* glyphRange = IO.Fonts->GetGlyphRangesDefault();
 #endif
-		IO.Fonts->AddFontFromFileTTF(TCHAR_TO_UTF8(*FontFile), 16.f * DpiScale, nullptr, glyphRange );
-	}
+        IO.Fonts->AddFontFromFileTTF(TCHAR_TO_UTF8(*Font), 16.f * DpiScale, nullptr, glyphRange);
+    }
+    else
+    {
+        IO.Fonts->AddFontDefault(&FontConfig);
+    }
 	
     uint8* TextureDataRaw;
     int32 TextureWidth, TextureHeight, BytesPerPixel;
