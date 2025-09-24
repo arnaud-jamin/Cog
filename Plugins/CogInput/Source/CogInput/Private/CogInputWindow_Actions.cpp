@@ -89,7 +89,7 @@ void FCogInputWindow_Actions::RenderContent()
         {
             FCogInputMappingContextInfo& MappingInfo = AllAppliedMappings.AddDefaulted_GetRef();
             MappingInfo.MappingContext = kv.Key;
-            MappingInfo.Priority = kv.Value;
+            MappingInfo.AppliedInputContextData = kv.Value;
         }
     }
 
@@ -128,7 +128,7 @@ void FCogInputWindow_Actions::RenderContent()
 		//----------------------------------------------------
         FCogInputMappingContextInfo& NewMappingInfo = Mappings.AddDefaulted_GetRef();
         NewMappingInfo.MappingContext = MappingInfo.MappingContext;
-        NewMappingInfo.Priority = MappingInfo.Priority;
+        NewMappingInfo.AppliedInputContextData = MappingInfo.AppliedInputContextData;
 
         //----------------------------------------------------
 		// Add all the mapping actions
@@ -157,7 +157,7 @@ void FCogInputWindow_Actions::RenderContent()
 
         Mappings.Sort([](const FCogInputMappingContextInfo& Lhs, const FCogInputMappingContextInfo& Rhs)
             {
-                return Lhs.Priority < Rhs.Priority;
+                return Lhs.AppliedInputContextData.Priority < Rhs.AppliedInputContextData.Priority;
             });
     }
 

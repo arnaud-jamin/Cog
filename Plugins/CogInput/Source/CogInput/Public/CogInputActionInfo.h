@@ -8,8 +8,8 @@ class UInputAction;
 class UInputMappingContext;
 class UEnhancedInputLocalPlayerSubsystem;
 
-typedef TMap<TObjectPtr<const UInputMappingContext>, int32> CogInputMappingContextMap;
-DEFINE_PRIVATE_ACCESSOR_VARIABLE(UEnhancedPlayerInput_AppliedInputContexts, UEnhancedPlayerInput, CogInputMappingContextMap, AppliedInputContexts);
+typedef TMap<TObjectPtr<const UInputMappingContext>, FAppliedInputContextData>  CogInputMappingContextMap;
+DEFINE_PRIVATE_ACCESSOR_VARIABLE(UEnhancedPlayerInput_AppliedInputContexts, UEnhancedPlayerInput, CogInputMappingContextMap, AppliedInputContextData);
 
 struct FCogInputActionInfo
 {
@@ -47,7 +47,7 @@ struct FCogInputMappingContextInfo
 {
     TObjectPtr<const UInputMappingContext> MappingContext;
 
-	int32 Priority = 0;
+	FAppliedInputContextData AppliedInputContextData;
 
     TArray<FCogInputActionInfo> Actions;
 };
