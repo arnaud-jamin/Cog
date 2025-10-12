@@ -26,6 +26,7 @@ public class CogAI : ModuleRules
                 "CogImgui",
                 "CogDebug",
                 "Cog",
+                "AIModule",
             }
             );
             
@@ -35,7 +36,6 @@ public class CogAI : ModuleRules
             {
                 "CoreUObject",
                 "Engine",
-                "AIModule",
             }
             );
         
