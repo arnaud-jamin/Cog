@@ -285,6 +285,15 @@ Display the output log based on each log categories verbosity.
 ---
 </details>
 <details>
+<summary>Perception</summary>
+
+Display the state of the AIPerception component of the selection's Controller.
+  
+![Perception](https://github.com/user-attachments/assets/a80ff669-db97-4a3a-95e3-b840119d2e53)
+
+---
+</details>
+<details>
 <summary>Plots</summary>
   
 Plots values and events overtime. When applicable, only the values and events of the selected actor are displayed.
