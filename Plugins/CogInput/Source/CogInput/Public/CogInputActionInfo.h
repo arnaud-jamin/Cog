@@ -3,13 +3,25 @@
 #include "CoreMinimal.h"
 #include "CogDebugRob.h"
 #include "EnhancedPlayerInput.h"
+#include "Misc/EngineVersionComparison.h"
 
 class UInputAction;
 class UInputMappingContext;
 class UEnhancedInputLocalPlayerSubsystem;
 
+#if UE_VERSION_OLDER_THAN(5, 6, 0)
+
 typedef TMap<TObjectPtr<const UInputMappingContext>, int32> CogInputMappingContextMap;
 DEFINE_PRIVATE_ACCESSOR_VARIABLE(UEnhancedPlayerInput_AppliedInputContexts, UEnhancedPlayerInput, CogInputMappingContextMap, AppliedInputContexts);
+
+#else //UE_VERSION_OLDER_THAN(5, 6, 0)
+
+typedef TMap<TObjectPtr<const UInputMappingContext>, FAppliedInputContextData>  CogInputMappingContextMap;
+DEFINE_PRIVATE_ACCESSOR_VARIABLE(UEnhancedPlayerInput_AppliedInputContexts, UEnhancedPlayerInput, CogInputMappingContextMap, AppliedInputContextData);
+
+#endif //UE_VERSION_OLDER_THAN(5, 6, 0)
+
+
 
 struct FCogInputActionInfo
 {
@@ -47,7 +59,11 @@ struct FCogInputMappingContextInfo
 {
     TObjectPtr<const UInputMappingContext> MappingContext;
 
-	int32 Priority = 0;
+#if UE_VERSION_OLDER_THAN(5, 6, 0)
+    int32 Priority = 0;
+#else //UE_VERSION_OLDER_THAN(5, 6, 0)
+    FAppliedInputContextData AppliedInputContextData;
+#endif //UE_VERSION_OLDER_THAN(5, 6, 0)
 
     TArray<FCogInputActionInfo> Actions;
 };

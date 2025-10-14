@@ -8,6 +8,7 @@
 #include "imgui_internal.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
+#include "Misc/EngineVersionComparison.h"
 #include "Styling/SlateTypes.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -89,7 +90,12 @@ void FCogInputWindow_Actions::RenderContent()
         {
             FCogInputMappingContextInfo& MappingInfo = AllAppliedMappings.AddDefaulted_GetRef();
             MappingInfo.MappingContext = kv.Key;
+
+#if UE_VERSION_OLDER_THAN(5, 6, 0)
             MappingInfo.Priority = kv.Value;
+#else //UE_VERSION_OLDER_THAN(5, 6, 0)
+            MappingInfo.AppliedInputContextData = kv.Value;
+#endif //UE_VERSION_OLDER_THAN(5, 6, 0)
         }
     }
 
@@ -128,7 +134,12 @@ void FCogInputWindow_Actions::RenderContent()
 		//----------------------------------------------------
         FCogInputMappingContextInfo& NewMappingInfo = Mappings.AddDefaulted_GetRef();
         NewMappingInfo.MappingContext = MappingInfo.MappingContext;
-        NewMappingInfo.Priority = MappingInfo.Priority;
+
+#if UE_VERSION_OLDER_THAN(5, 6, 0)
+        MappingInfo.Priority = MappingInfo.Priority;
+#else
+        NewMappingInfo.AppliedInputContextData = MappingInfo.AppliedInputContextData;
+#endif
 
         //----------------------------------------------------
 		// Add all the mapping actions
@@ -157,7 +168,11 @@ void FCogInputWindow_Actions::RenderContent()
 
         Mappings.Sort([](const FCogInputMappingContextInfo& Lhs, const FCogInputMappingContextInfo& Rhs)
             {
+#if UE_VERSION_OLDER_THAN(5, 6, 0)
                 return Lhs.Priority < Rhs.Priority;
+#else
+                return Lhs.AppliedInputContextData.Priority < Rhs.AppliedInputContextData.Priority;
+#endif
             });
     }
 
