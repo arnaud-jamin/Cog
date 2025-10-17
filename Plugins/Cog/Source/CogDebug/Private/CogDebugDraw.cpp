@@ -19,7 +19,7 @@
 #if ENABLE_COG
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::String2D(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FString& Text, const FVector2D& Location, const FColor& Color, const bool Persistent)
+void FCogDebugDraw::String2D(const FCogLogCategoryAlias& LogCategory, const UObject* WorldContextObject, const FString& Text, const FVector2D& Location, const FColor& Color, const bool Persistent)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
@@ -36,7 +36,7 @@ void FCogDebugDraw::String2D(const FLogCategoryBase& LogCategory, const UObject*
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Segment2D(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector2D& SegmentStart, const FVector2D& SegmentEnd, const FColor& Color, const bool Persistent)
+void FCogDebugDraw::Segment2D(const FCogLogCategoryAlias& LogCategory, const UObject* WorldContextObject, const FVector2D& SegmentStart, const FVector2D& SegmentEnd, const FColor& Color, const bool Persistent)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
@@ -53,7 +53,7 @@ void FCogDebugDraw::Segment2D(const FLogCategoryBase& LogCategory, const UObject
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Circle2D(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector2D& Location, const float Radius, const FColor& Color, const bool Persistent)
+void FCogDebugDraw::Circle2D(const FCogLogCategoryAlias& LogCategory, const UObject* WorldContextObject, const FVector2D& Location, const float Radius, const FColor& Color, const bool Persistent)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
@@ -72,7 +72,7 @@ void FCogDebugDraw::Circle2D(const FLogCategoryBase& LogCategory, const UObject*
 
 //--------------------------------------------------------------------------------------------------------------------------
 
-void FCogDebugDraw::Rect2D(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector2D& Min, const FVector2D& Max, const FColor& Color, const bool Persistent)
+void FCogDebugDraw::Rect2D(const FCogLogCategoryAlias& LogCategory, const UObject* WorldContextObject, const FVector2D& Min, const FVector2D& Max, const FColor& Color, const bool Persistent)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
@@ -90,7 +90,7 @@ void FCogDebugDraw::Rect2D(const FLogCategoryBase& LogCategory, const UObject* W
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::String(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FString& Text, const FVector& Location, const FColor& Color, const bool Persistent)
+void FCogDebugDraw::String(const FCogLogCategoryAlias& LogCategory, const UObject* WorldContextObject, const FString& Text, const FVector& Location, const FColor& Color, const bool Persistent)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
@@ -118,7 +118,7 @@ void FCogDebugDraw::String(const FLogCategoryBase& LogCategory, const UObject* W
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Point(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& Location, const float Size, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
+void FCogDebugDraw::Point(const FCogLogCategoryAlias& LogCategory, const UObject* WorldContextObject, const FVector& Location, const float Size, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
@@ -145,7 +145,7 @@ void FCogDebugDraw::Point(const FLogCategoryBase& LogCategory, const UObject* Wo
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Segment(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& SegmentStart, const FVector& SegmentEnd, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
+void FCogDebugDraw::Segment(const FCogLogCategoryAlias& LogCategory, const UObject* WorldContextObject, const FVector& SegmentStart, const FVector& SegmentEnd, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
@@ -175,7 +175,7 @@ void FCogDebugDraw::Segment(const FLogCategoryBase& LogCategory, const UObject* 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Bone(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& BoneLocation, const FVector& ParentLocation, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
+void FCogDebugDraw::Bone(const FCogLogCategoryAlias& LogCategory, const UObject* WorldContextObject, const FVector& BoneLocation, const FVector& ParentLocation, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
@@ -214,7 +214,7 @@ void FCogDebugDraw::Bone(const FLogCategoryBase& LogCategory, const UObject* Wor
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Arrow(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& SegmentStart, const FVector& SegmentEnd, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
+void FCogDebugDraw::Arrow(const FCogLogCategoryAlias& LogCategory, const UObject* WorldContextObject, const FVector& SegmentStart, const FVector& SegmentEnd, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
@@ -245,7 +245,7 @@ void FCogDebugDraw::Arrow(const FLogCategoryBase& LogCategory, const UObject* Wo
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Axis(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& AxisLoc, const FRotator& AxisRot, const float Scale, const bool Persistent, const uint8 DepthPriority)
+void FCogDebugDraw::Axis(const FCogLogCategoryAlias& LogCategory, const UObject* WorldContextObject, const FVector& AxisLoc, const FRotator& AxisRot, const float Scale, const bool Persistent, const uint8 DepthPriority)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
@@ -277,7 +277,7 @@ void FCogDebugDraw::Axis(const FLogCategoryBase& LogCategory, const UObject* Wor
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Circle(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FMatrix& Matrix, float Radius, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
+void FCogDebugDraw::Circle(const FCogLogCategoryAlias& LogCategory, const UObject* WorldContextObject, const FMatrix& Matrix, float Radius, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
@@ -311,7 +311,7 @@ void FCogDebugDraw::Circle(const FLogCategoryBase& LogCategory, const UObject* W
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::CircleArc(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FMatrix& Matrix, const float InnerRadius, const float OuterRadius, const float Angle, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
+void FCogDebugDraw::CircleArc(const FCogLogCategoryAlias& LogCategory, const UObject* WorldContextObject, const FMatrix& Matrix, const float InnerRadius, const float OuterRadius, const float Angle, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
@@ -345,7 +345,7 @@ void FCogDebugDraw::CircleArc(const FLogCategoryBase& LogCategory, const UObject
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::FlatCapsule(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector2D& Start, const FVector2D& End, const float Radius, const float Z, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
+void FCogDebugDraw::FlatCapsule(const FCogLogCategoryAlias& LogCategory, const UObject* WorldContextObject, const FVector2D& Start, const FVector2D& End, const float Radius, const float Z, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
@@ -378,7 +378,7 @@ void FCogDebugDraw::FlatCapsule(const FLogCategoryBase& LogCategory, const UObje
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Sphere(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& Location, const float Radius, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
+void FCogDebugDraw::Sphere(const FCogLogCategoryAlias& LogCategory, const UObject* WorldContextObject, const FVector& Location, const float Radius, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
@@ -409,7 +409,7 @@ void FCogDebugDraw::Sphere(const FLogCategoryBase& LogCategory, const UObject* W
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Box(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& Center, const FVector& Extent, const FQuat& Rotation, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
+void FCogDebugDraw::Box(const FCogLogCategoryAlias& LogCategory, const UObject* WorldContextObject, const FVector& Center, const FVector& Extent, const FQuat& Rotation, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
@@ -440,7 +440,7 @@ void FCogDebugDraw::Box(const FLogCategoryBase& LogCategory, const UObject* Worl
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::SolidBox(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& Center, const FVector& Extent, const FQuat& Rotation, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
+void FCogDebugDraw::SolidBox(const FCogLogCategoryAlias& LogCategory, const UObject* WorldContextObject, const FVector& Center, const FVector& Extent, const FQuat& Rotation, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
@@ -475,7 +475,7 @@ void FCogDebugDraw::SolidBox(const FLogCategoryBase& LogCategory, const UObject*
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Frustum(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FMatrix& Matrix, const float Angle, const float AspectRatio, const float NearPlane, const float FarPlane, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
+void FCogDebugDraw::Frustum(const FCogLogCategoryAlias& LogCategory, const UObject* WorldContextObject, const FMatrix& Matrix, const float Angle, const float AspectRatio, const float NearPlane, const float FarPlane, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
@@ -507,7 +507,7 @@ void FCogDebugDraw::Frustum(const FLogCategoryBase& LogCategory, const UObject* 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Capsule(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& Center, const float HalfHeight, const float Radius, const FQuat& Rotation, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
+void FCogDebugDraw::Capsule(const FCogLogCategoryAlias& LogCategory, const UObject* WorldContextObject, const FVector& Center, const float HalfHeight, const float Radius, const FQuat& Rotation, const FColor& Color, const bool Persistent, const uint8 DepthPriority)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
@@ -539,7 +539,7 @@ void FCogDebugDraw::Capsule(const FLogCategoryBase& LogCategory, const UObject* 
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Points(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const TArray<FVector>& Points, const float Radius, const FColor& StartColor, const FColor& EndColor, const bool Persistent, const uint8 DepthPriority)
+void FCogDebugDraw::Points(const FCogLogCategoryAlias& LogCategory, const UObject* WorldContextObject, const TArray<FVector>& Points, const float Radius, const FColor& StartColor, const FColor& EndColor, const bool Persistent, const uint8 DepthPriority)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory))
     {
@@ -554,7 +554,7 @@ void FCogDebugDraw::Points(const FLogCategoryBase& LogCategory, const UObject* W
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Path(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const TArray<FVector>& Points, const float PointSize, const FColor& StartColor, const FColor& EndColor, const bool Persistent, const uint8 DepthPriority)
+void FCogDebugDraw::Path(const FCogLogCategoryAlias& LogCategory, const UObject* WorldContextObject, const TArray<FVector>& Points, const float PointSize, const FColor& StartColor, const FColor& EndColor, const bool Persistent, const uint8 DepthPriority)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     {
@@ -593,7 +593,7 @@ void FCogDebugDraw::Path(const FLogCategoryBase& LogCategory, const UObject* Wor
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Skeleton(const FLogCategoryBase& LogCategory, const USkeletalMeshComponent* Skeleton, const FColor& Color, const bool DrawSecondaryBones, const uint8 DepthPriority)
+void FCogDebugDraw::Skeleton(const FCogLogCategoryAlias& LogCategory, const USkeletalMeshComponent* Skeleton, const FColor& Color, const bool DrawSecondaryBones, const uint8 DepthPriority)
 {
     if (Skeleton == nullptr)
     {
@@ -639,7 +639,7 @@ void FCogDebugDraw::Skeleton(const FLogCategoryBase& LogCategory, const USkeleta
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::LineTrace(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FVector& Start, const FVector& End, const bool HasHits, TArray<FHitResult>& HitResults, const FCogDebugDrawLineTraceParams& Settings)
+void FCogDebugDraw::LineTrace(const FCogLogCategoryAlias& LogCategory, const UObject* WorldContextObject, const FVector& Start, const FVector& End, const bool HasHits, TArray<FHitResult>& HitResults, const FCogDebugDrawLineTraceParams& Settings)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     { return; }
@@ -666,7 +666,7 @@ void FCogDebugDraw::LineTrace(const FLogCategoryBase& LogCategory, const UObject
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Sweep(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FCollisionShape& Shape, const FVector& Start, const FVector& End, const FQuat& Rotation, const bool HasHits, TArray<FHitResult>& HitResults, const FCogDebugDrawSweepParams& Settings)
+void FCogDebugDraw::Sweep(const FCogLogCategoryAlias& LogCategory, const UObject* WorldContextObject, const FCollisionShape& Shape, const FVector& Start, const FVector& End, const FQuat& Rotation, const bool HasHits, TArray<FHitResult>& HitResults, const FCogDebugDrawSweepParams& Settings)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     { return; }
@@ -702,7 +702,7 @@ void FCogDebugDraw::Sweep(const FLogCategoryBase& LogCategory, const UObject* Wo
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogDebugDraw::Overlap(const FLogCategoryBase& LogCategory, const UObject* WorldContextObject, const FCollisionShape& Shape, const FVector& Location, const FQuat& Rotation, const bool HasHits, TArray<FOverlapResult>& OverlapResults, const FCogDebugDrawOverlapParams& Settings)
+void FCogDebugDraw::Overlap(const FCogLogCategoryAlias& LogCategory, const UObject* WorldContextObject, const FCollisionShape& Shape, const FVector& Location, const FQuat& Rotation, const bool HasHits, TArray<FOverlapResult>& OverlapResults, const FCogDebugDrawOverlapParams& Settings)
 {
     if (FCogDebugLog::IsLogCategoryActive(LogCategory) == false)
     { return; }

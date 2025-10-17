@@ -109,6 +109,9 @@ void FCogEngineWindow_LogCategories::RenderContent()
         return;
     }
 
+#if NO_LOGGING
+    ImGui::Text("Logging is disabled.");
+#else //NO_LOGGING
     const bool IsClient = World->GetNetMode() == NM_Client;
 
     int Index = 0;
@@ -121,7 +124,7 @@ void FCogEngineWindow_LogCategories::RenderContent()
             continue;
         }
 
-        FLogCategoryBase* Category = CategoryInfo.LogCategory;
+        FCogLogCategoryAlias* Category = CategoryInfo.LogCategory;
 
         ImGui::PushID(Index);
         const auto CategoryFriendlyName = StringCast<ANSICHAR>(*CategoryInfo.GetDisplayName());
@@ -282,4 +285,5 @@ void FCogEngineWindow_LogCategories::RenderContent()
         ImGui::PopID();
         Index++;
     }
+#endif //NO_LOGGING
 }

@@ -142,13 +142,13 @@ void UCogSampleProjectileComponent::Activate(bool bReset)
         Velocity = ServerSpawnVelocity;
     }
 
-#if ENABLE_COG
+#if ENABLE_COG && !NO_LOGGING
     DrawDebugCurrentState(FColor::Green);
     if (FCogDebugLog::IsLogCategoryActive(LogCogProjectile))
     {
         LastDebugLocation = GetOwner()->GetActorLocation();
     }
-#endif //ENABLE_COG
+#endif //ENABLE_COG && !NO_LOGGING
 
     //--------------------------------------------------------------------------
     // Catchup after settings LastDebugLocation because Tick will be triggered 
@@ -180,7 +180,7 @@ void UCogSampleProjectileComponent::TickComponent(float DeltaTime, enum ELevelTi
 
     //TravelingTime += DeltaTime;
 
-#if ENABLE_COG
+#if ENABLE_COG && !NO_LOGGING
 
     if (FCogDebugLog::IsLogCategoryActive(LogCogProjectile))
     {
@@ -215,7 +215,7 @@ void UCogSampleProjectileComponent::TickComponent(float DeltaTime, enum ELevelTi
 
     }
 
-#endif //ENABLE_COG
+#endif //ENABLE_COG && !NO_LOGGING
 }
 //--------------------------------------------------------------------------------------------------------------------------
 void UCogSampleProjectileComponent::Catchup(float CatchupDuration)

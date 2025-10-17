@@ -1,6 +1,7 @@
 #pragma  once
 
 #include "CoreMinimal.h"
+#include "CogCommon.h"
 #include "Logging/LogVerbosity.h"
 
 struct FCogLogCategory;
@@ -12,7 +13,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogCogServerDebug, Verbose, All);
 //--------------------------------------------------------------------------------------------------------------------------
 struct COGDEBUG_API FCogDebugLogCategoryInfo
 {
-    FLogCategoryBase* LogCategory = nullptr;
+    FCogLogCategoryAlias* LogCategory = nullptr;
     
     ELogVerbosity::Type ServerVerbosity = ELogVerbosity::NoLogging;
     
@@ -28,19 +29,19 @@ struct COGDEBUG_API FCogDebugLogCategoryInfo
 //--------------------------------------------------------------------------------------------------------------------------
 struct COGDEBUG_API FCogDebugLog
 {
-    static void AddLogCategory(FLogCategoryBase& LogCategory, const FString& DisplayName = "", const FString& Description = "", bool bVisible = true);
+    static void AddLogCategory(FCogLogCategoryAlias& LogCategory, const FString& DisplayName = "", const FString& Description = "", bool bVisible = true);
 
     static bool IsVerbosityActive(ELogVerbosity::Type Verbosity);
 
-    static bool IsLogCategoryActive(const FLogCategoryBase& LogCategory);
+    static bool IsLogCategoryActive(const FCogLogCategoryAlias& LogCategory);
 
     static bool IsLogCategoryActive(FName CategoryName);
 
-    static void SetLogCategoryActive(FLogCategoryBase& LogCategory, bool Value);
+    static void SetLogCategoryActive(FCogLogCategoryAlias& LogCategory, bool Value);
 
-    static FLogCategoryBase* FindLogCategory(FName CategoryName);
+    static FCogLogCategoryAlias* FindLogCategory(FName CategoryName);
 
-    static FLogCategoryBase* GetLogCategoryBase(const FCogLogCategory& LogCategory);
+    static FCogLogCategoryAlias* GetLogCategoryBase(const FCogLogCategory& LogCategory);
 
     static FCogDebugLogCategoryInfo* FindLogCategoryInfo(FName CategoryName);
 

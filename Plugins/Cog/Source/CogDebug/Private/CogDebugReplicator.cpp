@@ -120,7 +120,7 @@ void ACogDebugReplicator::TickActor(float DeltaTime, enum ELevelTick TickType, F
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogDebugReplicator::Server_SetCategoryVerbosity_Implementation(FName LogCategoryName, ECogLogVerbosity Verbosity)
 {
-#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING && !NO_LOGGING
 
 	const ENetMode NetMode = GetWorld()->GetNetMode();
     if (NetMode == NM_DedicatedServer || NetMode == NM_ListenServer)
@@ -135,7 +135,7 @@ void ACogDebugReplicator::Server_SetCategoryVerbosity_Implementation(FName LogCa
         }
     }
 
-#endif // !UE_BUILD_SHIPPING
+#endif // !UE_BUILD_SHIPPING && !NO_LOGGING
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -173,7 +173,7 @@ void ACogDebugReplicator::Client_SendCategoriesVerbosity_Implementation(const TA
 //--------------------------------------------------------------------------------------------------------------------------
 void ACogDebugReplicator::Server_RequestAllCategoriesVerbosity_Implementation()
 {
-#if !UE_BUILD_SHIPPING
+#if !UE_BUILD_SHIPPING && !NO_LOGGING
 
 	const ENetMode NetMode = GetWorld()->GetNetMode();
     if (NetMode == NM_DedicatedServer || NetMode == NM_ListenServer)
@@ -195,7 +195,7 @@ void ACogDebugReplicator::Server_RequestAllCategoriesVerbosity_Implementation()
         Client_SendCategoriesVerbosity(CategoriesData);
     }
 
-#endif // !UE_BUILD_SHIPPING
+#endif // !UE_BUILD_SHIPPING && !NO_LOGGING
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
