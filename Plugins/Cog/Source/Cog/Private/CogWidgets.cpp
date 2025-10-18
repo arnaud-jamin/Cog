@@ -518,12 +518,13 @@ bool FCogWidgets::CheckBoxState(const char* Label, ECheckBoxState& State, bool S
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogWidgets::InputChord(const char* Label, FInputChord& InInputChord)
 {
+	FString LabelStr = Label;
     ImGui::PushID(Label);
    
     ImGui::AlignTextToFramePadding();
     ImGui::BeginDisabled();
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 15);
-    ImGui::InputText("##Shortcut", const_cast<char*>(Label), IM_ARRAYSIZE(Label));
+    ImGui::InputText("##Shortcut", const_cast<char*>(Label), IM_ARRAYSIZE(LabelStr));
     ImGui::EndDisabled();
 
     ImGui::SameLine();
