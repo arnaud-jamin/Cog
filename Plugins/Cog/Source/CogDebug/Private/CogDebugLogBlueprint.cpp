@@ -9,7 +9,7 @@ void UCogDebugLogBlueprint::Log(const UObject* WorldContextObject, const FCogLog
 {
 #if ENABLE_COG
 
-    const FLogCategoryBase* LogCategoryPtr = FCogDebugLog::GetLogCategoryBase(LogCategory);
+    const FCogLogCategoryAlias* LogCategoryPtr = FCogDebugLog::GetLogCategoryBase(LogCategory);
 
     if (LogCategoryPtr == nullptr)
     {
@@ -35,7 +35,7 @@ bool UCogDebugLogBlueprint::IsLogActive(const UObject* WorldContextObject, const
 {
 #if ENABLE_COG
 
-    if (const FLogCategoryBase* LogCategoryPtr = FCogDebugLog::GetLogCategoryBase(LogCategory))
+    if (const FCogLogCategoryAlias* LogCategoryPtr = FCogDebugLog::GetLogCategoryBase(LogCategory))
     {
         if (FCogDebugLog::IsLogCategoryActive(*LogCategoryPtr) == false)
         {

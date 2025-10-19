@@ -104,7 +104,7 @@ public:
 
     static float ScreenToViewport(const float value, const FVector2D& displaySize);
 
-    static bool HasLineOfSight(const UWorld* World, const FVector& Start, const FVector& End, const FCollisionObjectQueryParams& BlockersParams, const FCollisionQueryParams& QueryParams, const COG_LOG_CATEGORY& LogCategory);
+    static bool HasLineOfSight(const UWorld* World, const FVector& Start, const FVector& End, const FCollisionObjectQueryParams& BlockersParams, const FCollisionQueryParams& QueryParams, const FCogLogCategoryAlias& LogCategory);
 
     static bool IsActorAbilitySystemMatchingTags(const UAbilitySystemComponent* AbilitySystem, const FGameplayTagContainer& RequiredTags, const FGameplayTagContainer& IgnoredTags);
 

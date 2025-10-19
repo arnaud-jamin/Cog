@@ -18,11 +18,17 @@ public class CogCommon : ModuleRules
 			}
 			);
 			
+		PublicIncludePathModuleNames.AddRange(
+			new string[]
+			{
+				"CogDebug"
+			}
+			);
 		
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core",
+				"Core"
 			}
             );
 			

@@ -5,7 +5,6 @@
 #include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
 #include "CogHelper.h"
-#include "Editor.h"
 #include "Components/PrimitiveComponent.h"
 #include "EngineUtils.h"
 #include "imgui.h"
@@ -16,6 +15,7 @@
 #include "InputCoreTypes.h"
 
 #if WITH_EDITOR
+#include "Editor.h"
 #include "IAssetTools.h"
 #include "Subsystems/AssetEditorSubsystem.h"
 #endif

@@ -270,7 +270,7 @@ bool UCogSampleFunctionLibrary_Gameplay::HasLineOfSight(
     const FVector& End,
     const FCollisionObjectQueryParams& BlockersParams,
     const FCollisionQueryParams& QueryParams,
-    const COG_LOG_CATEGORY& LogCategory)
+    const FCogLogCategoryAlias& LogCategory)
 {
     IF_COG(FCogDebugDraw::Sphere(LogCategory, World, Start, 5.0f, FColor::Black, false, 0));
     IF_COG(FCogDebugDraw::Sphere(LogCategory, World, End, 10.0f, FColor::Black, false, 0));

@@ -10,11 +10,24 @@
 #endif
 
 #if ENABLE_COG
-
 #include "CogDebug.h"
+#define IF_COG(expr) { expr; }
+#else
+#define IF_COG(expr) (0)
+#endif
 
-#define IF_COG(expr)            { expr; }
-#define COG_LOG_CATEGORY        FLogCategoryBase
+// In no logging configurations all log categories are of type FNoLoggingCategory, which has no relation with
+// FLogCategoryBase. In order to not need to conditionally set the argument alias the type here.
+#if NO_LOGGING
+typedef FNoLoggingCategory FCogLogCategoryAlias;
+#else
+typedef FLogCategoryBase FCogLogCategoryAlias;
+#endif
+
+/**
+ * Logging Macros
+ */
+#if ENABLE_COG && !NO_LOGGING
 
 //--------------------------------------------------------------------------------------------------------------------------
 #define COG_LOG_ACTIVE_FOR_OBJECT(Object)   (FCogDebug::IsDebugActiveForObject(Object))
@@ -81,11 +94,7 @@
         COG_LOG(LogCategory, Verbosity, TEXT("%s | %s"), *GetNameSafe(Object), *FString::Printf(Format, ##__VA_ARGS__));    \
     }                                                                                                                       \
 
-#else //ENABLE_COG
-
-#define IF_COG(expr)                                                            (0)
-#define COG_LOG_CATEGORY                                                        FNoLoggingCategory
-#define COG_LOG_ABILITY(...)                                                    (0)
+#else //ENABLE_COG && !NO_LOGGING
 #define COG_NOTIFY(Format, ...)                                                 (0)
 #define COG_NOTIFY_WARNING(Format, ...)                                         (0)
 #define COG_NOTIFY_ERROR(Format, ...)                                           (0)
@@ -95,6 +104,5 @@
 #define COG_LOG_FUNC(LogCategory, Verbosity, Format, ...)                       (0)
 #define COG_LOG_OBJECT(LogCategory, Verbosity, Actor, Format, ...)              (0)
 #define COG_LOG_OBJECT_NO_CONTEXT(LogCategory, Verbosity, Actor, Format, ...)   (0)
-
-#endif //ENABLE_COG
+#endif //ENABLE_COG && !NO_LOGGING
 

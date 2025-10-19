@@ -551,7 +551,7 @@ bool UCogSampleTargetAcquisition::EvaluateCandidate(
     //--------------------------------------------------------------------------------------------------------------
     // Draw the score of each candidate
     //--------------------------------------------------------------------------------------------------------------
-#if ENABLE_COG
+#if ENABLE_COG && !NO_LOGGING
 
     if (FCogDebugLog::IsLogCategoryActive(LogCogTargetAcquisition))
     {
@@ -603,7 +603,7 @@ bool UCogSampleTargetAcquisition::EvaluateCandidate(
         FCogDebugDraw::String(LogCogTargetAcquisition, EvalParams.Controller, Text, CandidateTargetLocation, FColor::White, EvalParams.IsDebugPersistent);
     }
     
-#endif //ENABLE_COG
+#endif //ENABLE_COG && !NO_LOGGING
 
     return true;
 }
