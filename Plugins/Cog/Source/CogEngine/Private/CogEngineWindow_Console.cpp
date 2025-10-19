@@ -450,7 +450,7 @@ void FCogEngineWindow_Console::RenderCommandList()
                 const FString SelectedCommand = CommandList[SelectedCommandIndex];
                 const FString Help = GetConsoleCommandHelp(SelectedCommand);
                 const auto& HelpStr = StringCast<ANSICHAR>(*Help);
-                ImGui::TextWrapped(HelpStr.Get());
+                ImGui::TextWrapped("%s", HelpStr.Get());
             }
 
             ImGui::Unindent(Indent);

@@ -195,9 +195,9 @@ void FCogAIWindow_Perception::RenderContent()
             }
 
             const FString ActorName = FCogHelper::GetActorName(Actor);
-            auto ActorNameStr = COG_TCHAR_TO_CHAR(*ActorName);
+            auto ActorNameStr = StringCast<ANSICHAR>(*ActorName);
 
-            if (Filter.IsActive() && !Filter.PassFilter(ActorNameStr))
+            if (Filter.IsActive() && !Filter.PassFilter(ActorNameStr.Get()))
             {
                 continue;
             }
@@ -229,7 +229,7 @@ void FCogAIWindow_Perception::RenderContent()
             ImGui::TableNextRow();
             ImGui::TableNextColumn();
             ImGui::PushStyleColor(ImGuiCol_Text, NameColor);
-            bool bOpenActor = ImGui::TreeNodeEx(ActorNameStr, ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_SpanAllColumns | ImGuiTreeNodeFlags_LabelSpanAllColumns);
+            bool bOpenActor = ImGui::TreeNodeEx(ActorNameStr.Get(), ImGuiTreeNodeFlags_SpanFullWidth | ImGuiTreeNodeFlags_SpanAllColumns | ImGuiTreeNodeFlags_LabelSpanAllColumns);
             ImGui::PopStyleColor();
 
 
