@@ -232,6 +232,8 @@ void UCogSubsystem::Tick(float InDeltaTime)
 {
     UWorld* World = GetWorld();
 
+    const float RealDeltaTime = World->DeltaRealTimeSeconds;
+
     //----------------------------------------------------------------------------------------------
     // When changing world the DebugExecBindings can change. 
     //----------------------------------------------------------------------------------------------
@@ -275,15 +277,15 @@ void UCogSubsystem::Tick(float InDeltaTime)
 
     for (FCogWindow* Window : Windows)
     {
-        Window->GameTick(InDeltaTime);
+        Window->GameTick(RealDeltaTime);
     }
 
     const bool ShouldSkipRendering = NetImgui::IsConnected() && bIsSelectionModeActive == false;
     Context.SetSkipRendering(ShouldSkipRendering);
 
-    if (Context.BeginFrame(InDeltaTime))
+    if (Context.BeginFrame(RealDeltaTime))
     {
-        Render(InDeltaTime);
+        Render(RealDeltaTime);
         Context.EndFrame();
     }
 }
