@@ -30,7 +30,7 @@ void FCogEngineWindow_Selection::Initialize()
 
     Config = GetConfig<UCogEngineConfig_Selection>();
 
-    GetOwner()->AddShortcut(Config.Get(), &UCogEngineConfig_Selection::Shortcut_ToggleSelection).BindLambda([this] (){ GetOwner()->SetActivateSelectionMode(!GetOwner()->GetActivateSelectionMode()); });
+    GetOwner()->AddShortcut(Config.Get(), &UCogEngineConfig_Selection::Shortcut_ToggleSelection, FSimpleDelegate::CreateLambda([this] (){ GetOwner()->SetActivateSelectionMode(!GetOwner()->GetActivateSelectionMode()); }));
 
     Asset = GetAsset<UCogEngineDataAsset>();
 

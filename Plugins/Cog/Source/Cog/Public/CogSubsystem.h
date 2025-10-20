@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "CogHelper.h"
 #include "CogImguiContext.h"
+#include "CogInputChord.h"
 #include "CogWindow_Settings.h"
 #include "imgui.h"
 #include "Components/InputComponent.h"
@@ -76,10 +77,10 @@ public:
     template<typename T> 
     T* GetAsset();
 
-    FInputActionHandlerSignature& AddShortcut(const UObject& InInstance, const FProperty& InProperty);
+    void AddShortcut(const UObject& InInstance, const FProperty& InProperty, const FSimpleDelegate& InDelegate);
 
     template<typename TCLass, typename TMember>
-    FInputActionHandlerSignature& AddShortcut(TCLass* InInstance,  TMember TCLass::*InPointerToMember);
+    void AddShortcut(TCLass* InInstance, TMember TCLass::* InPointerToMember, const FSimpleDelegate& InDelegate);
 
     void RebindShortcut(const UCogCommonConfig& InConfig, const FProperty& InProperty);
     
@@ -115,7 +116,7 @@ protected:
         
         FInputActionHandlerSignature Delegate;
 
-        FInputChord InputChord;
+        FCogInputChord InputChord;
     };
 
     virtual void Render(float DeltaTime);
@@ -256,16 +257,20 @@ T* UCogSubsystem::GetAsset()
 
 //--------------------------------------------------------------------------------------------------------------------------
 template <typename TCLass, typename TMember>
-FInputActionHandlerSignature& UCogSubsystem::AddShortcut(TCLass* InInstance, TMember TCLass::* InPointerToMember)
+void UCogSubsystem::AddShortcut(TCLass* InInstance, TMember TCLass::* InPointerToMember, const FSimpleDelegate& InDelegate)
 {
     if (InInstance == nullptr)
-    { return InvalidShortcutDelegate; }
+    {
+        return;
+    }
 
     const FProperty* Property = FCogHelper::FindProperty(InInstance, InPointerToMember);
     if (Property == nullptr)
-    { return InvalidShortcutDelegate; }
+    {
+        return;
+    }
 
-    return AddShortcut(*InInstance, *Property);
+    AddShortcut(*InInstance, *Property, InDelegate);
 }
 
 

@@ -95,16 +95,16 @@ void UCogSubsystem::TryInitialize(UWorld& World)
      Settings = GetConfig<UCogWindowConfig_Settings>();
     
     UCogWindowConfig_Settings* SettingsPtr = Settings.Get();
-    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_ToggleImguiInput).BindLambda([this] () { ToggleInputMode(); });
-    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_LoadLayout1).BindLambda([this] (){ LoadLayout(1); });
-    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_LoadLayout2).BindLambda([this] (){ LoadLayout(2); });
-    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_LoadLayout3).BindLambda([this] (){ LoadLayout(3); });
-    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_LoadLayout4).BindLambda([this] (){ LoadLayout(4); });
-    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_SaveLayout1).BindLambda([this] (){ SaveLayout(1); });
-    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_SaveLayout2).BindLambda([this] (){ SaveLayout(2); });
-    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_SaveLayout3).BindLambda([this] (){ SaveLayout(3); });
-    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_SaveLayout4).BindLambda([this] (){ SaveLayout(4); });    
-    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_ResetLayout).BindLambda([this] (){ ResetLayout(); });
+    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_ToggleImguiInput, FSimpleDelegate::CreateLambda([this] () { ToggleInputMode(); }));
+    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_LoadLayout1,      FSimpleDelegate::CreateLambda([this] () { LoadLayout(1); }));
+    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_LoadLayout2,      FSimpleDelegate::CreateLambda([this] () { LoadLayout(2); }));
+    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_LoadLayout3,      FSimpleDelegate::CreateLambda([this] () { LoadLayout(3); }));
+    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_LoadLayout4,      FSimpleDelegate::CreateLambda([this] () { LoadLayout(4); }));
+    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_SaveLayout1,      FSimpleDelegate::CreateLambda([this] () { SaveLayout(1); }));
+    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_SaveLayout2,      FSimpleDelegate::CreateLambda([this] () { SaveLayout(2); }));
+    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_SaveLayout3,      FSimpleDelegate::CreateLambda([this] () { SaveLayout(3); }));
+    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_SaveLayout4,      FSimpleDelegate::CreateLambda([this] () { SaveLayout(4); }));
+    AddShortcut(SettingsPtr, &UCogWindowConfig_Settings::Shortcut_ResetLayout,      FSimpleDelegate::CreateLambda([this] () { ResetLayout(); }));
     
      LayoutsWindow = AddWindow<FCogWindow_Layouts>("Window.Layouts");
      SettingsWindow = AddWindow<FCogWindow_Settings>("Window.Settings");
@@ -1051,12 +1051,12 @@ bool UCogSubsystem::GetActivateSelectionMode() const
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-FInputActionHandlerSignature& UCogSubsystem::AddShortcut(const UObject& InInstance, const FProperty& InProperty)
+void UCogSubsystem::AddShortcut(const UObject& InInstance, const FProperty& InProperty, const FSimpleDelegate& Delegate)
 {
     FCogShortcut& Shortcut = Shortcuts.AddDefaulted_GetRef();
     Shortcut.PropertyName = InProperty.GetFName();
     Shortcut.Config = &InInstance;
-    return Shortcut.Delegate;
+    Shortcut.Delegate = Delegate;
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
@@ -1070,12 +1070,22 @@ bool UCogSubsystem::BindShortcut(FCogShortcut& InShortcut) const
     if (StructProperty == nullptr)
     { return false; }
 
-    const FInputChord* InputChord = static_cast<FInputChord*>(StructProperty->ContainerPtrToValuePtr<void>(Config));
+    const FCogInputChord* InputChord = static_cast<FCogInputChord*>(StructProperty->ContainerPtrToValuePtr<void>(Config));
     if (InputChord == nullptr)
     { return false; }
         
     FInputKeyBinding InputBinding(*InputChord, IE_Pressed);
-    InputBinding.KeyDelegate.GetDelegateForManualSet() = InShortcut.Delegate;
+
+    InputBinding.KeyDelegate.GetDelegateForManualSet() = FInputActionHandlerSignature::CreateLambda([this, &InShortcut]()
+        {
+            FCogImGuiContextScope ImGuiContextScope(Context);
+
+            if (ImGui::GetIO().WantTextInput == false || InShortcut.InputChord.bTriggerWhenImguiWantTextInput)
+            {
+                InShortcut.Delegate.ExecuteIfBound();
+            }
+        });
+
 
     if (UInputComponent* InputComponentPtr = InputComponent.Get())
     {
@@ -1123,7 +1133,7 @@ void UCogSubsystem::TryDisableCommandsConflictingWithShortcuts(UPlayerInput* Pla
     if (Settings->bDisableConflictingCommands == false)
     { return; }
     
-    TArray<FInputChord>& PrioritizedShortcuts = FCogImguiInputHelper::GetPrioritizedShortcuts();
+    TArray<FCogInputChord>& PrioritizedShortcuts = FCogImguiInputHelper::GetPrioritizedShortcuts();
     for (const FCogShortcut& Shortcut : Shortcuts)
     {
         PrioritizedShortcuts.Add(Shortcut.InputChord);

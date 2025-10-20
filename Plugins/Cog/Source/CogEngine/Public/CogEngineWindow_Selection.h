@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "CogCommonConfig.h"
 #include "CogEngineDataAsset.h"
+#include "CogInputChord.h"
 #include "GameFramework/Actor.h"
 #include "CogWindow.h"
 #include "Framework/Commands/InputChord.h"
@@ -88,7 +89,7 @@ public:
     int32 SelectedClassIndex = 0;
 
     UPROPERTY(Config)
-    FInputChord Shortcut_ToggleSelection = FInputChord(EKeys::F5);
+    FCogInputChord Shortcut_ToggleSelection = FCogInputChord(EKeys::F5, true);
     
     virtual void Reset() override
     {
@@ -97,6 +98,6 @@ public:
         bReapplySelection = true;
         SelectionName.Reset();
         SelectedClassIndex = 0;
-        Shortcut_ToggleSelection = FInputChord(EKeys::F5);
+        Shortcut_ToggleSelection = FCogInputChord(EKeys::F5, true);
     }
 };

@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "CogCommonConfig.h"
+#include "CogInputChord.h"
 #include "CogWindow.h"
 #include "Framework/Commands/InputChord.h"
 #include "CogWindow_Settings.generated.h"
@@ -101,34 +102,34 @@ public:
     FString Font;
 
     UPROPERTY(Config)
-    FInputChord Shortcut_ToggleImguiInput =  FInputChord(EKeys::F1);
+    FCogInputChord Shortcut_ToggleImguiInput = FCogInputChord(EKeys::F1, true);
 
     UPROPERTY(Config)
-    FInputChord Shortcut_LoadLayout1 = FInputChord(EKeys::F2);
+    FCogInputChord Shortcut_LoadLayout1 = FCogInputChord(EKeys::F2, true);
 
     UPROPERTY(Config)
-    FInputChord Shortcut_LoadLayout2 = FInputChord(EKeys::F3);
+    FCogInputChord Shortcut_LoadLayout2 = FCogInputChord(EKeys::F3, true);
 
     UPROPERTY(Config)
-    FInputChord Shortcut_LoadLayout3 = FInputChord(EKeys::F4);
+    FCogInputChord Shortcut_LoadLayout3 = FCogInputChord(EKeys::F4, true);
 
     UPROPERTY(Config)
-    FInputChord Shortcut_LoadLayout4 = FInputChord();
+    FCogInputChord Shortcut_LoadLayout4 = FCogInputChord();
 
     UPROPERTY(Config)
-    FInputChord Shortcut_SaveLayout1 = FInputChord();
+    FCogInputChord Shortcut_SaveLayout1 = FCogInputChord();
 
     UPROPERTY(Config)
-    FInputChord Shortcut_SaveLayout2 = FInputChord();
+    FCogInputChord Shortcut_SaveLayout2 = FCogInputChord();
 
     UPROPERTY(Config)
-    FInputChord Shortcut_SaveLayout3 = FInputChord();
+    FCogInputChord Shortcut_SaveLayout3 = FCogInputChord();
 
     UPROPERTY(Config)
-    FInputChord Shortcut_SaveLayout4 = FInputChord();
+    FCogInputChord Shortcut_SaveLayout4 = FCogInputChord();
     
     UPROPERTY(Config)
-    FInputChord Shortcut_ResetLayout = FInputChord();
+    FCogInputChord Shortcut_ResetLayout = FCogInputChord();
 
     //UPROPERTY(Config)
     //bool bNavEnableGamepad = false;
@@ -155,16 +156,16 @@ public:
         bDisableShortcutsWhenImGuiWantTextInput = false;
         WidgetAlignment = ECogWidgetAlignment::Right;
         ShowWidgetBorders = false;
-        Shortcut_ToggleImguiInput =  FInputChord(EKeys::F1);
-        Shortcut_LoadLayout1 = FInputChord(EKeys::F2);
-        Shortcut_LoadLayout2 = FInputChord(EKeys::F3);
-        Shortcut_LoadLayout3 = FInputChord(EKeys::F4);
-        Shortcut_LoadLayout4 = FInputChord();
-        Shortcut_SaveLayout1 = FInputChord();
-        Shortcut_SaveLayout2 = FInputChord();
-        Shortcut_SaveLayout3 = FInputChord();
-        Shortcut_SaveLayout4 = FInputChord();
-        Shortcut_ResetLayout = FInputChord();
+        Shortcut_ToggleImguiInput = FCogInputChord(EKeys::F1, true);
+        Shortcut_LoadLayout1 = FCogInputChord(EKeys::F2, true);
+        Shortcut_LoadLayout2 = FCogInputChord(EKeys::F3, true);
+        Shortcut_LoadLayout3 = FCogInputChord(EKeys::F4, true);
+        Shortcut_LoadLayout4 = FCogInputChord();
+        Shortcut_SaveLayout1 = FCogInputChord();
+        Shortcut_SaveLayout2 = FCogInputChord();
+        Shortcut_SaveLayout3 = FCogInputChord();
+        Shortcut_SaveLayout4 = FCogInputChord();
+        Shortcut_ResetLayout = FCogInputChord();
         Font = FString();
     }
 };

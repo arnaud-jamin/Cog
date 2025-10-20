@@ -4,6 +4,7 @@
 #include "CogWindow.h"
 
 class UPlayerInput;
+struct FCogInputChord;
 
 class COG_API FCogWindow_Layouts : public FCogWindow
 {
@@ -17,7 +18,7 @@ protected:
 
     virtual void RenderContent() override;
 
-    virtual void RenderLoadLayoutMenuItem(int InLayoutIndex, const FInputChord& InInputChord);
+    virtual void RenderLoadLayoutMenuItem(int InLayoutIndex, const FCogInputChord& InInputChord);
 
-    virtual void RenderSaveLayoutMenuItem(int InLayoutIndex, const FInputChord& InInputChord);
+    virtual void RenderSaveLayoutMenuItem(int InLayoutIndex, const FCogInputChord& InInputChord);
 };

@@ -21,10 +21,11 @@ void FCogEngineWindow_TimeScale::Initialize()
     Config = GetConfig<UCogEngineWindowConfig_TimeScale>();
 
     UCogEngineWindowConfig_TimeScale* ConfigPtr = Config.Get();
-    GetOwner()->AddShortcut(ConfigPtr, &UCogEngineWindowConfig_TimeScale::Shortcut_FasterTimeScale).BindRaw(this, &FCogEngineWindow_TimeScale::FasterTimeScale);
-    GetOwner()->AddShortcut(ConfigPtr, &UCogEngineWindowConfig_TimeScale::Shortcut_SlowerTimeScale).BindRaw(this, &FCogEngineWindow_TimeScale::SlowerTimeScale);
-    GetOwner()->AddShortcut(ConfigPtr, &UCogEngineWindowConfig_TimeScale::Shortcut_ResetTimeScale).BindRaw(this, &FCogEngineWindow_TimeScale::ResetTimeScale);
-    GetOwner()->AddShortcut(ConfigPtr, &UCogEngineWindowConfig_TimeScale::Shortcut_ZeroTimeScale).BindRaw(this, &FCogEngineWindow_TimeScale::ZeroTimeScale);
+
+    GetOwner()->AddShortcut(ConfigPtr, &UCogEngineWindowConfig_TimeScale::Shortcut_FasterTimeScale, FSimpleDelegate::CreateLambda([this]() { FasterTimeScale(); }));
+    GetOwner()->AddShortcut(ConfigPtr, &UCogEngineWindowConfig_TimeScale::Shortcut_SlowerTimeScale, FSimpleDelegate::CreateLambda([this]() { SlowerTimeScale(); }));
+    GetOwner()->AddShortcut(ConfigPtr, &UCogEngineWindowConfig_TimeScale::Shortcut_ResetTimeScale,  FSimpleDelegate::CreateLambda([this]() { ResetTimeScale(); }));
+    GetOwner()->AddShortcut(ConfigPtr, &UCogEngineWindowConfig_TimeScale::Shortcut_ZeroTimeScale,   FSimpleDelegate::CreateLambda([this]() { ZeroTimeScale(); }));
 }
 
 //--------------------------------------------------------------------------------------------------------------------------

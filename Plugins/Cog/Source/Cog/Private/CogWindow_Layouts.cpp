@@ -42,7 +42,7 @@ void FCogWindow_Layouts::RenderContent()
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogWindow_Layouts::RenderLoadLayoutMenuItem(int InLayoutIndex, const FInputChord& InInputChord)
+void FCogWindow_Layouts::RenderLoadLayoutMenuItem(int InLayoutIndex, const FCogInputChord& InInputChord)
 {
     const auto Shortcut = StringCast<ANSICHAR>(*FCogImguiInputHelper::InputChordToString(InInputChord));
     const auto Text = StringCast<ANSICHAR>(*FString::Printf(TEXT("Load Layout %d"), InLayoutIndex));
@@ -54,7 +54,7 @@ void FCogWindow_Layouts::RenderLoadLayoutMenuItem(int InLayoutIndex, const FInpu
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-void FCogWindow_Layouts::RenderSaveLayoutMenuItem(int InLayoutIndex, const FInputChord& InInputChord)
+void FCogWindow_Layouts::RenderSaveLayoutMenuItem(int InLayoutIndex, const FCogInputChord& InInputChord)
 {
     const auto Shortcut = StringCast<ANSICHAR>(*FCogImguiInputHelper::InputChordToString(InInputChord));
     const auto Text = StringCast<ANSICHAR>(*FString::Printf(TEXT("Save Layout %d"), InLayoutIndex));

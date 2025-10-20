@@ -1,5 +1,6 @@
 #include "CogImguiInputHelper.h"
 
+#include "CogInputChord.h"
 #include "Engine/World.h"
 #include "Framework/Application/SlateApplication.h"
 #include "Framework/Commands/UICommandInfo.h"
@@ -16,7 +17,7 @@
 #endif //WITH_EDITOR
 
 //--------------------------------------------------------------------------------------------------------------------------
- TArray<FInputChord> FCogImguiInputHelper::CogPrioritizedShortcuts;
+ TArray<FCogInputChord> FCogImguiInputHelper::CogPrioritizedShortcuts;
 
 //--------------------------------------------------------------------------------------------------------------------------
 APlayerController* FCogImguiInputHelper::GetFirstLocalPlayerController(const UWorld& World)
@@ -59,7 +60,7 @@ bool FCogImguiInputHelper::IsTopPriorityKeyEvent(const UPlayerInput& PlayerInput
     //------------------------------------------------------------------------------------------------
     // We want the user to be able to use Cog shortcuts when imgui has the input.
 	//------------------------------------------------------------------------------------------------
-    for (const FInputChord& InputChord : CogPrioritizedShortcuts)
+    for (const FCogInputChord& InputChord : CogPrioritizedShortcuts)
     {
         if (IsInputChordMatchingKeyInfo(InKeyEvent, InputChord))
         { return true; }
@@ -335,7 +336,7 @@ bool FCogImguiInputHelper::DisableCommandsConflictingWithShortcuts(UPlayerInput&
 {
     bool HasDisabled = false;
     
-    for (const FInputChord& Shortcut : CogPrioritizedShortcuts)
+    for (const FCogInputChord& Shortcut : CogPrioritizedShortcuts)
     {
         for (FKeyBind& KeyBind : PlayerInput.DebugExecBindings)
         {

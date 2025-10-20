@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CogInputChord.h"
 #include "imgui.h"
 #include "GenericPlatform/ICursor.h"
 
@@ -74,7 +75,7 @@ public:
 
     static bool IsKeyBoundToCommand(const UPlayerInput* InPlayerInput, const FKeyEvent& KeyEvent);
 
-    static TArray<FInputChord>& GetPrioritizedShortcuts() { return CogPrioritizedShortcuts; }
+    static TArray<FCogInputChord>& GetPrioritizedShortcuts() { return CogPrioritizedShortcuts; }
 
     static bool DisableCommandsConflictingWithShortcuts(UPlayerInput& PlayerInput);
 
@@ -85,5 +86,5 @@ public:
     }
 
 private:
-    static TArray<FInputChord> CogPrioritizedShortcuts; 
+    static TArray<FCogInputChord> CogPrioritizedShortcuts;
 };

@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "CogEngineReplicator.h"
+#include "CogInputChord.h"
 #include "CogWindow.h"
 #include "Framework/Commands/InputChord.h"
 #include "CogEngineWindow_TimeScale.generated.h"
@@ -66,10 +67,10 @@ public:
         TimeScales = { 0.00f, 0.01f, 0.10f, 0.50f, 1.00f, 2.00f, 5.00f, 10.0f };
         TimeScaleModifiedColor = FColor(255, 30, 210, 255);
 
-        Shortcut_ZeroTimeScale = FInputChord(EKeys::NumPadZero);
-        Shortcut_ResetTimeScale = FInputChord(EKeys::NumPadOne);
-        Shortcut_FasterTimeScale = FInputChord(EKeys::Add);
-        Shortcut_SlowerTimeScale = FInputChord(EKeys::Subtract);
+        Shortcut_ZeroTimeScale = FCogInputChord(EKeys::NumPadZero);
+        Shortcut_ResetTimeScale = FCogInputChord(EKeys::NumPadOne);
+        Shortcut_FasterTimeScale = FCogInputChord(EKeys::Add);
+        Shortcut_SlowerTimeScale = FCogInputChord(EKeys::Subtract);
     }
     
     UPROPERTY(Config)
@@ -85,14 +86,14 @@ public:
     FColor TimeScaleModifiedColor = FColor(255, 30, 210, 255);
 
     UPROPERTY(Config)
-    FInputChord Shortcut_ZeroTimeScale = FInputChord(EKeys::NumPadZero);
+    FCogInputChord Shortcut_ZeroTimeScale = FCogInputChord(EKeys::NumPadZero);
     
     UPROPERTY(Config)
-    FInputChord Shortcut_ResetTimeScale = FInputChord(EKeys::NumPadOne);
+    FCogInputChord Shortcut_ResetTimeScale = FCogInputChord(EKeys::NumPadOne);
 
     UPROPERTY(Config)
-    FInputChord Shortcut_FasterTimeScale = FInputChord(EKeys::Add);
+    FCogInputChord Shortcut_FasterTimeScale = FCogInputChord(EKeys::Add);
 
     UPROPERTY(Config)
-    FInputChord Shortcut_SlowerTimeScale = FInputChord(EKeys::Subtract);
+    FCogInputChord Shortcut_SlowerTimeScale = FCogInputChord(EKeys::Subtract);
 };

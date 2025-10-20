@@ -4,6 +4,7 @@
 #include "CogDebug.h"
 #include "CogImguiHelper.h"
 #include "CogImguiInputHelper.h"
+#include "CogInputChord.h"
 #include "CogHelper.h"
 #include "Components/PrimitiveComponent.h"
 #include "EngineUtils.h"
@@ -516,7 +517,7 @@ bool FCogWidgets::CheckBoxState(const char* Label, ECheckBoxState& State, bool S
 }
 
 //--------------------------------------------------------------------------------------------------------------------------
-bool FCogWidgets::InputChord(const char* Label, FInputChord& InInputChord)
+bool FCogWidgets::InputChord(const char* Label, FCogInputChord& InInputChord)
 {
     ImGui::PushID(Label);
    
@@ -527,7 +528,11 @@ bool FCogWidgets::InputChord(const char* Label, FInputChord& InInputChord)
     ImGui::EndDisabled();
 
     ImGui::SameLine();
-    const bool HasChanged = InputChord(InInputChord);
+    bool HasChanged = InputChord(InInputChord);
+
+    ImGui::SameLine();
+    HasChanged |= ImGui::Checkbox("", &InInputChord.bTriggerWhenImguiWantTextInput);
+    ImGui::SetItemTooltip("Trigger when imgui wants text input");
 
     ImGui::PopID();
 
@@ -1544,7 +1549,7 @@ FString FCogWidgets::FormatShortcutName(const FString& InShortcutName)
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogWidgets::TextInputChordProperty(UObject& InConfig, const FProperty& InInputChordProperty)
 {
-    const FInputChord* InputChord = InInputChordProperty.ContainerPtrToValuePtr<FInputChord>(&InConfig);
+    const FCogInputChord* InputChord = InInputChordProperty.ContainerPtrToValuePtr<FCogInputChord>(&InConfig);
     if (InputChord == nullptr)
     { return; }
 
@@ -1563,7 +1568,7 @@ void FCogWidgets::TextInputChordProperty(UObject& InConfig, const FProperty& InI
 //--------------------------------------------------------------------------------------------------------------------------
 bool FCogWidgets::InputChordProperty(UObject& InConfig, const FProperty& InInputChordProperty)
 {
-    FInputChord* InputChord = InInputChordProperty.ContainerPtrToValuePtr<FInputChord>(&InConfig);
+    FCogInputChord* InputChord = InInputChordProperty.ContainerPtrToValuePtr<FCogInputChord>(&InConfig);
     if (InputChord == nullptr)
     { return false; }
     
@@ -1580,7 +1585,7 @@ bool FCogWidgets::IsConfigContainingInputChords(const UObject& InConfig)
     {
         if (const FStructProperty* StructProperty = CastField<FStructProperty>(*It))
         {
-            if (StructProperty->Struct == FInputChord::StaticStruct())
+            if (StructProperty->Struct == FCogInputChord::StaticStruct())
             {
                 return true;
             }
@@ -1599,7 +1604,7 @@ bool FCogWidgets::AllInputChordsOfConfig(UObject& InConfig, FProperty** InModifi
     {
         if (FStructProperty* StructProperty = CastField<FStructProperty>(*It))
         {
-            if (StructProperty->Struct == FInputChord::StaticStruct())
+            if (StructProperty->Struct == FCogInputChord::StaticStruct())
             {
                 if (FCogWidgets::InputChordProperty(InConfig, *StructProperty))
                 {
@@ -1624,7 +1629,7 @@ void FCogWidgets::TextOfAllInputChordsOfConfig(UObject& InConfig)
     {
         if (const FStructProperty* StructProperty = CastField<FStructProperty>(*It))
         {
-            if (StructProperty->Struct == FInputChord::StaticStruct())
+            if (StructProperty->Struct == FCogInputChord::StaticStruct())
             {
                 TextInputChordProperty(InConfig, *StructProperty);
             }
