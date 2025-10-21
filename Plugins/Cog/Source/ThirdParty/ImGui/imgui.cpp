@@ -20677,7 +20677,7 @@ static bool Platform_OpenInShellFn_DefaultImpl(ImGuiContext*, const char* path)
 {
     return (INT_PTR)::ShellExecuteA(NULL, "open", path, NULL, NULL, SW_SHOWDEFAULT) > 32;
 }
-#else
+#elif defined(__APPLE__) || defined(__linux__)
 #include <sys/wait.h>
 #include <unistd.h>
 static bool Platform_OpenInShellFn_DefaultImpl(ImGuiContext*, const char* path)
@@ -20702,10 +20702,10 @@ static bool Platform_OpenInShellFn_DefaultImpl(ImGuiContext*, const char* path)
         return WEXITSTATUS(status) == 0;
     }
 }
-#endif
 #else
 static bool Platform_OpenInShellFn_DefaultImpl(ImGuiContext*, const char*) { return false; }
 #endif // Default shell handlers
+#endif
 
 //-----------------------------------------------------------------------------
 

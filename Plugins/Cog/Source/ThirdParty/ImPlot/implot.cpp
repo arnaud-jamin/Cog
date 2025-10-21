@@ -911,7 +911,7 @@ ImPlotTime MkGmtTime(struct tm *ptm) {
     ImPlotTime t;
 #ifdef _WIN32
     t.S = _mkgmtime(ptm);
-#else
+#elif defined(__APPLE__) || defined(__linux__)
     t.S = timegm(ptm);
 #endif
     if (t.S < 0)
@@ -926,8 +926,10 @@ tm* GetGmtTime(const ImPlotTime& t, tm* ptm)
     return ptm;
   else
     return nullptr;
-#else
+#elif defined(__APPLE__) || defined(__linux__)
   return gmtime_r(&t.S, ptm);
+#else
+    return nullptr;
 #endif
 }
 
@@ -945,8 +947,10 @@ tm* GetLocTime(const ImPlotTime& t, tm* ptm) {
     return ptm;
   else
     return nullptr;
-#else
+#elif defined(__APPLE__) || defined(__linux__)
     return localtime_r(&t.S, ptm);
+#else
+    return nullptr;
 #endif
 }
 
