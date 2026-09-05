@@ -39,7 +39,7 @@ public class CogImgui : ModuleRules
             });
         }
 
-        PublicDefinitions.Add("IMGUI_USER_CONFIG=\"CogImGuiConfig.h\"");
+        PublicDefinitions.Add("IMGUI_USER_CONFIG=\"CogImguiConfig.h\"");
         PublicDefinitions.Add("IMGUI_API=COGIMGUI_API");
         PublicDefinitions.Add("IMPLOT_API=COGIMGUI_API");
     }
