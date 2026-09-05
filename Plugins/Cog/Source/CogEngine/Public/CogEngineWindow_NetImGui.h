@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "CogCommonConfig.h"
 #include "CogWindow.h"
-#include "CogEngineWindow_NetImgui.generated.h"
+#include "CogEngineWindow_NetImGui.generated.h"
 
 class UCogEngineWindowConfig_NetImgui;
 
