@@ -176,6 +176,11 @@ void FCogAbilityWindow_Attributes::RenderContent()
                 TArray<FGameplayAttribute> AllAttributes;
                 for (TFieldIterator<FProperty> It(AttributeSet->GetClass()); It; ++It)
                 {
+                    if (!FGameplayAttribute::IsSupportedProperty(*It))
+                    {
+                        continue;
+                    }
+
                     FGameplayAttribute Attribute = *It;
                     if (Attribute.IsValid())
                     {
