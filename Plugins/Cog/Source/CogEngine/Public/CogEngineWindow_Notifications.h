@@ -12,7 +12,7 @@ class UCogEngineConfig_Notifications;
 class FCogEngineWindow_Notifications;
 
 //--------------------------------------------------------------------------------------------------------------------------
-class FCogNotificationOutputDevice : public FOutputDevice
+class COGENGINE_API FCogNotificationOutputDevice : public FOutputDevice
 {
 public:
     friend class FCogEngineWindow_Notifications;
