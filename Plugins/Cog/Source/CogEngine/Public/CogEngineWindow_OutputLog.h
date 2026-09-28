@@ -11,7 +11,7 @@ class UCogEngineConfig_OutputLog;
 class FCogEngineWindow_OutputLog;
 
 //--------------------------------------------------------------------------------------------------------------------------
-class FCogLogOutputDevice : public FOutputDevice
+class COGENGINE_API FCogLogOutputDevice : public FOutputDevice
 {
 public:
     friend class FCogEngineWindow_OutputLog;
