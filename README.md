@@ -459,7 +459,7 @@ Log and debug draw functions can be filtered by the selected actor.
 
 ### Testing the sample
 
-You must have Unreal 5.5 or greater and Visual Studio to launch the sample
+You must have Unreal 5.8 or greater and Visual Studio to launch the sample
 
 1. Download the code
 2. Right Click `Cog.uproject` and click `Generate Visual Studio project files`
@@ -476,7 +476,7 @@ You must have Unreal 5.5 or greater and Visual Studio to launch the sample
 > The way Cog integrates in your project has changed. If you didn't modify Cog sources, you should remove all your existing Cog source files before updating. If you did modify Cog sources and still have a `CogWindow` folder, consider deleting it before updating. Previously Cog was integrated from your project GameState class. Now it is integrated from UWorldSubsystem in your project as described in the integration guide below.
 
 The Cog repository has the following structure:
-- `CogSample` - A Sample that demonstrate various Cog functionalities. The project was saved in Unreal 5.5
+- `CogSample` - A Sample that demonstrate various Cog functionalities. The project was saved in Unreal 5.8
 - `Plugins/CogAbility` - ImGui windows for the Gameplay Ability System (Abilities, Effects, Tags, ...)
 - `Plugins/CogAI` - ImGui windows for AI (Behavior Tree, Blackboard)
 - `Plugins/CogInput` - ImGui windows for the Enhanced Input library (Input action, Gamepad)
