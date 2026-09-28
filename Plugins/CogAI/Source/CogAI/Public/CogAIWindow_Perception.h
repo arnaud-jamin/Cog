@@ -39,31 +39,31 @@ class UCogAIConfig_Perception : public UCogCommonConfig
 
 public:
 
-    UPROPERTY(EditAnywhere, Config)
+    UPROPERTY(EditAnywhere, Config, Category = "Cog")
     FLinearColor ActiveColor = FLinearColor(0.20f, 0.85f, 0.35f, 1.f);
 
-    UPROPERTY(EditAnywhere, Config)
+    UPROPERTY(EditAnywhere, Config, Category = "Cog")
     FLinearColor InactiveColor = FLinearColor(0.65f, 0.65f, 0.65f, 1.f);
 
-    UPROPERTY(EditAnywhere, Config)
+    UPROPERTY(EditAnywhere, Config, Category = "Cog")
     FLinearColor SightSenseColor = FLinearColor(0.90f, 0.75f, 0.10f, 1.f);
 
-    UPROPERTY(EditAnywhere, Config)
+    UPROPERTY(EditAnywhere, Config, Category = "Cog")
     FLinearColor HearingSenseColor = FLinearColor(0.20f, 0.60f, 1.00f, 1.f);
 
-    UPROPERTY(EditAnywhere, Config)
+    UPROPERTY(EditAnywhere, Config, Category = "Cog")
     FLinearColor DamageSenseColor = FLinearColor(0.95f, 0.20f, 0.20f, 1.f);
 
-    UPROPERTY(EditAnywhere, Config)
+    UPROPERTY(EditAnywhere, Config, Category = "Cog")
     FLinearColor TouchSenseColor = FLinearColor(0.20f, 0.90f, 0.45f, 1.f);
 
-    UPROPERTY(EditAnywhere, Config)
+    UPROPERTY(EditAnywhere, Config, Category = "Cog")
     FLinearColor TeamSenseColor = FLinearColor(0.75f, 0.20f, 0.90f, 1.f);
 
-    UPROPERTY(EditAnywhere, Config)
+    UPROPERTY(EditAnywhere, Config, Category = "Cog")
     FLinearColor PredictionSenseColor = FLinearColor(0.95f, 0.50f, 0.20f, 1.f);
 
-    UPROPERTY(EditAnywhere, Config)
+    UPROPERTY(EditAnywhere, Config, Category = "Cog")
     FLinearColor DefaultSenseColor = FLinearColor(0.7f, 0.7f, 0.7f, 1.f);
 
     virtual void Reset() override 
