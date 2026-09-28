@@ -22,7 +22,7 @@
 #include "CogEngineWindow_Levels.h"
 #include "CogEngineWindow_LogCategories.h"
 #include "CogEngineWindow_Metrics.h"
-#include "CogEngineWindow_NetImgui.h"
+#include "CogEngineWindow_NetImGui.h"
 #include "CogEngineWindow_NetEmulation.h"
 #include "CogEngineWindow_Notifications.h"
 #include "CogEngineWindow_OutputLog.h"
