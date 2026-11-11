@@ -4,6 +4,7 @@
 #include "imgui.h"
 #include "BuildSettings.h"
 #include "GenericPlatform/GenericPlatformMisc.h"
+#include "Misc/App.h"
 
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_BuildInfo::Initialize()
