@@ -158,7 +158,7 @@ void FCogEngineWindow_OutputLog::Copy() const
     if (BufferData == nullptr)
     { return; }
 
-    FStringBuilderBase StringBuilder;
+    TStringBuilder<1024> StringBuilder;
     for (const FLogInfo& LogInfo : LogInfos)
     {
         StringBuilder.Append(FString::Printf(TEXT("[%3d] [%s] [%s] "), GetDisplayedFrame(LogInfo), *LogInfo.Category.ToString(), ToString(LogInfo.Verbosity)));

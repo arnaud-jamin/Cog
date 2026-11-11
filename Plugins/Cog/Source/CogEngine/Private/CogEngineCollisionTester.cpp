@@ -98,7 +98,7 @@ void ACogEngineCollisionTester::Query() const
                 case ECogEngine_CollisionQueryBy::ObjectType:
                 {
                     FCollisionObjectQueryParams QueryObjectParams;
-                    QueryObjectParams.ObjectTypesToQuery = ObjectTypesToQuery;
+                    QueryObjectParams.SetObjectTypesToQuery((int64)(uint32)ObjectTypesToQuery);
 
                     switch (OverlapMode)
                     {
@@ -178,7 +178,7 @@ void ACogEngineCollisionTester::Query() const
                 case ECogEngine_CollisionQueryBy::ObjectType:
                 {
                     FCollisionObjectQueryParams QueryObjectParams;
-                    QueryObjectParams.ObjectTypesToQuery = ObjectTypesToQuery;
+                    QueryObjectParams.SetObjectTypesToQuery((int64)(uint32)ObjectTypesToQuery);
 
                     switch (TraceMode)
                     {
@@ -277,7 +277,7 @@ void ACogEngineCollisionTester::Query() const
                 case ECogEngine_CollisionQueryBy::ObjectType:
                 {
                     FCollisionObjectQueryParams QueryObjectParams;
-                    QueryObjectParams.ObjectTypesToQuery = ObjectTypesToQuery;
+                    QueryObjectParams.SetObjectTypesToQuery((int64)(uint32)ObjectTypesToQuery);
 
                     switch (TraceMode)
                     {

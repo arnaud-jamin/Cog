@@ -190,7 +190,7 @@ void FCogEngineWindow_CollisionViewer::RenderContent()
     FCollisionQueryParams QueryParams(TraceTag, SCENE_QUERY_STAT_ONLY(CogHitDetection), Config->UseComplexCollisions);
 
     FCollisionObjectQueryParams QueryObjectParams;
-    QueryObjectParams.ObjectTypesToQuery = Config->ObjectTypesToQuery;
+    QueryObjectParams.SetObjectTypesToQuery((int64)(uint32)Config->ObjectTypesToQuery);
 
     FCollisionShape QueryShape;
     QueryShape.SetSphere(QueryRadius);

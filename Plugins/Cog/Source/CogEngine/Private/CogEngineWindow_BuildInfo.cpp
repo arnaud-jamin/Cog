@@ -108,7 +108,7 @@ void FCogEngineWindow_BuildInfo::RenderContent()
 //--------------------------------------------------------------------------------------------------------------------------
 void FCogEngineWindow_BuildInfo::BuildText()
 {
-    FStringBuilderBase S;
+    TStringBuilder<256> S;
     bool AddSeparator = false;
 
     if (Config->ShowBranchName) { S.Append(BuildSettings::GetBranchName()); S.Append(Config->Separator); }
